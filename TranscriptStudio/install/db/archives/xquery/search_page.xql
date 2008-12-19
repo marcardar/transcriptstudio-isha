@@ -17,7 +17,7 @@ return
         <td valign="bottom">
         <form id="searchbox">
             <table id="searchBox"><tr>
-                <td><input type="text" name="search" size="50"/></td>
+                <td><input type="text" name="search" size="50" value="{$searchString}"/></td>
                 <td><input type="submit" value="Transcript Search"/></td>
             </tr></table>
         </form>
