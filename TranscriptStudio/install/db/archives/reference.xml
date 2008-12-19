@@ -1,0 +1,18 @@
+<reference>
+	<categoryTypes>
+		<categoryType id="topic" name="Topic" contentType="outline"/>
+		<categoryType id="question" name="Question" contentType="outline"/>
+		<categoryType id="joke" name="Joke" contentType="outline"/>
+		<categoryType id="story" name="Story" contentType="outline"/>
+		<categoryType id="quote" name="Quote" contentType="inline"/>
+		<categoryType id="music" name="Music" contentType="outline"/>
+		<categoryType id="process" name="Process" contentType="outline"/>
+		<categoryType id="soundbite" name="Sound Bite" contentType="both"/>
+	</categoryTypes>
+    <categories>
+    </categories>
+	<conceptHierarchy>
+	</conceptHierarchy>
+    <conceptSynonymGroups>
+    </conceptSynonymGroups>
+</reference>

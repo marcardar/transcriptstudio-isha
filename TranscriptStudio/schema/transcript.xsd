@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="session">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element minOccurs="1" maxOccurs="1"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="transcript">
+		<xs:complexType>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element minOccurs="1" maxOccurs="1" ref="outline"/>
+				<xs:element minOccurs="1" maxOccurs="1" ref="content"/>
+			</xs:choice>
+			<xs:attribute name="id" type="xs:string" use="required"/>
+			<xs:attribute name="importedAt" type="xs:dateTime"/>
+			<xs:attribute name="importedBy" type="xs:string"/>
+			<xs:attribute name="transcribedBy" type="xs:string"/>
+			<xs:attribute name="proofedBy" type="xs:string"/>
+			<xs:attribute name="lastModifiedAt" type="xs:dateTime"/>
+			<xs:attribute name="lastModifiedBy" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="outline">
+		<xs:complexType>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element minOccurs="0" maxOccurs="unbounded" ref="tag"/>
+				<xs:element minOccurs="1" maxOccurs="1" ref="outline"/>
+				<xs:element minOccurs="1" maxOccurs="1" ref="content"/>
+			</xs:choice>
+			<xs:attribute name="id" type="xs:ID"/>
+			<xs:attribute name="comment" type="xs:string"/>
+			<xs:attribute name="lastModifiedAt" type="xs:dateTime"/>
+			<xs:attribute name="lastModifiedBy" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>			
+	<xs:element name="segment">
+		<xs:complexType>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element minOccurs="0" maxOccurs="unbounded" ref="tag"/>
+				<xs:element minOccurs="1" maxOccurs="unbounded" ref="inline"/>
+				<xs:element minOccurs="1" maxOccurs="unbounded" ref="text"/>
+			</xs:choice>
+			<xs:attribute name="id" type="xs:ID" use="required"/>
+			<xs:attribute name="lastModifiedBy" type="xs:string"/>
+			<xs:attribute name="lastModifiedAt" type="xs:dateTime" use="required"/>
+			<xs:attribute name="confidential" type="xs:boolean"/>
+			<xs:attribute name="speaker" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>			
+	<xs:element name="inline">
+		<xs:complexType>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element minOccurs="0" maxOccurs="unbounded" ref="tag"/>
+				<xs:element minOccurs="1" maxOccurs="1" ref="inline"/>
+				<xs:element minOccurs="1" maxOccurs="1" ref="text"/>
+			</xs:choice>
+			<xs:attribute name="id" type="xs:ID"/>
+			<xs:attribute name="comment" type="xs:string"/>
+			<xs:attribute name="lastModifiedAt" type="xs:dateTime"/>
+			<xs:attribute name="lastModifiedBy" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>			
+	<xs:element name="tag">
+		<xs:complexType>
+			<xs:attribute name="type" type="xs:string"/>
+			<xs:attribute name="value" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

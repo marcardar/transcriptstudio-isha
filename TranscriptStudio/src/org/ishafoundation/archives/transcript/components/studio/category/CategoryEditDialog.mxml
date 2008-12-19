@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" alpha="2.0" layout="vertical" x="80" y="30" width="400" horizontalAlign="center" paddingBottom="10" creationComplete="nameTextInput.setFocus()">
+	<mx:Script>
+    <![CDATA[
+    	import mx.collections.ICollectionView;
+    	import mx.utils.StringUtil;
+    	import mx.controls.Alert;
+    	import mx.managers.PopUpManager;
+    	import org.ishafoundation.archives.transcript.model.ReferenceManager;
+    	import mx.collections.ArrayCollection;
+
+    	private var referenceMgr:ReferenceManager;
+
+    	[Bindable]
+    	public var typeIds:ArrayCollection = new ArrayCollection();
+    	[Bindable]
+    	public var concepts:ArrayCollection = new ArrayCollection();
+    	
+		public static function createInstance(referenceMgr:ReferenceManager):CategoryEditDialog {
+			var result:CategoryEditDialog = new CategoryEditDialog();
+			result.referenceMgr = referenceMgr; 
+			return result;
+		}
+
+		public function closeMe():void {
+        	PopUpManager.removePopUp(this);
+		}
+		
+		private function getCategoryTypeIdsForComboBox():ArrayCollection {
+			var result:ArrayCollection = new ArrayCollection(this.referenceMgr.getCategoryTypeIds(true, true));
+			return result;
+		}
+		
+		private function addTypeClicked():void {
+			var typeId:String = typeComboBox.selectedItem as String;
+			if (this.typeIds.contains(typeId)) {
+				Alert.show("Already using this type");
+			}
+			else {
+				this.typeIds.addItem(typeId);
+			}
+			typeComboBox.selectedIndex = -1;
+		}
+		
+		private function addConceptClicked():void {
+			var concept:String = StringUtil.trim(conceptTextInput.text.toLowerCase());
+			if (this.concepts.contains(concept)) {
+				Alert.show("Already using concept: " + concept);
+			}
+			else {
+				conceptTextInput.text = "";
+				this.concepts.addItem(concept);
+			}
+		}
+		
+		private static function upEnabled(index:int):Boolean {
+			return index > 0;
+		}
+		
+		private static function downEnabled(index:int, length:int):Boolean {
+			return index >= 0 && index < length - 1;
+		}
+		
+		private static function moveSelectedItem(list:List, direction:int):void {
+			var oldIndex:int = list.selectedIndex;
+			var newIndex:int = oldIndex + direction;
+			var ac:ArrayCollection = list.dataProvider as ArrayCollection;
+			var replacingItem:Object = ac.getItemAt(oldIndex);
+			var replacedItem:Object = ac.getItemAt(newIndex);
+			ac.setItemAt(replacedItem, oldIndex);
+			ac.setItemAt(replacingItem, newIndex);
+			list.selectedIndices = new Array();
+			list.selectedIndex = newIndex;
+		} 
+		
+		private static function removeSelectedItem(list:List):void {
+			var ac:ArrayCollection = list.dataProvider as ArrayCollection;
+			ac.removeItemAt(list.selectedIndex);
+		}
+    ]]>
+	</mx:Script>
+	<mx:Label text="Category Name" width="95%"/>
+	<mx:TextArea id="nameTextInput" width="95%" wordWrap="true"/>
+	<mx:VBox width="70%">
+		<mx:Label text="Match on these types:" width="100%" paddingTop="10"/>
+		<mx:HBox width="100%">
+			<mx:ComboBox id="typeComboBox" width="100%" labelFunction="referenceMgr.getCategoryTypeNameFromId" prompt="Select type..." dataProvider="{getCategoryTypeIdsForComboBox()}" change="addTypeClicked()"/>
+			<mx:Spacer width="100" height="100%"/>
+		</mx:HBox>
+		<mx:HBox width="100%" height="80">
+			<mx:List id="typeList" allowMultipleSelection="false" width="100%" height="100%" dataProvider="{typeIds}" labelFunction="referenceMgr.getCategoryTypeNameFromId"/>
+			<mx:VBox height="100%" width="100" verticalAlign="middle">
+				<mx:Button label="Remove" width="100%" enabled="{typeList.selectedIndex &gt;= 0}" click="removeSelectedItem(typeList);"/>
+				<mx:Button label="Up" width="100%" enabled="{upEnabled(typeList.selectedIndex)}" click="moveSelectedItem(typeList, -1)"/>
+				<mx:Button label="Down" width="100%" enabled="{downEnabled(typeList.selectedIndex, typeIds.length)}" click="moveSelectedItem(typeList, +1)"/>
+			</mx:VBox>
+		</mx:HBox>
+		<mx:Label text="Match on these concepts:" width="100%" paddingTop="5"/>
+		<mx:HBox width="100%">
+			<mx:TextInput id="conceptTextInput" width="100%" enter="addConceptClicked()"/>
+			<mx:Button label="Add" width="100" enabled="{StringUtil.trim(conceptTextInput.text).length &gt; 0}" click="addConceptClicked()"/>
+		</mx:HBox>
+		<mx:HBox width="100%">
+			<mx:List id="conceptList" allowMultipleSelection="false" width="100%" dataProvider="{concepts}"/>
+			<mx:VBox height="100%" width="100" verticalAlign="middle">
+				<mx:Button label="Remove" width="100%" enabled="{conceptList.selectedIndex &gt;= 0}" click="removeSelectedItem(conceptList)"/>
+				<mx:Spacer height="100%"/>
+				<mx:Button label="Up" width="100%" enabled="{upEnabled(conceptList.selectedIndex)}" click="moveSelectedItem(conceptList, -1)"/>
+				<mx:Button label="Down" width="100%" enabled="{downEnabled(conceptList.selectedIndex, concepts.length)}" click="moveSelectedItem(conceptList, +1)"/>
+			</mx:VBox>
+		</mx:HBox>
+	</mx:VBox>
+	<mx:Spacer height="5"/>
+	<mx:HBox width="30%" horizontalAlign="center">
+		<mx:Button id="okButton" label="OK" enabled="{this.typeIds.length > 0 &amp;&amp; StringUtil.trim(this.nameTextInput.text).length &gt; 0 &amp;&amp; StringUtil.trim(conceptTextInput.text).length == 0}"/>
+		<mx:Button label="Cancel" click="this.typeIds = null;closeMe()"/>
+	</mx:HBox>
+</mx:TitleWindow>
