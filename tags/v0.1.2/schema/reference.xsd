@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="reference">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element minOccurs="1" maxOccurs="1" ref="keywords"/>
+				<xs:element minOccurs="1" maxOccurs="1" ref="keywordSynonyms"/>
+				<xs:element minOccurs="1" maxOccurs="1" ref="markupTypes"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="keywords">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element minOccurs="0" maxOccurs="unbounded" ref="keyword"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="keyword">
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element minOccurs="1" maxOccurs="1" ref="keyword"/>
+				<xs:element minOccurs="1" maxOccurs="1" ref="keywordRef"/>
+			</xs:choice>
+			<xs:attribute name="id" type="xs:string" use="required"/>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="keywordRef">
+		<xs:complexType>
+			<xs:attribute name="id" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="keywordSynonyms">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element minOccurs="0" maxOccurs="unbounded" ref="keywordSynonym"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="keywordSynonym">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element minOccurs="2" maxOccurs="unbounded" ref="keywordRef"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="markupTypes">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element minOccurs="0" maxOccurs="unbounded" ref="markupType"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="markupType">
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element minOccurs="1" maxOccurs="1" ref="markupType"/>
+				<xs:element minOccurs="1" maxOccurs="1" ref="markupTypeRef"/>
+				<xs:element minOccurs="1" maxOccurs="1" ref="keywordRef"/>
+			</xs:choice>
+			<xs:attribute name="id" type="xs:string" use="required"/>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="contentType">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="outline"/>
+						<xs:enumeration value="inline"/>
+						<xs:enumeration value="both"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="allowSupplementaryKeywords" type="xs:boolean" default="false"/>
+			<xs:attribute name="allowUserDefinedSubtype" type="xs:boolean" default="false"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="markupTypeRef">
+		<xs:complexType>
+			<xs:attribute name="id" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

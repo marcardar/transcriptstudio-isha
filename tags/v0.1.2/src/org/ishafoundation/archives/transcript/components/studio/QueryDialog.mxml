@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="{0.99 * parentDocument.width}" height="{0.99 * parentDocument.height}" title="Search" creationComplete="init()" xmlns:text="org.ishafoundation.archives.transcript.components.studio.text.*">
+	<mx:Script>
+	<![CDATA[
+		import name.carter.mark.flex.project.mdoc.MSuperContent;
+		import name.carter.mark.flex.project.mdoc.MSuperSegment;
+		import org.ishafoundation.archives.transcript.model.Transcript;
+		import name.carter.mark.flex.project.mdoc.MNode;
+		import name.carter.mark.flex.project.mdoc.MSuperNodeProperties;
+		import name.carter.mark.flex.project.mdoc.MSuperNode;
+		import name.carter.mark.flex.util.Utils;
+		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
+		import mx.controls.Alert;
+		import org.ishafoundation.archives.transcript.db.XQueries;
+		
+		public var xQueryExecutor:XQueryExecutor;
+		
+		private function init():void {
+		}
+		
+		private function labelFunc(itemElement:XML):String {
+			if (itemElement.localName() == "event") {
+				return "Event: " + itemElement.@name;				
+			}
+			else if (itemElement.localName() == "session") {
+				return "Session: " + itemElement.@name;				
+			}
+			else if (itemElement.localName() == MSuperSegment.TAG_NAME || itemElement.localName() == MSuperContent.TAG_NAME) {
+				var node:MSuperNode = new MSuperNode(itemElement, null);
+				var props:MSuperNodeProperties = new MSuperNodeProperties(node);
+				return Transcript.createMarkupTitleExternal(props, true, transcriptTextArea.referenceMgr);
+			}
+			else {
+				return "Unknown: " + itemElement.toXMLString();
+			} 
+		}
+		
+		private function searchClicked():void {
+			xQueryExecutor.query(XQueries.ALL_OUTLINES, null, function(xml:XML):void {
+				resultList.dataProvider = xml.*;
+			}, function(msg:String):void {
+				Alert.show(msg);
+			});
+		}
+		
+		private function resultClicked():void {
+			var itemElement:XML = resultList.selectedItem as XML;
+			if (itemElement == null) {
+				transcriptTextArea.transcript = null;
+				return;
+			}
+			//xQueryExecutor.query(
+		}
+	]]>
+	</mx:Script>
+	<mx:HDividedBox width="100%" height="100%" horizontalGap="{Utils.DIVIDER_SIZE}">
+		<mx:VBox minWidth="100" width="50%" height="100%" horizontalAlign="center">
+			<mx:HBox width="100%">
+				<mx:TextInput width="100%"/>
+				<mx:Button label="Search" click="searchClicked()"/>				
+			</mx:HBox>
+			<mx:List id="resultList" labelFunction="labelFunc" width="100%" height="100%"/>		
+		</mx:VBox>
+		<text:TranscriptTextArea id="transcriptTextArea" minWidth="100" width="50%" height="100%"/>
+	</mx:HDividedBox>
+</mx:TitleWindow>

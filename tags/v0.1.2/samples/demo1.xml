@@ -1,0 +1,104 @@
+<session id="demo1">
+	<source id="n124" type="mixer">
+		<stream id="default" quality="good">
+		<syncPoint id="sp1" timecode="15"/>
+		<syncPoint id="sp2" timecode="17"/>
+	</source>
+	<!--source id="n224" type="mainCam">
+		<stream id="video" quality="good">
+		<stream id="lapelMic" quality="good">
+		<stream id="openMic" quality="poor">
+	</source-->
+	<transcript id="t1" lastModifiedAt="2008-05-17T11:48:37" lastModifiedBy="admin">
+		<segment type="paragraph" id="p1" lastModifiedAt="2008-05-17T11:13:14" confidential="true" speaker="interviewer">
+			<content id="c1" startSyncPointId="sp1" endSyncPointId="sp2" spokenLanguage="tamil" emphasis="true">Hello everyone!</content>
+		</segment>
+		<superSegment id="o1" lastModifiedAt="2008-05-17T11:33:36" lastModifiedBy="admin">
+			<tag type="markupType" value="question"/>
+			<tag type="markupCategory" value="ifthecreatorscreation1"/>
+			<tag type="rating" value="100"/>
+			<tag type="summary" value="This is the summary"/>
+			<tag type="comment" value="This is the comment"/>
+			<segment type="paragraph" id="p2" lastModifiedAt="2008-05-17T11:13:14" speaker="questioner">
+				<content id="c2">Sadhguru, if the creation</content>
+				<content id="c24" spokenLanguage="tamil" emphasis="true">is perfect,</content>
+				<content id="c23">and the creator has done such a good job on us as you say, why is there so much suffering in the world?</content>
+			</segment>
+			<segment type="paragraph" id="p3" lastModifiedAt="2008-05-17T11:13:14">
+				<content id="c3">(Laughs)</content>
+			</segment>
+			<segment type="paragraph" id="p4" lastModifiedAt="2008-05-17T11:13:14" speaker="questioner">
+				<content id="c4">Why do we need to depend upon somebody's compassion to exist here?</content>
+			</segment>
+			<superSegment id="o2" lastModifiedAt="2008-05-17T11:38:14" lastModifiedBy="admin">
+				<tag type="markupType" value="topic"/>
+				<tag type="markupCategory" value="whysuffering1"/>
+				<superSegment id="o3" lastModifiedAt="2008-05-17T11:38:14" lastModifiedBy="admin">
+					<tag type="markupType" value="joke"/>
+					<tag type="markupCategory" value="boyfindsten1"/>
+					<segment type="paragraph" id="p5" lastModifiedAt="2008-05-17T11:13:14">
+						<content id="c5">So if Creator had done a good job on us, (Laughs) why there is so much suffering in the world? Why we need to depend on other people's compassion and understanding to exist here? This is like... it happened once. A little boy came home with a ten-dollar bill... in Ohio. A little boy came home with a ten-dollar bill. His mother asked, he said 'I found it.' His mother asked, 'Luke, did you really find it? Are you sure?' He said, 'Sure maam, I even saw the man looking for it.'</content>
+					</segment>
+				</superSegment>
+				<segment type="paragraph" id="p6" lastModifiedAt="2008-05-17T11:13:14">
+					<content id="c6">Why there is so much misery if this is a perfect job? It's such a perfect job that it gives you the opportunity to be whichever way you wish to be. If creation had not given you the necessary opportunity to be what you wish to be, then there would be no possibilities, isn't it? Then there would be no such thing as liberation. So why create a bondage and then liberation? Why couldn't you have been liberated? Then there would be no creation; only because there is creation, now the possibility of going beyond that. Now in animal nature and in other forms of life that you see around you, every kind; there is not much possibility. The possibility is just to survive, procreate, carry on with life and die one day. Because there is not much possibility, there is not much misery either. You don't see other creatures of the planet suffering like human beings. Their suffering is purely physical. If they're physically harmed, they're in pain. Even in pain, they do not know the kind of suffering that a human being knows.</content>
+				</segment>
+				<segment type="paragraph" id="p7" lastModifiedAt="2008-05-17T11:13:14">
+					<content id="c7">Human being knows this suffering, not because creation gave this suffering to you, creation just gave you the freedom to make whatever you wish to out of yourself. You're making suffering out of yourself, or a large population of the world has decided to make suffering out of themselves, that is their choice. Physical realities sometimes are comfortable, sometimes are not comfortable. That is so. We have been given the necessary intelligence to create necessary comfort for ourselves. That's not an issue really. If we have no problems with each other, creating comfort for all the population in the world is not a problem. It's not at all a big problem, really. Simply because we have inner problems, simply because this freedom which should have been a benediction, has become a curse upon humanity.</content>
+					<superContent id="i1" lastModifiedAt="2008-05-17T11:36:21" lastModifiedBy="admin">
+						<tag type="markupType" value="quote"/>
+						<tag type="concept" value="suffering"/>
+						<tag type="concept" value="freedom"/>
+						<content id="c8">Right now, what human beings are suffering is not their bondage. They are suffering their freedom.</content>
+					</superContent>
+					<content id="c9">If you suffer your bondage, it's alright; but if you suffer your freedom that's tragedy. Right now, human beings are unfortunately suffering their freedom.</content>
+				</segment>
+				<segment type="paragraph" id="p8" lastModifiedAt="2008-05-17T11:13:14">
+					<content id="c10">This moment you can make anything out of yourself. You can make joy out of yourself. You can make suffering out of yourself. What to do if 50 percent of the people or 90 percent of the people are choosing to make misery out of themselves? That's not creation's fault. Just gave you the freedom so that you could go beyond. Once you have come as human, you're not trapped anymore. Other creatures are trapped in their own instincts; beyond that, they cannot think. You have instincts for survival, but still you have the possibility of going beyond these instincts. If you don't choose to go beyond, that means still enough suffering has not touched you. Because, it's unfortunate in the world, that very few people transcend out of their intelligence. Most people have to be thrashed by life; only then they will transcend. Only then they will think of going beyond; otherwise no.</content>
+				</segment>
+				<segment type="paragraph" id="p9" lastModifiedAt="2008-05-17T11:13:14">
+					<content id="c11">I don't know if you're aware of this Luke. You came early, but in India if you tell somebody that I'm living in an ashram, they will ask you, why what went wrong? What happened to your life? So they believe only after something really goes wrong you'll go to the ashram. Okay? Because most people's intelligence is such, because they kept their brains in cold storage, they think they're going to use it in future. So they can only seek anything beyond when something really goes wrong with their life. 'Til then, even if something really goes wrong, they will only pray for a better life- next time.</content>
+				</segment>
+				<segment type="paragraph" id="p10" lastModifiedAt="2008-05-17T11:13:14">
+					<content id="c12">Now, you don't have to depend upon anybody's compassion or understanding. The whole world can live under the umbrella of your compassion and your understanding. I would like to see that you stand up that way; that the world lives under your compassion and understanding. You don't live in other people's compassion and understanding. If you have any dignity, that's how you should live, isn't it? Isn't it so?</content>
+				</segment>
+			</superSegment>
+		</superSegment>
+		<superSegment id="o4">
+			<tag type="markupType" value="question"/>
+			<tag type="markupCategory" value="knowinglife1"/>
+			<segment type="paragraph" id="p11" lastModifiedAt="2008-05-17T11:13:14" speaker="questioner">
+				<content id="c13">Dear Sadhguru, how can I actually know life around me?</content>
+			</segment>
+		</superSegment>
+		<superSegment id="o5" lastModifiedAt="2008-05-17T11:31:15" lastModifiedBy="admin">
+			<tag type="markupType" value="topic"/>
+			<tag type="markupCategory" value="knowinglife1"/>
+			<segment type="paragraph" id="p12" lastModifiedAt="2008-05-17T11:13:14">
+				<content id="c14">Only life can know life.</content>
+				<superContent id="i2" lastModifiedAt="2008-05-17T11:25:36" lastModifiedBy="admin">
+					<tag type="markupType" value="quote"/>
+					<tag type="concept" value="life"/>
+					<content id="c15">A thought cannot know life. An emotion cannot know life. An ego cannot know life. Only life can know life.</content>
+				</superContent>
+				<content id="c16">If you stop being a bundle of thoughts, opinions and emotions, and just exist here as life- just throbbing pulsating life, knowing life is just natural. So what we are referring to as enlightenment is just this, instead of being a thought, instead of being an emotion, instead of being an ego, you just become life- simply life. In a way, it is a most basic thing. Enlightenment is not the ultimate thing. Yes it is in one way. In another way, it is the most basic thing because first thing you're life; then everything else, isn't it? Only because you're alive, you're capable of thought. Only because you're alive, you're capable of emotion. Only because you're alive, you're capable of ego. So the most basic thing is life. So, this is like becoming very basic, just life, pure life nothing else. All other things are there, but you're never identified with it. Experientially, intellectually knowing I am not this, I am not that doesn't liberate a person. Something more deeper is needed. Right now, the center of your existence is your identities or your identification. All identities are taken on, put-on identities. So the very center of your existence is something you put on, not in reality. So when you're not in reality, the question of experiencing life as it is doesn't arise.</content>
+			</segment>
+			<segment type="paragraph" id="p13" lastModifiedAt="2008-05-17T11:13:14">
+				<content id="c17">Now, you said you want to know just life the way it is and the flowers, and the moon, and the clouds. Today is a cloudy day. There is no possibility of moon, but anyway if you just become life, there are no clouds, there is no moon, there is no flowers; there is simply pulsating life. Just as you are, everything is. Flowers, clouds, mountains, moon exists because you have become something other than life. If you become just life, none of those things exist. Only life exists- just this pulsating mass of energy. You can call it creation; you can call it Creator; or you can call it myself, it's the same thing. What you call it, it doesn't matter; but it's just life. Some of it manifest; most of it un-manifest, but still life. Because, I call everything life, because all of it is in some kind of movement. All of it is some kind of possibility. Every atom in the existence is a possibility. So it's life.</content>
+				<superContent id="i3" lastModifiedAt="2008-05-17T11:25:48" lastModifiedBy="admin">
+					<tag type="markupType" value="quote"/>
+					<tag type="concept" value="life"/>
+					<content id="c18">What you call as life is just a possibility. What you make out of it is all that it is,</content>
+				</superContent>
+				<content id="c20">isn't it?</content>
+			</segment>
+			<superSegment id="o6">
+				<tag type="markupType" value="joke"/>
+				<tag type="markupCategory" value="doyouwantto1"/>
+				<segment type="paragraph" id="p14" lastModifiedAt="2008-05-17T11:13:14">
+					<content id="c21">It happened one day. A radio jockey, who thought of himself as a star, was traveling in bus to his work. Then he heard a women's voice in the back seat tell the kid, 'Tommy, do you want to hear, listen to Alfonso's show?' The man's chest swelled in pride that he's a star. There are people who want their children to listen to his show. The boy immediately snapped back saying 'no.' Then, his mother said, 'then you better behave yourself.'</content>
+				</segment>
+			</superSegment>
+		</superSegment>
+	</transcript>
+</session>
