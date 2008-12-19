@@ -1,0 +1,52 @@
+<!--
+   Transcript Markups Editor: An XML based application that allows users to define 
+   and store contextual metadata for contiguous sections within a text document. 
+
+   Copyright 2008 Mark Carter, Swami Kevala
+
+   This file is part of Transcript Markups Editor.
+
+   Transcript Markups Editor is free software: you can redistribute it and/or modify it 
+   under the terms of the GNU General Public License as  published by the Free Software 
+   Foundation, either version 3 of the License, or (at your option) any later version.
+
+   Transcript Markups Editor is distributed in the hope that it will be useful, but 
+   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along with 
+   Transcript Markups Editor. If not, see http://www.gnu.org/licenses/.
+-->
+
+<mx:Tree xmlns:mx="http://www.adobe.com/2006/mxml" fontFamily="arial" fontSize="14" fontWeight="bold" initialize="init()" doubleClickEnabled="true" doubleClick="doubleClickHandler()">
+	<mx:Script>
+	<![CDATA[
+		import org.ishafoundation.archives.transcript.fs.SessionFile;
+		import org.ishafoundation.archives.transcript.fs.EventFile;
+		import org.ishafoundation.archives.transcript.fs.File;
+		import flash.events.Event;
+		
+		import mx.binding.utils.BindingUtils;
+		import mx.controls.Tree;
+		
+		import name.carter.mark.flex.util.icon.IconUtils;
+		
+		import org.ishafoundation.archives.transcript.fs.Collection;
+	
+		public function init():void {
+			//var icon24Class:Class = IconUtils.getIconClassUsingEmbeddedClass(this, FOLDER_ICON_CLASS, 24, 24);
+			//this.iconFunction = function (item:Object):Class {return icon24Class;};
+			this.labelFunction = function(file:File):String {
+				return file.name;
+			};
+			this.dataDescriptor = new EventChooserTreeDataDescriptor();
+		}
+		
+		private function doubleClickHandler():void {
+			if (this.selectedItem is EventFile) {
+				expandItem(this.selectedItem, true);
+			}
+		}
+	]]>
+	</mx:Script>
+</mx:Tree>

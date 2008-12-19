@@ -1,0 +1,178 @@
+<!--
+   Transcript Markups Editor: An XML based application that allows users to define 
+   and store contextual metadata for contiguous sections within a text document. 
+
+   Copyright 2008 Mark Carter, Swami Kevala
+
+   This file is part of Transcript Markups Editor.
+
+   Transcript Markups Editor is free software: you can redistribute it and/or modify it 
+   under the terms of the GNU General Public License as  published by the Free Software 
+   Foundation, either version 3 of the License, or (at your option) any later version.
+
+   Transcript Markups Editor is distributed in the hope that it will be useful, but 
+   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along with 
+   Transcript Markups Editor. If not, see http://www.gnu.org/licenses/.
+-->
+
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" top="20" width="1000" height="600" layout="vertical" styleName="plain" backgroundColor="0x869CA7" xmlns:local="*" creationComplete="initApp()" pageTitle="Transcript Studio">
+	<mx:Script>
+        <![CDATA[
+        	import mx.managers.CursorManager;
+        	import org.ishafoundation.archives.transcript.components.generic.DatabasePopUp;
+        	import name.carter.mark.flex.util.remote.ClientManager;
+        	import name.carter.mark.flex.util.Utils;
+        	import org.ishafoundation.archives.transcript.db.DatabaseConstants;
+        	import org.ishafoundation.archives.transcript.components.studio.text.TranscriptTextArea;
+        	import org.ishafoundation.archives.transcript.components.studio.MainPanel;
+        	import org.ishafoundation.archives.transcript.components.generic.LoginPopUp;
+        	import mx.controls.Alert;
+        	import mx.events.FlexEvent;
+        	import mx.managers.PopUpManager;
+        	import org.ishafoundation.archives.transcript.db.DatabaseManagerUsingEXist;
+        	import mx.core.UIComponent;
+        	import org.ishafoundation.archives.transcript.components.generic.LoginPopUp;
+        	import name.carter.mark.flex.util.icon.IconUtils;
+        	import org.ishafoundation.archives.transcript.components.studio.text.TranscriptTextArea;
+        	import org.ishafoundation.archives.transcript.db.DatabaseManagerDemo;
+        	import org.ishafoundation.archives.transcript.db.DatabaseManager;
+        	
+        	private static const ICON_NAMES_TO_PRELOAD:Array = ["chant", "default", "joke", "music", "process", "question", "quote", "story", "topic"];
+        	
+			private function preloadIcons(nextFunc:Function):void {
+				trace("Preloading icons: " + ICON_NAMES_TO_PRELOAD);
+				var count:int = 0;
+				var completeFunc:Function = function():void {
+					count++;
+					if (count == ICON_NAMES_TO_PRELOAD.length) {
+						trace("Finished preloading icons");
+						nextFunc();
+					}
+				};
+				for each (var iconName:String in ICON_NAMES_TO_PRELOAD) {
+					var iconPath:String = Utils.getIconPath(iconName);
+					IconUtils.preloadIcon(iconPath, completeFunc, function(msg:String):void {
+						trace("Could not preload icon: " + msg);
+						completeFunc();
+					});
+				}
+			}
+
+        	private var databaseMgr:DatabaseManagerUsingEXist;
+        	
+			private function initApp():void {
+				addEventListener(Event.REMOVED_FROM_STAGE, function(evt:Event):void {
+					trace("Removed from stage");
+				});
+				this.explicitWidth = NaN;
+				this.explicitHeight = NaN;
+				var thisHandle:Application = this;
+				trace("Using default hostname");
+				preloadIcons(function():void {
+					TranscriptTextArea.ICONS_ENABLED = true;
+					testConnection(function():void {
+		                var loginPopUp:LoginPopUp = PopUpManager.createPopUp(thisHandle, LoginPopUp, true) as LoginPopUp;
+		                PopUpManager.centerPopUp(loginPopUp);
+						loginPopUp.loginButton.addEventListener(MouseEvent.CLICK, loginButtonClicked);
+						loginPopUp.passwordTextInput.addEventListener(FlexEvent.ENTER, loginButtonClicked);
+						//status = "Logging in...";												
+					});
+				});
+			}
+			
+			private function testConnection(successFunc:Function, databasePopUp:DatabasePopUp = null):void {
+				var thisHandle:Application = this;
+				CursorManager.setBusyCursor();
+				ClientManager.testConnectionToURL(DatabaseConstants.EXIST_URL, function(response:Object):void {
+					CursorManager.removeBusyCursor();
+					if (databasePopUp != null) {
+						PopUpManager.removePopUp(databasePopUp);
+					}
+					successFunc();
+				}, function(msg:String):void {
+					CursorManager.removeBusyCursor();
+					if (databasePopUp == null) {
+						databasePopUp = PopUpManager.createPopUp(thisHandle, DatabasePopUp, true) as DatabasePopUp;
+						PopUpManager.centerPopUp(databasePopUp);
+						databasePopUp.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+							DatabaseConstants.EXIST_URL = databasePopUp.urlTextInput.text;
+							testConnection(successFunc, databasePopUp);
+						});
+					}
+					else {
+						Alert.show(DatabaseConstants.EXIST_URL, "Could not find database");						
+					}
+				});
+			}
+			
+			private function showIOAlert(text:String):void {
+				this.enabled = false;
+				Alert.show(text, "Could not find eXist DB");
+			}
+			
+			private function showSecurityAlert(text:String):void {
+				var url:String = "<local swf path>";
+				var startIndex:int = text.indexOf("file:///");
+				if (startIndex >= 0) {
+					startIndex += 8;
+					var endIndex:int = text.indexOf(" cannot ", startIndex);
+					url = text.substring(startIndex, endIndex);
+					url = url.replace("|", ":");				
+				}
+				var simpleURL:String = this.url.substring(this.url.indexOf("://") + 4).replace("|", ":");
+				if (simpleURL.indexOf("/") == 0) {
+					simpleURL = simpleURL.substring(1);
+				}
+				this.enabled = false; // don't allow the user to do ANYTHING?
+				var al:Alert = Alert.show("Try this:\n\nRight click -> Settings... -> Advanced...\n\n(...takes you to browser...)\n\n-> Global Security Settings Panel\n\nAdd the following URL to \"Always trust files in these locations\":\n\n" + simpleURL + "\n\nFinally, restart application", "Security Error");
+				// important to move the Alert to the top left because the settings box also comes up in the middle (and its modal!)
+				al.callLater(function():void {
+					al.x = 20;
+					al.y = 20;
+				});
+			}
+			
+			private function loginButtonClicked(event:Event):void {
+				var loginPopUp:LoginPopUp = (event.currentTarget as UIComponent).document as LoginPopUp;
+				if (!loginPopUp.loginButton.enabled) {
+					// cheeky - the user hit enter in the password text input field when the button was disabled
+					return;
+				}
+				var username:String = loginPopUp.usernameTextInput.text;
+				var password:String = loginPopUp.passwordTextInput.text;
+				databaseMgr = new DatabaseManagerUsingEXist(username, password);
+				databaseMgr.testConnection(function():void {
+					PopUpManager.removePopUp(loginPopUp);
+					//status = "Login succeeded";
+					// make sure the transcript collection has been created
+					databaseMgr.retrieveCollection(DatabaseConstants.DATA_COLLECTION_PATH, function():void {
+						mainPanel.init(username, databaseMgr);
+						mainPanel.visible = true;
+					},
+					function(msg:String):void {
+						Alert.show(msg);
+					});
+				}, loginFailed);
+			}
+			
+			private function loginFailed(msg:String):void {
+				//status = "Login failed";
+				var index:int = msg.lastIndexOf("URL:") + 1;
+				var url:String = index >= 0 ? msg.substr(index + 4) : msg;
+				var s:String;
+				if (msg.toLowerCase().indexOf("io error") >= 0) {
+					s = "Could not connect to server: " + url; 
+				}
+				else {
+					s = "Incorrect username/password";
+				}
+				trace(msg);
+				Alert.show(s, "Login failed");
+			} 			
+    	]]>
+    </mx:Script>
+    <studioNS:MainPanel id="mainPanel" width="100%" height="100%" verticalGap="0"/>
+</mx:Application>
