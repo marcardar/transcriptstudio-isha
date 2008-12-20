@@ -50,7 +50,7 @@ declare function search:get-super-concept-ids($unprocessedIds as xs:string*, $pr
 		if (count($unprocessedIds) = 0) then
 			()
 		else
-			for $unprocessedId in $unprocessedId
+			for $unprocessedId in $unprocessedIds
 			return
 				if (index-of($processedIds, $unprocessedId)) then
 					()
