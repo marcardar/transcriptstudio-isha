@@ -15,8 +15,8 @@ return
         <table id="header">
         <tr><td><h2>Isha Foundation<br/>Transcript Search</h2></td>
         <td valign="bottom">
-        <form id="searchbox">
-            <table id="searchBox"><tr>
+        <form id="search-form" action="{session:encode-url(request:get-uri())}">
+            <table id="search-form-table"><tr>
                 <td><input type="text" name="search" size="50" value="{$searchString}"/></td>
                 <td><input type="submit" value="Transcript Search"/></td>
             </tr></table>
