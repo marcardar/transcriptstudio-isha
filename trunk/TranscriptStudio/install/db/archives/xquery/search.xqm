@@ -133,7 +133,14 @@ declare function search:text-search($baseElements as element()*, $searchTerms as
 			return
 				let $searchTerms := if ($nearValue >= 0) then remove($searchTerms, 1) else $searchTerms	
 				let $stringOfKeywords := string-join($searchTerms, ' ')
-				return $baseElements[near(., $stringOfKeywords, max(($nearValue, 1)))]
+				return
+					if ($nearValue < 0) then
+						(: no value was specified so do an exact match :)
+						$baseElements[near(., $stringOfKeywords, 1)]
+					else
+						let $reverseStringOfKeywords := string-join(reverse($searchTerms), ' ')
+						return
+							$baseElements[near(., $stringOfKeywords, $nearValue) or near(., $reverseStringOfKeywords, $nearValue)]
 };
 
 declare function search:expand-concept($concept as xs:string) as xs:string*
