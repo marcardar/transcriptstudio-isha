@@ -2,13 +2,14 @@ xquery version "1.0";
 
 module namespace search = "http://www.ishafoundation.org/archives/xquery/search";
 
-declare function search:main($searchString as xs:string) as element()*
+(: $defaultType is either "markup", "text" or "event" :)
+declare function search:main($searchString as xs:string, $defaultType as xs:string) as element()*
 {
 	let $searchString :=
-		if (contains($searchString, 'markup:')) then
+		if (contains($searchString, concat($defaultType, ':'))) then
 			$searchString
 		else
-			concat('markup:', $searchString)
+			concat($defaultType, ':', $searchString)
 	let $eventSearchTerms := search:extract-sub-search-terms($searchString, 'event')
 	let $markupSearchTerms := search:extract-sub-search-terms($searchString, 'markup')
 	let $textSearchTerms := search:extract-sub-search-terms($searchString, 'text')
