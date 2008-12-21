@@ -13,53 +13,53 @@ declare function search:main($searchString as xs:string) as element()*
 	let $markupSearchTerms := search:extract-sub-search-terms($searchString, 'markup')
 	let $textSearchTerms := search:extract-sub-search-terms($searchString, 'text')
 	return
-		if (exists($markupSearchTerms) and exists($textSearchTerms)) then
-			(<p>Cannot specify both "<b>text:</b>" and "<b>markup:</b>"</p>)
-		else 
-			let $events := search:get-events(collection('/db/archives/data')/event, $eventSearchTerms)
-			let $eventIds := trace($events/string(@id), 'eventIds:')
-			let $transcripts := search:get-transcripts($eventIds)
-			let $tableRows := 
-				if (exists($markupSearchTerms)) then
-					for $markup in search:markup-search(($transcripts//superSegment, $transcripts//superContent), $markupSearchTerms)
+		let $events := search:get-events(collection('/db/archives/data')/event, $eventSearchTerms)
+		let $eventIds := trace($events/string(@id), 'eventIds:')
+		let $transcripts := search:get-transcripts($eventIds)
+		let $tableRows := 
+			if (exists($markupSearchTerms)) then
+				let $matchedMarkups := search:markup-search(($transcripts//superSegment, $transcripts//superContent), $markupSearchTerms)
+				let $matchedMarkups := if (exists($textSearchTerms)) then search:text-search($matchedMarkups, $textSearchTerms) else $matchedMarkups
+				return
+					for $markup in $matchedMarkups
 					order by $markup/tag[@type = 'markupCategory']/@value, number($markup/tag[@type eq 'rating']/@value)
 					return
 						search:markup-as-table-row($markup)
+			else
+				if (exists($textSearchTerms)) then
+					for $segment in	search:text-search($transcripts/segment, $textSearchTerms)
+					order by $segment/ancestor::session/@id descending
+					return
+						search:segment-as-table-row($segment)					
 				else
-					if (exists($textSearchTerms)) then
-						for $segment in	search:text-search($transcripts/segment, $textSearchTerms)
-						order by $segment/ancestor::session/@id descending
+					if (exists($eventSearchTerms)) then
+						(: just searching events - so the results are transcripts :)
+						for $transcript in $transcripts
+						order by $transcript/../@id descending
 						return
-							search:segment-as-table-row($segment)					
+							search:transcript-as-table-row($transcript)
 					else
-						if (exists($eventSearchTerms)) then
-							(: just searching events - so the results are transcripts :)
-							for $transcript in $transcripts
-							order by $transcript/../@id descending
-							return
-								search:transcript-as-table-row($transcript)
-						else
-							(<p>No meaningful terms in search string</p>)
+						(<p>No meaningful terms in search string</p>)
+		return
+			let $numRows := count(trace($tableRows, 'table rows'))
+			let $afterSearching := concat('after searching ', count(collection('/db/archives/data')/session/transcript), ' transcripts.')
 			return
-				let $numRows := count(trace($tableRows, 'table rows'))
-				let $afterSearching := concat('after searching ', count(collection('/db/archives/data')/session/transcript), ' transcripts.')
-				return
-					if ($numRows = 0) then
-						(: No results :)
-						(<p>Nothing found {$afterSearching}</p>)
+				if ($numRows = 0) then
+					(: No results :)
+					(<p>Nothing found {$afterSearching}</p>)
+				else
+					if ($numRows = 1 and local-name($tableRows[1]) = 'p') then
+						(: This is a message not a table row :)
+						$tableRows
 					else
-						if ($numRows = 1 and local-name($tableRows[1]) = 'p') then
-							(: This is a message not a table row :)
-							$tableRows
-						else
-							(: normal results :)
-							(
-								<p>Found {$numRows} result(s) {$afterSearching}</p>
-								,
-								<table class="result-table">
-									{$tableRows}
-								</table>
-							)
+						(: normal results :)
+						(
+							<p>Found {$numRows} result(s) {$afterSearching}</p>
+							,
+							<table class="result-table">
+								{$tableRows}
+							</table>
+						)
 };
 
 declare function search:get-transcripts($eventIds as xs:string*) as element()*
