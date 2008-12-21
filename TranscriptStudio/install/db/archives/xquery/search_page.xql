@@ -1,10 +1,9 @@
 import module namespace search = "http://www.ishafoundation.org/archives/xquery/search" at "search.xqm";
 
 let $searchString := if (request:exists()) then
-        normalize-space(request:get-parameter("search", ()))
+        normalize-space(request:get-parameter('search', ()))
     else
         ()
-let $sessionDoc := collection('/db/archives/data/work')//session[@id = 'y2004m04d20e01s01']
 return
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
