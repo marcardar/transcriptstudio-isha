@@ -205,7 +205,7 @@ declare function search-fns:markup-as-table-row($markup as element()) as element
 	let $categoryId := $markup/tag[@type = 'markupCategory']/@value
 	let $markupCategory := collection('/db/archives')/reference/categories/category[@id = $categoryId]
 	let $markupCategoryName := if (exists($markupCategory)) then
-			concat(': ', $markupCategory/@name)
+			concat(': ', $markupCategory/@name, search-fns:get-markup-category-concepts-string($markupCategory))
 		else
 			()
 	let $eventId := search-fns:get-event-id($session/@id)
@@ -229,7 +229,7 @@ declare function search-fns:markup-as-table-row($markup as element()) as element
 	let $maxTextChars := 500
 	return
 		<tr><td class="result-td">
-			<a class="result-anchor" href="view-session-xhtml.xql?sessionId={$session/@id}&amp;highlightId={$markup/@id}#{$targetId}">{string($markupType/@name)}{$markupCategoryName}</a>
+			<a class="result-anchor" href="view-session-xhtml.xql?sessionId={$session/@id}&amp;highlightId={$markup/@id}#{$targetId}">{string($markupType/@name)}{$markupCategoryName}{search-fns:get-additional-concepts-string($markup)}</a>
 			<br/>
 			{
 				concat(substring($text, 0, $maxTextChars), 
@@ -238,6 +238,26 @@ declare function search-fns:markup-as-table-row($markup as element()) as element
 			<br/>
 			<span class="event">Event ({upper-case($event/@type)}): {(string($event/@startAt), " ", string($event/@name))} @ {string($event/@location)}</span>
 		</td></tr>
+};
+
+declare function search-fns:get-markup-category-concepts-string($markupCategory as element()) as xs:string
+{
+	let $conceptNames := $markupCategory/tag[@type = 'concept']/@value
+	return
+		if (exists($conceptNames)) then
+			concat(' [', string-join($conceptNames, ', '), ']')
+		else
+			''
+};
+
+declare function search-fns:get-additional-concepts-string($markup as element()) as xs:string
+{
+	let $conceptNames := $markup/tag[@type = 'concept']/@value
+	return
+		if (exists($conceptNames)) then
+			concat(' +[', string-join($conceptNames, ', '), ']')
+		else
+			''
 };
 
 declare function search-fns:segment-as-table-row($segment as element()) as element()
