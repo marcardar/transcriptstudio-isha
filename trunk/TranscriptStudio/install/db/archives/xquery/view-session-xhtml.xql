@@ -1,6 +1,13 @@
 xquery version "1.0";
 
-import module namespace session_xhtml = "http://ishafoundation.org/archives/xquery/session_xhtml" at "xmldb:exist:///db/archives/xquery/session_xhtml.xqm";
+declare namespace view-session-xhtml = "http://www.ishafoundation.org/archives/xquery/session-xhtml";
+
+import module namespace transform = "http://exist-db.org/xquery/transform";
+
+declare function view-session-xhtml:transformToXHTML($doc as element(), $highlightId as xs:string?) as element()
+{
+    transform:transform($doc, doc('/db/archives/xslt/session_xhtml.xsl'), <parameters><param name="highlightId" value="{$highlightId}"/></parameters>)
+};
 
 let $sessionId := if (request:exists()) then
         request:get-parameter("sessionId", ())
@@ -19,4 +26,5 @@ return if (empty($doc)) then
     else 
 	    <error>sessionId not specified</error>
 else
-    session_xhtml:html($doc, $highlightId)
+    view-session-xhtml:transformToXHTML($doc, $highlightId)
+
