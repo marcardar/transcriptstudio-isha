@@ -99,12 +99,26 @@ declare function search-fns:get-events($baseEvents as element()*, $eventSearchTe
 declare function search-fns:transcript-as-table-row($transcript as element()) as element()
 {
 	let $session := $transcript/..
-	let $eventId := search-fns:get-event-id($session/@id)
-	let $event := collection('/db/archives/data')/event[@id = $eventId]
 	return
 		<tr><td class="result-td">
-			<a class="result-anchor" href="view-session-xhtml.xql?sessionId={$session/@id}">Event ({upper-case($event/@type)}): {(string($event/@startAt), " ", string($event/@name))} @ {string($event/@location)}</a>
+			<a class="result-anchor" href="display-session-xhtml.xql?sessionId={$session/@id}">{search-fns:get-session-title($session)}</a>
+			<br/>
+			<span class="row-footer">{string($session/@id)}</span>
 		</td></tr>
+};
+
+declare function search-fns:get-session-title($session as element()) as xs:string
+{
+	let $eventId := search-fns:get-event-id($session/@id)
+	let $event := collection('/db/archives/data')/event[@id = $eventId]
+	let $sources := concat(' (', string-join($session/source/upper-case(@id), ', '), ')')
+	return
+		concat(search-fns:get-event-title($event), $sources)
+};
+
+declare function search-fns:get-event-title($event as element()) as xs:string
+{
+	concat('Event (', upper-case($event/@type), '): ', $event/@startAt, " ", $event/@name, ' @ ', $event/@location)
 };
 
 declare function search-fns:markup-search($baseMarkups as element()*, $searchTerms as xs:string*) as element()*
@@ -208,8 +222,6 @@ declare function search-fns:markup-as-table-row($markup as element()) as element
 			concat(': ', $markupCategory/@name, search-fns:get-markup-category-concepts-string($markupCategory))
 		else
 			()
-	let $eventId := search-fns:get-event-id($session/@id)
-	let $event := collection('/db/archives/data')/event[@id = $eventId]
 	let $targetId := 
 		if (local-name($markup) = "superSegment") then
 			$markup/preceding::segment[1]/@id (: maybe faster to use $markup/preceding-sibling::*[1]//segment[last()]/@id :)
@@ -229,14 +241,14 @@ declare function search-fns:markup-as-table-row($markup as element()) as element
 	let $maxTextChars := 500
 	return
 		<tr><td class="result-td">
-			<a class="result-anchor" href="view-session-xhtml.xql?sessionId={$session/@id}&amp;highlightId={$markup/@id}#{$targetId}">{string($markupType/@name)}{$markupCategoryName}{search-fns:get-additional-concepts-string($markup)}</a>
+			<a class="result-anchor" href="display-session-xhtml.xql?sessionId={$session/@id}&amp;highlightId={$markup/@id}#{$targetId}">{string($markupType/@name)}{$markupCategoryName}{search-fns:get-additional-concepts-string($markup)}</a>
 			<br/>
 			{
 				concat(substring($text, 0, $maxTextChars), 
 				if (string-length($text) > $maxTextChars) then "..." else ())
 			}
 			<br/>
-			<span class="event">Event ({upper-case($event/@type)}): {(string($event/@startAt), " ", string($event/@name))} @ {string($event/@location)}</span>
+			<span class="row-footer">{concat(search-fns:get-session-title($session), ' [', $session/@id, ']')}</span>
 		</td></tr>
 };
 
@@ -263,20 +275,20 @@ declare function search-fns:get-additional-concepts-string($markup as element())
 declare function search-fns:segment-as-table-row($segment as element()) as element()
 {
 	let $session := $segment/ancestor::session
-	let $eventId := search-fns:get-event-id($session/@id)
-	let $event := collection('/db/archives/data')/event[@id = $eventId]
 	let $targetId := $segment/preceding::segment[1]/@id (: maybe faster to use $markup/preceding-sibling::*[1]//segment[last()]/@id :)
 	let $targetId := ($targetId, $segment/@id) [1]
 	let $text := search-fns:element-text($segment)
 	let $maxTextChars := 500
 	return
 		<tr><td class="result-td">
-			<a class="result-anchor" href="view-session-xhtml.xql?sessionId={$session/@id}&amp;highlightId={$segment/@id}#{$targetId}">Event ({upper-case($event/@type)}): {(string($event/@startAt), " ", string($event/@name))} @ {string($event/@location)}</a>
+			<a class="result-anchor" href="display-session-xhtml.xql?sessionId={$session/@id}&amp;highlightId={$segment/@id}#{$targetId}">{search-fns:get-session-title($session)}</a>
 			<br/>
 			{
 				concat(substring($text, 0, $maxTextChars), 
 				if (string-length($text) > $maxTextChars) then "..." else ())
 			}
+			<br/>
+			<span class="row-footer">{string($session/@id)}</span>
 		</td></tr>
 };
 

@@ -6,7 +6,7 @@ import module namespace transform = "http://exist-db.org/xquery/transform";
 
 declare function view-session-xhtml:transformToXHTML($doc as element(), $highlightId as xs:string?) as element()
 {
-    transform:transform($doc, doc('/db/archives/xslt/session_xhtml.xsl'), <parameters><param name="highlightId" value="{$highlightId}"/></parameters>)
+    transform:transform($doc, doc('/db/archives/xslt/session-xhtml.xsl'), <parameters><param name="highlightId" value="{$highlightId}"/></parameters>)
 };
 
 let $sessionId := if (request:exists()) then
