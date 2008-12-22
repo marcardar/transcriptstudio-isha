@@ -28,7 +28,7 @@ declare function search:main($searchString as xs:string, $defaultType as xs:stri
 						search:markup-as-table-row($markup)
 			else
 				if (exists($textSearchTerms)) then
-					for $segment in	search:text-search($transcripts/segment, $textSearchTerms)
+					for $segment in	search:text-search($transcripts//segment, $textSearchTerms)
 					order by $segment/ancestor::session/@id descending
 					return
 						search:segment-as-table-row($segment)					
