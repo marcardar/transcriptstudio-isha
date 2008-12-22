@@ -23,7 +23,6 @@ declare function search-panel:main() as element()
 	return
 		<div class="panel">
 			<center>
-			<h2>Isha Foundation Transcript Search</h2>
 			<table id="header">
 				<tr><td valign="bottom">
 				<form id="search-form" action="{session:encode-url(request:get-uri())}">
@@ -31,7 +30,7 @@ declare function search-panel:main() as element()
 						<td><input type="text" name="search" size="50" value="{if (not($searchString = $notSearchingNow)) then $searchString else ()}"/></td>
 						<td><select name="defaultType">
 							{
-							for $i in (1, 2, 3)
+							for $i in (1 to 3)
 							let $thisValue := $defaultTypeValues[$i]
 							let $thisName := $defaultTypeNames[$i]
 							return
@@ -42,7 +41,7 @@ declare function search-panel:main() as element()
 								
 							}
 						</select></td>
-						<td><input type="submit" value="Transcript Search"/></td>
+						<td><input type="submit" value="Search"/></td>
 					</tr></table>
 				</form>
 				</td></tr>
