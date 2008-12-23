@@ -15,13 +15,21 @@ declare function login-panel:transformToXHTML($doc as element(), $highlightId as
 declare function login-panel:main() as element()*
 {
 	let $queryString := request:get-query-string()
-	let $queryString := if ($queryString and not(contains($queryString, 'logout'))) then concat('?', $queryString) else ()
+	let $queryString := 
+		if ($queryString) then
+			if (not(contains($queryString, 'panel=login'))) then 
+				concat('?', $queryString) 
+			else
+				'?panel=search'
+		else
+			'?panel=search'
+			
 	return
 	(
 		<center><h2>Isha Foundation Transcript Studio</h2></center>
 	,
 		<div class="panel">
-			<form action="{session:encode-url(request:get-uri())}?panel=search{$queryString}" method="post">
+			<form action="{session:encode-url(request:get-uri())}{$queryString}" method="post">
 				<table class="login" cellpadding="5">
 					<tr>
 						<th colspan="2" align="left">Please Login</th>
