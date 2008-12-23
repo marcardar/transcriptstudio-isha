@@ -1,8 +1,8 @@
 xquery version "1.0";
 
-module namespace concepts-panel = "http://www.ishafoundation.org/archives/xquery/concepts-panel";
+module namespace all-concepts-panel = "http://www.ishafoundation.org/archives/xquery/all-concepts-panel";
 
-declare function concepts-panel:main() as element()*
+declare function all-concepts-panel:main() as element()*
 {	
 	let $reference := collection('/db/archives')/reference
 	let $referenceConcepts := ($reference/categories/category/tag[@type eq 'concept']/string(@value), $reference//concept/string(@idRef))
