@@ -126,9 +126,19 @@ declare function search-fns:markup-search($baseMarkups as element()*, $searchTer
 	else
 		let $searchTerm as xs:string := $searchTerms[1]
 		let $newConcepts := remove($searchTerms, 1)
-		let $expandedSearchTerm as xs:string* := search-fns:expand-concept($searchTerm)
-		let $newBaseMarkups := search-fns:markups-for-any-concept($baseMarkups, $expandedSearchTerm)
+		let $newBaseMarkups :=
+			if (search-fns:is-category-id($searchTerm)) then
+				search-fns:markups-for-category($baseMarkups, $searchTerm)
+			else
+				let $expandedSearchTerm as xs:string* := search-fns:expand-concept($searchTerm)
+				return
+					search-fns:markups-for-any-concept($baseMarkups, $expandedSearchTerm)
 		return search-fns:markup-search($newBaseMarkups, $newConcepts)
+};
+
+declare function search-fns:is-category-id($categoryId as xs:string) as xs:boolean
+{
+	exists(collection('/db/archives')/reference/categories/category[@id = $categoryId])
 };
 
 declare function search-fns:text-search($baseElements as element()*, $searchTerms as xs:string*) as element()*
@@ -207,6 +217,12 @@ declare function search-fns:markups-for-any-concept($baseMarkups as element()*, 
 		:)
 		(:error(QName("http://error.com", "myerror"), concat("Number of baseMarkups: ", count($baseMarkups))),:)
 		$result
+};
+
+declare function search-fns:markups-for-category($baseMarkups as element()*, $categoryId as xs:string*) as element()*
+{
+	for $markup in $baseMarkups/tag[@type = 'markupCategory' and @value = $categoryId]/..
+	return $markup
 };
 
 declare function search-fns:markup-as-table-row($markup as element()) as element()

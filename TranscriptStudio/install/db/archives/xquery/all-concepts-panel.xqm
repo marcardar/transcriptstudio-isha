@@ -11,9 +11,9 @@ declare function all-concepts-panel:main() as element()*
 	(
 		<center><h1>Isha Foundation Markup Concepts</h1></center>
 		,
-		for $concept in distinct-values(($referenceConcepts, $additionalConcepts))
-		order by $concept
+		for $conceptId in distinct-values(($referenceConcepts, $additionalConcepts))
+		order by $conceptId
 		return
-			<a class="concept-anchor" href="main.xql?panel=search&amp;search={$concept}&amp;defaultType=markup">{$concept}</a>
+			<a class="concept-anchor" href="main.xql?panel=categories&amp;conceptId={$conceptId}">{$conceptId}</a>
 	)
 };
