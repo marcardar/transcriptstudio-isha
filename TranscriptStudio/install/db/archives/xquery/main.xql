@@ -10,6 +10,9 @@ declare namespace request = "http://exist-db.org/xquery/request";
 declare namespace session = "http://exist-db.org/xquery/session";
 declare namespace xdb = "http://exist-db.org/xquery/xmldb";
 
+declare variable $defaultPanel := "search";
+
+import module namespace login-panel = "http://www.ishafoundation.org/archives/xquery/login-panel" at "login-panel.xqm";
 import module namespace search-panel = "http://www.ishafoundation.org/archives/xquery/search-panel" at "search-panel.xqm";
 import module namespace session-panel = "http://www.ishafoundation.org/archives/xquery/session-panel" at "session-panel.xqm";
 import module namespace concepts-panel = "http://www.ishafoundation.org/archives/xquery/concepts-panel" at "concepts-panel.xqm";
@@ -18,62 +21,27 @@ import module namespace categories-panel = "http://www.ishafoundation.org/archiv
 (:
 	Select the page to show. Every page is defined in its own module 
 :)
-declare function main:panel() as element()*
+declare function main:display-panel($panel) as element()*
 {
-	let $panel := request:get-parameter("panel", "status") return
-		if ($panel eq "search") then
-		(
-			search-panel:main()
-		)
-		else if ($panel eq "session") then
-		(
-			session-panel:main()
-		)
-		else if ($panel eq "concepts") then
-		(
-			concepts-panel:main()
-		)
-		else if ($panel eq "categories") then
-		(
-			categories-panel:main()
-		)
-		else
-		(
-			search-panel:main()
-		)
-};
-
-(:~  
-	Display the login form.
-:)
-declare function main:display-login-form() as element()*
-{
-	let $queryString := request:get-query-string()
-	let $queryString := if ($queryString and not(contains($queryString, 'logout'))) then concat('?', $queryString) else ()
-	return
+	if ($panel eq "search") then
 	(
-		<center><h2>Isha Foundation Transcript Studio</h2></center>
-	,
-		<div class="panel">
-			<form action="{session:encode-url(request:get-uri())}{$queryString}" method="post">
-				<table class="login" cellpadding="5">
-					<tr>
-						<th colspan="2" align="left">Please Login</th>
-					</tr>
-					<tr>
-						<td align="left">Username:</td>
-						<td><input name="user" type="text" size="20"/></td>
-					</tr>
-					<tr>
-						<td align="left">Password:</td>
-						<td><input name="pass" type="password" size="20"/></td>
-					</tr>
-					<tr>
-						<td colspan="2" align="left"><input type="submit"/></td>
-					</tr>
-				</table>
-			</form>
-		</div>
+		search-panel:main()
+	)
+	else if ($panel eq "session") then
+	(
+		session-panel:main()
+	)
+	else if ($panel eq "concepts") then
+	(
+		concepts-panel:main()
+	)
+	else if ($panel eq "categories") then
+	(
+		categories-panel:main()
+	)
+	else
+	(
+		error((), concat('Unrecognised panel: ', $panel))
 	)
 };
 
@@ -131,6 +99,7 @@ let $loginStatus :=
 			'Login required'
 		)
 	)
+let $panel := request:get-parameter("panel", $defaultPanel)
 let $highlightId := if (request:exists()) then
 		request:get-parameter('highlightId', ())
 	else
@@ -148,11 +117,6 @@ return
 			}
 		</head>
 		<body>
-			<!-- div class="header">
-				{admin:info-header()}
-				<img src="logo.jpg"/>
-			</div-->
-			
 			<div class="content">
 				{
 					if ($loginStatus) then
@@ -162,13 +126,20 @@ return
 						else
 							<p>{$loginStatus}</p>
 						,
-						main:display-login-form()
+						login-panel:main()
 					)
 					else
 					(
-						<p align="right"><a href="{session:encode-url(request:get-uri())}?logout=yes">Logout <b>{xdb:get-current-user()}</b></a></p>
+						<table width="100%"><tr>
+						{if (not($panel eq 'search')) then
+							<td align="left"><a href="{session:encode-url(request:get-uri())}?panel=search">New search</a></td>
+						else
+							()
+						}
+						<td align="right"><a href="{session:encode-url(request:get-uri())}?logout=yes">Logout <b>{xdb:get-current-user()}</b></a></td>
+						</tr></table>
 						,
-						main:panel()
+						main:display-panel($panel)
 					)
 				}
 			</div>

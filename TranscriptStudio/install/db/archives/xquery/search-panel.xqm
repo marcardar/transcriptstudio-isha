@@ -29,6 +29,7 @@ declare function search-panel:main() as element()*
 			<table id="header">
 				<tr><td valign="bottom">
 				<form id="search-form" action="{session:encode-url(request:get-uri())}">
+					<input type="hidden" name="panel" value="search"/>
 					<table id="search-form-table"><tr>
 						<td><input type="text" name="search" size="50" value="{if (not($searchString = $notSearchingNow)) then $searchString else ()}"/></td>
 						<td><select name="defaultType">
@@ -44,7 +45,7 @@ declare function search-panel:main() as element()*
 								
 							}
 						</select></td>
-						<td><input type="submit" value="Search"/></td>
+						<td><input type="submit" value="Search"/></td> 
 					</tr></table>
 				</form>
 				</td></tr>
