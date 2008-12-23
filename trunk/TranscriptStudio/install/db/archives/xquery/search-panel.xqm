@@ -38,11 +38,10 @@ declare function search-panel:main() as element()*
 							let $thisValue := $defaultTypeValues[$i]
 							let $thisName := $defaultTypeNames[$i]
 							return
-								if ($defaultType = $thisValue) then
-									<option value="{$thisValue}" selected="selected">{$thisName}</option>
-								else
-									<option value="{$thisValue}">{$thisName}</option>
-								
+								<option value="{$thisValue}">
+								{if ($defaultType = $thisValue) then attribute selected {'selected'} else ()}
+								{$thisName}
+								</option>
 							}
 						</select></td>
 						<td><input type="submit" value="Search"/></td> 
@@ -63,7 +62,10 @@ declare function search-panel:main() as element()*
 				)
 			}
 			<hr/>
-			Additional info: <a href="main.xql?panel=concepts">concepts</a>, <a href="main.xql?panel=categories">categories</a>
+			<div class="additional-info">
+				Additional info: <a href="main.xql?panel=all-concepts">concepts</a>, <a href="main.xql?panel=categories">categories</a>
+			</div>
+			<br/>
 		</div>
 	)
 };

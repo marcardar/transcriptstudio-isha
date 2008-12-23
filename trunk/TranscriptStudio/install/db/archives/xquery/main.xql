@@ -15,7 +15,7 @@ declare variable $defaultPanel := "search";
 import module namespace login-panel = "http://www.ishafoundation.org/archives/xquery/login-panel" at "login-panel.xqm";
 import module namespace search-panel = "http://www.ishafoundation.org/archives/xquery/search-panel" at "search-panel.xqm";
 import module namespace session-panel = "http://www.ishafoundation.org/archives/xquery/session-panel" at "session-panel.xqm";
-import module namespace concepts-panel = "http://www.ishafoundation.org/archives/xquery/concepts-panel" at "concepts-panel.xqm";
+import module namespace all-concepts-panel = "http://www.ishafoundation.org/archives/xquery/all-concepts-panel" at "all-concepts-panel.xqm";
 import module namespace categories-panel = "http://www.ishafoundation.org/archives/xquery/categories-panel" at "categories-panel.xqm";
 
 (:
@@ -35,9 +35,9 @@ declare function main:display-panel($panel) as element()*
 	(
 		session-panel:main()
 	)
-	else if ($panel eq "concepts") then
+	else if ($panel eq "all-concepts") then
 	(
-		concepts-panel:main()
+		all-concepts-panel:main()
 	)
 	else if ($panel eq "categories") then
 	(
