@@ -101,8 +101,7 @@ declare function search-fns:transcript-as-table-row($transcript as element()) as
 	let $session := $transcript/..
 	return
 		<tr><td class="result-td">
-			<a class="result-anchor" href="display-session-xhtml.xql?sessionId={$session/@id}">{search-fns:get-session-title($session)}</a>
-			<br/>
+			{search-fns:get-result-anchor($session, (), (), search-fns:get-session-title($session))}
 			<span class="row-footer">{string($session/@id)}</span>
 		</td></tr>
 };
@@ -241,8 +240,7 @@ declare function search-fns:markup-as-table-row($markup as element()) as element
 	let $maxTextChars := 500
 	return
 		<tr><td class="result-td">
-			<a class="result-anchor" href="display-session-xhtml.xql?sessionId={$session/@id}&amp;highlightId={$markup/@id}#{$targetId}">{string($markupType/@name)}{$markupCategoryName}{search-fns:get-additional-concepts-string($markup)}</a>
-			<br/>
+			{search-fns:get-result-anchor($session, $markup/@id, $targetId, concat($markupType/@name, $markupCategoryName, search-fns:get-additional-concepts-string($markup)))}
 			{
 				concat(substring($text, 0, $maxTextChars), 
 				if (string-length($text) > $maxTextChars) then "..." else ())
@@ -281,8 +279,7 @@ declare function search-fns:segment-as-table-row($segment as element()) as eleme
 	let $maxTextChars := 500
 	return
 		<tr><td class="result-td">
-			<a class="result-anchor" href="display-session-xhtml.xql?sessionId={$session/@id}&amp;highlightId={$segment/@id}#{$targetId}">{search-fns:get-session-title($session)}</a>
-			<br/>
+			{search-fns:get-result-anchor($session, $segment/@id, $targetId, search-fns:get-session-title($session))}
 			{
 				concat(substring($text, 0, $maxTextChars), 
 				if (string-length($text) > $maxTextChars) then "..." else ())
@@ -290,6 +287,18 @@ declare function search-fns:segment-as-table-row($segment as element()) as eleme
 			<br/>
 			<span class="row-footer">{string($session/@id)}</span>
 		</td></tr>
+};
+
+declare function search-fns:get-result-anchor($session as element(), $highlightId as xs:string?, $targetId as xs:string?, $text as xs:string) as element()*
+{
+	let $highlightParam := if ($highlightId) then concat('&amp;highlightId=', $highlightId) else ''
+	let $targetParam := if ($targetId) then concat('#', $targetId) else ''
+	return
+	(
+		<a class="result-anchor" href="main.xql?panel=session&amp;id={$session/@id}{$highlightParam}{$targetParam}">{$text}</a>
+	,
+		<br/>
+	)
 };
 
 declare function search-fns:get-event-id($sessionId as xs:string) as xs:string

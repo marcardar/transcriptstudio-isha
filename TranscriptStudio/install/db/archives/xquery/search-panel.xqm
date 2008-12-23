@@ -7,7 +7,7 @@ import module namespace search-fns = "http://www.ishafoundation.org/archives/xqu
 declare namespace request = "http://exist-db.org/xquery/request";
 declare namespace session = "http://exist-db.org/xquery/session";
 
-declare function search-panel:main() as element()
+declare function search-panel:main() as element()*
 {
 	let $defaultTypeValues := ('markup', 'text', 'event') 
 	let $defaultTypeNames := ('Markups', 'Text', 'Events')
@@ -21,6 +21,9 @@ declare function search-panel:main() as element()
 		else
 			()
 	return
+	(
+		<center><h2>Isha Foundation Transcript</h2></center>
+	,
 		<div class="panel">
 			<center>
 			<table id="header">
@@ -59,4 +62,5 @@ declare function search-panel:main() as element()
 				)
 			}
 		</div>
+	)
 };
