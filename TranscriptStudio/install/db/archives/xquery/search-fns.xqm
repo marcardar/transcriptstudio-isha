@@ -166,12 +166,12 @@ declare function search-fns:expand-concept($concept as xs:string) as xs:string*
 			return string($synonym/@idRef)
 		))
 	(: expand by concept hierarchy :) 
-	let $result := search-fns:get-super-concept-ids($synonyms, ())
+	let $result := search-fns:get-sub-concept-ids($synonyms, ())
 	return
 		$result
 };
 
-declare function search-fns:get-super-concept-ids($unprocessedIds as xs:string*, $processedIds as xs:string*) as xs:string*
+declare function search-fns:get-sub-concept-ids($unprocessedIds as xs:string*, $processedIds as xs:string*) as xs:string*
 {
 	let $newUnprocessedIds :=
 		if (count($unprocessedIds) = 0) then
@@ -183,12 +183,12 @@ declare function search-fns:get-super-concept-ids($unprocessedIds as xs:string*,
 					()
 				else
 					(: have not processed this one before :)
-					collection('/db/archives')/reference/conceptHierarchy/concept/concept[@idRef = $unprocessedId]/../@idRef
+					collection('/db/archives')/reference/conceptHierarchy/concept[@idRef = $unprocessedId]/concept/@idRef
 	return
 		let $newProcessedIds := ($processedIds, $unprocessedIds)
 		return
 			if ($newUnprocessedIds) then
-				search-fns:get-super-concept-ids($newUnprocessedIds, $newProcessedIds)
+				search-fns:get-sub-concept-ids($newUnprocessedIds, $newProcessedIds)
 			else
 				distinct-values($newProcessedIds)
 };
