@@ -78,48 +78,64 @@ declare function main:display-login-form() as element()*
 };
 
 (: main entry point :)
-let $isLoggedIn := if(xdb:get-current-user() eq "guest")then
+(: loginStatus will be empty iff logged in :)
+let $loginStatus :=
+	if (xdb:get-current-user() != "guest") then
 	(
-		(: is this a login attempt? :)
-		if(request:get-parameter("user", ()) and not(empty(request:get-parameter("pass", ()))))then
+		(: already logged in :)
+		(: are we logging out? - i.e. set permissions back to guest :)
+		if (request:get-parameter("logout",())) then
 		(
-			if(request:get-parameter("user", ()) eq "guest")then
-			(
-				(: prevent the guest user from accessing the admin webapp :)
-				false()
-			)
-			else
-			(
-				(: try and log the user in :)
-				xdb:login("/db", request:get-parameter("user", ()), request:get-parameter("pass", ()))
-			)
+			let $null := xdb:login("/db", "guest", "guest")
+			return
+				'Successfully logged out'
 		)
 		else
 		(
-			(: prevent the guest user from accessing the admin webapp :)
-			false()
+			(: we are already logged in and we are not the guest user :)
 		)
 	)
 	else
 	(
-		(: if we are already logged in, are we logging out - i.e. set permissions back to guest :)
-		if(request:get-parameter("logout",()))then
+		if (request:get-parameter-names() = 'user') then
 		(
-			let $null := xdb:login("/db", "guest", "guest") return
-				false()
+			let $user := request:get-parameter("user", 'admin')
+			return
+				(: is this a login attempt? :)
+				if (not($user)) then
+				(
+					'No user specified'
+				)
+				else if ($user eq "guest") then
+				(
+					(: prevent the guest user from accessing the admin webapp :)
+					concat('Not allowed to log in as ', $user)
+				)
+				else if (not(xdb:exists-user($user))) then
+				(
+					concat('Unknown user: ', $user)
+				)
+				else
+				(
+					let $success := xdb:login("/db", $user, request:get-parameter("pass", ()))
+					return
+						if ($success) then
+							()
+						else 
+							'Invalid password'
+				)
 		)
 		else
 		(
-			 (: we are already logged in and we are not the guest user :)
-			true()
+			(: not a login attempt :)
+			'Login required'
 		)
 	)
+let $highlightId := if (request:exists()) then
+		request:get-parameter('highlightId', ())
+	else
+		()
 return
-	let $highlightId := if (request:exists()) then
-			request:get-parameter('highlightId', ())
-		else
-			()
-	return
 	<html xmlns="http://www.w3.org/1999/xhtml">
 		<head>
 			<title>Isha Foundation Transcript Studio</title>
@@ -139,20 +155,23 @@ return
 			
 			<div class="content">
 				{
-					if ($isLoggedIn)then
-						<p align="right"><a href="{session:encode-url(request:get-uri())}?logout=yes">Logout <b>{xdb:get-current-user()}</b></a></p>
-					else
-						()
-					,
-					if ($isLoggedIn)then
+					if ($loginStatus) then
 					(
-						main:panel()
+						if ($loginStatus = 'Login required') then
+							()
+						else
+							<p>{$loginStatus}</p>
+						,
+						main:display-login-form()
 					)
 					else
 					(
-						main:display-login-form()
+						<p align="right"><a href="{session:encode-url(request:get-uri())}?logout=yes">Logout <b>{xdb:get-current-user()}</b></a></p>
+						,
+						main:panel()
 					)
 				}
 			</div>
 		</body>
 	</html>
+		
