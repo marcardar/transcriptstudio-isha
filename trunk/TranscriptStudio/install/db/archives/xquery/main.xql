@@ -23,7 +23,11 @@ import module namespace categories-panel = "http://www.ishafoundation.org/archiv
 :)
 declare function main:display-panel($panel) as element()*
 {
-	if ($panel eq "search") then
+	if ($panel eq "login") then
+	(
+		login-panel:main()
+	)
+	else if ($panel eq "search") then
 	(
 		search-panel:main()
 	)
@@ -46,13 +50,18 @@ declare function main:display-panel($panel) as element()*
 };
 
 (: main entry point :)
+let $panel := request:get-parameter("panel", $defaultPanel)
+let $highlightId := if (request:exists()) then
+		request:get-parameter('highlightId', ())
+	else
+		()
 (: loginStatus will be empty iff logged in :)
 let $loginStatus :=
 	if (xdb:get-current-user() != "guest") then
 	(
 		(: already logged in :)
 		(: are we logging out? - i.e. set permissions back to guest :)
-		if (request:get-parameter("logout",())) then
+		if ($panel eq 'login') then
 		(
 			let $null := xdb:login("/db", "guest", "guest")
 			return
@@ -99,11 +108,6 @@ let $loginStatus :=
 			'Login required'
 		)
 	)
-let $panel := request:get-parameter("panel", $defaultPanel)
-let $highlightId := if (request:exists()) then
-		request:get-parameter('highlightId', ())
-	else
-		()
 return
 	<html xmlns="http://www.w3.org/1999/xhtml">
 		<head>
@@ -136,7 +140,7 @@ return
 						else
 							()
 						}
-						<td align="right"><a href="{session:encode-url(request:get-uri())}?logout=yes">Logout <b>{xdb:get-current-user()}</b></a></td>
+						<td align="right"><a href="{session:encode-url(request:get-uri())}?panel=login">Logout <b>{xdb:get-current-user()}</b></a></td>
 						</tr></table>
 						,
 						main:display-panel($panel)
