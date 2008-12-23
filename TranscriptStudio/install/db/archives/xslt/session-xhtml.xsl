@@ -5,24 +5,16 @@
 	<xsl:param name="highlightId"/>
 	
 	<xsl:template match="/">
-		<html>
-            <head>
-                <style type="text/css">
-					#<xsl:value-of select="$highlightId"/>{ background-color:wheat; padding: 0 5px 0 5px;}
-				</style>
-			</head>
-			<body style="font-size:20;margin-top:50px;margin-bottom:100px;width:750px;margin-left:auto;margin-right:auto;text-align:left;">
-				<h1 style="text-align:center;font-size:25;">ISHA FOUNDATION TRANSCRIPT</h1>
-				<h2 style="text-align:center;font-size:22;">
-					<xsl:value-of select="upper-case(string-join(//source/@id, ', '))"/>
-					<xsl:text>: </xsl:text>
-					<xsl:value-of select="/session/@name"/>
-					<xsl:value-of select="concat(' (',/session/@startAt,')')"/>
-				</h2>
-				<br/>
-				<xsl:apply-templates select="//transcript"/>
-			</body>
-		</html>
+		<div style="font-size:20;margin-bottom:100px;width:750px;margin-left:auto;margin-right:auto;text-align:left;">
+			<h2 style="text-align:center;font-size:22;">
+				<xsl:value-of select="upper-case(string-join(//source/@id, ', '))"/>
+				<xsl:text>: </xsl:text>
+				<xsl:value-of select="/session/@name"/>
+				<xsl:value-of select="concat(' (',/session/@startAt,')')"/>
+			</h2>
+			<br/>
+			<xsl:apply-templates select="//transcript"/>
+		</div>
 	</xsl:template>
 	
 	<xsl:template match="transcript">
