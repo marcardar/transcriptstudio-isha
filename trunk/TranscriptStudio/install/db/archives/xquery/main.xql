@@ -12,6 +12,8 @@ declare namespace xdb = "http://exist-db.org/xquery/xmldb";
 
 import module namespace search-panel = "http://www.ishafoundation.org/archives/xquery/search-panel" at "search-panel.xqm";
 import module namespace session-panel = "http://www.ishafoundation.org/archives/xquery/session-panel" at "session-panel.xqm";
+import module namespace concepts-panel = "http://www.ishafoundation.org/archives/xquery/concepts-panel" at "concepts-panel.xqm";
+import module namespace categories-panel = "http://www.ishafoundation.org/archives/xquery/categories-panel" at "categories-panel.xqm";
 
 (:
 	Select the page to show. Every page is defined in its own module 
@@ -26,6 +28,14 @@ declare function main:panel() as element()*
 		else if ($panel eq "session") then
 		(
 			session-panel:main()
+		)
+		else if ($panel eq "concepts") then
+		(
+			concepts-panel:main()
+		)
+		else if ($panel eq "categories") then
+		(
+			categories-panel:main()
 		)
 		else
 		(

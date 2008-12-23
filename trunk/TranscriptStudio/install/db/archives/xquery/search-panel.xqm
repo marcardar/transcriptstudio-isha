@@ -22,7 +22,7 @@ declare function search-panel:main() as element()*
 			()
 	return
 	(
-		<center><h2>Isha Foundation Transcript</h2></center>
+		<center><h2>Isha Foundation Transcript &amp; Event Search</h2></center>
 	,
 		<div class="panel">
 			<center>
@@ -61,6 +61,8 @@ declare function search-panel:main() as element()*
 					'Blank search string'
 				)
 			}
+			<hr/>
+			Additional info: <a href="main.xql?panel=concepts">concepts</a>, <a href="main.xql?panel=categories">categories</a>
 		</div>
 	)
 };
