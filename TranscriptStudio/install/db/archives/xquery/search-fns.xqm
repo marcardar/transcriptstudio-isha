@@ -79,20 +79,19 @@ declare function search-fns:get-events($baseEvents as element()*, $eventSearchTe
 	else
 		let $searchTerm := $eventSearchTerms[1]
 		let $newEventSearchTerms := remove($eventSearchTerms, 1)
+		let $newBaseEvents :=
+			if (matches($searchTerm, '^[A-Z]{1,2}$')) then
+				(: this is an event type :)
+				$baseEvents[@type = lower-case($searchTerm)]
+			else
+				if (matches($searchTerm, '^[0-9]{4}$')) then
+					(: this is an event year :)
+					$baseEvents[starts-with(@startAt, $searchTerm)]
+				else 
+					(: it could be anything :)
+					$baseEvents[matches(@*, $searchTerm, 'i')]
 		return
-			let $newBaseEvents :=
-				if (matches($searchTerm, '^[A-Z]{1,2}$')) then
-					(: this is an event type :)
-					$baseEvents[@type = lower-case($searchTerm)]
-				else
-					if (matches($searchTerm, '^[0-9]{4}$')) then
-						(: this is an event year :)
-						$baseEvents[starts-with(@startAt, $searchTerm)]
-					else 
-						(: it could be anything :)
-						$baseEvents[matches(@*, $searchTerm, 'i')]
-			return
-				search-fns:get-events($newBaseEvents, $newEventSearchTerms)
+			search-fns:get-events($newBaseEvents, $newEventSearchTerms)
 };
 
 
