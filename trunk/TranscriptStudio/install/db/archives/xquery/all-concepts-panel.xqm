@@ -5,15 +5,23 @@ module namespace all-concepts-panel = "http://www.ishafoundation.org/archives/xq
 declare function all-concepts-panel:main() as element()*
 {	
 	let $reference := collection('/db/archives')/reference
-	let $referenceConcepts := ($reference/categories/category/tag[@type eq 'concept']/string(@value), $reference//concept/string(@idRef))
+	let $categoryConcepts := $reference/categories/category/tag[@type eq 'concept']/string(@value)
+	let $otherReferenceConcepts := $reference//concept/string(@idRef)
 	let $additionalConcepts := collection('/db/archives/data')/session/transcript/(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
 	return
 	(
 		<center><h1>Isha Foundation Markup Concepts</h1></center>
 		,
-		for $conceptId in distinct-values(($referenceConcepts, $additionalConcepts))
+		<div style="font-size:small;">Note: italics denotes concept referenced by at least one category</div>
+		,
+		<br/>
+		,
+		for $conceptId in distinct-values(($categoryConcepts, $otherReferenceConcepts, $additionalConcepts))
 		order by $conceptId
 		return
-			<a class="concept-anchor" href="main.xql?panel=categories&amp;conceptId={$conceptId}">{$conceptId}</a>
+			if ($conceptId = $categoryConcepts) then
+				<a class="category-concept-anchor" href="main.xql?panel=categories&amp;conceptId={$conceptId}"><i>{$conceptId}</i></a>
+			else
+				<a class="concept-anchor" href="main.xql?panel=search&amp;search={$conceptId}&amp;defaultType=markup">{$conceptId}</a>
 	)
 };
