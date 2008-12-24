@@ -169,7 +169,7 @@
 	<mx:VBox width="100%" height="100%">
 		<mx:HBox width="100%">
 			<mx:ComboBox id="typeComboBox" labelFunction="comboBoxLabelFunc" dataProvider="{getCategoryTypeIdsForComboBox(this.referenceMgr)}"/>
-			<mx:TextInput width="100%" id="searchTextInput" restrict="a-z0-9\-" enter="searchClicked()"/>
+			<mx:TextInput width="100%" id="searchTextInput" restrict="a-z0-9\- " enter="searchClicked()"/>
 			<mx:Button label="Search" id="searchButton" click="searchClicked()" width="80"/>			
 		</mx:HBox>
 		<mx:HBox width="100%" height="100%">
