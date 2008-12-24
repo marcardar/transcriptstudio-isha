@@ -97,7 +97,7 @@
 		</mx:HBox>
 		<mx:Label text="Match on these concepts:" width="100%" paddingTop="5"/>
 		<mx:HBox width="100%">
-			<mx:TextInput id="conceptTextInput" width="100%" enter="addConceptClicked()"/>
+			<mx:TextInput id="conceptTextInput" width="100%" restrict="a-z0-9\-" enter="addConceptClicked()"/>
 			<mx:Button label="Add" width="100" enabled="{StringUtil.trim(conceptTextInput.text).length &gt; 0}" click="addConceptClicked()"/>
 		</mx:HBox>
 		<mx:HBox width="100%">
