@@ -47,7 +47,7 @@ package name.carter.mark.flex.project.mdoc
 		
 		[Bindable]
 		public function set markupTypeId(newValue:String):void {
-			setTags(superNode, MARKUP_TYPE_TAG_NAME, newValue);
+			setSingletonTag(superNode, MARKUP_TYPE_TAG_NAME, newValue);
 		}
 		
 		public function get markupTypeId():String {
@@ -56,7 +56,7 @@ package name.carter.mark.flex.project.mdoc
 		
 		[Bindable]
 		public function set markupCategoryId(newValue:String):void {
-			setTags(superNode, MARKUP_CATEGORY_TAG_NAME, newValue);			
+			setSingletonTag(superNode, MARKUP_CATEGORY_TAG_NAME, newValue);			
 		}
 		
 		public function get markupCategoryId():String {
@@ -65,7 +65,7 @@ package name.carter.mark.flex.project.mdoc
 		
 		[Bindable]
 		public function set markupCategorySuggestion(newValue:String):void {
-			setTags(superNode, MARKUP_CATEGORY_SUGGESTION_TAG_NAME, newValue);			
+			setSingletonTag(superNode, MARKUP_CATEGORY_SUGGESTION_TAG_NAME, newValue);			
 		}
 		
 		public function get markupCategorySuggestion():String {
@@ -83,7 +83,7 @@ package name.carter.mark.flex.project.mdoc
 		
 		[Bindable]
 		public function set summary(newValue:String):void {
-			setTags(superNode, SUMMARY_TAG_NAME, newValue);
+			setSingletonTag(superNode, SUMMARY_TAG_NAME, newValue);
 		}
 		
 		public function get summary():String {
@@ -92,7 +92,7 @@ package name.carter.mark.flex.project.mdoc
 		
 		[Bindable]
 		public function set comment(newValue:String):void {
-			setTags(superNode, COMMENT_TAG_NAME, newValue);
+			setSingletonTag(superNode, COMMENT_TAG_NAME, newValue);
 		}
 		
 		public function get comment():String {
@@ -101,7 +101,7 @@ package name.carter.mark.flex.project.mdoc
 		
 		[Bindable]
 		public function set rating(newValue:int):void {
-			setTags(superNode, RATING_TAG_NAME, newValue >= 0 ? newValue : null);
+			setSingletonTag(superNode, RATING_TAG_NAME, newValue >= 0 ? newValue : null);
 		}
 		
 		public function get rating():int {
@@ -188,7 +188,7 @@ package name.carter.mark.flex.project.mdoc
 			}
 		}
 		
-		private static function setTags(taggable:TaggableMNode, type:String, ...values):void {
+		private static function setTags(taggable:TaggableMNode, type:String, values:Array):void {
 			taggable.removeAllTags(type);
 			if (values != null) {
 				for each (var value:* in values) {
@@ -197,8 +197,18 @@ package name.carter.mark.flex.project.mdoc
 					}
 					var valueStr:String = value.toString();
 					if (valueStr != null && valueStr.length > 0) {
-						taggable.addTag(type, value);
+						taggable.addTag(type, valueStr);
 					}
+				}
+			}
+		}
+		
+		private static function setSingletonTag(taggable:TaggableMNode, type:String, value:Object):void {
+			taggable.removeAllTags(type);
+			if (value != null) {
+				var valueStr:String = value.toString();
+				if (valueStr != null && valueStr.length > 0) {
+					taggable.addTag(type, valueStr);
 				}
 			}
 		}

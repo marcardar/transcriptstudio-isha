@@ -58,7 +58,7 @@ package org.ishafoundation.archives.transcript.model
 				result += ": " + referenceMgr.getCategoryName(markupAttrs.markupCategoryId);
 				var catTags:Array = referenceMgr.getConceptsForCategoryId(markupAttrs.markupCategoryId);
 				if (catTags.length > 0) {
-					result += " [" + catTags.toString() + "]";
+					result += " [" + catTags.join(' ') + "]";
 				}
 			}
 			else if (markupAttrs.markupCategorySuggestion != "") {
@@ -68,7 +68,7 @@ package org.ishafoundation.archives.transcript.model
 				// this is uncategorized
 			}
 			if (includeAdditionalConcepts && markupAttrs.additionalConcepts.length > 0) {
-				result += " +[" + markupAttrs.additionalConcepts + "]";
+				result += " +[" + markupAttrs.additionalConcepts.join(' ') + "]";
 			}
 			return result;
 		}
