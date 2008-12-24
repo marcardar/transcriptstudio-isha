@@ -270,7 +270,7 @@ declare function search-fns:get-markup-category-concepts-string($markupCategory 
 	let $conceptNames := $markupCategory/tag[@type = 'concept']/@value
 	return
 		if (exists($conceptNames)) then
-			concat(' [', string-join($conceptNames, ', '), ']')
+			concat(' [', string-join($conceptNames, ' '), ']')
 		else
 			''
 };
