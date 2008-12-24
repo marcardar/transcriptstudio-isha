@@ -18,26 +18,33 @@ declare function categories-panel:main() as element()*
 			$reference/categories/category
 	return
 	(
-		<center><h1>Isha Foundation Markup Categories{
-			if ($conceptId) then
-			(
-				<br/>
-				,
-				concat('(for concept: ', $conceptId, ')')
-			)
-			else ()
-			}</h1></center>
-		,
-			if (exists($categories)) then
-				for $category in $categories
-				order by lower-case($category/@name)
-				return
-					<div class="category">
-						<span>
-							<a class="category-anchor" href="main.xql?panel=search&amp;search=markup:{$category/@id}">{concat($category/@name, search-fns:get-markup-category-concepts-string($category))}</a>
-						</span>
-					</div>
-			else
-				<div>No categories for concept: {$conceptId}</div>
+		<center><h1>Isha Foundation Markup Categories
+			{
+				if ($conceptId) then
+				(
+					<br/>
+					,
+					'(for concept: '
+					,
+					<a href="main.xql?panel=search&amp;search={$conceptId}&amp;defaultType=markup">{$conceptId}</a>
+					,
+					')'
+				)
+				else
+					()
+			}
+		</h1></center>
+	,
+		if (exists($categories)) then
+			for $category in $categories
+			order by lower-case($category/@name)
+			return
+				<div class="category">
+					<span>
+						<a class="category-anchor" href="main.xql?panel=search&amp;search=markup:{$category/@id}">{concat($category/@name, search-fns:get-markup-category-concepts-string($category))}</a>
+					</span>
+				</div>
+		else
+			<div>No categories for concept: {$conceptId}</div>
 	)
 };
