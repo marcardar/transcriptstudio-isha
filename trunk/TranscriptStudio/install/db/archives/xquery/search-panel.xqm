@@ -30,8 +30,8 @@ declare function search-panel:main() as element()*
 				<tr><td valign="bottom">
 				<form id="search-form" action="{session:encode-url(request:get-uri())}">
 					<input type="hidden" name="panel" value="search"/>
-					<table id="search-form-table"><tr>
-						<td><input type="text" name="search" size="50" value="{if (not($searchString = $notSearchingNow)) then $searchString else ()}"/></td>
+					<table id="search-form-table" cellpadding="2"><tr>
+						<td>Search</td>
 						<td><select name="defaultType">
 							{
 							for $i in (1 to 3)
@@ -44,6 +44,8 @@ declare function search-panel:main() as element()*
 								</option>
 							}
 						</select></td>
+						<td>for</td>
+						<td><input type="text" name="search" size="50" value="{if (not($searchString = $notSearchingNow)) then $searchString else ()}"/></td>
 						<td><input type="submit" value="Search"/></td> 
 					</tr></table>
 				</form>

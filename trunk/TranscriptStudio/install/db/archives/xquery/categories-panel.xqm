@@ -18,7 +18,7 @@ declare function categories-panel:main() as element()*
 			$reference/categories/category
 	return
 	(
-		<center><h1>Isha Foundation Markup Categories
+		<center><h2>Isha Foundation Markup Categories
 			{
 				if ($conceptId) then
 				(
@@ -33,7 +33,7 @@ declare function categories-panel:main() as element()*
 				else
 					()
 			}
-		</h1></center>
+		</h2></center>
 	,
 		if (exists($categories)) then
 			for $category in $categories

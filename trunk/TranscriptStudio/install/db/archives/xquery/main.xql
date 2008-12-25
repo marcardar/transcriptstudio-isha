@@ -114,7 +114,7 @@ let $loginStatus :=
 return
 	<html xmlns="http://www.w3.org/1999/xhtml">
 		<head>
-			<title>Isha Foundation Transcript Studio</title>
+			<title>Isha Foundation Transcripts</title>
 			<link type="text/css" href="main.css" rel="stylesheet"/>
 			{if ($highlightId) then
 	            <style type="text/css">

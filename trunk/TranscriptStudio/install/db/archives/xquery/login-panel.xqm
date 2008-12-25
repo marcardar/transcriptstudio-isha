@@ -26,7 +26,7 @@ declare function login-panel:main() as element()*
 			
 	return
 	(
-		<center><h2>Isha Foundation Transcript Studio</h2></center>
+		<center><h2>Isha Foundation Transcripts</h2></center>
 	,
 		<div class="panel">
 			<form action="{session:encode-url(request:get-uri())}{$queryString}" method="post">
