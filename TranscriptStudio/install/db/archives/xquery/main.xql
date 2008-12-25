@@ -12,6 +12,9 @@ declare namespace xdb = "http://exist-db.org/xquery/xmldb";
 
 declare variable $defaultPanel := "search";
 
+(:declare option exist:serialize "method=xhtml doctype-public=-//W3C//DTD XHTML 1.1//EN doctype-system=http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd";:) 
+declare option exist:serialize "media-type=text/html"; 
+
 import module namespace login-panel = "http://www.ishafoundation.org/archives/xquery/login-panel" at "login-panel.xqm";
 import module namespace search-panel = "http://www.ishafoundation.org/archives/xquery/search-panel" at "search-panel.xqm";
 import module namespace session-panel = "http://www.ishafoundation.org/archives/xquery/session-panel" at "session-panel.xqm";
@@ -125,10 +128,7 @@ return
 				{
 					if ($loginStatus) then
 					(
-						if ($loginStatus = 'Login required') then
-							()
-						else
-							<p>{$loginStatus}</p>
+						<p>{if ($loginStatus = 'Login required') then () else $loginStatus}</p>
 						,
 						login-panel:main()
 					)

@@ -51,14 +51,16 @@ declare function search-panel:main() as element()*
 			</table>
 			</center>
 			{
-			if (request:get-parameter('search', 'notsearchingnow') = 'notsearchingnow') then
-				()
-			else
-				(<hr/>,
-				if ($searchString) then
-					search-fns:main($searchString, $defaultType)
+				if (request:get-parameter('search', 'notsearchingnow') = 'notsearchingnow') then
+					()
 				else
-					'Blank search string'
+				(
+					<hr/>
+				,
+					if ($searchString) then
+						search-fns:main($searchString, $defaultType)
+					else
+						'Blank search string'
 				)
 			}
 			<hr/>
