@@ -2,6 +2,8 @@ xquery version "1.0";
 
 module namespace search-fns = "http://www.ishafoundation.org/archives/xquery/search-fns";
 
+declare variable $search-fns:maxTextChars := 560;
+
 (: $defaultType is either "markup", "text" or "event" :)
 declare function search-fns:main($searchString as xs:string, $defaultType as xs:string) as element()*
 {
@@ -92,17 +94,6 @@ declare function search-fns:get-events($baseEvents as element()*, $eventSearchTe
 					$baseEvents[matches(@*, $searchTerm, 'i')]
 		return
 			search-fns:get-events($newBaseEvents, $newEventSearchTerms)
-};
-
-
-declare function search-fns:transcript-as-table-row($transcript as element()) as element()
-{
-	let $session := $transcript/..
-	return
-		<tr><td class="result-td">
-			{search-fns:get-result-anchor($session, (), (), search-fns:get-session-title($session))}
-			<span class="row-footer">{string($session/@id)}</span>
-		</td></tr>
 };
 
 declare function search-fns:get-session-title($session as element()) as xs:string
@@ -252,17 +243,26 @@ declare function search-fns:markup-as-table-row($markup as element()) as element
 					search-fns:element-text($markup)
 		else
 			search-fns:element-text($markup)
-	let $maxTextChars := 500
 	return
-		<tr><td class="result-td">
-			{search-fns:get-result-anchor($session, $markup/@id, $targetId, concat($markupType/@name, $markupCategoryName, search-fns:get-additional-concepts-string($markup)))}
-			{
-				concat(substring($text, 0, $maxTextChars), 
-				if (string-length($text) > $maxTextChars) then "..." else ())
-			}
-			<br/>
-			<span class="row-footer">{concat(search-fns:get-session-title($session), ' [', $session/@id, ']')}</span>
-		</td></tr>
+		<table class="single-result">
+			<tr>
+				<td><img src="../assets/{$markup/tag[@type='markupType']/@value}.png" width="24" height="24"/></td>
+				<td class="result-header" width="100%">
+					{search-fns:get-result-header($session, $markup/@id, $targetId, concat($markupType/@name, $markupCategoryName, search-fns:get-additional-concepts-string($markup)))}
+				</td>
+			</tr>
+			<tr>
+				<td class="result-body" colspan="2">
+					{substring($text, 0, $search-fns:maxTextChars)} 
+					{if (string-length($text) > $search-fns:maxTextChars) then '...' else ()}
+				</td>
+			</tr>
+			<tr>
+				<td class="result-footer" colspan="2">
+					{concat(search-fns:get-session-title($session), ' [', $session/@id, ']')}
+				</td>
+			</tr>
+		</table>
 };
 
 declare function search-fns:get-markup-category-concepts-string($markupCategory as element()) as xs:string
@@ -291,29 +291,43 @@ declare function search-fns:segment-as-table-row($segment as element()) as eleme
 	let $targetId := $segment/preceding::segment[1]/@id (: maybe faster to use $markup/preceding-sibling::*[1]//segment[last()]/@id :)
 	let $targetId := ($targetId, $segment/@id) [1]
 	let $text := search-fns:element-text($segment)
-	let $maxTextChars := 500
 	return
-		<tr><td class="result-td">
-			{search-fns:get-result-anchor($session, $segment/@id, $targetId, search-fns:get-session-title($session))}
+		<div class="single-result">
+			<div class="result-header">
+				{search-fns:get-result-header($session, $segment/@id, $targetId, search-fns:get-session-title($session))}
+			</div>
+			<div class="result-body">
 			{
-				concat(substring($text, 0, $maxTextChars), 
-				if (string-length($text) > $maxTextChars) then "..." else ())
+				concat(substring($text, 0, $search-fns:maxTextChars), 
+				if (string-length($text) > $search-fns:maxTextChars) then "..." else ())
 			}
-			<br/>
-			<span class="row-footer">{string($session/@id)}</span>
-		</td></tr>
+			</div>
+			<div class="result-footer">
+				{string($session/@id)}
+			</div>
+		</div>
 };
 
-declare function search-fns:get-result-anchor($session as element(), $highlightId as xs:string?, $targetId as xs:string?, $text as xs:string) as element()*
+declare function search-fns:transcript-as-table-row($transcript as element()) as element()
+{
+	let $session := $transcript/..
+	return
+		<div class="single-result">
+			<div class="result-header">
+				{search-fns:get-result-header($session, (), (), search-fns:get-session-title($session))}
+			</div>
+			<div class="result-footer">
+				{string($session/@id)}
+			</div>
+		</div>
+};
+
+declare function search-fns:get-result-header($session as element(), $highlightId as xs:string?, $targetId as xs:string?, $text as xs:string) as element()
 {
 	let $highlightParam := if ($highlightId) then concat('&amp;highlightId=', $highlightId) else ''
 	let $targetParam := if ($targetId) then concat('#', $targetId) else ''
 	return
-	(
-		<a class="result-anchor" href="main.xql?panel=session&amp;id={$session/@id}{$highlightParam}{$targetParam}">{$text}</a>
-	,
-		<br/>
-	)
+		<a class="result-header" href="main.xql?panel=session&amp;id={$session/@id}{$highlightParam}{$targetParam}">{$text}</a>
 };
 
 declare function search-fns:get-event-id($sessionId as xs:string) as xs:string
