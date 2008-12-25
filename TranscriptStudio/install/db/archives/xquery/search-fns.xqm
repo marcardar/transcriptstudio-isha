@@ -59,9 +59,7 @@ declare function search-fns:main($searchString as xs:string, $defaultType as xs:
 						(
 							<p>Found {$numRows} result(s) {$afterSearching}</p>
 							,
-							<table class="result-table">
-								{$tableRows}
-							</table>
+							$tableRows
 						)
 };
 
@@ -247,20 +245,20 @@ declare function search-fns:markup-as-table-row($markup as element()) as element
 		<table class="single-result">
 			<tr>
 				<td><img src="../assets/{$markup/tag[@type='markupType']/@value}.png" width="24" height="24"/></td>
-				<td class="result-header" width="100%">
+				<td width="100%"><div class="result-header">
 					{search-fns:get-result-header($session, $markup/@id, $targetId, concat($markupType/@name, $markupCategoryName, search-fns:get-additional-concepts-string($markup)))}
-				</td>
+				</div></td>
 			</tr>
 			<tr>
-				<td class="result-body" colspan="2">
+				<td colspan="2"><div class="result-body">
 					{substring($text, 0, $search-fns:maxTextChars)} 
 					{if (string-length($text) > $search-fns:maxTextChars) then '...' else ()}
-				</td>
+				</div></td>
 			</tr>
 			<tr>
-				<td class="result-footer" colspan="2">
+				<td colspan="2"><div class="result-footer">
 					{concat(search-fns:get-session-title($session), ' [', $session/@id, ']')}
-				</td>
+				</div></td>
 			</tr>
 		</table>
 };

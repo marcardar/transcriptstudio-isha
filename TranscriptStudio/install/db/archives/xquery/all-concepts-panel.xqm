@@ -10,7 +10,7 @@ declare function all-concepts-panel:main() as element()*
 	let $additionalConcepts := collection('/db/archives/data')/session/transcript/(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
 	return
 	(
-		<center><h1>Isha Foundation Markup Concepts</h1></center>
+		<center><h2>Isha Foundation Markup Concepts</h2></center>
 		,
 		<div style="font-size:small;">Note: italics denotes concept referenced by at least one category</div>
 		,
