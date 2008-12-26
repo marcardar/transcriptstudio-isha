@@ -6,14 +6,13 @@ package name.carter.mark.flex.project.mdoc
 
 	public class MNode implements IUID
 	{
-		public static const CREATED_BY_ATTR_NAME:String = "createdBy";
-		public static const CREATED_AT_ATTR_NAME:String = "createdAt";
-		public static const MODIFIED_BY_ATTR_NAME:String = "modifiedBy";
-		public static const MODIFIED_AT_ATTR_NAME:String = "modifiedAt";
-		public static const PROOFED_BY_ATTR_NAME:String = "proofedBy";
-		public static const PROOFED_AT_ATTR_NAME:String = "proofedAt";
-		public static const PROOFREAD_BY_ATTR_NAME:String = "proofreadBy";
-		public static const PROOFREAD_AT_ATTR_NAME:String = "proofreadAt";
+		public static const LAST_ACTION_ATTR_NAME:String = "lastAction";
+		public static const LAST_ACTION_AT_ATTR_NAME:String = LAST_ACTION_ATTR_NAME + "At";
+		public static const LAST_ACTION_BY_ATTR_NAME:String = LAST_ACTION_ATTR_NAME + "By";
+		
+		public static const MODIFIED_ACTION:String = "modified";
+		public static const PROOFED_ACTION:String = "proofed";
+		public static const PROOFREAD_ACTION:String = "proofread";
 
 		public var nodeElement:XML;
 		private var _xmlBasedDoc:MDocument

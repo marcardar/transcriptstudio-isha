@@ -35,6 +35,13 @@ package org.ishafoundation.archives.transcript.importer
 		
 		private static const ACTION_PATTERN:RegExp = /^(.+)\s*\((.+)\)/;
 		
+		public static const MODIFIED_BY_ATTR_NAME:String = "modifiedBy";
+		public static const MODIFIED_AT_ATTR_NAME:String = "modifiedAt";
+		public static const PROOFED_BY_ATTR_NAME:String = "proofedBy";
+		public static const PROOFED_AT_ATTR_NAME:String = "proofedAt";
+		public static const PROOFREAD_BY_ATTR_NAME:String = "proofreadBy";
+		public static const PROOFREAD_AT_ATTR_NAME:String = "proofreadAt";
+
 		private static const EMPHASIZED:String = "emphasized";
 		private static const TAMIL:String = "tamil";
 
@@ -49,6 +56,7 @@ package org.ishafoundation.archives.transcript.importer
 		
 		public var audioTranscriptElement:XML; // parent for segment elements. Also holds transcribedBy,proofedBy etc 
 		public var sourceElement:XML; // properties and syncPoints
+		public var streamElement:XML;
 		public var sessionElement:XML; // only properties
 		public var eventElement:XML; // only properties
 		
@@ -60,7 +68,9 @@ package org.ishafoundation.archives.transcript.importer
 			
 			this.audioTranscriptElement = <audioTranscript {SessionProperties.SUB_TITLE_ATTR_NAME}={audioTranscriptName}/>;
 			var importedBy:String = Utils.getClassName(this) + "-v" + Utils.getApplicationVersion();
-			this.sourceElement = <source id={sourceId} {MNode.CREATED_AT_ATTR_NAME}={Utils.getNowDateString()} {MNode.CREATED_BY_ATTR_NAME}={importedBy}/>;
+			this.sourceElement = <source id={sourceId} type="mixer" {MODIFIED_AT_ATTR_NAME}={Utils.getNowDateString()} {MODIFIED_BY_ATTR_NAME}={importedBy}/>;
+			this.streamElement = <stream id="default"/>
+			this.sourceElement.appendChild(streamElement);
 			this.sessionElement = <session/>;
 			this.eventElement = <event {EventProperties.TYPE_ATTR_NAME}={eventType}/>;
 
@@ -330,14 +340,14 @@ package org.ishafoundation.archives.transcript.importer
 		private function extractHeaders():XML {
  			for each (var contentElement:XML in getHeaderContents()) {
  				// actions
- 				extractAttributeFromHeader(contentElement, audioTranscriptElement, ["TRANSCRIBED BY"], false, MNode.CREATED_BY_ATTR_NAME, true);
- 				extractAttributeFromHeader(contentElement, audioTranscriptElement, ["PROOFED BY"], false, MNode.PROOFED_BY_ATTR_NAME, true);
- 				extractAttributeFromHeader(contentElement, audioTranscriptElement, ["PROOFREAD BY", "PROOF READ BY"], false, MNode.PROOFREAD_BY_ATTR_NAME, true);
+ 				extractAttributeFromHeader(contentElement, audioTranscriptElement, ["TRANSCRIBED BY"], false, MODIFIED_BY_ATTR_NAME, true);
+ 				extractAttributeFromHeader(contentElement, audioTranscriptElement, ["PROOFED BY"], false, PROOFED_BY_ATTR_NAME, true);
+ 				extractAttributeFromHeader(contentElement, audioTranscriptElement, ["PROOFREAD BY", "PROOF READ BY"], false, PROOFREAD_BY_ATTR_NAME, true);
 
  				// now for the audio stuff
  				extractAttributeFromHeader(contentElement, sourceElement, ["MEDIA CODE #", "MEDIA CODE"], true, "id", true);
- 				extractAttributeFromHeader(contentElement, sourceElement, ["MEDIA SOURCE"], false, "type", true);
- 				extractAttributeFromHeader(contentElement, sourceElement, ["AUDIO CLARITY (E G F P)"], false, "audioClarity", true); 				
+ 				// now this is hardcoded as "mixer": extractAttributeFromHeader(contentElement, sourceElement, ["MEDIA SOURCE"], false, "type", true);
+ 				extractAttributeFromHeader(contentElement, streamElement, ["AUDIO CLARITY (E G F P)"], false, "quality", true); 				
 
  				// session - allow multiple dates to pile up because dates are in a special format
  				extractAttributeFromHeader(contentElement, sessionElement, ["DATE"], true, SessionProperties.START_AT_ATTR_NAME, false); 
@@ -349,9 +359,9 @@ package org.ishafoundation.archives.transcript.importer
  				extractAttributeFromHeader(contentElement, eventElement, ["LANGUAGE"], false, EventProperties.LANGUAGE_ATTR_NAME, true, EventProperties.LANGUAGE_DEFAULT);
  			}
  			// handle actionBy's properly (i.e. extract bracketed dates
-			processActionBy(MNode.CREATED_AT_ATTR_NAME, MNode.CREATED_BY_ATTR_NAME);
-			processActionBy(MNode.PROOFED_AT_ATTR_NAME, MNode.PROOFED_BY_ATTR_NAME);
-			processActionBy(MNode.PROOFREAD_AT_ATTR_NAME, MNode.PROOFREAD_BY_ATTR_NAME);
+			processActionBy(MODIFIED_AT_ATTR_NAME, MODIFIED_BY_ATTR_NAME);
+			processActionBy(PROOFED_AT_ATTR_NAME, PROOFED_BY_ATTR_NAME);
+			processActionBy(PROOFREAD_AT_ATTR_NAME, PROOFREAD_BY_ATTR_NAME);
  			
  			// handle source element properly
  			var audioClarity:String = XMLUtils.getAttributeValue(sourceElement, "audioClarity");
