@@ -72,9 +72,11 @@ package org.ishafoundation.archives.transcript.model
 			var result:String;
 			if (sessionFile == null) {
 				result = eventFile.collection.path + "/" + id;
-				if (props.name != null) {
-					result += " " + props.name;
+				if (props.subTitle != null) {
+					result += "-" + props.subTitle;
 				}
+				// replace spaces with underscores
+				result = result.replace(/ /g, "_").toLowerCase();
 				result += ".xml";
 			}
 			else {
@@ -83,6 +85,26 @@ package org.ishafoundation.archives.transcript.model
 			return result;
 		}
 		
+		/*private function generateFilename(eventProps:EventProperties):String {
+			var filename:String = id + "-" + eventProps.type;
+			if (eventProps.subTitle != null) {
+				filename += "-" + eventProps.subTitle;
+			}
+			if (subTitle != null) {
+				filename += "-" + subTitle;
+			}
+			if (eventProps.location != null) {
+				filename += "-" + eventProps.location;
+			}
+			if (eventProps.venue != null) {
+				filename += "-" + eventProps.venue;
+			}
+			filename += ".xml";
+			// remove any spaces and make lower case
+			filename = filename.replace(/ /g, "").toLowerCase();
+			return filename;
+		}*/
+
 		public static function testSourceId(str:String):Boolean {
 			var match:Object = SOURCE_ID_REG_EXP.exec(str);
 			if (match == null) {

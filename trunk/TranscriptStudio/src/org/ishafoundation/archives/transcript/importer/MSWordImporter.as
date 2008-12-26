@@ -62,6 +62,8 @@ package org.ishafoundation.archives.transcript.importer
 			for each (var at1:WordMLTransformer in audioTranscripts) {
 				var audioSessionElement:XML = at1.sessionElement;
 				WordMLTransformer.mergeInGuestProperties(sessionElement, audioSessionElement);
+				// remove the name attribute
+				delete sessionElement.@name;
 			}
 			var transcriptElement:XML = <transcript id="t1"/>;
 			for each (var audioTranscript:WordMLTransformer in audioTranscripts) {

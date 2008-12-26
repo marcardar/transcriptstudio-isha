@@ -7,7 +7,7 @@ package org.ishafoundation.archives.transcript.model
 	public class SessionProperties
 	{
 		public static const ID_ATTR_NAME:String = "id";
-		public static const NAME_ATTR_NAME:String = "name";
+		public static const SUB_TITLE_ATTR_NAME:String = "subTitle";
 		public static const START_AT_ATTR_NAME:String = "startAt";
 		public static const COMMENT_ATTR_NAME:String = "comment";
 		
@@ -31,12 +31,12 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		[Bindable]
-		public function get name():String {
-			return XMLUtils.getAttributeValue(sessionElement, NAME_ATTR_NAME);
+		public function get subTitle():String {
+			return XMLUtils.getAttributeValue(sessionElement, SUB_TITLE_ATTR_NAME);
 		}
 		
-		public function set name(newValue:String):void {
-			XMLUtils.setAttributeValue(sessionElement, NAME_ATTR_NAME, newValue);
+		public function set subTitle(newValue:String):void {
+			XMLUtils.setAttributeValue(sessionElement, SUB_TITLE_ATTR_NAME, newValue);
 		}
 		
 		[Bindable]
@@ -55,7 +55,6 @@ package org.ishafoundation.archives.transcript.model
 		
 		public function set comment(newValue:String):void {
 			XMLUtils.setAttributeValue(sessionElement, COMMENT_ATTR_NAME, newValue);
-		}
-		
+		}		
 	}
 }

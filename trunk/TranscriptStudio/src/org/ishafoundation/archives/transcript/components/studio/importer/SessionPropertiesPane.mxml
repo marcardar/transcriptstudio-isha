@@ -2,6 +2,8 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="creationCompleteHandler()" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10">
 	<mx:Script>
 	<![CDATA[
+		import org.ishafoundation.archives.transcript.model.ReferenceManager;
+		import org.ishafoundation.archives.transcript.model.EventProperties;
 		import mx.controls.Alert;
 		import org.ishafoundation.archives.transcript.model.SessionProperties;
 		import mx.events.PropertyChangeEvent;
@@ -17,8 +19,13 @@
 		import name.carter.mark.flex.util.XMLUtils;
 		import mx.collections.ArrayCollection;
 		
+		[Bindable]
+		public var referenceMgr:ReferenceManager;
+		
 		private var _sessionProps:SessionProperties;
 		private var _eventFile:EventFile;
+		[Bindable]
+		public var eventProps:EventProperties;
 		[Bindable]
 		private var existingSessionIndexes:ISet;
 
@@ -40,7 +47,7 @@
 				return;
 			}
 			_sessionProps = newProps;
-			sessionNameTextInput.text = _sessionProps.name;
+			sessionSubTitleTextInput.text = _sessionProps.subTitle;
 			startAtDateField.selectedDate = _sessionProps.startAt;
 			commentTextArea.text = _sessionProps.comment;
 			sessionIndexChangeHandler();
@@ -73,16 +80,33 @@
 			idAlreadyExists = existingSessionIndexes.contains(sessionIndex);
 			sessionProps.id = eventFile.nodeId + 's' + sessionIndexBox.text;
 		}
+
+		private static function generateFullTitle(eventProps:EventProperties, referenceMgr:ReferenceManager):String {
+			var result:String = referenceMgr.getEventTypeName(eventProps.type);
+			if (eventProps.subTitle != null) {
+				result += " - " + eventProps.subTitle;
+			}
+			return result;
+		}
+		
 	]]>
 	</mx:Script>
-	<mx:Boolean id="ready">{!idAlreadyExists &amp;&amp; StringUtil.trim(sessionNameTextInput.text).length > 0}</mx:Boolean>
+	<mx:Boolean id="ready">{!idAlreadyExists}</mx:Boolean>
 	<mx:Grid width="100%" height="100%">
 		<mx:GridRow width="100%">
 			<mx:GridItem height="100%" horizontalAlign="right" verticalAlign="middle">
-				<mx:Label text="Session Name"/>
+				<mx:Label text="Session Title"/>
 			</mx:GridItem>
 			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
-				<mx:TextInput width="100%" id="sessionNameTextInput" change="{sessionProps.name = sessionNameTextInput.text}"/>
+				<mx:Label width="100%" text="{generateFullTitle(eventProps, referenceMgr)}"/>
+			</mx:GridItem>
+		</mx:GridRow>
+		<mx:GridRow width="100%">
+			<mx:GridItem height="100%" horizontalAlign="right" verticalAlign="middle">
+				<mx:Label text="Session Sub Title"/>
+			</mx:GridItem>
+			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+				<mx:TextInput width="100%" id="sessionSubTitleTextInput" change="{sessionProps.subTitle = sessionSubTitleTextInput.text}"/>
 			</mx:GridItem>
 		</mx:GridRow>
 		<mx:GridRow width="100%">

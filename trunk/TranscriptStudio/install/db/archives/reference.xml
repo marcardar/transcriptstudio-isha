@@ -40,23 +40,28 @@
 		<eventType id="al" name="Ashram Life"/>
 	</eventTypes>
 	<places>
-		<country id="india" name="India">
-			<location id="iyc" name="Isha Yoga Center">
-				<venue id="spanda" name="Spanda Hall"/>
-				<venue id="biksha" name="Biksha Hall"/>
+		<country id="India">
+			<location id="Isha Yoga Center">
+				<venue id="Spanda Hall"/>
+				<venue id="Biksha Hall"/>
 			</location>
-			<location id="coimbatore" name="Coimbatore">
+			<location id="Coimbatore">
 			</location>
-			<location id="mumbai" name="Mumbai">
-				<venue id="bse" name="Bombay Stock Exchange"/>
+			<location id="Mumbai">
+				<venue id="Bombay Stock Exchange"/>
 			</location>
 		</country>
-		<country id="england" name="England">
-			<location id="london" name="London">
-				<venue id="millennium-mayfair" name="Millennium Mayfair Hotel"/>
+		<country id="England">
+			<location id="London">
+				<venue id="Millennium Mayfair Hotel"/>
 			</location>
 		</country>
 	</places>
+	<languages>
+		<language id="english"/>
+		<language id="tamil"/>
+		<language id="other"/>
+	<languages>
 	<categoryTypes>
 		<categoryType id="topic" name="Topic" contentType="outline"/>
 		<categoryType id="question" name="Question" contentType="outline"/>

@@ -1,6 +1,5 @@
 package org.ishafoundation.archives.transcript.model
 {
-	import name.carter.mark.flex.util.Utils;
 	import name.carter.mark.flex.util.XMLUtils;
 	
 	import org.ishafoundation.archives.transcript.util.IdUtils;
@@ -8,12 +7,13 @@ package org.ishafoundation.archives.transcript.model
 	public class EventProperties
 	{
 		public static const ID_ATTR_NAME:String = "id";
-		public static const NAME_ATTR_NAME:String = "name";
+		public static const SUB_TITLE_ATTR_SUB_TITLE:String = "subTitle";
 		public static const TYPE_ATTR_NAME:String = "type";
-		public static const TYPE_DEFAULT:String = "n";
 		public static const START_AT_ATTR_NAME:String = "startAt";
 		public static const END_AT_ATTR_NAME:String = "endAt";
+		public static const COUNTRY_ATTR_NAME:String = "country";
 		public static const LOCATION_ATTR_NAME:String = "location";
+		public static const VENUE_ATTR_NAME:String = "venue";
 		public static const LANGUAGE_ATTR_NAME:String = "language";
 		public static const LANGUAGE_DEFAULT:String = "english";
 		public static const COMMENT_ATTR_NAME:String = "comment";
@@ -49,12 +49,12 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		[Bindable]
-		public function get name():String {
-			return XMLUtils.getAttributeValue(eventElement, NAME_ATTR_NAME);			
+		public function get subTitle():String {
+			return XMLUtils.getAttributeValue(eventElement, SUB_TITLE_ATTR_SUB_TITLE);			
 		}
 		
-		public function set name(newValue:String):void {
-			XMLUtils.setAttributeValue(eventElement, NAME_ATTR_NAME, newValue);
+		public function set subTitle(newValue:String):void {
+			XMLUtils.setAttributeValue(eventElement, SUB_TITLE_ATTR_SUB_TITLE, newValue);
 		}
 		
 		[Bindable]
@@ -63,7 +63,7 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		public function set type(newValue:String):void {
-			XMLUtils.setAttributeValue(eventElement, TYPE_ATTR_NAME, newValue, TYPE_DEFAULT);
+			XMLUtils.setAttributeValue(eventElement, TYPE_ATTR_NAME, newValue);
 		}
 		
 		[Bindable]
@@ -85,12 +85,30 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		[Bindable]
+		public function get country():String {
+			return XMLUtils.getAttributeValue(eventElement, COUNTRY_ATTR_NAME);
+		}
+		
+		public function set country(newValue:String):void {
+			XMLUtils.setAttributeValue(eventElement, COUNTRY_ATTR_NAME, newValue);
+		}
+		
+		[Bindable]
 		public function get location():String {
 			return XMLUtils.getAttributeValue(eventElement, LOCATION_ATTR_NAME);
 		}
 		
 		public function set location(newValue:String):void {
 			XMLUtils.setAttributeValue(eventElement, LOCATION_ATTR_NAME, newValue);
+		}
+		
+		[Bindable]
+		public function get venue():String {
+			return XMLUtils.getAttributeValue(eventElement, VENUE_ATTR_NAME);
+		}
+		
+		public function set venue(newValue:String):void {
+			XMLUtils.setAttributeValue(eventElement, VENUE_ATTR_NAME, newValue);
 		}
 		
 		[Bindable]
@@ -111,6 +129,21 @@ package org.ishafoundation.archives.transcript.model
 			XMLUtils.setAttributeValue(eventElement, COMMENT_ATTR_NAME, newValue);
 		}
 		
-		
+		public function generateFilename():String {
+			var filename:String = id + "-" + type;
+			if (subTitle != null) {
+				filename += "-" + subTitle;
+			}
+			if (location != null) {
+				filename += "-" + location;
+			}
+			if (venue != null) {
+				filename += "-" + venue;
+			}
+			filename += ".xml";
+			// replace spaces with underscores and make lower case
+			filename = filename.replace(/ /g, "_").toLowerCase();
+			return filename;
+		}
 	}
 }

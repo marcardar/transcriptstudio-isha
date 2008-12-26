@@ -2,6 +2,7 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="creationCompleteHandler()" paddingLeft="10" paddingRight="10" paddingTop="10" paddingBottom="10" xmlns:collection="org.ishafoundation.archives.transcript.components.studio.collection.*">
 	<mx:Script>
 	<![CDATA[
+		import org.ishafoundation.archives.transcript.model.ReferenceManager;
 		import org.ishafoundation.archives.transcript.db.DatabaseConstants;
 		import org.ishafoundation.archives.transcript.fs.FileSystem;
 		import org.ishafoundation.archives.transcript.model.EventProperties;
@@ -17,6 +18,9 @@
 
 		[Bindable]
 		public var fileSystem:FileSystem;
+		
+		[Bindable]
+		public var referenceMgr:ReferenceManager;
 
 		[Bindable]
 		private var _eventProps:EventProperties;
@@ -26,7 +30,9 @@
 		private function creationCompleteHandler():void {
 			eventIndexBox.dataProvider = getArrayCollectionSequence(1, 99, 2, false);
 			eventLanguageComboBox.dataProvider = EventProperties.LANGUAGES;
-			eventTypeComboBox.dataProvider = EventProperties.TYPES;
+			eventTypeComboBox.dataProvider = referenceMgr.getEventTypes();
+			eventCountryComboBox.dataProvider = referenceMgr.getCountries();
+			eventCountryComboBox.selectedIndex = -1;
 		}
 		
 		[Bindable]
@@ -39,11 +45,13 @@
 				return;
 			}
 			_eventProps = newEventProps;
-			eventNameTextInput.text = _eventProps.name;
+			eventSubTitleTextInput.text = _eventProps.subTitle;
 			eventTypeComboBox.selectedItem = _eventProps.type;
 			startAtDateField.selectedDate = _eventProps.startAt; 
 			endAtDateField.selectedDate = _eventProps.endAt;
-			eventLocationTextInput.text = _eventProps.location; 
+			eventCountryComboBox.text = _eventProps.country; 
+			eventLocationComboBox.text = _eventProps.location; 
+			eventVenueComboBox.text = _eventProps.venue; 
 			eventLanguageComboBox.selectedItem = _eventProps.language;
 			commentTextArea.text = _eventProps.comment;
 			// reset the other fields
@@ -81,6 +89,22 @@
 			}
 			eventProps.id = idDateComponentStr + "e" + fixWidth(eventIndex, 2);
 		}
+		
+		private function countryChangeHandler():void {
+			eventProps.country = eventCountryComboBox.text;
+			eventLocationComboBox.dataProvider = referenceMgr.getLocations(eventCountryComboBox.text);
+			eventLocationComboBox.selectedIndex = -1;
+		}
+
+		private function locationChangeHandler():void {
+			eventProps.location = eventLocationComboBox.text;
+			var oldText:String = eventVenueComboBox.text;
+			eventVenueComboBox.dataProvider = referenceMgr.getVenues(eventCountryComboBox.text, eventLocationComboBox.text);
+			eventVenueComboBox.selectedIndex = -1;
+			callLater(function():void {
+				eventVenueComboBox.text = oldText;
+			});
+		}
 
 		private static function fixWidthForComboBox(comboBox:ComboBox, width:int):String {
 			var result:String;
@@ -112,22 +136,30 @@
 	<mx:Boolean id="idAlreadyExists">{existingEventIds.contains(eventProps.id)}</mx:Boolean>
 	<mx:Boolean id="invalidId">{!IdUtils.isValidEventId(eventProps.id)}</mx:Boolean>
 
-	<mx:Boolean id="ready">{!invalidId &amp;&amp; !idAlreadyExists &amp;&amp; StringUtil.trim(eventNameTextInput.text).length > 0 &amp;&amp; collectionChooserTree.selectedItem != null}</mx:Boolean>
+	<mx:Boolean id="ready">{!invalidId &amp;&amp; !idAlreadyExists &amp;&amp; collectionChooserTree.selectedItem != null}</mx:Boolean>
 	<mx:Grid width="100%" height="100%">
 		<mx:GridRow width="100%">
 			<mx:GridItem height="100%" horizontalAlign="right" verticalAlign="middle">
-				<mx:Label text="Event Name"/>
+				<mx:Label text="Event Type"/>
 			</mx:GridItem>
 			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
-				<mx:TextInput width="100%" id="eventNameTextInput" change="{eventProps.name = eventNameTextInput.text}"/>
+				<mx:ComboBox id="eventTypeComboBox" width="100" textAlign="center" change="{eventProps.type = eventTypeComboBox.selectedItem as String}"/>
 			</mx:GridItem>
 		</mx:GridRow>
 		<mx:GridRow width="100%">
 			<mx:GridItem height="100%" horizontalAlign="right" verticalAlign="middle">
-				<mx:Label text="Type"/>
+				<mx:Label text="Event Title"/>
 			</mx:GridItem>
 			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
-				<mx:ComboBox id="eventTypeComboBox" width="100" textAlign="center" change="{eventProps.type = eventTypeComboBox.selectedItem as String}"/>
+				<mx:Label id="eventTitleLabel" width="100%" text="{referenceMgr.getEventTypeName(eventTypeComboBox.value.toString())}"/>
+			</mx:GridItem>
+		</mx:GridRow>
+		<mx:GridRow width="100%">
+			<mx:GridItem height="100%" horizontalAlign="right" verticalAlign="middle">
+				<mx:Label text="Event Sub Title"/>
+			</mx:GridItem>
+			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+				<mx:TextInput width="100%" id="eventSubTitleTextInput" change="{eventProps.subTitle = eventSubTitleTextInput.text}"/>
 			</mx:GridItem>
 		</mx:GridRow>
 		<mx:GridRow width="100%">
@@ -159,10 +191,26 @@
 		</mx:GridRow>
 		<mx:GridRow width="100%">
 			<mx:GridItem height="100%" horizontalAlign="right" verticalAlign="middle">
+				<mx:Label text="Country"/>
+			</mx:GridItem>
+			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+				<mx:ComboBox width="100%" id="eventCountryComboBox" editable="true" change="countryChangeHandler()"/>
+			</mx:GridItem>
+		</mx:GridRow>
+		<mx:GridRow width="100%">
+			<mx:GridItem height="100%" horizontalAlign="right" verticalAlign="middle">
 				<mx:Label text="Location"/>
 			</mx:GridItem>
 			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
-				<mx:TextInput width="100%" id="eventLocationTextInput" change="{eventProps.location = eventLocationTextInput.text}"/>
+				<mx:ComboBox width="100%" id="eventLocationComboBox" editable="true" change="locationChangeHandler()"/>
+			</mx:GridItem>
+		</mx:GridRow>
+		<mx:GridRow width="100%">
+			<mx:GridItem height="100%" horizontalAlign="right" verticalAlign="middle">
+				<mx:Label text="Venue"/>
+			</mx:GridItem>
+			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+				<mx:ComboBox width="100%" id="eventVenueComboBox" editable="true" change="{eventProps.venue = eventVenueComboBox.text}"/>
 			</mx:GridItem>
 		</mx:GridRow>
 		<mx:GridRow width="100%">
