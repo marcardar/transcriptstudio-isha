@@ -69,6 +69,18 @@ package org.ishafoundation.archives.transcript.importer
 			for each (var audioTranscript:WordMLTransformer in audioTranscripts) {
 				var sourceElement:XML = audioTranscript.sourceElement;
 				sessionElement.appendChild(sourceElement);
+				var lastAction:String;
+				if (audioTranscript.audioTranscriptElement.hasOwnProperty("@proofreadBy")) {
+					lastAction = "proofread";
+				}
+				else if (audioTranscript.audioTranscriptElement.hasOwnProperty("@proofedBy")) {
+					lastAction = "proofed";
+				}
+				else {
+					lastAction = "modified";
+				}
+				var lastActionAt:Date = XMLUtils.getAttributeAsDate(audioTranscript.audioTranscriptElement, lastAction + "At");
+				var lastActionBy:String = XMLUtils.getAttributeValue(audioTranscript.audioTranscriptElement, lastAction + "By");
 				for each (var segmentElement:XML in audioTranscript.audioTranscriptElement.segment) {
 					if (segmentElement.content.length() > 0) {
 						// work on a copy
@@ -76,11 +88,9 @@ package org.ishafoundation.archives.transcript.importer
 						// remove all extracted content
 						XMLUtils.removeAllElements(segmentElement.*.(localName() != "content"));
 						// apply actions
-			 			for each (var attr:XML in audioTranscript.audioTranscriptElement.attributes()) {
-			 				var attrName:String = attr.localName();
-			 				var attrValue:String = attr.toString();
-			 				XMLUtils.setAttributeValue(segmentElement, attrName, attrValue);
-			 			}
+		 				XMLUtils.setAttributeValue(segmentElement, "lastAction", lastAction);
+		 				XMLUtils.setAttributeAsDate(segmentElement, "lastActionAt", lastActionAt);
+		 				XMLUtils.setAttributeValue(segmentElement, "lastActionBy", lastActionBy);
 						transcriptElement.appendChild(segmentElement);
 					}
 				}				

@@ -110,9 +110,9 @@ package org.ishafoundation.archives.transcript.model
 			if (username == null) {
 				throw new Error("Username has not been set");
 			}
-			if (XMLUtils.getAttributeAsDate(node.nodeElement, MNode.CREATED_BY_ATTR_NAME) == null) {
-				// this must be new because no createdBy has been set
-				setCreatedAttributesOnElement(node.nodeElement, date, username);
+			if (XMLUtils.getAttributeValue(node.nodeElement, MNode.LAST_ACTION_ATTR_NAME) == null) {
+				// this must be new because last action has not been set
+				setModifiedAttributesOnElement(node.nodeElement, date, username);
 			}
 			else if (node.modified) { // only set modified if not setting created
 				setModifiedAttributesOnElement(node.nodeElement, date, username);
@@ -124,15 +124,10 @@ package org.ishafoundation.archives.transcript.model
 			}
 		} 
 
-
 		public static function setModifiedAttributesOnElement(element:XML, modifiedDate:Date, modifiedBy:String):void {
-			XMLUtils.setAttributeAsDate(element, MNode.MODIFIED_AT_ATTR_NAME, modifiedDate, true);
-			XMLUtils.setAttributeValue(element, MNode.MODIFIED_BY_ATTR_NAME, modifiedBy);
-		}		
-
-		public static function setCreatedAttributesOnElement(element:XML, createdDate:Date, createdBy:String):void {
-			XMLUtils.setAttributeAsDate(element, MNode.CREATED_AT_ATTR_NAME, createdDate, true);
-			XMLUtils.setAttributeValue(element, MNode.CREATED_BY_ATTR_NAME, createdBy);
-		}		
+			XMLUtils.setAttributeValue(element, MNode.LAST_ACTION_ATTR_NAME, MNode.MODIFIED_ACTION);
+			XMLUtils.setAttributeAsDate(element, MNode.LAST_ACTION_AT_ATTR_NAME, modifiedDate, true);
+			XMLUtils.setAttributeValue(element, MNode.LAST_ACTION_BY_ATTR_NAME, modifiedBy);
+		}
 	}
 }
