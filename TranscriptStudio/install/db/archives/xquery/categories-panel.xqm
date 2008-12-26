@@ -44,7 +44,9 @@ declare function categories-panel:main() as element()*
 						<a class="category-anchor" href="main.xql?panel=search&amp;search=markup:{$category/@id}">{concat($category/@name, search-fns:get-markup-category-concepts-string($category))}</a>
 					</span>
 				</div>
-		else
+		else if ($conceptId) then
 			<div>No categories for concept: {$conceptId}</div>
+		else
+			<div>No categories defined!</div>
 	)
 };
