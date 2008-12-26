@@ -10,7 +10,7 @@ import module namespace search-fns = "http://www.ishafoundation.org/archives/xqu
 declare function categories-panel:main() as element()*
 {	
 	let $conceptId := request:get-parameter('conceptId', ())
-	let $reference := collection('/db/archives')/reference
+	let $reference := collection('/db/archives/reference')/reference
 	let $categories := 
 		if ($conceptId) then
 			$reference/categories/category/tag[@type eq 'concept' and @value eq $conceptId]/..
