@@ -24,6 +24,7 @@ package org.ishafoundation.archives.transcript.db
 	{
 		public static var EXIST_URL:String = "http://127.0.0.1:8080/exist";
 		public static const ARCHIVES_COLLECTION_PATH:String = "/db/archives";
+		public static const REFERENCE_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/reference";
 		public static const DATA_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/data";
 		public static const IMPORT_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/import";			
 		public static const EXPORT_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/export";			

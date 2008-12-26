@@ -37,7 +37,7 @@ package org.ishafoundation.archives.transcript.model
 	 */
 	public class ReferenceManager {
 
-		public static const REFERENCE_XML_PATH:String = DatabaseConstants.ARCHIVES_COLLECTION_PATH + "/reference.xml";
+		public static const REFERENCE_XML_PATH:String = DatabaseConstants.REFERENCE_COLLECTION_PATH + "/reference.xml";
 		
 		private var xmlRetrieverStorer:XMLRetrieverStorer;
 		

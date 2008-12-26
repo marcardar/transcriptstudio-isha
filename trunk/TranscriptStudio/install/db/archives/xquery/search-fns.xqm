@@ -127,7 +127,7 @@ declare function search-fns:markup-search($baseMarkups as element()*, $searchTer
 
 declare function search-fns:is-category-id($categoryId as xs:string) as xs:boolean
 {
-	exists(collection('/db/archives')/reference/categories/category[@id = $categoryId])
+	exists(collection('/db/archives/reference')/reference/categories/category[@id = $categoryId])
 };
 
 declare function search-fns:text-search($baseElements as element()*, $searchTerms as xs:string*) as element()*
@@ -159,7 +159,7 @@ declare function search-fns:expand-concept($concept as xs:string) as xs:string*
 {
 	(: expand by synonyms :)
 	let $synonyms := distinct-values(($concept,
-			for $synonym in collection('/db/archives')/reference/conceptSynonymGroups/conceptSynonymGroup/concept[@idRef = $concept]/../concept
+			for $synonym in collection('/db/archives/reference')/reference/conceptSynonymGroups/conceptSynonymGroup/concept[@idRef = $concept]/../concept
 			return string($synonym/@idRef)
 		))
 	(: expand by concept hierarchy :) 
@@ -180,7 +180,7 @@ declare function search-fns:get-sub-concept-ids($unprocessedIds as xs:string*, $
 					()
 				else
 					(: have not processed this one before :)
-					collection('/db/archives')/reference/conceptHierarchy/concept[@idRef = $unprocessedId]/concept/@idRef
+					collection('/db/archives/reference')/reference/conceptHierarchy/concept[@idRef = $unprocessedId]/concept/@idRef
 	return
 		let $newProcessedIds := ($processedIds, $unprocessedIds)
 		return
@@ -192,7 +192,7 @@ declare function search-fns:get-sub-concept-ids($unprocessedIds as xs:string*, $
 
 declare function search-fns:markups-for-any-concept($baseMarkups as element()*, $concepts as xs:string*) as element()*
 {
-	let $markupCategories as element()*:= collection('/db/archives')/reference/categories/category/tag[@type = "concept" and exists(index-of($concepts, string(@value)))]/..
+	let $markupCategories as element()*:= collection('/db/archives/reference')/reference/categories/category/tag[@type = "concept" and exists(index-of($concepts, string(@value)))]/..
 	(:
 	let $null := error(QName("http://error.com", "myerror"), concat("Number of markupCategories: ", count($markupCategories)))
 	:)
@@ -218,9 +218,9 @@ declare function search-fns:markup-as-table-row($markup as element()) as element
 {
 	let $session := $markup/ancestor::session
 	let $markupTypeId := $markup/tag[@type = 'markupType']/@value
-	let $markupType := collection('/db/archives')/reference/categoryTypes/categoryType[@id = $markupTypeId]
+	let $markupType := collection('/db/archives/reference')/reference/categoryTypes/categoryType[@id = $markupTypeId]
 	let $categoryId := $markup/tag[@type = 'markupCategory']/@value
-	let $markupCategory := collection('/db/archives')/reference/categories/category[@id = $categoryId]
+	let $markupCategory := collection('/db/archives/reference')/reference/categories/category[@id = $categoryId]
 	let $markupCategoryName := if (exists($markupCategory)) then
 			concat(': ', $markupCategory/@name, search-fns:get-markup-category-concepts-string($markupCategory))
 		else
