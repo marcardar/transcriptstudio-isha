@@ -2,6 +2,7 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="{getTitle(viewstack.selectedChild)}" creationComplete="init()" xmlns:importer="org.ishafoundation.archives.transcript.components.studio.importer.*">
 	<mx:Script>
 	<![CDATA[
+		import org.ishafoundation.archives.transcript.model.ReferenceManager;
 		import org.ishafoundation.archives.transcript.db.DatabaseConstants;
 		import org.ishafoundation.archives.transcript.importer.MSWordImporter;
 		import mx.core.Container;
@@ -33,7 +34,11 @@
 	   	
 	   	public var xmlStorer:XMLStorer;
 	   	
+	   	[Bindable]
+	   	public var referenceMgr:ReferenceManager;
+	   	
 		private var _fileSystem:FileSystem;
+		
 		[Bindable]
 		private var existingSessionIds:ISet;
 		
@@ -134,7 +139,7 @@
 			else if (viewstack.selectedChild == eventPropertiesPane) {
 				// need to create the new event file
 				var collection:Collection = eventPropertiesPane.collectionChooserTree.selectedItem as Collection;
-				var filename:String = eventPropertiesPane.eventProps.id + " " + eventPropertiesPane.eventProps.name + ".xml";
+				var filename:String = eventPropertiesPane.eventProps.generateFilename();
 				var eventPath:String = collection.path + "/" + filename;
 				xmlStorer.storeXML(eventPath, eventXML, function():void {
 					fileSystem.refresh(collection.path, function():void {
@@ -182,6 +187,7 @@
 			else if (viewstack.selectedChild == sessionPropertiesPane) {
 				var sp:SessionProperties = new SessionProperties(sessionXML);
 				sessionPropertiesPane.eventFile = eventFile;
+				sessionPropertiesPane.eventProps = new EventProperties(eventXML);
 				sessionPropertiesPane.sessionProps = sp;
 			}
 		}
@@ -259,8 +265,8 @@
 		</mx:VBox>
 		<importer:ImportFilesPreviewPane id="importFilesPreviewPane" width="100%" height="100%"/>
 		<importer:EventSelectorPane id="eventSelectorPane" width="100%" height="100%"/>
-		<importer:EventPropertiesPane id="eventPropertiesPane" label="Event Properties" width="100%" height="100%"/>
-		<importer:SessionPropertiesPane id="sessionPropertiesPane" label="Session Properties" width="100%" height="100%"/>
+		<importer:EventPropertiesPane id="eventPropertiesPane" label="Event Properties" width="100%" height="100%" referenceMgr="{referenceMgr}"/>
+		<importer:SessionPropertiesPane id="sessionPropertiesPane" label="Session Properties" width="100%" height="100%" referenceMgr="{referenceMgr}"/>
 	</mx:ViewStack>
 	<mx:HBox id="buttonBox">
 		<mx:Button label="&lt; Back" enabled="{isBackEnabled()}" click="backClicked(event)"/>

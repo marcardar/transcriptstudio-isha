@@ -58,10 +58,10 @@ package org.ishafoundation.archives.transcript.importer
 			var audioTranscriptName:String = extractAudioTranscriptNameFromFilePath(filePath);
 			var eventType:String = extractEventTypeFromSourceId(sourceId);
 			
-			this.audioTranscriptElement = <audioTranscript/>;
+			this.audioTranscriptElement = <audioTranscript {SessionProperties.SUB_TITLE_ATTR_NAME}={audioTranscriptName}/>;
 			var importedBy:String = Utils.getClassName(this) + "-v" + Utils.getApplicationVersion();
 			this.sourceElement = <source id={sourceId} {MNode.CREATED_AT_ATTR_NAME}={Utils.getNowDateString()} {MNode.CREATED_BY_ATTR_NAME}={importedBy}/>;
-			this.sessionElement = <session {SessionProperties.NAME_ATTR_NAME}={audioTranscriptName}/>;
+			this.sessionElement = <session/>;
 			this.eventElement = <event {EventProperties.TYPE_ATTR_NAME}={eventType}/>;
 
 			transformXML(wordMLDoc, idFunc);
@@ -74,7 +74,7 @@ package org.ishafoundation.archives.transcript.importer
 		}
 		
 		public function get name():String {
-			return XMLUtils.getAttributeValue(sessionElement, SessionProperties.NAME_ATTR_NAME);
+			return XMLUtils.getAttributeValue(audioTranscriptElement, SessionProperties.SUB_TITLE_ATTR_NAME);
 		}
 		
 		public function get text():String {
@@ -344,8 +344,8 @@ package org.ishafoundation.archives.transcript.importer
  				extractAttributeFromHeader(contentElement, sessionElement, ["NOTES", "NOTE"], false, SessionProperties.COMMENT_ATTR_NAME, false);
 				
 				// event
- 				extractAttributeFromHeader(contentElement, eventElement, ["EVENT"], false, EventProperties.NAME_ATTR_NAME, false);
- 				extractAttributeFromHeader(contentElement, eventElement, ["LOCATION"], false, EventProperties.LOCATION_ATTR_NAME, false);
+ 				//extractAttributeFromHeader(contentElement, eventElement, ["EVENT"], false, EventProperties.SUB_TITLE_ATTR_SUB_TITLE, false);
+ 				extractAttributeFromHeader(contentElement, eventElement, ["LOCATION"], false, EventProperties.VENUE_ATTR_NAME, false);
  				extractAttributeFromHeader(contentElement, eventElement, ["LANGUAGE"], false, EventProperties.LANGUAGE_ATTR_NAME, true, EventProperties.LANGUAGE_DEFAULT);
  			}
  			// handle actionBy's properly (i.e. extract bracketed dates

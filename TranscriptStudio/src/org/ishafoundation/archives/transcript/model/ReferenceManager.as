@@ -1,5 +1,4 @@
 /*
-
    Transcript Markups Editor: An XML based application that allows users to define 
    and store contextual metadata for contiguous sections within a text document. 
 
@@ -17,9 +16,7 @@
 
    You should have received a copy of the GNU General Public License along with 
    Transcript Markups Editor. If not, see http://www.gnu.org/licenses/.
-
 */
-
 
 package org.ishafoundation.archives.transcript.model
 {
@@ -524,6 +521,48 @@ package org.ishafoundation.archives.transcript.model
 				}
 			}
 			throw new Error("This should not be reachable");
+		}
+		
+		public function getEventTypes():Array {
+			var result:Array = [];
+			for each (var eventTypeId:String in referenceXML.eventTypes.eventType.@id) {
+				result.push(eventTypeId);
+			}
+			return result;
+		}
+		
+		public function getEventTypeName(eventTypeId:String):String {
+			return referenceXML.eventTypes.eventType.(@id == eventTypeId).@name;
+		}
+		
+		public function getCountries():Array {
+			var result:Array = [];
+			for each (var id:String in referenceXML.places.country.@id) {
+				result.push(id);
+			}
+			return result;
+		}
+		
+		public function getLocations(countryId:String):Array {
+			var countryElement:XML = referenceXML.places.country.(@id == countryId)[0];
+			var result:Array = [];
+			if (countryElement != null) {
+				for each (var id:String in countryElement.location.@id) {
+					result.push(id);
+				}
+			}
+			return result;
+		}
+
+		public function getVenues(countryId:String, locationId:String):Array {
+			var locationElement:XML = referenceXML.places.country.(@id == countryId).location.(@id == locationId)[0];
+			var result:Array = [];
+			if (locationElement != null) {
+				for each (var id:String in locationElement.venue.@id) {
+					result.push(id);
+				}
+			}
+			return result;
 		}
 	}
 }
