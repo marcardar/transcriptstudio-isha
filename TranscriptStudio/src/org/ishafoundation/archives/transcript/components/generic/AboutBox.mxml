@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-
 <!--
-
    Transcript Markups Editor: An XML based application that allows users to define 
    and store contextual metadata for contiguous sections within a text document. 
 
@@ -20,9 +18,7 @@
 
    You should have received a copy of the GNU General Public License along with 
    Transcript Markups Editor. If not, see http://www.gnu.org/licenses/.
-
 -->
-
 
 <mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" x="40" y="40" title="About..." width="410" borderThickness="1" alpha="2.0" layout="absolute">
 	<mx:Script>
@@ -39,7 +35,7 @@
 		<mx:Text fontSize="16" width="100%" textAlign="center" htmlText="&lt;b&gt;{Utils.getApplicationName()} {Utils.getApplicationVersion()}&lt;/b&gt;"/>
 		<mx:Text fontSize="14" width="100%">
 			<mx:htmlText>	
-				<![CDATA[<br/>Written for the Isha Foundation.<br/><br/>Main Contributors: Mark Carter, Swami Kevala.<br/><br/>Please read the wiki for more information: <u><a href='http://context.wiki.sourceforge.net'>http://context.wiki.sourceforge.net</a></u>]]>
+				<![CDATA[<br/>Written for the Isha Foundation.<br/><br/>Main Contributors: Mark Carter, Swami Kevala.<br/><br/>Please read the wiki for more information: <u><a href='http://code.google.com/p/transcriptstudio4isha'>http://code.google.com/p/transcriptstudio4isha</a></u>]]>
 			</mx:htmlText>
 		</mx:Text>
 		<mx:Text paddingTop="10" text="Flex SDK Version: {flexSdkVersion}"/>
