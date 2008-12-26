@@ -21,6 +21,7 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" width="100%" height="100%" verticalGap="0">
 	<mx:Script>
 		<![CDATA[
+			import flash.net.navigateToURL;
 			import org.ishafoundation.archives.transcript.db.XQueries;
 			import org.ishafoundation.archives.transcript.components.studio.importer.ImportDialog;
 			import org.ishafoundation.archives.transcript.fs.SessionFile;
@@ -374,6 +375,10 @@
 					var selected:Boolean = evt.item.@toggled.toString() == "true";
 					this.transcriptPane.markupsPane.setNodePropertiesPaneVisibility(selected);
 				}
+				else if ( actionName == "showHTMLSearchInterface" ) {
+					
+					navigateToURL(new URLRequest(DatabaseConstants.EXIST_URL + "/rest/db/archives/xquery/main.xql"), "_blank");
+				}
 				else if ( actionName.indexOf("debug") == 0) {
 					var popup:DebugPopUp = new DebugPopUp();
 					PopUpManager.addPopUp(popup, this, true);
@@ -420,7 +425,7 @@
 				<menuitem type="separator"/>
 				<menuitem id="query" label="Execute XQuery..."/>				
 			</menuitem>
-			<menuitem id="textMenuItem" label="Selection" enabled="{transcriptPane.transcriptTextArea.ttSelection != null}">
+			<menuitem label="Selection" enabled="{transcriptPane.transcriptTextArea.ttSelection != null}">
 				<menuitem id="markupText" label="Markup Text" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowMarkup()}"/>
 				<menuitem id="removeMarkup" label="Remove Markup" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowRemoveMarkup()}"/>
 				<menuitem type="separator"/>
@@ -433,6 +438,9 @@
 			</menuitem>				
 			<menuitem label="Window" enabled="{transcriptPane.transcript != null}">
 				<menuitem id="showPropertiesPane" label="Properties" type="check" toggled="true"/>
+			</menuitem>
+			<menuitem label="Tools">
+				<menuitem id="showHTMLSearchInterface" label="HTML Search Interface"/>
 			</menuitem>
 			<menuitem label="Help">
 				<menuitem label="Debug">
