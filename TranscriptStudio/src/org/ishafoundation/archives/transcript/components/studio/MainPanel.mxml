@@ -122,13 +122,6 @@
 				showUnsavedChangesPopupIfNecessary(showRetrieveTranscriptDialog);
 			}
 			
-			private function searchClicked():void {
-				var searchDialog:QueryDialog = new QueryDialog();
-				searchDialog.xQueryExecutor = databaseMgr;
-				PopUpManager.addPopUp(searchDialog, this, true);
-				searchDialog.transcriptTextArea.referenceMgr = referenceMgr;
-			}
-			
 			private function categoryManagerClicked():void {
 				var thisRef:DisplayObject = this;
 				reloadReferencesBeforeContinuing(function():void {
@@ -335,9 +328,6 @@
 				else if ( actionName == "reloadTranscript" ) {
 					reloadClicked();
 				}
-				else if ( actionName == "search" ) {
-					searchClicked();
-				}
 				else if ( actionName == "import" ) {
 					importClicked();
 				}
@@ -415,7 +405,6 @@
 				<menuitem id="store" label="Save" enabled="{myMenuBar != null &amp;&amp; session != null &amp;&amp; session.unsavedChanges}"/>
 				<menuitem id="reloadTranscript" label="Reload from database" enabled="{session != null &amp;&amp; session.sessionFile != null}"/>
 				<menuitem type="separator"/>
-				<menuitem id="search" label="Search..."/>
 			</menuitem>
 			<menuitem label="Admin" enabled="{referenceMgr != null}">
 				<menuitem id="import" label="Import..."/>
