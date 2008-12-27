@@ -535,6 +535,14 @@ package org.ishafoundation.archives.transcript.model
 			return referenceXML.eventTypes.eventType.(@id == eventTypeId).@name;
 		}
 		
+		public function getLanguages():Array {
+			var result:Array = [];
+			for each (var id:String in referenceXML.languages.language.@id) {
+				result.push(id);
+			}
+			return result;
+		}
+		
 		public function getCountries():Array {
 			var result:Array = [];
 			for each (var id:String in referenceXML.places.country.@id) {

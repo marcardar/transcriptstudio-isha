@@ -18,7 +18,6 @@ package org.ishafoundation.archives.transcript.model
 		public static const LANGUAGE_DEFAULT:String = "english";
 		public static const COMMENT_ATTR_NAME:String = "comment";
 		
-		public static const LANGUAGES:Array = [EventProperties.LANGUAGE_DEFAULT, "tamil", "other"];
 		public static const TYPES:Array = createTypesArray();
 		
 		public var eventElement:XML;

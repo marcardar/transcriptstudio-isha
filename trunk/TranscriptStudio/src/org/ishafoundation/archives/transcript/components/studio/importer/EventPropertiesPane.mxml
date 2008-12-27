@@ -29,7 +29,7 @@
 
 		private function creationCompleteHandler():void {
 			eventIndexBox.dataProvider = getArrayCollectionSequence(1, 99, 2, false);
-			eventLanguageComboBox.dataProvider = EventProperties.LANGUAGES;
+			eventLanguageComboBox.dataProvider = referenceMgr.getLanguages();
 			eventTypeComboBox.dataProvider = referenceMgr.getEventTypes();
 			eventCountryComboBox.dataProvider = referenceMgr.getCountries();
 			eventCountryComboBox.selectedIndex = -1;
