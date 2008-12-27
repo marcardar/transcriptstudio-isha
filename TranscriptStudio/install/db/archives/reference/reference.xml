@@ -61,7 +61,7 @@
 		<language id="english"/>
 		<language id="tamil"/>
 		<language id="other"/>
-	<languages>
+	</languages>
 	<categoryTypes>
 		<categoryType id="topic" name="Topic" contentType="outline"/>
 		<categoryType id="question" name="Question" contentType="outline"/>
