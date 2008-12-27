@@ -83,6 +83,10 @@
 		}
 
 		public function markupPropertiesChangeHandler(markup:MSuperNode):void {
+			if (markup == null) {
+				trace("WARNING: Passed a null markup to markupPropertiesChangeHandler");
+				return;
+			}
 			trace("MarkupsTree handling editMarkupProps. markup: " + markup.id);
 			invalidateList();
 			//drawItem(itemToItemRenderer(markup), true, false);
