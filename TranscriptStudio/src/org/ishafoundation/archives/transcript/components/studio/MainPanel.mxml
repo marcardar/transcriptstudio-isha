@@ -404,7 +404,6 @@
 				-->
 				<menuitem id="store" label="Save" enabled="{myMenuBar != null &amp;&amp; session != null &amp;&amp; session.unsavedChanges}"/>
 				<menuitem id="reloadTranscript" label="Reload from database" enabled="{session != null &amp;&amp; session.sessionFile != null}"/>
-				<menuitem type="separator"/>
 			</menuitem>
 			<menuitem label="Admin" enabled="{referenceMgr != null}">
 				<menuitem id="import" label="Import..."/>
