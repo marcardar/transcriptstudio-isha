@@ -512,8 +512,8 @@ package org.ishafoundation.archives.transcript.model
 		 * TODO - do this properly. Truncate and add postfix etc
 		 */
 		private function generateCategoryId(categoryName:String):String {
-			var nonWordCharPattern:RegExp = /\W/g;
-			var categoryIdBase:String = categoryName.replace(nonWordCharPattern, "").substr(0, 50).toLowerCase();
+			var nonWordCharPattern:RegExp = /\W+/g;
+			var categoryIdBase:String = categoryName.replace(nonWordCharPattern, "-").substr(0, 25).toLowerCase();
 			for (var i:int = 1; ; i++) {
 				var categoryId:String = categoryIdBase + i;
 				if (!hasCategoryId(categoryId)) {
