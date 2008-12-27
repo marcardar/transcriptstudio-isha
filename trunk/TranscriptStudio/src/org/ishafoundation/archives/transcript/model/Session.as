@@ -71,13 +71,14 @@ package org.ishafoundation.archives.transcript.model
 		public function get path():String {
 			var result:String;
 			if (sessionFile == null) {
-				result = eventFile.collection.path + "/" + id;
+				var filename:String = id;
 				if (props.subTitle != null) {
-					result += "-" + props.subTitle;
+					filename += "_" + props.subTitle;
 				}
 				// replace spaces with underscores
-				result = result.replace(/ /g, "_").toLowerCase();
-				result += ".xml";
+				filename = filename.replace(/ /g, "-").toLowerCase();
+				filename += ".xml";
+				result = eventFile.collection.path + "/" + filename;
 			}
 			else {
 				result = sessionFile.path;
@@ -86,22 +87,22 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		/*private function generateFilename(eventProps:EventProperties):String {
-			var filename:String = id + "-" + eventProps.type;
+			var filename:String = id + "_" + eventProps.type;
 			if (eventProps.subTitle != null) {
-				filename += "-" + eventProps.subTitle;
+				filename += "_" + eventProps.subTitle;
 			}
 			if (subTitle != null) {
-				filename += "-" + subTitle;
+				filename += "_" + subTitle;
 			}
 			if (eventProps.location != null) {
-				filename += "-" + eventProps.location;
+				filename += "_" + eventProps.location;
 			}
 			if (eventProps.venue != null) {
-				filename += "-" + eventProps.venue;
+				filename += "_" + eventProps.venue;
 			}
 			filename += ".xml";
 			// remove any spaces and make lower case
-			filename = filename.replace(/ /g, "").toLowerCase();
+			filename = filename.replace(/ /g, "-").toLowerCase();
 			return filename;
 		}*/
 

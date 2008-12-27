@@ -130,19 +130,19 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		public function generateFilename():String {
-			var filename:String = id + "-" + type;
+			var filename:String = id + "_" + type;
 			if (subTitle != null) {
-				filename += "-" + subTitle;
+				filename += "_" + subTitle;
 			}
 			if (location != null) {
-				filename += "-" + location;
+				filename += "_" + location;
 			}
 			if (venue != null) {
-				filename += "-" + venue;
+				filename += "_" + venue;
 			}
 			filename += ".xml";
 			// replace spaces with underscores and make lower case
-			filename = filename.replace(/ /g, "_").toLowerCase();
+			filename = filename.replace(/ /g, "-").toLowerCase();
 			return filename;
 		}
 	}
