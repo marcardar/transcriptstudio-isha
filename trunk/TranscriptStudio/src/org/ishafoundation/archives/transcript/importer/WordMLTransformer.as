@@ -348,7 +348,13 @@ package org.ishafoundation.archives.transcript.importer
  				extractAttributeFromHeader(contentElement, sessionElement, ["NOTES", "NOTE"], false, SessionProperties.COMMENT_ATTR_NAME, false);
 				
 				// event
- 				extractAttributeFromHeader(contentElement, eventElement, ["LOCATION"], false, EventProperties.VENUE_ATTR_NAME, false);
+ 				var newValue:String = extractAttributeFromHeader(contentElement, eventElement, ["LOCATION"], false, EventProperties.VENUE_ATTR_NAME, false);
+ 				if (newValue != null) {
+ 					// make sure only certain characters are used
+ 					newValue = newValue.replace(/[^a-zA-Z0-9\ ]+/g, " ");
+ 					newValue = Utils.normalizeSpace(newValue);
+ 					XMLUtils.setAttributeValue(eventElement, EventProperties.VENUE_ATTR_NAME, newValue, "");
+ 				}
  				extractAttributeFromHeader(contentElement, eventElement, ["LANGUAGE"], false, EventProperties.LANGUAGE_ATTR_NAME, true, EventProperties.LANGUAGE_DEFAULT);
  			}
  			// handle actionBy's properly (i.e. extract bracketed dates
@@ -395,10 +401,10 @@ package org.ishafoundation.archives.transcript.importer
  		/**
  		 * Target can be either XML or XMLList
  		 */
- 		private static function extractAttributeFromHeader(contentElement:XML, targetElement:XML, headerPrefixes:Array, ignoreDuplicates:Boolean, attrName:String, toLowerCase:Boolean, defaultValue:String = null):void {
+ 		private static function extractAttributeFromHeader(contentElement:XML, targetElement:XML, headerPrefixes:Array, ignoreDuplicates:Boolean, attrName:String, toLowerCase:Boolean, defaultValue:String = null):String {
  			if (contentElement.localName() != MContent.TAG_NAME) {
  				// looks like something was already extracted from this one
- 				return;
+ 				return null;
  			}
  			var contentText:String = contentElement.text();
  			var value:String;
@@ -409,7 +415,7 @@ package org.ishafoundation.archives.transcript.importer
  				}
  			}
 			if (value == null) {
-				return;
+				return null;
 			}
 			if (toLowerCase) {
 				value = value.toLowerCase();
@@ -435,11 +441,12 @@ package org.ishafoundation.archives.transcript.importer
 	 				else {
 	 					// there is another definition for this name, and its different
 	 					// so don't delete it but don't add it to the attribute either
-	 					return;
+	 					return null;
 	 				}
  				}
  			}
 			removeContentElement(contentElement);
+			return value;
  		}
  		
  		private static function substringAfter(text:String, dividingChar:String):String {
