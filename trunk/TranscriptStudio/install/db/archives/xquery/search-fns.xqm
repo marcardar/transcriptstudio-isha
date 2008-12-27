@@ -25,7 +25,7 @@ declare function search-fns:main($searchString as xs:string, $defaultType as xs:
 				let $matchedMarkups := if (exists($textSearchTerms)) then search-fns:text-search($matchedMarkups, $textSearchTerms) else $matchedMarkups
 				return
 					for $markup in $matchedMarkups
-					order by $markup/tag[@type = 'markupCategory']/@value, number($markup/tag[@type eq 'rating']/@value)
+					order by $markup/tag[@type = 'markupCategory']/@value
 					return
 						search-fns:markup-as-table-row($markup)
 			else
@@ -233,19 +233,17 @@ declare function search-fns:markup-as-table-row($markup as element()) as element
 	let $targetId := ($targetId, $markup/@id) [1]
 	let $text :=
 		if (local-name($markup) = "superSegment") then
-			let $summary := string($markup/tag[@type = "summary"]/@value)
-			return
-				if ($summary) then
-					string-join(("[summary]", $summary), " ")
-				else
-					search-fns:element-text($markup)
+			if ($markup/@summary) then
+				string-join(("[summary]", $markup/@summary), " ")
+			else
+				search-fns:element-text($markup)
 		else
 			search-fns:element-text($markup)
 	return
 		<table class="single-result">
 			<tr>
-				<td><img src="../assets/{$markup/tag[@type='markupType']/@value}.png" width="24" height="24"/></td>
-				<td width="100%"><div class="result-header">
+				<td width="24"><img src="../assets/{$markup/tag[@type='markupType']/@value}.png" width="24" height="24"/></td>
+				<td><div class="result-header">
 					{search-fns:get-result-header($session, $markup/@id, $targetId, concat($markupType/@name, $markupCategoryName, search-fns:get-additional-concepts-string($markup)))}
 				</div></td>
 			</tr>
@@ -278,7 +276,7 @@ declare function search-fns:get-additional-concepts-string($markup as element())
 	let $conceptNames := $markup/tag[@type = 'concept']/@value
 	return
 		if (exists($conceptNames)) then
-			concat(' +[', string-join($conceptNames, ', '), ']')
+			concat(' +[', string-join($conceptNames, ' '), ']')
 		else
 			''
 };
