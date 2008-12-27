@@ -67,7 +67,7 @@ package org.ishafoundation.archives.transcript.importer
 			
 			this.audioTranscriptElement = <audioTranscript filename={filename}/>;
 			var importedBy:String = Utils.getClassName(this) + "-v" + Utils.getApplicationVersion();
-			this.sourceElement = <source id={sourceId} type="mixer" {MODIFIED_AT_ATTR_NAME}={Utils.getNowDateString()} {MODIFIED_BY_ATTR_NAME}={importedBy}/>;
+			this.sourceElement = <source id={sourceId} type="mixer"/>;
 			this.streamElement = <stream id="default"/>
 			this.sourceElement.appendChild(streamElement);
 			this.sessionElement = <session/>;
