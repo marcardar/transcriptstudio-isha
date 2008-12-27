@@ -63,10 +63,10 @@ package org.ishafoundation.archives.transcript.importer
 		public function WordMLTransformer(filePath:String, wordMLDoc:XML, idFunc:Function)
 		{
 			var sourceId:String = extractSourceIdFromFilePath(filePath);
-			var audioTranscriptName:String = extractAudioTranscriptNameFromFilePath(filePath);
+			var filename:String = extractFilenameLessExtensionFromPath(filePath);
 			var eventType:String = extractEventTypeFromSourceId(sourceId);
 			
-			this.audioTranscriptElement = <audioTranscript {SessionProperties.SUB_TITLE_ATTR_NAME}={audioTranscriptName}/>;
+			this.audioTranscriptElement = <audioTranscript filename={filename}/>;
 			var importedBy:String = Utils.getClassName(this) + "-v" + Utils.getApplicationVersion();
 			this.sourceElement = <source id={sourceId} type="mixer" {MODIFIED_AT_ATTR_NAME}={Utils.getNowDateString()} {MODIFIED_BY_ATTR_NAME}={importedBy}/>;
 			this.streamElement = <stream id="default"/>
@@ -84,7 +84,7 @@ package org.ishafoundation.archives.transcript.importer
 		}
 		
 		public function get name():String {
-			return XMLUtils.getAttributeValue(audioTranscriptElement, SessionProperties.SUB_TITLE_ATTR_NAME);
+			return XMLUtils.getAttributeValue(audioTranscriptElement, "name");
 		}
 		
 		public function get text():String {
@@ -116,12 +116,6 @@ package org.ishafoundation.archives.transcript.importer
 			return filenameLessExtension.substring(0, index).toLowerCase();
 		}
 
-		private static function extractAudioTranscriptNameFromFilePath(filePath:String):String {
-			var filenameLessExtension:String = extractFilenameLessExtensionFromPath(filePath);
-			var index:int = filenameLessExtension.indexOf(" ");
-			return filenameLessExtension.substring(index + 1);
-		}
-		
 		private static function extractFilenameLessExtensionFromPath(path:String):String {
 			var index:int = path.lastIndexOf("/");
 			var extensionIndex:int = path.lastIndexOf(".");
@@ -343,6 +337,7 @@ package org.ishafoundation.archives.transcript.importer
  				extractAttributeFromHeader(contentElement, audioTranscriptElement, ["TRANSCRIBED BY"], false, MODIFIED_BY_ATTR_NAME, true);
  				extractAttributeFromHeader(contentElement, audioTranscriptElement, ["PROOFED BY"], false, PROOFED_BY_ATTR_NAME, true);
  				extractAttributeFromHeader(contentElement, audioTranscriptElement, ["PROOFREAD BY", "PROOF READ BY"], false, PROOFREAD_BY_ATTR_NAME, true);
+ 				extractAttributeFromHeader(contentElement, audioTranscriptElement, ["EVENT"], false, "name", false);
 
  				// now for the audio stuff
  				extractAttributeFromHeader(contentElement, sourceElement, ["MEDIA CODE #", "MEDIA CODE"], true, "id", true);
@@ -354,7 +349,6 @@ package org.ishafoundation.archives.transcript.importer
  				extractAttributeFromHeader(contentElement, sessionElement, ["NOTES", "NOTE"], false, SessionProperties.COMMENT_ATTR_NAME, false);
 				
 				// event
- 				//extractAttributeFromHeader(contentElement, eventElement, ["EVENT"], false, EventProperties.SUB_TITLE_ATTR_SUB_TITLE, false);
  				extractAttributeFromHeader(contentElement, eventElement, ["LOCATION"], false, EventProperties.VENUE_ATTR_NAME, false);
  				extractAttributeFromHeader(contentElement, eventElement, ["LANGUAGE"], false, EventProperties.LANGUAGE_ATTR_NAME, true, EventProperties.LANGUAGE_DEFAULT);
  			}
@@ -379,7 +373,7 @@ package org.ishafoundation.archives.transcript.importer
  				else if (audioClarity == "p") {
  					audioClarity = "poor";
  				}
- 				XMLUtils.setAttributeValue(sourceElement, "audioClarity", audioClarity, "");
+ 				XMLUtils.setAttributeValue(sourceElement, "quality", audioClarity, "");
  			}
 			return sourceElement;
 		}

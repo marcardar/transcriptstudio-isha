@@ -26,6 +26,7 @@ package org.ishafoundation.archives.transcript.importer
 	import name.carter.mark.flex.util.XMLUtils;
 	
 	import org.ishafoundation.archives.transcript.db.XMLRetriever;
+	import org.ishafoundation.archives.transcript.model.SessionProperties;
 	
 	public class MSWordImporter
 	{
@@ -93,10 +94,45 @@ package org.ishafoundation.archives.transcript.importer
 		 				XMLUtils.setAttributeValue(segmentElement, "lastActionBy", lastActionBy);
 						transcriptElement.appendChild(segmentElement);
 					}
-				}				
+				}
+				// the session notes can contain information about the imported file(s)
+				appendSessionCommentLine("\rImported file:", sessionElement);
+				appendAttributesToSessionComment(audioTranscript.audioTranscriptElement, sessionElement);
 			}
 			sessionElement.appendChild(transcriptElement);
 			return sessionElement;
+		}
+		
+		private static function appendAttributesToSessionComment(audioTranscriptElement:XML, sessionElement:XML):void {
+			appendSessionCommentLine("", sessionElement);
+			var attrNames:Array = []
+			for each (var attr:XML in audioTranscriptElement.@*) {
+				// but put "filename" and "name" at front
+				var attrName:String = attr.localName();
+				if (attrName == "filename" || attrName == "name") {
+					attrName = "_" + attrName;
+				}
+				attrNames.push(attrName);
+			}
+			attrNames = attrNames.sort();
+			
+			for each (attrName in attrNames) {
+				if (attrName.indexOf("_") == 0) {
+					attrName = attrName.substring(1);
+				}
+				appendSessionCommentLine(attrName + ": " + audioTranscriptElement.attribute(attrName), sessionElement);
+			}
+		}
+		
+		private static function appendSessionCommentLine(text:String, sessionElement:XML):void {
+			/*text = Utils.normalizeSpace(text);
+			if (text.length == 0) {
+				return;
+			}*/
+			var comment:String = XMLUtils.getAttributeValue(sessionElement, SessionProperties.COMMENT_ATTR_NAME, "");
+			comment += "\r"
+			comment += text;
+			XMLUtils.setAttributeValue(sessionElement, SessionProperties.COMMENT_ATTR_NAME, comment);
 		}
 		
 		private function importPathsInternal(paths:Array, audioTranscripts:Array, idFunc:Function, successFunc:Function, failureFunc:Function):void {
