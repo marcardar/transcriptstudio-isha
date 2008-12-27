@@ -34,8 +34,8 @@ package org.ishafoundation.archives.transcript.importer
 		
 		private static const ACTION_PATTERN:RegExp = /^(.+)\s*\((.+)\)/;
 		
-		public static const MODIFIED_BY_ATTR_NAME:String = "modifiedBy";
-		public static const MODIFIED_AT_ATTR_NAME:String = "modifiedAt";
+		public static const TRANSCRIBED_BY_ATTR_NAME:String = "transcribedBy";
+		public static const TRANSCRIBED_AT_ATTR_NAME:String = "transcribedAt";
 		public static const PROOFED_BY_ATTR_NAME:String = "proofedBy";
 		public static const PROOFED_AT_ATTR_NAME:String = "proofedAt";
 		public static const PROOFREAD_BY_ATTR_NAME:String = "proofreadBy";
@@ -333,7 +333,7 @@ package org.ishafoundation.archives.transcript.importer
 		private function extractHeaders():XML {
  			for each (var contentElement:XML in getHeaderContents()) {
  				// actions
- 				extractAttributeFromHeader(contentElement, audioTranscriptElement, ["TRANSCRIBED BY"], false, MODIFIED_BY_ATTR_NAME, true);
+ 				extractAttributeFromHeader(contentElement, audioTranscriptElement, ["TRANSCRIBED BY"], false, TRANSCRIBED_BY_ATTR_NAME, true);
  				extractAttributeFromHeader(contentElement, audioTranscriptElement, ["PROOFED BY"], false, PROOFED_BY_ATTR_NAME, true);
  				extractAttributeFromHeader(contentElement, audioTranscriptElement, ["PROOFREAD BY", "PROOF READ BY"], false, PROOFREAD_BY_ATTR_NAME, true);
  				extractAttributeFromHeader(contentElement, audioTranscriptElement, ["EVENT"], false, "name", false);
@@ -352,7 +352,7 @@ package org.ishafoundation.archives.transcript.importer
  				extractAttributeFromHeader(contentElement, eventElement, ["LANGUAGE"], false, EventProperties.LANGUAGE_ATTR_NAME, true, EventProperties.LANGUAGE_DEFAULT);
  			}
  			// handle actionBy's properly (i.e. extract bracketed dates
-			processActionBy(MODIFIED_AT_ATTR_NAME, MODIFIED_BY_ATTR_NAME);
+			processActionBy(TRANSCRIBED_AT_ATTR_NAME, TRANSCRIBED_BY_ATTR_NAME);
 			processActionBy(PROOFED_AT_ATTR_NAME, PROOFED_BY_ATTR_NAME);
 			processActionBy(PROOFREAD_AT_ATTR_NAME, PROOFREAD_BY_ATTR_NAME);
  			
