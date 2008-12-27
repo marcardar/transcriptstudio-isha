@@ -20,14 +20,16 @@
 
 package name.carter.mark.flex.project.mdoc
 {
+	import name.carter.mark.flex.util.XMLUtils;
+	
 	public class MSuperNodeProperties {
 		public static const MARKUP_TYPE_TAG_NAME:String = "markupType";
 		public static const MARKUP_CATEGORY_TAG_NAME:String = "markupCategory";
 		public static const MARKUP_CATEGORY_SUGGESTION_TAG_NAME:String = "markupCategorySuggestion";
 		public static const ADDITIONAL_CONCEPT_TAG_NAME:String = "concept";
-		public static const SUMMARY_TAG_NAME:String = "summary";
-		public static const COMMENT_TAG_NAME:String = "comment";
-		public static const RATING_TAG_NAME:String = "rating";
+		public static const SUMMARY_PROP_NAME:String = "summary";
+		public static const COMMENT_PROP_NAME:String = "comment";
+		public static const RATING_PROP_NAME:String = "rating";
 		
 		private var superNode:MSuperNode;
 		
@@ -83,29 +85,29 @@ package name.carter.mark.flex.project.mdoc
 		
 		[Bindable]
 		public function set summary(newValue:String):void {
-			setSingletonTag(superNode, SUMMARY_TAG_NAME, newValue);
+			XMLUtils.setAttributeValue(superNode.nodeElement, SUMMARY_PROP_NAME, newValue);
 		}
 		
 		public function get summary():String {
-			return getFirstTagValueOrBlank(superNode, SUMMARY_TAG_NAME);
+			return XMLUtils.getAttributeValue(superNode.nodeElement, SUMMARY_PROP_NAME, "");
 		}
 		
 		[Bindable]
 		public function set comment(newValue:String):void {
-			setSingletonTag(superNode, COMMENT_TAG_NAME, newValue);
+			XMLUtils.setAttributeValue(superNode.nodeElement, COMMENT_PROP_NAME, newValue);
 		}
 		
 		public function get comment():String {
-			return getFirstTagValueOrBlank(superNode, COMMENT_TAG_NAME);
+			return XMLUtils.getAttributeValue(superNode.nodeElement, COMMENT_PROP_NAME, "");
 		}
 		
 		[Bindable]
 		public function set rating(newValue:int):void {
-			setSingletonTag(superNode, RATING_TAG_NAME, newValue >= 0 ? newValue : null);
+			XMLUtils.setAttributeValue(superNode.nodeElement, RATING_PROP_NAME, newValue >= 0 ? newValue : null);
 		}
 		
 		public function get rating():int {
-			var ratingStr:String = getFirstTagValue(superNode, RATING_TAG_NAME);
+			var ratingStr:String = XMLUtils.getAttributeValue(superNode.nodeElement, RATING_PROP_NAME);
 			if (ratingStr == null || ratingStr.length == 0) {
 				return -1;
 			}

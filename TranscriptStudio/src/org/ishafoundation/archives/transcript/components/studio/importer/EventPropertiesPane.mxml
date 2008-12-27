@@ -194,7 +194,7 @@
 				<mx:Label text="Country"/>
 			</mx:GridItem>
 			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
-				<mx:ComboBox width="100%" id="eventCountryComboBox" editable="true" change="countryChangeHandler()"/>
+				<mx:ComboBox minWidth="200" id="eventCountryComboBox" editable="true" change="countryChangeHandler()"/>
 			</mx:GridItem>
 		</mx:GridRow>
 		<mx:GridRow width="100%">
@@ -202,7 +202,7 @@
 				<mx:Label text="Location"/>
 			</mx:GridItem>
 			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
-				<mx:ComboBox width="100%" id="eventLocationComboBox" editable="true" change="locationChangeHandler()"/>
+				<mx:ComboBox minWidth="200" id="eventLocationComboBox" editable="true" change="locationChangeHandler()"/>
 			</mx:GridItem>
 		</mx:GridRow>
 		<mx:GridRow width="100%">
