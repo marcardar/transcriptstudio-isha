@@ -8,7 +8,6 @@ package org.ishafoundation.archives.transcript.importer
 	
 	import name.carter.mark.flex.project.mdoc.MContent;
 	import name.carter.mark.flex.project.mdoc.MContentProperties;
-	import name.carter.mark.flex.project.mdoc.MNode;
 	import name.carter.mark.flex.project.mdoc.MSegmentProperties;
 	import name.carter.mark.flex.util.DateUtils;
 	import name.carter.mark.flex.util.Utils;
@@ -358,22 +357,22 @@ package org.ishafoundation.archives.transcript.importer
 			processActionBy(PROOFREAD_AT_ATTR_NAME, PROOFREAD_BY_ATTR_NAME);
  			
  			// handle source element properly
- 			var audioClarity:String = XMLUtils.getAttributeValue(sourceElement, "audioClarity");
- 			if (audioClarity != null) {
+ 			var quality:String = XMLUtils.getAttributeValue(streamElement, "quality");
+ 			if (quality != null) {
  				var ac:String;
- 				if (audioClarity == "e") {
- 					audioClarity = "excellent";
+ 				if (quality == "e") {
+ 					quality = "excellent";
  				}
- 				else if (audioClarity == "g") {
- 					audioClarity = "good";
+ 				else if (quality == "g") {
+ 					quality = "good";
  				}
- 				else if (audioClarity == "f") {
- 					audioClarity = "fair";
+ 				else if (quality == "f") {
+ 					quality = "fair";
  				}
- 				else if (audioClarity == "p") {
- 					audioClarity = "poor";
+ 				else if (quality == "p") {
+ 					quality = "poor";
  				}
- 				XMLUtils.setAttributeValue(sourceElement, "quality", audioClarity, "");
+ 				XMLUtils.setAttributeValue(streamElement, "quality", quality, "");
  			}
 			return sourceElement;
 		}
