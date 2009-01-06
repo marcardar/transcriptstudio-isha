@@ -92,7 +92,12 @@
 						PopUpManager.removePopUp(databasePopUp);
 					}
 					successFunc();
-				}, function(msg:String):void {
+				}, function(evt:ErrorEvent):void {
+					if (evt is SecurityErrorEvent && evt.text.indexOf("#2048") >= 0) {
+						// this is an error caused by the sandbox security manager
+						showSecurityAlert(evt.text);
+						return;
+					}
 					CursorManager.removeBusyCursor();
 					if (databasePopUp == null) {
 						databasePopUp = PopUpManager.createPopUp(thisHandle, DatabasePopUp, true) as DatabasePopUp;
