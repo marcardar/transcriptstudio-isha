@@ -1,4 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <reference>
+	<eventTypes>
+		<eventType id="a" name="Inner Engineering"/>
+		<eventType id="b" name="Isha Yoga"/>
+		<eventType id="c" name="Spiritual Cultural"/>
+		<eventType id="d" name="Samyama"/>
+		<eventType id="e" name="Wholeness"/>
+		<eventType id="f" name="BSP"/>
+		<eventType id="g" name="Himalayan Trek"/>
+		<eventType id="h" name="Mahashivarathri"/>
+		<eventType id="i" name="Ishafest"/>
+		<eventType id="j" name="Mahasathsang"/>
+		<eventType id="k" name="Special Event"/>
+		<eventType id="l" name="Conference"/>
+		<eventType id="m" name="Meditator Sathsang"/>
+		<eventType id="n" name="Intro Talk"/>
+		<eventType id="p" name="Resident Sathsang"/>
+		<eventType id="q" name="Interview Press"/>
+		<eventType id="r" name="Visit Activity"/>
+		<eventType id="s" name="Dhyanalinga"/>
+		<eventType id="t" name="Ashram Event"/>
+		<eventType id="u" name="Prison"/>
+		<eventType id="v" name="Construction"/>
+		<eventType id="w" name="Teachers"/>
+		<eventType id="x" name="Private Meeting"/>
+		<eventType id="y" name="Bramhacharis"/>
+		<eventType id="aa" name="Vanashree Eco Center"/>
+		<eventType id="ab" name="Sharings"/>
+		<eventType id="ac" name="ARR"/>
+		<eventType id="ad" name="Committee Meet"/>
+		<eventType id="ae" name="Tsunami 2005"/>
+		<eventType id="af" name="ARR Function"/>
+		<eventType id="ag" name="???"/>
+		<eventType id="ah" name="Isha Home School"/>
+		<eventType id="ai" name="Isha Rejuvenation"/>
+		<eventType id="aj" name="Sounds of Isha"/>
+		<eventType id="ak" name="Isha Samskriti"/>
+		<eventType id="al" name="Ashram Life"/>
+	</eventTypes>
+	<places>
+		<country id="India">
+			<location id="Isha Yoga Center">
+				<venue id="Spanda Hall"/>
+				<venue id="Biksha Hall"/>
+			</location>
+			<location id="Coimbatore"/>
+			<location id="Mumbai">
+				<venue id="Bombay Stock Exchange"/>
+			</location>
+		</country>
+		<country id="England">
+			<location id="London">
+				<venue id="Millennium Mayfair Hotel"/>
+			</location>
+		</country>
+	</places>
+	<languages>
+		<language id="english"/>
+		<language id="tamil"/>
+		<language id="other"/>
+	</languages>
 	<categoryTypes>
 		<categoryType id="topic" name="Topic" contentType="outline"/>
 		<categoryType id="question" name="Question" contentType="outline"/>
@@ -9,7 +70,7 @@
 		<categoryType id="process" name="Process" contentType="outline"/>
 		<categoryType id="soundbite" name="Sound Bite" contentType="both"/>
 	</categoryTypes>
-    <categories>
+	<categories>
 		<category id="laotzubecomesthe1" name="Lao Tzu becomes the Chief Judge">
 			<tag type="type" value="story"/>
 			<tag type="concept" value="lao tzu"/>
@@ -28,21 +89,21 @@
 		<category id="doyouwantto1" name="Do you want to listen to Alfonso's show?">
 			<tag type="type" value="joke"/>
 		</category>
-		<category id="shankaranpillai1" name="Shankaran Pillai gets arrested shopping for Diwali">
+		<category id="shankaranpillai1" name="shankaran-pillai gets arrested shopping for Diwali">
 			<tag type="type" value="joke"/>
-			<tag type="concept" value="shankaran pillai"/>
+			<tag type="concept" value="shankaran-pillai"/>
 		</category>
-		<category id="shankaranpillai2" name="Shankaran Pillai goes to women's liberation meeting">
+		<category id="shankaranpillai2" name="shankaran-pillai goes to women's liberation meeting">
 			<tag type="type" value="joke"/>
-			<tag type="concept" value="shankaran pillai"/>
+			<tag type="concept" value="shankaran-pillai"/>
 		</category>
-		<category id="shankaranpillai3" name="Shankaran Pillai learns Vedanta">
+		<category id="shankaranpillai3" name="shankaran-pillai learns Vedanta">
 			<tag type="type" value="joke"/>
-			<tag type="concept" value="shankaran pillai"/>
+			<tag type="concept" value="shankaran-pillai"/>
 		</category>
-		<category id="shankaranpillai4" name="Shankaran Pillai gets his donkey painted red">
+		<category id="shankaranpillai4" name="shankaran-pillai gets his donkey painted red">
 			<tag type="type" value="joke"/>
-			<tag type="concept" value="shankaran pillai"/>
+			<tag type="concept" value="shankaran-pillai"/>
 		</category>
 		<category id="popechauffeur1" name="Pope Chauffeur">
 			<tag type="type" value="joke"/>
@@ -87,13 +148,13 @@
 			<tag type="concept" value="creation"/>
 			<tag type="concept" value="suffering"/>
 		</category>
-		<category id="canyoutalkaboutishas1" name="Can you talk about Isha's prison programs?">
+		<category id="canyoutalkaboutishas1" name="Can you talk about Isha's prison-programs?">
 			<tag type="type" value="question"/>
-			<tag type="concept" value="prison programs"/>
+			<tag type="concept" value="prison-programs"/>
 		</category>
-		<category id="doyouhaveplansto1" name="Do you have plans to extend the prison programs to other parts of India and abroad?">
+		<category id="doyouhaveplansto1" name="Do you have plans to extend the prison-programs to other parts of India and abroad?">
 			<tag type="type" value="question"/>
-			<tag type="concept" value="prison programs"/>
+			<tag type="concept" value="prison-programs"/>
 		</category>
 		<category id="yousaidifone1" name="You said if one is willing it just takes a moment to transcend. What do I need to do for this to happen?">
 			<tag type="type" value="question"/>
@@ -110,7 +171,7 @@
 		<category id="meditationprocess1" name="Meditation Process">
 			<tag type="type" value="process"/>
 		</category>
-    </categories>
+	</categories>
 	<conceptHierarchy>
 		<concept idRef="meditation">
 			<concept idRef="shoonya"/>
@@ -123,7 +184,7 @@
 			<concept idRef="neuroscience"/>
 		</concept>
 		<concept idRef="cosmology">
-			<concept idRef="big bang"/>
+			<concept idRef="big-bang"/>
 		</concept>
 		<concept idRef="being">
 			<concept idRef="guru"/>
@@ -133,14 +194,14 @@
 			<concept idRef="dhyanalinga"/>
 		</concept>
 	</conceptHierarchy>
-    <conceptSynonymGroups>
-        <conceptSynonymGroup>
-            <concept idRef="enlightenment"/>
-            <concept idRef="liberation"/>
-        </conceptSynonymGroup>
-        <conceptSynonymGroup>
-            <concept idRef="guru"/>
-            <concept idRef="master"/>
-        </conceptSynonymGroup>
-    </conceptSynonymGroups>
+	<conceptSynonymGroups>
+		<conceptSynonymGroup>
+			<concept idRef="enlightenment"/>
+			<concept idRef="liberation"/>
+		</conceptSynonymGroup>
+		<conceptSynonymGroup>
+			<concept idRef="guru"/>
+			<concept idRef="master"/>
+		</conceptSynonymGroup>
+	</conceptSynonymGroups>
 </reference>
