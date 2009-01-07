@@ -2,8 +2,8 @@ xquery version "1.0";
 
 module namespace all-concepts-panel = "http://www.ishafoundation.org/archives/xquery/all-concepts-panel";
 
-declare variable $all-concepts-panel:numColumns := 2;
-declare variable $all-concepts-panel:columnWidth := 80;
+declare variable $all-concepts-panel:numColumns := 8;
+declare variable $all-concepts-panel:columnWidth := 100;
 
 declare function all-concepts-panel:main() as element()*
 {	
@@ -32,16 +32,15 @@ declare function all-concepts-panel:main() as element()*
 			for $concept in distinct-values(($categoryConcepts, $otherReferenceConcepts, $additionalConcepts))
 			order by $concept 
 			return $concept
+		for $startCharIndex in (0 to 25)
+		let $startChar := codepoints-to-string($startCharIndex + 97)
+		let $filteredConcepts := all-concepts-panel:filter-concepts-for-start-char($startChar, $concepts)
 		return
-			for $startCharIndex in (0 to 25)
-			let $startChar := codepoints-to-string($startCharIndex + 97)
-			let $filteredConcepts := all-concepts-panel:filter-concepts-for-start-char($startChar, $concepts)
-			return
-				(
-					<b id="{$startChar}">{upper-case($startChar)}:</b>
-				,
-					all-concepts-panel:create-table($filteredConcepts, $categoryConcepts)
-				)
+			(
+				<b id="{$startChar}">{upper-case($startChar)}:</b>
+			,
+				all-concepts-panel:create-table($filteredConcepts, $categoryConcepts)
+			)
 	)
 };
 
@@ -64,23 +63,25 @@ declare function all-concepts-panel:create-table($concepts as xs:string*, $categ
 		else
 			<table>
 				{
-				for $startIndex in (0 to count($concepts) - 1)[. mod $all-concepts-panel:numColumns = 0]
+				let $numRows := xs:integer(ceiling(count($concepts) div $all-concepts-panel:numColumns))
+				for $rowIndex in (1 to $numRows)
 				return
-					all-concepts-panel:create-table-row($startIndex + 1, $concepts, $categoryConcepts)
+					all-concepts-panel:create-table-row($rowIndex, $numRows, $concepts, $categoryConcepts)
 				}
 			</table>
 	)
 };
 
-declare function all-concepts-panel:create-table-row($startIndex as xs:integer, $concepts as xs:string*, $categoryConcepts as xs:string*) as element()
+declare function all-concepts-panel:create-table-row($rowIndex as xs:integer, $numRows as xs:integer, $concepts as xs:string*, $categoryConcepts as xs:string*) as element()
 {
 	<tr>
 		{
-		for $i in ($startIndex to min(($startIndex + $all-concepts-panel:numColumns - 1, count($concepts))))
-		let $conceptId := $concepts[$i]
+		let $numConcepts := count($concepts)
+		for $i in (0 to $numConcepts - 1)[. mod $numRows = $rowIndex - 1]
+		let $conceptId := $concepts[$i + 1]
 		return
 		(
-			<td width="{$all-concepts-panel:columnWidth}">
+			<td width="{$all-concepts-panel:columnWidth}" style="white-space: nowrap">
 				{if ($conceptId = $categoryConcepts) then
 					<a class="category-concept-anchor" href="main.xql?panel=categories&amp;conceptId={$conceptId}"><i>{$conceptId}</i></a>
 				else
@@ -88,7 +89,8 @@ declare function all-concepts-panel:create-table-row($startIndex as xs:integer, 
 				}
 			</td>
 		,
-			<td width="10"/>
+			(: for horizontal separation :)
+			<td width="20"/>
 		)	
 		}
 	</tr>
