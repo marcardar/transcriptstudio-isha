@@ -3,6 +3,7 @@ xquery version "1.0";
 module namespace all-concepts-panel = "http://www.ishafoundation.org/archives/xquery/all-concepts-panel";
 
 declare variable $all-concepts-panel:numColumns := 8;
+declare variable $all-concepts-panel:minRows := 3;
 declare variable $all-concepts-panel:columnWidth := 100;
 
 declare function all-concepts-panel:main() as element()*
@@ -63,7 +64,7 @@ declare function all-concepts-panel:create-table($concepts as xs:string*, $categ
 		else
 			<table>
 				{
-				let $numRows := xs:integer(ceiling(count($concepts) div $all-concepts-panel:numColumns))
+				let $numRows := max((xs:integer(ceiling(count($concepts) div $all-concepts-panel:numColumns)), min(($numConcepts, $all-concepts-panel:minRows))))
 				for $rowIndex in (1 to $numRows)
 				return
 					all-concepts-panel:create-table-row($rowIndex, $numRows, $concepts, $categoryConcepts)
