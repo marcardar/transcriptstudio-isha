@@ -62,7 +62,7 @@ declare function all-concepts-panel:create-table($concepts as xs:string*, $categ
 		if ($numConcepts = 0) then
 			<br/>		
 		else
-			<table>
+			<table cellspacing="0">
 				{
 				let $numRows := max((xs:integer(ceiling(count($concepts) div $all-concepts-panel:numColumns)), min(($numConcepts, $all-concepts-panel:minRows))))
 				for $rowIndex in (1 to $numRows)
@@ -82,7 +82,7 @@ declare function all-concepts-panel:create-table-row($rowIndex as xs:integer, $n
 		let $conceptId := $concepts[$i + 1]
 		return
 		(
-			<td width="{$all-concepts-panel:columnWidth}" style="white-space: nowrap">
+			<td width="{$all-concepts-panel:columnWidth}" style="white-space: nowrap; background:Moccasin;">
 				{if ($conceptId = $categoryConcepts) then
 					<a class="category-concept-anchor" href="main.xql?panel=categories&amp;conceptId={$conceptId}"><i>{$conceptId}</i></a>
 				else
