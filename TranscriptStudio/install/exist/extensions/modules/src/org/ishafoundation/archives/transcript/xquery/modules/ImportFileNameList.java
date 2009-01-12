@@ -76,7 +76,7 @@ public class ImportFileNameList extends BasicFunction
 		builder.startElement( new QName( "list", TranscriptStudioModule.NAMESPACE_URI, TranscriptStudioModule.PREFIX ), null );
 		builder.addAttribute( new QName( "directory", null, null ), baseDir.toString() );
 		
-		String pattern 	= "*.xml";
+		String pattern 	= "*.docx";
 		File[] files 	= DirectoryScanner.scanDir( baseDir, pattern );
 		String relDir 	= null;
 		
