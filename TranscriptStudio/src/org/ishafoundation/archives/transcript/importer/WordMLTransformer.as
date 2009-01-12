@@ -59,13 +59,12 @@ package org.ishafoundation.archives.transcript.importer
 		public var sessionElement:XML; // only properties
 		public var eventElement:XML; // only properties
 		
-		public function WordMLTransformer(filePath:String, wordMLDoc:XML, idFunc:Function)
+		public function WordMLTransformer(importName:String, wordMLDoc:XML, idFunc:Function)
 		{
-			var sourceId:String = extractSourceIdFromFilePath(filePath);
-			var filename:String = extractFilenameLessExtensionFromPath(filePath);
+			var sourceId:String = extractSourceIdFromName(importName);
 			var eventType:String = extractEventTypeFromSourceId(sourceId);
 			
-			this.audioTranscriptElement = <audioTranscript filename={filename}/>;
+			this.audioTranscriptElement = <audioTranscript filename={importName}/>;
 			var importedBy:String = Utils.getClassName(this) + "-v" + Utils.getApplicationVersion();
 			this.sourceElement = <source id={sourceId} type="mixer"/>;
 			this.streamElement = <stream id="default"/>
@@ -109,10 +108,9 @@ package org.ishafoundation.archives.transcript.importer
 			return arr[1];
 		}
 		
-		private static function extractSourceIdFromFilePath(filePath:String):String {
-			var filenameLessExtension:String = extractFilenameLessExtensionFromPath(filePath);
-			var index:int = filenameLessExtension.indexOf(" ");
-			return filenameLessExtension.substring(0, index).toLowerCase();
+		private static function extractSourceIdFromName(importName:String):String {
+			var index:int = importName.indexOf(" ");
+			return importName.substring(0, index).toLowerCase();
 		}
 
 		private static function extractFilenameLessExtensionFromPath(path:String):String {

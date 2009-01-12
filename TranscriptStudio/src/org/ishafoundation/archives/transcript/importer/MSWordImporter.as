@@ -25,23 +25,23 @@ package org.ishafoundation.archives.transcript.importer
 	
 	import name.carter.mark.flex.util.XMLUtils;
 	
-	import org.ishafoundation.archives.transcript.db.XMLRetriever;
+	import org.ishafoundation.archives.transcript.db.XQueryExecutor;
 	import org.ishafoundation.archives.transcript.model.SessionProperties;
 	
 	public class MSWordImporter
 	{
 		private static var DATE_FORMAT_STRINGS:Array = ["DD-MMMM-YY", "DD-MMM-YY", "DD-MM-YY"];
 		
-		private var xmlRetriever:XMLRetriever;
+		private var xqueryExecutor:XQueryExecutor;
 				
-		public function MSWordImporter(xmlRetriever:XMLRetriever) {
-			this.xmlRetriever = xmlRetriever;	
+		public function MSWordImporter(xqueryExecutor:XQueryExecutor) {
+			this.xqueryExecutor = xqueryExecutor;	
 		}
 		
-		public function importAudioTranscripts(paths:Array, successFunc:Function, failureFunc:Function):void {
+		public function importAudioTranscripts(names:Array, successFunc:Function, failureFunc:Function):void {
 			var audioTranscripts:Array = [];
 			var idFunc:Function = getIdFunc();
-			importPathsInternal(paths, audioTranscripts, idFunc, function():void {
+			importPathsInternal(names, audioTranscripts, idFunc, function():void {
 				successFunc(audioTranscripts);
 			}, function (msg:String):void {
 				failureFunc(msg);
@@ -135,19 +135,21 @@ package org.ishafoundation.archives.transcript.importer
 			XMLUtils.setAttributeValue(sessionElement, SessionProperties.COMMENT_ATTR_NAME, comment);
 		}
 		
-		private function importPathsInternal(paths:Array, audioTranscripts:Array, idFunc:Function, successFunc:Function, failureFunc:Function):void {
-			if (paths.length == 0) {
+		private function importPathsInternal(names:Array, audioTranscripts:Array, idFunc:Function, successFunc:Function, failureFunc:Function):void {
+			if (names.length == 0) {
 				successFunc();
 				return;
 			}
-			var nextPath:String = paths.shift();
-			xmlRetriever.retrieveXML(nextPath, function(wordXML:XML):void {
-				var audioTranscript:WordMLTransformer = new WordMLTransformer(nextPath, wordXML, idFunc);
+			var nextName:String = names.shift();
+			xqueryExecutor.query("import module namespace transcriptstudio='http://ishafoundation.org/xquery/archives/transcript' at 'java:org.ishafoundation.archives.transcript.xquery.modules.TranscriptStudioModule';transcriptstudio:import-file-read($arg0)", [nextName], function(resultXML:XML):void {
+				var existNS:Namespace = resultXML.namespace("exist");
+				var wordXML:XML = resultXML.existNS::value.*[0];
+				var audioTranscript:WordMLTransformer = new WordMLTransformer(nextName, wordXML, idFunc);
 				audioTranscripts.push(audioTranscript); 
-				importPathsInternal(paths, audioTranscripts, idFunc, successFunc, failureFunc);
+				importPathsInternal(names, audioTranscripts, idFunc, successFunc, failureFunc);
 			}, function(msg:String):void {
 				failureFunc(msg);
-			}, false);
+			});
 		}
 		
 		private static function getIdFunc():Function {

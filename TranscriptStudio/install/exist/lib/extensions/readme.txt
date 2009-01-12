@@ -1,0 +1,1 @@
+exist-modules.jar is the same as in the distribution except in addition it has the transcript studio xquery module classes.

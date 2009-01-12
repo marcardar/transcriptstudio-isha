@@ -4,7 +4,7 @@
 	<![CDATA[
 		import org.ishafoundation.archives.transcript.model.ReferenceManager;
 		import org.ishafoundation.archives.transcript.db.DatabaseConstants;
-		import org.ishafoundation.archives.transcript.fs.FileSystem;
+		import org.ishafoundation.archives.transcript.fs.DbFileSystem;
 		import org.ishafoundation.archives.transcript.model.EventProperties;
 		import name.carter.mark.flex.util.collection.ISet;
 		import mx.utils.StringUtil;
@@ -17,7 +17,7 @@
 		private static const UNKNOWN_LABEL:String = "Unknown";  
 
 		[Bindable]
-		public var fileSystem:FileSystem;
+		public var fileSystem:DbFileSystem;
 		
 		[Bindable]
 		public var referenceMgr:ReferenceManager;

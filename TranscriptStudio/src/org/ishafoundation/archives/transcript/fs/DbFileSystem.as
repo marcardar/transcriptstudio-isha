@@ -9,13 +9,13 @@ package org.ishafoundation.archives.transcript.fs
 	import org.ishafoundation.archives.transcript.db.CollectionRetriever;
 	import org.ishafoundation.archives.transcript.db.DatabaseConstants;
 	
-	public class FileSystem
+	public class DbFileSystem
 	{
 		private var collectionRetriever:CollectionRetriever;
 		
 		private var collectionHierarchyXML:XML;
 		
-		public function FileSystem(rootCollectionPath:String, collectionRetriever:CollectionRetriever, successFunc:Function, failureFunc:Function) {
+		public function DbFileSystem(rootCollectionPath:String, collectionRetriever:CollectionRetriever, successFunc:Function, failureFunc:Function) {
 			this.collectionRetriever = collectionRetriever;
 			if (rootCollectionPath == null) {
 				rootCollectionPath = DatabaseConstants.ARCHIVES_COLLECTION_PATH;

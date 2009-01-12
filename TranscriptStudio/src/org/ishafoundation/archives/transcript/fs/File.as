@@ -3,9 +3,9 @@ package org.ishafoundation.archives.transcript.fs
 	public class File
 	{
 		public var nodeId:String; // unique for any node in FS
-		public var fileSystem:FileSystem;
+		public var fileSystem:DbFileSystem;
 		
-		public function File(nodeId:String, fileSystem:FileSystem)
+		public function File(nodeId:String, fileSystem:DbFileSystem)
 		{
 			this.nodeId = nodeId;
 			this.fileSystem = fileSystem;
