@@ -2,7 +2,7 @@ package org.ishafoundation.archives.transcript.fs
 {
 	public class EventFile extends File
 	{
-		public function EventFile(eventId:String, fileSystem:FileSystem)
+		public function EventFile(eventId:String, fileSystem:DbFileSystem)
 		{
 			super(eventId, fileSystem);
 		}

@@ -26,7 +26,7 @@
 			import org.ishafoundation.archives.transcript.components.studio.importer.ImportDialog;
 			import org.ishafoundation.archives.transcript.fs.SessionFile;
 			import org.ishafoundation.archives.transcript.fs.Collection;
-			import org.ishafoundation.archives.transcript.fs.FileSystem;
+			import org.ishafoundation.archives.transcript.fs.DbFileSystem;
 			import org.ishafoundation.archives.transcript.db.DatabaseConstants;
 			import org.ishafoundation.archives.transcript.util.IdUtils;
 			import name.carter.mark.flex.util.XMLUtils;
@@ -156,7 +156,7 @@
 			private function showRetrieveTranscriptDialog():void {
 				var popup:RetrieveTranscriptDialog = new RetrieveTranscriptDialog();
 				popup.addEventListener(FlexEvent.CREATION_COMPLETE, function():void {
-					var fileSystem:FileSystem = new FileSystem(DatabaseConstants.DATA_COLLECTION_PATH, databaseMgr, function ():void {
+					var fileSystem:DbFileSystem = new DbFileSystem(DatabaseConstants.DATA_COLLECTION_PATH, databaseMgr, function ():void {
 						popup.collectionChooserTree.dataProvider = fileSystem.getRootCollection();
 					}, collectionTreeFailed);
 				});
@@ -231,7 +231,7 @@
 					//session.collectionPath = popup.selectedCollection.path;
 					storeTranscript(successFunction, failureFunction);
 				});
-				var fileSystem:FileSystem = new FileSystem(DatabaseConstants.DATA_COLLECTION_PATH, databaseMgr, function ():void {
+				var fileSystem:DbFileSystem = new DbFileSystem(DatabaseConstants.DATA_COLLECTION_PATH, databaseMgr, function ():void {
 					popup.collectionChooserTree.dataProvider = fileSystem.getRootCollection();
 				}, collectionTreeFailed);					
 				PopUpManager.addPopUp(popup, this, true);
@@ -297,7 +297,7 @@
 			
 			private function importTranscript():void {
 				var thisPanel:MainPanel = this;
-				var fileSystem:FileSystem = new FileSystem(DatabaseConstants.ARCHIVES_COLLECTION_PATH, databaseMgr, function ():void {
+				var fileSystem:DbFileSystem = new DbFileSystem(DatabaseConstants.ARCHIVES_COLLECTION_PATH, databaseMgr, function ():void {
 					var popup:ImportDialog = new ImportDialog();
 					popup.addEventListener(ImportDialog.OK_CLICKED, function(event:Event):void {
 						session = sessionMgr.createSession(popup.sessionXML, popup.eventFile);
@@ -306,6 +306,7 @@
 						updateTitle();
 					});
 					popup.fileSystem = fileSystem;
+					popup.xqueryExecutor = databaseMgr;
 					popup.xmlStorer = databaseMgr;
 					popup.referenceMgr = referenceMgr;
 					popup.importer = new MSWordImporter(databaseMgr);

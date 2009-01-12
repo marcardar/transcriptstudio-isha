@@ -4,7 +4,7 @@ package org.ishafoundation.archives.transcript.fs
 	
 	public class SessionFile extends File
 	{
-		public function SessionFile(sessionId:String, fileSystem:FileSystem)
+		public function SessionFile(sessionId:String, fileSystem:DbFileSystem)
 		{
 			super(sessionId, fileSystem);
 		}

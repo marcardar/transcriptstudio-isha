@@ -2,7 +2,7 @@ package org.ishafoundation.archives.transcript.fs
 {
 	public class Collection extends File
 	{
-		public function Collection(collectionId:String, fileSystem:FileSystem)
+		public function Collection(collectionId:String, fileSystem:DbFileSystem)
 		{
 			super(collectionId, fileSystem);
 		}

@@ -2,6 +2,7 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="{getTitle(viewstack.selectedChild)}" creationComplete="init()" xmlns:importer="org.ishafoundation.archives.transcript.components.studio.importer.*">
 	<mx:Script>
 	<![CDATA[
+		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
 		import org.ishafoundation.archives.transcript.model.ReferenceManager;
 		import org.ishafoundation.archives.transcript.db.DatabaseConstants;
 		import org.ishafoundation.archives.transcript.importer.MSWordImporter;
@@ -12,7 +13,7 @@
 		import mx.binding.utils.ChangeWatcher;
 		import org.ishafoundation.archives.transcript.model.SessionProperties;
 		import org.ishafoundation.archives.transcript.fs.EventFile;
-		import org.ishafoundation.archives.transcript.fs.FileSystem;
+		import org.ishafoundation.archives.transcript.fs.DbFileSystem;
 		import org.ishafoundation.archives.transcript.fs.File;
 		import org.ishafoundation.archives.transcript.fs.Collection;
 		import name.carter.mark.flex.util.XMLUtils;
@@ -37,7 +38,9 @@
 	   	[Bindable]
 	   	public var referenceMgr:ReferenceManager;
 	   	
-		private var _fileSystem:FileSystem;
+		private var _fileSystem:DbFileSystem;
+
+		private var _xqueryExecutor:XQueryExecutor;
 		
 		[Bindable]
 		private var existingSessionIds:ISet;
@@ -85,13 +88,18 @@
 		}
 		
 		[Bindable]
-		public function set fileSystem(fileSystem:FileSystem):void {
+		public function set fileSystem(fileSystem:DbFileSystem):void {
 			_fileSystem = fileSystem;
 			existingSessionIds = fileSystem.getAllSessionIds();
 		}
 		
-		public function get fileSystem():FileSystem {
+		public function get fileSystem():DbFileSystem {
 			return _fileSystem;
+		}
+		
+		public function set xqueryExecutor(xqueryExecutor:XQueryExecutor):void {
+			_xqueryExecutor = xqueryExecutor;
+			setImportListDataProvider(xqueryExecutor);
 		}
 		
 		private function backClicked(evt:MouseEvent):void {
@@ -109,9 +117,9 @@
 			// postprocess pane
 			if (viewstack.selectedChild == importFilesPane) {
 				enabled = false;
-				var selectedPaths:Array = new Array();
-				for each (var file:File in importList.selectedItems.reverse()) {
-					selectedPaths.push(file.path);
+				var selectedPaths:Array = [];
+				for each (var name:String in importList.selectedItems.reverse()) {
+					selectedPaths.push(name);
 				}
 				CursorManager.setBusyCursor();
 				importer.importAudioTranscripts(selectedPaths, function(audioTranscripts:Array):void {
@@ -250,10 +258,24 @@
 			}
 		}
 		
-		private static function getImportFiles(fileSystem:FileSystem):Array {
+		/*private static function getImportFiles(fileSystem:DbFileSystem):Array {
 			var result:Array = fileSystem.getCollection(DatabaseConstants.IMPORT_COLLECTION_PATH).otherFiles;
 			result.sort();
 			return result;			
+		}*/
+		
+		private function setImportListDataProvider(xqueryExecutor:XQueryExecutor):void {
+			xqueryExecutor.query("import module namespace transcriptstudio='http://ishafoundation.org/xquery/archives/transcript' at 'java:org.ishafoundation.archives.transcript.xquery.modules.TranscriptStudioModule';transcriptstudio:import-file-name-list()", [], function(xml:XML):void {
+				var names:Array = [];
+				var nameAttrs:XMLList = xml.*.*.@name;
+				for each (var name:String in nameAttrs) {
+					names.push(name);
+				}
+				names.sort();
+				importList.dataProvider = names;
+			}, function (msg:String):void {
+				Alert.show(msg, "Could not read import files listing");
+			});
 		}
 		
 	]]>
@@ -261,7 +283,7 @@
 	
 	<mx:ViewStack id="viewstack" width="100%" height="100%" change="buttonBox.executeBindings(true)" creationPolicy="all">
 		<mx:VBox id="importFilesPane" label="Import Session Files" width="100%" height="100%">
-			<mx:List id="importList" width="100%" height="100%" allowMultipleSelection="true" dataProvider="{getImportFiles(fileSystem)}" labelFunction="labelFunc" change="buttonBox.executeBindings(true)"/>
+			<mx:List id="importList" width="100%" height="100%" allowMultipleSelection="true" change="buttonBox.executeBindings(true)"/>
 		</mx:VBox>
 		<importer:ImportFilesPreviewPane id="importFilesPreviewPane" width="100%" height="100%"/>
 		<importer:EventSelectorPane id="eventSelectorPane" width="100%" height="100%"/>
