@@ -4,6 +4,7 @@ import org.exist.xquery.AbstractInternalModule;
 import org.exist.xquery.FunctionDef;
 import org.exist.xquery.XQueryContext;
 import org.exist.util.SingleInstanceConfiguration;
+import org.exist.security.User;
 
 import java.io.File;
 
@@ -54,5 +55,11 @@ public class TranscriptStudioModule extends AbstractInternalModule
 	public void reset( XQueryContext xqueryContext )
 	{
 		super.reset( xqueryContext );
+	}
+
+	static void checkSuperUser(User user) {
+		if (!user.hasDbaRole()) {
+			throw new RuntimeException("User '" + user.getName() + "' is not a super user so cannot call this function");
+		}
 	}
 }
