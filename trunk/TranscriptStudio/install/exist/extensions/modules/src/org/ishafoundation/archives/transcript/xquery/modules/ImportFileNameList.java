@@ -64,6 +64,8 @@ public class ImportFileNameList extends BasicFunction
 	
 	public Sequence eval( Sequence[] args, Sequence contextSequence ) throws XPathException
 	{
+		TranscriptStudioModule.checkSuperUser(context.getUser());
+		
 		File 		baseDir 	= TranscriptStudioModule.getImportDir();
 		
 		LOG.debug( "Listing matching files in directory: " + baseDir );

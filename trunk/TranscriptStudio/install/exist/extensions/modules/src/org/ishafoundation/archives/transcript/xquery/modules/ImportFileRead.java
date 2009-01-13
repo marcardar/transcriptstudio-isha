@@ -44,6 +44,8 @@ public class ImportFileRead extends BasicFunction {
 	 */
 	public Sequence eval( Sequence[] args, Sequence contextSequence ) throws XPathException 
 	{
+		TranscriptStudioModule.checkSuperUser(context.getUser());
+
 		String arg = args[0].itemAt(0).getStringValue();
 		String filename = arg + ".docx";
 		
