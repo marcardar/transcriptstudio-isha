@@ -46,6 +46,10 @@
 			importFilesList.executeBindings(); // redraws the list contents
 			importFilesList.selectedItem = audioTransctipt; 			
 		}
+		
+		private function getImportFileText(transformer:WordMLTransformer):String {
+			return transformer.text;
+		}
 	]]>
 	</mx:Script>
 	<mx:HBox width="100%">
@@ -103,6 +107,6 @@
 			</mx:GridRow>
 		</mx:Grid>
 		<mx:Label paddingTop="20" text="Import file text" width="100%" fontWeight="bold" textDecoration="underline"/>
-		<mx:TextArea width="100%" height="100%" editable="false" text="{(importFilesList.selectedItem as WordMLTransformer).text}"/>		
+		<mx:TextArea width="100%" height="100%" editable="false" text="{getImportFileText(importFilesList.selectedItem as WordMLTransformer)}"/>		
 	</mx:VBox>
 </mx:VBox>
