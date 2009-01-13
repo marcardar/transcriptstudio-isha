@@ -31,7 +31,8 @@ package org.ishafoundation.archives.transcript.db
 	public class DatabaseManagerUsingEXist implements DatabaseManager
 	{
 		private var remoteMgr:ClientManager;
-		private var loggedIn:Boolean = false; 
+		private var loggedIn:Boolean = false;
+		private var _isSuperUser:Boolean = false;
 		
 		public function DatabaseManagerUsingEXist(username:String, password:String) {
 			trace("Using eXist URL: " + DatabaseConstants.EXIST_URL);
@@ -42,6 +43,7 @@ package org.ishafoundation.archives.transcript.db
 			// we test the connection by reading the top level collection
 			remoteMgr.testConnection(function(response:Object):void {
 				loggedIn = true;
+				checkForSuperUser();
 				successFunction();
 			},
 			function(msg:String):void {
@@ -168,5 +170,23 @@ package org.ishafoundation.archives.transcript.db
 			new EXistRESTClient(remoteMgr.getRESTClient()).executeStoredXQuery(DatabaseConstants.XQUERY_COLLECTION_PATH + "/" + xQueryFilename, params, successFunc, failureFunc);
 		}
 
+		[Bindable]
+		public function get isSuperUser():Boolean {
+			return _isSuperUser;
+		}
+		
+		public function set isSuperUser(value:Boolean):void {
+			_isSuperUser = value;
+		}
+
+		private function checkForSuperUser():void {
+			var thisObj:DatabaseManagerUsingEXist = this;
+			query("xmldb:is-admin-user(xmldb:get-current-user())", [], function(xml:XML):void {
+				var boolString:String = xml.*.text();
+				thisObj.isSuperUser = boolString == "true";
+			}, function(msg:String):void {
+				Alert.show(msg, "Failed checking for super user");
+			});
+		}
 	}
 }

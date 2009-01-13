@@ -76,6 +76,7 @@
 			import mx.events.CloseEvent;
 			import mx.controls.Alert;
 
+			[Bindable]
 			public var databaseMgr:DatabaseManager;
 
 			[Bindable]			
@@ -406,7 +407,7 @@
 				<menuitem id="store" label="Save" enabled="{myMenuBar != null &amp;&amp; session != null &amp;&amp; session.unsavedChanges}"/>
 				<menuitem id="reloadTranscript" label="Reload from database" enabled="{session != null &amp;&amp; session.sessionFile != null}"/>
 			</menuitem>
-			<menuitem label="Admin" enabled="{referenceMgr != null}">
+			<menuitem label="Admin" enabled="{databaseMgr != null &amp;&amp; databaseMgr.isSuperUser}">
 				<menuitem id="import" label="Import..."/>
 				<menuitem type="separator"/>
 				<menuitem id="categoryManager" label="Categories..."/>
