@@ -255,7 +255,8 @@ declare function search-fns:markup-as-table-row($markup as element()) as element
 			</tr>
 			<tr>
 				<td colspan="2"><div class="result-footer">
-					{concat(search-fns:get-session-title($session), ' [', $session/@id, ']')}
+					{concat(search-fns:get-session-title($session), ' (', $session/@id, ')')}
+					{search-fns:get-html-word-links($session/@id)}
 				</div></td>
 			</tr>
 		</table>
@@ -300,6 +301,7 @@ declare function search-fns:segment-as-table-row($segment as element()) as eleme
 			</div>
 			<div class="result-footer">
 				{string($session/@id)}
+				{search-fns:get-html-word-links($session/@id)}
 			</div>
 		</div>
 };
@@ -314,6 +316,7 @@ declare function search-fns:transcript-as-table-row($transcript as element()) as
 			</div>
 			<div class="result-footer">
 				{string($session/@id)}
+				{search-fns:get-html-word-links($session/@id)}
 			</div>
 		</div>
 };
@@ -324,6 +327,17 @@ declare function search-fns:get-result-header($session as element(), $highlightI
 	let $targetParam := if ($targetId) then concat('#', $targetId) else ''
 	return
 		<a class="result-header" href="main.xql?panel=session&amp;id={$session/@id}{$highlightParam}{$targetParam}">{$text}</a>
+};
+
+declare function search-fns:get-html-word-links($sessionId as xs:string) as element()
+{
+	<span class="htmlWordLinks">
+	[
+	<a href="main.xql?panel=session&amp;id={$sessionId}">HTML</a>
+	|
+	<a href="download-docx.xql?sessionId={$sessionId}">Word</a>
+	]
+	</span>
 };
 
 declare function search-fns:get-event-id($sessionId as xs:string) as xs:string

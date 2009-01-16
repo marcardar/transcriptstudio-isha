@@ -70,7 +70,6 @@
 		<mx:HBox width="100%" horizontalAlign="center">
 			<mx:Button id="okButton" label="OK" click="okClicked(event)" enabled="{eventChooserTree.selectedItem is SessionFile}"/>
 			<mx:Button label="Cancel" click="closeMe()"/>		
-			<mx:Button id="exportButton" label="Export" enabled="{okButton.enabled}"/>		
 		</mx:HBox>		
 	</mx:VBox>
 </mx:TitleWindow>
