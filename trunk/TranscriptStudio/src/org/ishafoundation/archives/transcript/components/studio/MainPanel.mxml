@@ -162,16 +162,6 @@
 					}, collectionTreeFailed);
 				});
 				PopUpManager.addPopUp(popup, this, true);
-				popup.exportButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
-					var sessionFile:SessionFile = popup.selectedFile as SessionFile;
-					var params:Object = {sessionPath: Utils.encodePath(sessionFile.path)};
-					//params.sessionId = sessionFile.nodeId;
-					databaseMgr.executeStoredXQuery("export-msword.xql", params, function(response:Object):void {
-						Alert.show("Successfully exported session");
-					}, function(msg:String):void {
-						Alert.show(msg, "Could not export session");
-					});
-				});
 				popup.addEventListener(RetrieveTranscriptDialog.OK_CLICKED, retrieveOKClicked);
 			}
 			

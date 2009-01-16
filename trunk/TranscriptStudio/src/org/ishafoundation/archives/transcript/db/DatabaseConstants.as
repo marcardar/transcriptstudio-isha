@@ -26,8 +26,6 @@ package org.ishafoundation.archives.transcript.db
 		public static const ARCHIVES_COLLECTION_PATH:String = "/db/archives";
 		public static const REFERENCE_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/reference";
 		public static const DATA_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/data";
-		public static const IMPORT_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/import";			
-		public static const EXPORT_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/export";			
 		public static const XQUERY_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/xquery";
 		public static const XSLT_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/xslt";
 	}

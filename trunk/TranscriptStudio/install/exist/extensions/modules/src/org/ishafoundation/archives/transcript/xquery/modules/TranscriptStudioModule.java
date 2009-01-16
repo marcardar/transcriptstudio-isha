@@ -17,10 +17,19 @@ public class TranscriptStudioModule extends AbstractInternalModule
 	private final static FunctionDef[] functions = {
 		new FunctionDef( ImportFileNameList.signatures[0], 	ImportFileNameList.class ),
 		new FunctionDef( ImportFileRead.signatures[0], 	ImportFileRead.class ),
+		new FunctionDef( CreateDocxFile.signatures[0], 	CreateDocxFile.class ),
 	};
 	
 	public final static File getImportDir() {
-		return new File(new File(new File(SingleInstanceConfiguration.getWebappHome(), "archives"), "transcript"), "import");
+		return new File(getTranscriptDir(), "import");
+	}
+	
+	public final static File getExportDir() {
+		return new File(getTranscriptDir(), "export");
+	}
+	
+	public final static File getTranscriptDir() {
+		return new File(new File(SingleInstanceConfiguration.getWebappHome(), "archives"), "transcript");
 	}
 	
 	public TranscriptStudioModule() 
