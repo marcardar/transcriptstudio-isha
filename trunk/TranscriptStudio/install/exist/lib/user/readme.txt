@@ -1,1 +1,0 @@
-transcript.jar was built manually. Should write an ANT script later.

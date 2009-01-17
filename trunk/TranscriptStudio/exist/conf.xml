@@ -555,7 +555,7 @@
         and "string".  Anything else will be treated as type "string".
         
     -->
-    <transformer class="org.apache.xalan.processor.TransformerFactoryImpl"/>
+    <transformer class="net.sf.saxon.TransformerFactoryImpl"/>
 
     <!--
         Settings for XML validation
