@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="transcript-studio">
+
+	<description>Isha Foundation Transcript Studio - eXist</description>
+	
+	<!-- import default properties from file -->
+	<!--property file="build.properties"/-->
+
+	<property name="src.dir" location="./src"/>
+	<property name="build.dir" location="./build"/>
+	<property name="build.classes.dir" location="${build.dir}/classes"/>
+	<property name="lib.dir" location="./lib"/>
+	<property name="webapp.dir" location="./webapp"/>
+	<property name="exist.lib.dir" location="${exist.home}/lib"/>
+	<property name="exist.webapp.dir" location="${exist.home}/webapp"/>
+	
+	<target name="build">
+		<delete dir="${build.dir}"/>
+		<mkdir dir="${build.classes.dir}"/>
+		<echo message="Compiling eXist extension classes..."/>
+		<javac destdir="${build.classes.dir}" srcdir="${src.dir}">
+			<classpath>
+				<fileset dir="${exist.lib.dir}/core">
+					<include name="*.jar"/>
+				</fileset>
+				<pathelement path="${exist.home}/exist.jar"/>
+			</classpath>
+		</javac>
+		<echo message="Creating transcript.jar..."/>
+		<jar basedir="${build.classes.dir}" compress="true" jarfile="${build.dir}/transcript.jar">
+			<manifest>
+				<attribute name="Project-Name" value="Transcript Studio eXist extensions"/>
+				<!--attribute name="Project-Version" value="${project.version}"/>
+				<attribute name="Project-Build" value="${DSTAMP}"/>
+				<attribute name="Project-CodeName" value="${project.codename}"/>
+				<attribute name="SVN-Revision" value="${svn.revision}"/-->
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="dist">
+        <copy todir="${exist.home}" file="conf.xml"/>
+        <copy todir="${exist.lib.dir}">
+            <fileset dir="${lib.dir}">
+                <include name="**/*.jar"/>
+            </fileset>
+        </copy>
+        <copy todir="${exist.lib.dir}/user">
+            <fileset dir="${build.dir}">
+                <include name="*.jar"/>
+            </fileset>
+        </copy>
+        <copy todir="${exist.webapp.dir}" includeEmptyDirs="true">
+            <fileset dir="${webapp.dir}">
+                <include name="**/*"/>
+            </fileset>
+        </copy>
+		
+	</target>
+	
+    <target name="all"
+        depends="build,dist"
+        description="Build all">
+    </target>
+</project>
