@@ -6,24 +6,33 @@
 	<!-- import default properties from file -->
 	<!--property file="build.properties"/-->
 
-	<property name="src.dir" location="./src"/>
+	<path id="classpath.core">
+		<fileset dir="${exist.home}/lib/core">
+			<include name="*.jar"/>
+		</fileset>
+		<pathelement path="${exist.home}/exist.jar"/>
+		<pathelement path="${exist.home}/exist-optional.jar"/>
+	</path>
+
+	<typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+		<classpath refid="classpath.core"/>
+	</typedef>
+
 	<property name="build.dir" location="./build"/>
 	<property name="build.classes.dir" location="${build.dir}/classes"/>
+	<property name="db.dir" location="./db"/>
 	<property name="lib.dir" location="./lib"/>
+	<property name="src.dir" location="./src"/>
 	<property name="webapp.dir" location="./webapp"/>
 	<property name="exist.lib.dir" location="${exist.home}/lib"/>
-	<property name="exist.webapp.dir" location="${exist.home}/webapp"/>
 	
-	<target name="build">
+   <target name="build">
 		<delete dir="${build.dir}"/>
 		<mkdir dir="${build.classes.dir}"/>
 		<echo message="Compiling eXist extension classes..."/>
 		<javac destdir="${build.classes.dir}" srcdir="${src.dir}">
-			<classpath>
-				<fileset dir="${exist.lib.dir}/core">
-					<include name="*.jar"/>
-				</fileset>
-				<pathelement path="${exist.home}/exist.jar"/>
+            <classpath>
+                <path refid="classpath.core"/>
 			</classpath>
 		</javac>
 		<echo message="Creating transcript.jar..."/>
@@ -39,27 +48,48 @@
 	</target>
 	
 	<target name="dist">
-        <copy todir="${exist.home}" file="conf.xml"/>
-        <copy todir="${exist.lib.dir}">
-            <fileset dir="${lib.dir}">
-                <include name="**/*.jar"/>
-            </fileset>
-        </copy>
-        <copy todir="${exist.lib.dir}/user">
-            <fileset dir="${build.dir}">
-                <include name="*.jar"/>
-            </fileset>
-        </copy>
-        <copy todir="${exist.webapp.dir}" includeEmptyDirs="true">
-            <fileset dir="${webapp.dir}">
-                <include name="**/*"/>
-            </fileset>
-        </copy>
-		
+		<echo message="Copying TranscriptStudio-specific files to eXist installation..."/>
+		<copy todir="${exist.home}" file="conf.xml"/>
+		<copy todir="${exist.lib.dir}">
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="${exist.lib.dir}/user">
+			<fileset dir="${build.dir}">
+				<include name="*.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="${exist.home}/webapp" includeEmptyDirs="true">
+			<fileset dir="${webapp.dir}">
+				<include name="**/*"/>
+			</fileset>
+		</copy>
+		<echo message="Initialising database..."/>
+		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" collection="archives"/>  
+		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives/assets" createcollection="true">
+			<fileset dir="${db.dir}/archives/assets">
+				<include name="*.*"/>
+			</fileset>
+		</xdb:store>
+		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives/reference" createcollection="true">
+			<fileset dir="${db.dir}/archives/reference">
+				<include name="*.*"/>
+			</fileset>
+		</xdb:store>
+		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives/xquery" createcollection="true">
+			<fileset dir="${db.dir}/archives/xquery">
+				<include name="*.*"/>
+			</fileset>
+		</xdb:store>
+		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives/xslt" createcollection="true">
+			<fileset dir="${db.dir}/archives/xslt">
+				<include name="*.*"/>
+			</fileset>
+		</xdb:store>
+		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives" collection="data"/>  
+		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives/data" collection="work"/>  
 	</target>
 	
-    <target name="all"
-        depends="build,dist"
-        description="Build all">
-    </target>
+	<target name="all" depends="build,dist" description="Build all"/>
 </project>
