@@ -21,6 +21,7 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" width="100%" height="100%" verticalGap="0">
 	<mx:Script>
 		<![CDATA[
+			import org.ishafoundation.archives.transcript.components.studio.importer.CreateEventDialog;
 			import flash.net.navigateToURL;
 			import org.ishafoundation.archives.transcript.db.XQueries;
 			import org.ishafoundation.archives.transcript.components.studio.importer.ImportDialog;
@@ -272,6 +273,22 @@
 				});
 			}
 			
+			public function createEventClicked():void {
+				var thisPanel:MainPanel = this;
+				var fileSystem:DbFileSystem = new DbFileSystem(DatabaseConstants.ARCHIVES_COLLECTION_PATH, databaseMgr, function ():void {
+					var popup:CreateEventDialog = new CreateEventDialog();
+					popup.addEventListener(CreateEventDialog.OK_CLICKED, function(event:Event):void {
+						status = "Successfully created event";
+						Alert.show("Successfully created event"); 
+					});
+					popup.eventXML = <event/>;
+					PopUpManager.addPopUp(popup, thisPanel, true);
+					popup.fileSystem = fileSystem;
+					popup.xmlStorer = databaseMgr;
+					popup.referenceMgr = referenceMgr;
+				}, collectionTreeFailed);
+			}
+			
 			private function importClicked():void {
 				if (session != null && session.unsavedChanges) {
 					// confirm this operation with the user
@@ -319,6 +336,9 @@
 				}
 				else if ( actionName == "reloadTranscript" ) {
 					reloadClicked();
+				}
+				else if ( actionName == "createEvent" ) {
+					createEventClicked();
 				}
 				else if ( actionName == "import" ) {
 					importClicked();
@@ -398,6 +418,7 @@
 				<menuitem id="reloadTranscript" label="Reload from database" enabled="{session != null &amp;&amp; session.sessionFile != null}"/>
 			</menuitem>
 			<menuitem label="Admin" enabled="{databaseMgr != null &amp;&amp; databaseMgr.isSuperUser}">
+				<menuitem id="createEvent" label="Create Event..."/>
 				<menuitem id="import" label="Import..."/>
 				<menuitem type="separator"/>
 				<menuitem id="categoryManager" label="Categories..."/>
