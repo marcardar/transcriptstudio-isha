@@ -66,25 +66,9 @@
 			</fileset>
 		</copy>
 		<echo message="Initialising database..."/>
-		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" collection="archives"/>  
-		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives/assets" createcollection="true">
-			<fileset dir="${db.dir}/archives/assets">
-				<include name="*.*"/>
-			</fileset>
-		</xdb:store>
-		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives/reference" createcollection="true">
-			<fileset dir="${db.dir}/archives/reference">
-				<include name="*.*"/>
-			</fileset>
-		</xdb:store>
-		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives/xquery" createcollection="true">
-			<fileset dir="${db.dir}/archives/xquery">
-				<include name="*.*"/>
-			</fileset>
-		</xdb:store>
-		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives/xslt" createcollection="true">
-			<fileset dir="${db.dir}/archives/xslt">
-				<include name="*.*"/>
+		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
+			<fileset dir="${db.dir}">
+				<include name="**/*.*"/>
 			</fileset>
 		</xdb:store>
 		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives" collection="data"/>  
