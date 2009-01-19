@@ -21,7 +21,7 @@ return
 	else
 	(
 		let $docxFilename := replace(util:document-name($doc), '.xml$', '.docx')
-		let $wordML := transform:transform($doc, doc('/db/archives/xslt/export-msword.xsl'), ())
+		let $wordML := transform:transform($doc, doc('/db/archives/xslt/export-msword.xsl'), <parameters><param name='eventPath' value='{$sessionPath}'/></parameters>)
 		return
 			response:stream-binary(transcriptstudio:create-docx($wordML), "application/zip", $docxFilename)
 	)
