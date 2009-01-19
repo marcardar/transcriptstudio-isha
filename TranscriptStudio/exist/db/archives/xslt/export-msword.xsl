@@ -3,12 +3,10 @@
 		xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
 	<xsl:output method="xml"/>
 	<xsl:strip-space elements="*"/>
-
-<!--xsl:variable name="reference" select="document('reference.xml')/reference"/-->
+ 	<xsl:param name="eventPath"/>
+	<xsl:variable name="reference" select="doc('/db/archives/reference/reference.xml')/reference"/>
 	<xsl:variable name="eventId" select="substring(/session/@id,1,14)"/>
-<!--xsl:variable name="event" select="collection('xmldb:exist://localhost:8080//db/archives/data')/event[@id=$eventId]"/-->
-	
-	
+	<xsl:variable name="event" select="doc($eventPath)/event"/>
 	
 	<xsl:template match="/">
 		<w:document>
@@ -71,7 +69,7 @@
 							</w:p>
 							<w:p w:rsidR="00BD70D3" w:rsidRPr="00914051" w:rsidRDefault="00BD70D3" w:rsidP="00021F27">
 								<w:r>
-									<w:t>MEDIA CODE: <xsl:value-of select="upper-case(/session/source/@id)"/>
+									<w:t>MEDIA CODE: <xsl:value-of select="upper-case(string-join(//source/@id, ', '))"/>
 									</w:t>
 								</w:r>
 							</w:p>
@@ -96,7 +94,7 @@
 									</w:rPr>
 								</w:pPr>
 								<w:r>
-									<w:t>EVENT: <!--xsl:value-of select="$event/@name"/--></w:t>
+									<w:t>EVENT: <xsl:value-of select="$reference/eventTypes/eventType[@id=$event/@type]/@name"/></w:t>
 								</w:r>
 							</w:p>
 						</w:tc>
@@ -111,7 +109,7 @@
 							</w:tcPr>
 							<w:p w:rsidR="00BD70D3" w:rsidRPr="00914051" w:rsidRDefault="00BD70D3" w:rsidP="00021F27">
 								<w:r>
-									<w:t>LOCATION: <!--xsl:value-of select="$event/@location"/--></w:t>
+									<w:t>LOCATION: <xsl:value-of select="$event/@venue"/></w:t>
 								</w:r>
 							</w:p>
 						</w:tc>
@@ -141,7 +139,7 @@
 							</w:tcPr>
 							<w:p w:rsidR="00BD70D3" w:rsidRPr="00914051" w:rsidRDefault="00BD70D3" w:rsidP="00021F27">
 								<w:r>
-									<w:t>DATE: <!--xsl:value-of select="$event/@startAt"/--></w:t>
+									<w:t>DATE: <xsl:value-of select="$event/@startAt"/></w:t>
 								</w:r>
 							</w:p>
 						</w:tc>
