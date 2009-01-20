@@ -93,9 +93,8 @@
 									</w:rPr>
 								</w:pPr>
 								<w:r>
-                                    <w:t>EVENT: <xsl:value-of select="$eventPath"/>
-                                        <xsl:value-of select="$reference/eventTypes/eventType[@id=$event/@type]/@name"/>
-                                    </w:t>
+                                    <w:t>EVENT: <xsl:value-of select="$reference/eventTypes/eventType[@id=$event/@type]/@name"/>
+									</w:t>
 								</w:r>
 							</w:p>
 						</w:tc>
@@ -111,7 +110,7 @@
 							<w:p w:rsidR="00BD70D3" w:rsidRPr="00914051" w:rsidRDefault="00BD70D3" w:rsidP="00021F27">
 								<w:r>
                                     <w:t>LOCATION: <xsl:value-of select="string-join(($event/@venue, $event/@location, $event/@country), ', ')"/>  
-                                    </w:t>
+									</w:t>
 								</w:r>
 							</w:p>
 						</w:tc>
@@ -141,8 +140,8 @@
 							</w:tcPr>
 							<w:p w:rsidR="00BD70D3" w:rsidRPr="00914051" w:rsidRDefault="00BD70D3" w:rsidP="00021F27">
 								<w:r>
-                                    <w:t>DATE: <xsl:value-of select="$event/@startAt"/>
-                                    </w:t>
+                                    <w:t>SESSION DATE: <xsl:value-of select="(session/@startAt, $event/@startAt)[1]"/>
+									</w:t>
 								</w:r>
 							</w:p>
 						</w:tc>
@@ -207,8 +206,9 @@
 </xsl:for-each>
 -->
 				<xsl:for-each select="//superSegment | //superContent">
-					<xsl:variable name="markupType" select="tag[@type='markupType']/@value"/>
 					<xsl:variable name="markupId" select="@id"/>
+					<xsl:variable name="markupType" select="tag[@type='markupType']/@value"/>
+					<xsl:variable name="markupCategory" select="tag[@type='markupCategory']/@value"/>
 					<w:p>
                         <w:hyperlink w:history="1">
 							<xsl:attribute name="w:anchor">
@@ -219,8 +219,11 @@
                                     <w:rStyle w:val="Hyperlink"/>
 								</w:rPr>
 								<w:t>
-                                    <xsl:value-of select="concat(upper-case(substring($markupType,1,1)), substring($markupType,2))"/>
-									<xsl:text>: </xsl:text>
+                                    <xsl:value-of select="$reference/categoryTypes/categoryType[@id = $markupType]/@name"/>
+									<xsl:if test="$markupCategory">
+										<xsl:text>: </xsl:text>
+										<xsl:value-of select="$reference/categories/category[@id = $markupCategory]/@name"/>
+									</xsl:if>
 								</w:t>
 							</w:r>
 						</w:hyperlink>
@@ -228,74 +231,88 @@
 				</xsl:for-each>
 				
 				<w:p/>
-				
-				<xsl:for-each select="//segment[@type='paragraph']">
-					<xsl:variable name="syncPoint" select="content[1]/@startSyncPointId"/>
-					<xsl:if test="$syncPoint and not(preceding::segment[position() &lt; 3]/content[1]/@startSyncPointId)">
-						<xsl:variable name="time" select="/session/source/syncPoint[@idRef = $syncPoint]/@timecode"/>
-						<w:p>
-                            <w:r>
-                                <w:t>Time <xsl:number format="1" value="floor($time div 60)"/>
-									<xsl:text>:</xsl:text>
-									<xsl:number format="01" value="$time mod 60"/>
-								</w:t>
-							</w:r>
-						</w:p>
-						<w:p/>
-					</xsl:if>
-					<w:p>
-                        <xsl:if test="(position() = 1) or (preceding::segment[1]/@speaker and not(@speaker)) or (not(preceding::segment[1]/@speaker) and @speaker) or (preceding::segment[1]/@speaker != @speaker)">
-							<w:r>
-                                <w:rPr>
-                                    <w:b/>
-								</w:rPr>
-								<w:t>
-                                    <xsl:attribute name="xml:space">preserve</xsl:attribute>
-									<xsl:choose>
-                                        <xsl:when test="@speaker">
-											<xsl:value-of select="normalize-space(concat(upper-case(substring(@speaker,1,1)), substring(@speaker,2)))"/>
-											<xsl:text>: </xsl:text>
-										</xsl:when>
-										<xsl:otherwise>
-                                            <xsl:text>Sadhguru: </xsl:text>
-										</xsl:otherwise>
-									</xsl:choose>
-								</w:t>
-							</w:r>
-						</xsl:if>
-						<xsl:for-each select=".//content">
-							<w:r>
-                                <xsl:if test="@emphasis | @spokenLanguage">
-									<w:rPr>
-                                        <xsl:if test="@emphasis='true'">
-											<w:i/>
-										</xsl:if>
-										<xsl:if test="@spokenLanguage='tamil'">
-											<w:color w:val="00B0F0"/>
-										</xsl:if>
-									</w:rPr>
-								</xsl:if>
-								<w:t>
-                                    <xsl:attribute name="xml:space">preserve</xsl:attribute>
-									<xsl:value-of select="normalize-space(.)"/>
-									<xsl:if test="position() &lt; last()">
-										<xsl:text> </xsl:text>
-									</xsl:if>
-								</w:t>
-							</w:r>
-						</xsl:for-each>
-					</w:p>
-					<w:p/>
-				</xsl:for-each>
-			
+				<xsl:apply-templates select="//transcript"/>
 			
 			</w:body>
 		</w:document>
-	<!--xsl:apply-templates/-->
+		<!--xsl:apply-templates/-->
 	</xsl:template>
 	
-	<xsl:template match="//superSegment">
-		<w:moog/>
+				
+	<xsl:template match="transcript">
+		<xsl:apply-templates select="segment|superSegment"/>
 	</xsl:template>
-
+				
+	<xsl:template match="superSegment">
+		<xsl:apply-templates select="segment|superSegment"/>
+	</xsl:template>
+	
+	<!--xsl:template match="//superSegment">
+		<w:moog/>
+	</xsl:template-->
+	
+	<xsl:template match="segment">
+		<xsl:variable name="syncPoint" select="content[1]/@startSyncPointId"/>
+		<xsl:if test="$syncPoint and not(preceding::segment[position() &lt; 3]/content[1]/@startSyncPointId)">
+			<xsl:variable name="time" select="/session/source/syncPoint[@idRef = $syncPoint]/@timecode"/>
+			<w:p>
+                <w:r>
+                    <w:t>Time <xsl:number format="1" value="floor($time div 60)"/>
+						<xsl:text>:</xsl:text>
+						<xsl:number format="01" value="$time mod 60"/>
+					</w:t>
+				</w:r>
+			</w:p>
+			<w:p/>
+		</xsl:if>
+		<w:p>
+            <xsl:if test="(position() = 1) or (preceding::segment[1]/@speaker and not(@speaker)) or (not(preceding::segment[1]/@speaker) and @speaker) or (preceding::segment[1]/@speaker != @speaker)">
+				<w:r>
+                    <w:rPr>
+                        <w:b/>
+					</w:rPr>
+					<w:t>
+                        <xsl:attribute name="xml:space">preserve</xsl:attribute>
+						<xsl:choose>
+                            <xsl:when test="@speaker">
+								<xsl:value-of select="normalize-space(concat(upper-case(substring(@speaker,1,1)), substring(@speaker,2)))"/>
+								<xsl:text>: </xsl:text>
+							</xsl:when>
+							<xsl:otherwise>
+                                <xsl:text>Sadhguru: </xsl:text>
+							</xsl:otherwise>
+						</xsl:choose>
+					</w:t>
+				</w:r>
+			</xsl:if>
+			<xsl:apply-templates select="content|superContent"/>
+		</w:p>
+		<w:p/>
+	</xsl:template>
+	
+	<xsl:template match="superContent">
+		<xsl:apply-templates select="content|superContent"/>
+	</xsl:template>
+	
+	<xsl:template match="content">
+		<w:r>
+            <xsl:if test="@emphasis | @spokenLanguage">
+				<w:rPr>
+                    <xsl:if test="@emphasis='true'">
+						<w:i/>
+					</xsl:if>
+					<xsl:if test="@spokenLanguage='tamil'">
+						<w:color w:val="00B0F0"/>
+					</xsl:if>
+				</w:rPr>
+			</xsl:if>
+			<w:t>
+                <xsl:attribute name="xml:space">preserve</xsl:attribute>
+				<xsl:value-of select="normalize-space(.)"/>
+				<xsl:if test="position() &lt; last()">
+					<xsl:text> </xsl:text>
+				</xsl:if>
+			</w:t>
+		</w:r>
+	</xsl:template>
 </xsl:stylesheet>
