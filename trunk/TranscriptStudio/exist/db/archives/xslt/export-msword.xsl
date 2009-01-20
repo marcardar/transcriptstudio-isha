@@ -244,7 +244,13 @@
 	</xsl:template>
 				
 	<xsl:template match="superSegment">
+		<w:bookmarkStart w:id="0">
+			<xsl:attribute name="w:name">
+				<xsl:value-of select="./@id"/>
+			</xsl:attribute>
+		</w:bookmarkStart>
 		<xsl:apply-templates select="segment|superSegment"/>
+		<w:bookmarkEnd w:id="0"/>
 	</xsl:template>
 	
 	<!--xsl:template match="//superSegment">
@@ -291,7 +297,13 @@
 	</xsl:template>
 	
 	<xsl:template match="superContent">
+		<w:bookmarkStart w:id="0">
+			<xsl:attribute name="w:name">
+				<xsl:value-of select="./@id"/>
+			</xsl:attribute>
+		</w:bookmarkStart>
 		<xsl:apply-templates select="content|superContent"/>
+		<w:bookmarkEnd w:id="0"/>
 	</xsl:template>
 	
 	<xsl:template match="content">
