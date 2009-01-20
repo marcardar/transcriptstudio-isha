@@ -25,8 +25,8 @@
 	<property name="src.dir" location="./src"/>
 	<property name="webapp.dir" location="./webapp"/>
 	<property name="exist.lib.dir" location="${exist.home}/lib"/>
-	
-   <target name="build">
+
+	<target name="build">
 		<delete dir="${build.dir}"/>
 		<mkdir dir="${build.classes.dir}"/>
 		<echo message="Compiling eXist extension classes..."/>
@@ -69,10 +69,24 @@
 		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
 			<fileset dir="${db.dir}">
 				<include name="**/*.*"/>
+				<exclude name="archives/reference/reference.xml"/>
 			</fileset>
 		</xdb:store>
+		<!-- Cannot get this working properly, so reference.xml will have to be done manually
+		condition property="reference.xml.exists" value="false" else="true">  
+			<xdb:exist xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist:///db/archives/reference" resource="reference.xml"/>
+		</condition>
+		<antcall target="store-reference-xml"/-->
 		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives" collection="data"/>  
 		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives/data" collection="work"/>  
+	</target>
+	
+	<target name="store-reference-xml" unless="reference.xml.exists">
+		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
+			<fileset dir="${db.dir}">
+				<include name="archives/reference/reference.xml"/>
+			</fileset>
+		</xdb:store>
 	</target>
 	
 	<target name="all" depends="build,dist" description="Build all"/>
