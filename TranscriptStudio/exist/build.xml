@@ -73,15 +73,15 @@
 			</fileset>
 		</xdb:store>
 		<!-- Cannot get this working properly, so reference.xml will have to be done manually -->
-		<!--condition property="reference.xml.exists" value="true" else="false">  
-			<xdb:exist xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist:///db/archives/reference" resource="reference.xml"/>
+		<condition property="reference.xml.exists">  
+			<xdb:exist xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives/reference" resource="reference.xml"/>
 		</condition>
-		<antcall target="store-reference-xml"/-->
+		<antcall target="store-reference-xml"/>
 		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives" collection="data"/>  
 		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives/data" collection="work"/>  
 	</target>
 	
-	<target name="store-reference-xml">
+	<target name="store-reference-xml" unless="reference.xml.exists">
 		<echo message="Storing reference.xml"/>
 		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
 			<fileset dir="${db.dir}">
