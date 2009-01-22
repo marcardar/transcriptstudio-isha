@@ -80,6 +80,10 @@
 		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives" collection="data"/>  
 		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives/data" collection="work"/>  
 	</target>
+
+	<target name="closing-message">
+		<echo message="Please restart eXist database for changes to take effect"/> 
+	</target>
 	
 	<target name="store-reference-xml" unless="reference.xml.exists">
 		<echo message="Storing reference.xml"/>
@@ -90,5 +94,5 @@
 		</xdb:store>
 	</target>
 	
-	<target name="all" depends="build,dist" description="Build all"/>
+	<target name="all" depends="build,dist,closing-message" description="Build all"/>
 </project>
