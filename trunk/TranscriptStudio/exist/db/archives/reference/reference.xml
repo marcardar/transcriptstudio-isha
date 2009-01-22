@@ -70,12 +70,7 @@
 		<categoryType id="process" name="Process" contentType="outline"/>
 		<categoryType id="soundbite" name="Sound Bite" contentType="both"/>
 	</categoryTypes>
-	<categories>
-        <category id="my-special-joke-about-the1" name="My special joke about the pope">
-			<tag type="type" value="joke"/>
-			<tag type="concept" value="pope"/>
-		</category>
-	</categories>
+	<categories/>
 	<conceptHierarchy/>
 	<conceptSynonymGroups/>
 </reference>
