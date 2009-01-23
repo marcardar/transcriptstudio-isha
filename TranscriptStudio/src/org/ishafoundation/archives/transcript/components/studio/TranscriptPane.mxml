@@ -81,6 +81,10 @@
 			});
 			this.transcriptTextArea.addEventListener(TranscriptTextArea.SELECTION_CHANGE_EVENT, transcriptTextAreaSelectionChange);
 			this.markupsPane.markupPropertiesPane.addEventListener(MarkupPropertiesPane.MARKUP_PROPERTIES_CHANGE_EVENT, function(evt:Event):void {
+				// TODO - this selectedMarkup is sometimes null when it shouldnt be
+				if (markupsPane.selectedMarkup == null) {
+					throw new Error("Could not handle markup properties change because markupsPane.selectedMarkup is null");
+				}
 				markupPropertiesChangeHandler(markupsPane.selectedMarkup);
 			});     		
 			this.markupsPane.markupPropertiesPane.addEventListener(MarkupPropertiesPane.MARKUP_REMOVE_EVENT, function(evt:Event):void {
