@@ -40,6 +40,7 @@ package org.ishafoundation.archives.transcript.model
 		public static const REFERENCE_XML_PATH:String = DatabaseConstants.REFERENCE_COLLECTION_PATH + "/reference.xml";
 		
 		private var xmlRetrieverStorer:XMLRetrieverStorer;
+		private var xqueryExecutor:XQueryExecutor;
 		
 		[Bindable]
 		public var referenceXML:XML;
@@ -47,8 +48,9 @@ package org.ishafoundation.archives.transcript.model
 		[Bindable]
 		public var unsavedChanges:Boolean = false;
 			
-		public function ReferenceManager(xmlRetrieverStorer:XMLRetrieverStorer) {
+		public function ReferenceManager(xmlRetrieverStorer:XMLRetrieverStorer, xqueryExecutor:XQueryExecutor) {
 			this.xmlRetrieverStorer = xmlRetrieverStorer;
+			this.xqueryExecutor = xqueryExecutor;
 		}	
 		
 		public function loadReferences(retrieveXMLSuccess:Function, retrieveXMLFailure:Function):void {
@@ -571,6 +573,33 @@ package org.ishafoundation.archives.transcript.model
 				}
 			}
 			return result;
+		}
+		
+		public function addConcept(conceptId:String, successFunc:Function, failureFunc:Function):void {
+			trace("Adding concept: " + conceptId);
+			xqueryExecutor.executeStoredXQuery("update-concept.xql", {newConceptId:conceptId}, function(returnVal:int):void {
+				loadReferences(function():void {
+					successFunc(returnVal);
+				}, failureFunc);
+			}, failureFunc);
+		}
+		
+		public function renameConcept(oldConceptId:String, newConceptId:String, successFunc:Function, failureFunc:Function):void {
+			trace("Renaming concept: " + oldConceptId + " to: " + newConceptId);
+			xqueryExecutor.executeStoredXQuery("update-concept.xql", {oldConceptId:oldConceptId, newConceptId:newConceptId}, function(returnVal:int):void {
+				loadReferences(function():void {
+					successFunc(returnVal);
+				}, failureFunc);
+			}, failureFunc);
+		}
+		
+		public function removeConcept(conceptId:String, successFunc:Function, failureFunc:Function):void {
+			trace("Removing concept: " + conceptId);
+			xqueryExecutor.executeStoredXQuery("update-concept.xql", {oldConceptId:conceptId}, function(returnVal:int):void {
+				loadReferences(function():void {
+					successFunc(returnVal);
+				}, failureFunc);
+			}, failureFunc);
 		}
 	}
 }

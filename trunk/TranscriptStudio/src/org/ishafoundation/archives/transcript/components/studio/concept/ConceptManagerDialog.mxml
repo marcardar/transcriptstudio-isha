@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" alpha="2.0" layout="vertical" x="30" y="30" width="700" height="450" title="Concept Manager" horizontalAlign="center" creationComplete="init()">
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" alpha="2.0" layout="vertical" x="30" y="30" width="700" height="450" title="Concept Manager" horizontalAlign="center" creationComplete="init()" paddingLeft="0" paddingRight="0" paddingTop="0" roundedBottomCorners="false">
 <mx:Script>
 	<![CDATA[
+		import mx.utils.StringUtil;
+		import org.ishafoundation.archives.transcript.components.generic.TextInputDialog;
+		import mx.events.MenuEvent;
 		import mx.collections.ArrayCollection;
 		import mx.managers.DragManager;
 		import mx.binding.utils.BindingUtils;
@@ -27,14 +30,15 @@
 			conceptList.dataProvider = allConcepts.sort();
 		}
 
-    	private function selectionChanged(evt:Event):void {
+    	private function selectionChange(newConceptId:String):void {
     		if (DragManager.isDragging) {
     			return;
     		}
-    		if (this.selectedConceptId != conceptList.selectedItem) {
-	    		trace("Selection changed to: " + conceptList.selectedItem);
-    			this.selectedConceptId = conceptList.selectedItem as String;
+    		if (this.selectedConceptId != newConceptId) {
+	    		trace("Selection changed to: " + newConceptId);
+    			this.selectedConceptId = newConceptId;
     		}
+    		conceptList.selectedItem = newConceptId;
     	}
 
 		private function saveClicked():void {
@@ -140,12 +144,85 @@
 			synonymList.executeBindings();
 			collectedConceptTextArea.executeBindings();
 		}
+		
+		private function onMenuClick(evt:MenuEvent):void {
+			var actionName:String = evt.item.@id;
+			if ( actionName == "add" ) {
+				var newConceptDialog:TextInputDialog = TextInputDialog.display(this, "Enter new concept");
+				newConceptDialog.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+					var conceptId:String = StringUtil.trim(newConceptDialog.textInput.text);
+					if (conceptId != "") {
+						referenceMgr.addConcept(conceptId, function(returnVal:int):void {
+							init();
+							selectionChange(conceptId);
+							if (returnVal == 0) {
+								Alert.show(conceptId, "Concept already exists");
+							}
+							else {
+								Alert.show(conceptId, "Successfully added concept");
+							}
+						},
+						function(msg:String):void {
+							Alert.show(msg, "Could not add concept: " + conceptId);
+						});
+					}
+				});
+			}
+			else if ( actionName == "rename" ) {
+				var oldConceptId:String = conceptList.selectedItem.toString();
+				var renameConceptDialog:TextInputDialog = TextInputDialog.display(this, "Rename concept", oldConceptId);
+				renameConceptDialog.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+					var conceptId:String = StringUtil.trim(renameConceptDialog.textInput.text);
+					if (conceptId != "") {
+						referenceMgr.renameConcept(oldConceptId, conceptId, function(returnVal:int):void {
+							init();
+							if (returnVal == 0) {
+								selectionChange(null);
+								Alert.show(conceptId, "Could not find concept");
+							}
+							else {
+								selectionChange(conceptId);
+								Alert.show(returnVal + " instance" + (returnVal != 1 ? "s" : ""), "Successfully renamed concept: " + conceptId);
+							}
+						},
+						function(msg:String):void {
+							Alert.show(msg, "Could not rename concept: " + oldConceptId + " to: " + conceptId);
+						});
+					}
+				});
+			}
+			else if ( actionName == "remove" ) {
+				var conceptId:String = conceptList.selectedItem.toString();
+				referenceMgr.removeConcept(conceptId, function(returnVal:int):void {
+					init();
+					selectionChange(null);
+					if (returnVal == 0) {
+						Alert.show("No concept found: " + conceptId);
+					}
+					else {
+						Alert.show(returnVal + " instance" + (returnVal != 1 ? "s" : ""), "Successfully removed concept: " + conceptId);
+					}
+				},
+				function(msg:String):void {
+					Alert.show(msg, "Could not remove concept: " + conceptId);
+				});
+			}
+		}
 	]]>
 	</mx:Script>
+	<mx:MenuBar id="myMenuBar" width="100%" labelField="@label" itemClick="onMenuClick(event)">
+		<mx:XMLList id="menuData">
+			<menuitem label="Concept" enabled="{!saveButton.enabled}">
+				<menuitem id="add" label="Add..."/>
+				<menuitem id="rename" label="Rename..." enabled="{conceptList.selectedItem != null}"/>
+				<menuitem id="remove" label="Remove" enabled="{conceptList.selectedItem != null}"/>
+			</menuitem>
+		</mx:XMLList>
+	</mx:MenuBar>
 	<mx:HDividedBox width="100%" height="100%" horizontalGap="{Utils.DIVIDER_SIZE}">
 		<mx:VBox width="33%" height="100%" minWidth="100">
 			<mx:Label text="Concepts"/>
-			<mx:List id="conceptList" width="100%" height="100%" change="selectionChanged(event)" dragEnabled="true" dragDrop="dragDropToSubTypeList(event)" dragComplete="dragComplete(event)"/>
+			<mx:List id="conceptList" width="100%" height="100%" change="selectionChange(conceptList.selectedItem as String)" dragEnabled="true" dragDrop="dragDropToSubTypeList(event)" dragComplete="dragComplete(event)"/>
 		</mx:VBox>
 		<mx:VDividedBox width="67%" height="100%" minWidth="250" verticalGap="{Utils.DIVIDER_SIZE}">
 			<mx:HDividedBox width="100%" height="60%" minHeight="100" horizontalGap="{Utils.DIVIDER_SIZE}" paddingBottom="10">
@@ -167,7 +244,7 @@
 		</mx:VDividedBox>
 	</mx:HDividedBox>
 	<mx:HBox>
-		<mx:Button label="Save" enabled="{this.referenceMgr.unsavedChanges}" click="saveClicked();closeMe()"/>
+		<mx:Button id="saveButton" label="Save" enabled="{this.referenceMgr.unsavedChanges}" click="saveClicked();closeMe()"/>
 		<mx:Button label="Cancel" click="cancelClicked();closeMe()"/>		
 	</mx:HBox>	
 </mx:TitleWindow>
