@@ -41,7 +41,7 @@ package name.carter.mark.flex.util.remote.rest
 			//httpService.requestTimeout = 5;
 			
 			httpService.addEventListener(ResultEvent.RESULT, function(evt:ResultEvent):void {
-				if (evt.result.error != null) {
+				if (evt.result.hasOwnProperty("error") && evt.result.error != null) {
 					failureFunc("Failed because: " + evt.result.error);
 					return;
 				}
