@@ -2,6 +2,7 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" alpha="2.0" layout="vertical" x="30" y="30" width="700" height="450" title="Concept Manager" horizontalAlign="center" creationComplete="init()" paddingLeft="0" paddingRight="0" paddingTop="0" roundedBottomCorners="false">
 <mx:Script>
 	<![CDATA[
+		import org.ishafoundation.archives.transcript.components.generic.MessagePopUp;
 		import org.ishafoundation.archives.transcript.util.Constants;
 		import mx.utils.StringUtil;
 		import org.ishafoundation.archives.transcript.components.generic.TextInputDialog;
@@ -153,18 +154,19 @@
 				newConceptDialog.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
 					var conceptId:String = Utils.normalizeSpace(newConceptDialog.textInput.text);
 					if (conceptId != "") {
+						var messagePopUp:MessagePopUp = createMessagePopup("Adding concept: " + conceptId);
 						referenceMgr.addConcept(conceptId, function(returnVal:int):void {
 							init();
 							selectionChange(conceptId);
 							if (returnVal == 0) {
-								Alert.show(conceptId, "Concept already exists");
+								messagePopUp.enableOkButton("Concept already exists!");
 							}
 							else {
-								Alert.show(conceptId, "Successfully added concept");
+								messagePopUp.enableOkButton("Added concept");
 							}
 						},
 						function(msg:String):void {
-							Alert.show(msg, "Could not add concept: " + conceptId);
+							messagePopUp.enableOkButton("Failed: " + msg);
 						});
 					}
 				});
@@ -173,41 +175,44 @@
 				var oldConceptId:String = conceptList.selectedItem.toString();
 				var renameConceptDialog:TextInputDialog = TextInputDialog.display(this, "Rename concept", oldConceptId, Constants.CONCEPT_ID_RESTRICTION);
 				renameConceptDialog.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
-					var conceptId:String = Utils.normalizeSpace(renameConceptDialog.textInput.text);
-					if (conceptId != "") {
-						referenceMgr.renameConcept(oldConceptId, conceptId, function(returnVal:int):void {
+					var newConceptId:String = Utils.normalizeSpace(renameConceptDialog.textInput.text);
+					if (newConceptId != "") {
+						var messagePopUp:MessagePopUp = createMessagePopup("Renaming concept: " + oldConceptId + " to: " + newConceptId);
+						referenceMgr.renameConcept(oldConceptId, newConceptId, function(returnVal:int):void {
 							init();
 							if (returnVal == 0) {
 								selectionChange(null);
-								Alert.show(conceptId, "Could not find concept");
+								messagePopUp.enableOkButton("Could not find concept!");
 							}
 							else {
 								selectionChange(conceptId);
-								Alert.show(returnVal + " instance" + (returnVal != 1 ? "s" : ""), "Successfully renamed concept: " + conceptId);
+								messagePopUp.enableOkButton("Renamed " + returnVal + " instance" + (returnVal != 1 ? "s" : ""));
 							}
 						},
 						function(msg:String):void {
-							Alert.show(msg, "Could not rename concept: " + oldConceptId + " to: " + conceptId);
+							messagePopUp.enableOkButton("Failed: " + msg);
 						});
 					}
 				});
 			}
 			else if ( actionName == "remove" ) {
 				var conceptId:String = conceptList.selectedItem.toString();
+				var messagePopUp:MessagePopUp = createMessagePopup("Removing concept: " + conceptId);
 				referenceMgr.removeConcept(conceptId, function(returnVal:int):void {
 					init();
 					selectionChange(null);
-					if (returnVal == 0) {
-						Alert.show("No concept found: " + conceptId);
-					}
-					else {
-						Alert.show(returnVal + " instance" + (returnVal != 1 ? "s" : ""), "Successfully removed concept: " + conceptId);
-					}
+					messagePopUp.enableOkButton(returnVal == 0 ? "Could not find concept!" : "Removed " + returnVal + " instance" + (returnVal != 1 ? "s" : ""));
 				},
 				function(msg:String):void {
-					Alert.show(msg, "Could not remove concept: " + conceptId);
+					messagePopUp.enableOkButton("Failed: " + msg);
 				});
 			}
+		}
+		
+		private function createMessagePopup(title:String):MessagePopUp {
+			var result:MessagePopUp = MessagePopUp.display(this, title, "Please wait...", 250);
+			result.okButton.enabled = false;
+			return result;
 		}
 	]]>
 	</mx:Script>
