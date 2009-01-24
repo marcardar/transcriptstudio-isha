@@ -162,7 +162,7 @@
 								messagePopUp.enableOkButton("Concept already exists!");
 							}
 							else {
-								messagePopUp.enableOkButton("Added concept");
+								messagePopUp.enableOkButton("Added");
 							}
 						},
 						function(msg:String):void {
