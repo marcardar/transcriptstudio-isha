@@ -166,7 +166,7 @@
 							}
 						},
 						function(msg:String):void {
-							messagePopUp.enableOkButton("Failed: " + msg);
+							messagePopUp.enableOkButton("Failed", msg);
 						});
 					}
 				});
@@ -190,7 +190,7 @@
 							}
 						},
 						function(msg:String):void {
-							messagePopUp.enableOkButton("Failed: " + msg);
+							messagePopUp.enableOkButton("Failed", msg);
 						});
 					}
 				});
@@ -204,7 +204,7 @@
 					messagePopUp.enableOkButton(returnVal == 0 ? "Could not find concept!" : "Removed " + returnVal + " instance" + (returnVal != 1 ? "s" : ""));
 				},
 				function(msg:String):void {
-					messagePopUp.enableOkButton("Failed: " + msg);
+					messagePopUp.enableOkButton("Failed", msg);
 				});
 			}
 		}
