@@ -2,6 +2,28 @@ xquery version "1.0";
 
 module namespace concept-fns = "http://www.ishafoundation.org/archives/xquery/concept-fns";
 
+declare function concept-fns:get-all-concepts-ordered() as xs:string*
+{
+	let $reference := collection('/db/archives/reference')/reference
+	let $categoryConcepts := $reference/categories/category/tag[@type eq 'concept']/string(@value)
+	let $otherReferenceConcepts := $reference//concept/string(@idRef)
+	let $additionalConcepts := collection('/db/archives/data')/session/transcript/(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
+	return
+		for $concept in distinct-values(($categoryConcepts, $otherReferenceConcepts, $additionalConcepts))
+		order by $concept 
+		return $concept
+};
+
+declare function concept-fns:add-synonym($conceptId1 as xs:string, $conceptId2 as xs:string) as xs:boolean
+{
+	true
+};
+
+declare function concept-fns:remove-synonym($conceptId1 as xs:string, $conceptId2 as xs:string) as xs:boolean
+{
+	true
+};
+
 (: Returns the number of concepts deleted :)
 declare function concept-fns:add($conceptId as xs:string) as xs:integer
 {
@@ -123,7 +145,7 @@ declare function concept-fns:rename-synonym-concept($conceptId as xs:string, $ne
 						update delete $oldConcept
 					else
 						(: merge the two synonym groups :)
-						let $mergedSynonymConceptIds := distinct-values(($oldConcept|$newConcept)/../*/string(@idRef))
+						let $mergedSynonymConceptIds := distinct-values(($oldConcept|$newConcept)/../*[not(@idRef eq $conceptId)]/string(@idRef))
 						let $mergedSynonymGroup :=
 							element { 'conceptSynonymGroup' }
 								{
