@@ -2,6 +2,7 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" alpha="2.0" layout="vertical" x="30" y="30" width="700" height="450" title="Concept Manager" horizontalAlign="center" creationComplete="init()" paddingLeft="0" paddingRight="0" paddingTop="0" roundedBottomCorners="false">
 <mx:Script>
 	<![CDATA[
+		import org.ishafoundation.archives.transcript.util.Constants;
 		import mx.utils.StringUtil;
 		import org.ishafoundation.archives.transcript.components.generic.TextInputDialog;
 		import mx.events.MenuEvent;
@@ -148,9 +149,9 @@
 		private function onMenuClick(evt:MenuEvent):void {
 			var actionName:String = evt.item.@id;
 			if ( actionName == "add" ) {
-				var newConceptDialog:TextInputDialog = TextInputDialog.display(this, "Enter new concept");
+				var newConceptDialog:TextInputDialog = TextInputDialog.display(this, "Enter new concept", null, Constants.CONCEPT_ID_RESTRICTION);
 				newConceptDialog.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
-					var conceptId:String = StringUtil.trim(newConceptDialog.textInput.text);
+					var conceptId:String = Utils.normalizeSpace(newConceptDialog.textInput.text);
 					if (conceptId != "") {
 						referenceMgr.addConcept(conceptId, function(returnVal:int):void {
 							init();
@@ -170,9 +171,9 @@
 			}
 			else if ( actionName == "rename" ) {
 				var oldConceptId:String = conceptList.selectedItem.toString();
-				var renameConceptDialog:TextInputDialog = TextInputDialog.display(this, "Rename concept", oldConceptId);
+				var renameConceptDialog:TextInputDialog = TextInputDialog.display(this, "Rename concept", oldConceptId, Constants.CONCEPT_ID_RESTRICTION);
 				renameConceptDialog.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
-					var conceptId:String = StringUtil.trim(renameConceptDialog.textInput.text);
+					var conceptId:String = Utils.normalizeSpace(renameConceptDialog.textInput.text);
 					if (conceptId != "") {
 						referenceMgr.renameConcept(oldConceptId, conceptId, function(returnVal:int):void {
 							init();
