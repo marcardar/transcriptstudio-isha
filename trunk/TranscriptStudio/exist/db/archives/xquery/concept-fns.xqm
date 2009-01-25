@@ -2,7 +2,7 @@ xquery version "1.0";
 
 module namespace concept-fns = "http://www.ishafoundation.org/archives/xquery/concept-fns";
 
-declare function concept-fns:get-all-concepts-ordered() as xs:string*
+declare function concept-fns:get-all-concepts() as xs:string*
 {
 	let $reference := collection('/db/archives/reference')/reference
 	let $categoryConcepts := $reference/categories/category/tag[@type eq 'concept']/string(@value)
@@ -14,17 +14,103 @@ declare function concept-fns:get-all-concepts-ordered() as xs:string*
 		return $concept
 };
 
-declare function concept-fns:add-synonym($conceptId1 as xs:string, $conceptId2 as xs:string) as xs:boolean
+declare function concept-fns:add-synonyms($conceptIds as xs:string*) as xs:boolean
 {
-	true
+	if (count($conceptIds) < 2) then
+		false()
+	else
+		let $conceptSynonymGroups := collection('/db/archives/reference')/reference/conceptSynonymGroups
+		let $existingGroups := $conceptSynonymGroups/conceptSynonymGroup/concept[@idRef = $conceptIds]/..
+		return
+			let $targetGroup :=
+				if (count($existingGroups) = 0) then
+				(
+					let $newGroup := <conceptSynonymGroup/>
+					let $null := update insert $newGroup into $conceptSynonymGroups
+					(: cannot return $newGroup because "update" cannot handle elements that have been constructed in memory - so grab what we just persisted instead :)
+					return $conceptSynonymGroups/conceptSynonymGroup[last()]
+				)
+				else if (count($existingGroups) = 1) then
+				(
+					$existingGroups[1]
+				)
+				else
+				(
+					let $null :=
+					(
+						update insert $existingGroups[position() > 1]/concept into $existingGroups[1]
+						,
+						update delete $existingGroups[position() > 1]
+					)
+					return $existingGroups[1]
+				)
+			let $newGroupMembers :=
+				for $conceptId in $conceptIds
+				where not(exists($targetGroup/concept[@idRef eq $conceptId]))
+				return
+					element { 'concept' }
+					{ attribute {'idRef'} {$conceptId} }
+			let $null :=
+				if (exists($newGroupMembers)) then
+					update insert $newGroupMembers into $targetGroup
+				else
+					()
+			return true()
 };
 
-declare function concept-fns:remove-synonym($conceptId1 as xs:string, $conceptId2 as xs:string) as xs:boolean
+declare function concept-fns:remove-synonym($conceptId as xs:string) as xs:boolean
 {
-	true
+	let $synonym := collection('/db/archives/reference')/reference/conceptSynonymGroups/conceptSynonymGroup/concept[@idRef eq $conceptId]
+	return
+		if (exists($synonym)) then
+			let $null :=
+				if (count($synonym/../concept) <= 2) then
+					(: deleting this synonym will leave this group meaningless so remove whole group :)
+					update delete $synonym/..
+				else
+					update delete $synonym
+			return true()
+		else
+			false()
 };
 
-(: Returns the number of concepts deleted :)
+declare function concept-fns:add-subtype($superConceptId as xs:string, $subConceptId as xs:string) as xs:boolean
+{
+	let $conceptHierarchy := collection('/db/archives/reference')/reference/conceptHierarchy
+	let $superConcept := $conceptHierarchy/concept[@idRef eq $superConceptId]
+	return
+		if (exists($superConcept)) then
+			if (exists($superConcept/concept[@idRef eq $subConceptId])) then
+				(: this relationship already exists :)
+				false()
+			else
+				let $subConcept :=
+					element { 'concept' }
+					{ attribute {'idRef'} {$subConceptId} }
+				let $null :=
+					update insert $subConcept into $superConcept
+				return true()
+		else
+			(: super concept does not exist so create new one :)
+			let $subConcept :=
+				element { 'concept' }
+				{ attribute {'idRef'} {$subConceptId} }
+			let $superConcept :=
+				element { 'concept' }
+				{ (attribute {'idRef'} {$superConceptId}, $subConcept) }
+			let $null :=
+				update insert $superConcept into $conceptHierarchy
+			return true()
+};
+
+(: removes the sub concept from the super concept - but does not remove the super concept (even if there are no other sub concepts) :)
+declare function concept-fns:remove-subtype($superConceptId as xs:string, $subConceptId as xs:string) as xs:boolean
+{
+	let $conceptHierarchy := collection('/db/archives/reference')/reference/conceptHierarchy
+	return concept-fns:delete-internal($conceptHierarchy/concept[@idRef eq $superConceptId]/concept[@idRef eq $subConceptId]) > 0
+};
+
+(: Returns the number of concepts added (0 or 1 depending on whether the concept already exists or not) :)
 declare function concept-fns:add($conceptId as xs:string) as xs:integer
 {
 	let $reference := collection('/db/archives/reference')/reference
