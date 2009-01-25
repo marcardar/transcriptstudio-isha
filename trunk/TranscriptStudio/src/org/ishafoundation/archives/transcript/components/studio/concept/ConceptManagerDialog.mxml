@@ -185,7 +185,7 @@
 								messagePopUp.enableOkButton("Could not find concept!");
 							}
 							else {
-								selectionChange(conceptId);
+								selectionChange(newConceptId);
 								messagePopUp.enableOkButton("Renamed " + returnVal + " instance" + (returnVal != 1 ? "s" : ""));
 							}
 						},
