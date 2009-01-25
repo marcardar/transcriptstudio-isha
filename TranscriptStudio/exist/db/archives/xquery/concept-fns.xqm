@@ -46,22 +46,22 @@ declare function concept-fns:rename($conceptId as xs:string, $newConceptId) as x
 	let $reference := collection('/db/archives/reference')/reference
 	let $renameValues :=
 		(
-		concept-fns:rename-category-concept($conceptId, $newConceptId, $reference)
+		concept-fns:rename-category-concept($conceptId, $newConceptId, $reference/categories)
 		,
-		concept-fns:rename-super-concept($conceptId, $newConceptId, $reference)
+		concept-fns:rename-super-concept($conceptId, $newConceptId, $reference/conceptHierarchy)
 		,
-		concept-fns:rename-sub-concept($conceptId, $newConceptId, $reference)
+		concept-fns:rename-sub-concept($conceptId, $newConceptId, $reference/conceptHierarchy)
 		,
-		concept-fns:rename-synonym-concept($conceptId, $newConceptId, $reference)
+		concept-fns:rename-synonym-concept($conceptId, $newConceptId, $reference/conceptSynonymGroups)
 		,
-		concept-fns:rename-additional-concept($conceptId, $newConceptId)
+		concept-fns:rename-additional-concept($conceptId, $newConceptId, collection('/db/archives/data'))
 		)
 	return sum($renameValues)
 };
 
-declare function concept-fns:rename-category-concept($conceptId as xs:string, $newConceptId as xs:string, $reference as element()) as xs:integer
+declare function concept-fns:rename-category-concept($conceptId as xs:string, $newConceptId as xs:string, $categories as element()) as xs:integer
 {
-	let $categoryTags := $reference/categories/category/tag[@type eq 'concept' and @value eq $conceptId]
+	let $categoryTags := $categories/category/tag[@type eq 'concept' and @value eq $conceptId]
 	let $null :=
 		for $categoryTag in $categoryTags
 		return
@@ -73,46 +73,39 @@ declare function concept-fns:rename-category-concept($conceptId as xs:string, $n
 	return count($categoryTags)
 };
 
-declare function concept-fns:rename-super-concept($conceptId as xs:string, $newConceptId as xs:string, $reference as element()) as xs:integer
+declare function concept-fns:rename-super-concept($oldConceptId as xs:string, $newConceptId as xs:string, $conceptHierarchy as element()) as xs:integer
 {
-	let $oldConcept := $reference/conceptHierarchy/concept[@idRef eq $conceptId]
-	return
-		if (not(exists($oldConcept))) then
-			0
-		else
-			let $newConcept := $reference/conceptHierarchy/concept[@idRef eq $newConceptId]
-			let $null :=
-				if (not(exists($newConcept))) then
-					(: only need to rename old value to new value - no danger of merge :)
-					update value $oldConcept/@idRef with $newConceptId
-				else
-					(: merge the old with the new :)
-					let $mergedSubConceptIds := distinct-values($reference/conceptHierarchy/concept[@idRef = ($conceptId, $newConceptId)]/*/string(@idRef))
-					let $mergedConcept :=
-						element { 'concept' }
-							{
-							attribute {'idRef'} {$newConceptId},
-							for $mergedSubConceptId in $mergedSubConceptIds 
-							return
-								if ($mergedSubConceptId != '') then
-									element { 'concept' }
-									{ attribute {'idRef'} {$mergedSubConceptId} }
-								else
-									()
-							}
-					return
+	if ($oldConceptId eq $newConceptId) then
+		0
+	else
+		let $oldConcept := $conceptHierarchy/concept[@idRef eq $oldConceptId]
+		return
+			if (not(exists($oldConcept))) then
+				0
+			else
+				let $newConcept := $conceptHierarchy/concept[@idRef eq $newConceptId]
+				let $null :=
+					if (not(exists($newConcept))) then
+						(: only need to rename old value to new value - no danger of merge :)
+						update value $oldConcept/@idRef with $newConceptId
+					else
+						(: append the old subconcepts to the new concept's children :)
 						(
-							update delete $oldConcept
+							for $oldSubConcept in $oldConcept/concept
+							where not(exists($newConcept/concept[@idRef eq $oldSubConcept/string(@idRef)]))
+							return
+								(: old concept's sub concept is not a sub concept for the new concept name - so insert it :)
+								update insert $oldSubConcept into $newConcept
 						,
-							update replace $newConcept with $mergedConcept
+							update delete $oldConcept
 						)
-			return 1
+				return 1
 };
 
 (: its fine for a concept to have multiple super concepts :)
-declare function concept-fns:rename-sub-concept($conceptId as xs:string, $newConceptId as xs:string, $reference as element()) as xs:integer
+declare function concept-fns:rename-sub-concept($oldConceptId as xs:string, $newConceptId as xs:string, $conceptHierarchy as element()) as xs:integer
 {
-	let $oldConcepts := $reference/conceptHierarchy/concept/concept[@idRef eq $conceptId]
+	let $oldConcepts := $conceptHierarchy/concept/concept[@idRef eq $oldConceptId]
 	let $null :=
 		for $oldConcept in $oldConcepts
 		return
@@ -126,14 +119,14 @@ declare function concept-fns:rename-sub-concept($conceptId as xs:string, $newCon
 };
 
 (: a synonym can appear in at most ONE group :)
-declare function concept-fns:rename-synonym-concept($conceptId as xs:string, $newConceptId as xs:string, $reference as element()) as xs:integer
+declare function concept-fns:rename-synonym-concept($oldConceptId as xs:string, $newConceptId as xs:string, $conceptSynonymGroups as element()) as xs:integer
 {
-	let $oldConcept := $reference/conceptSynonymGroups/conceptSynonymGroup/concept[@idRef eq $conceptId]
+	let $oldConcept := $conceptSynonymGroups/conceptSynonymGroup/concept[@idRef eq $oldConceptId]
 	return
 		if (not(exists($oldConcept))) then
 			0
 		else
-			let $newConcept := $reference/conceptSynonymGroups/conceptSynonymGroup/concept[@idRef eq $newConceptId]
+			let $newConcept := $conceptSynonymGroups/conceptSynonymGroup/concept[@idRef eq $newConceptId]
 			let $null :=
 				if (not(exists($newConcept))) then
 					(: only need to rename old value to new value - no danger of new concept appearing twice :)
@@ -144,28 +137,25 @@ declare function concept-fns:rename-synonym-concept($conceptId as xs:string, $ne
 						(: already in the same synonym group so just delete old one :)
 						update delete $oldConcept
 					else
-						(: merge the two synonym groups :)
-						let $mergedSynonymConceptIds := distinct-values(($oldConcept|$newConcept)/../*[not(@idRef eq $conceptId)]/string(@idRef))
-						let $mergedSynonymGroup :=
-							element { 'conceptSynonymGroup' }
-								{
-								for $mergedSynonymConceptId in $mergedSynonymConceptIds 
-								return
-									element { 'concept' }
-									{ attribute {'idRef'} {$mergedSynonymConceptId} }
-								}
+						(: different synonym groups so append old synonyms to new synonyms :)
+						let $oldSynonymGroup := $oldConcept/..
+						let $newSynonymGroup := $newConcept/..
 						return
-							(
-								update delete $oldConcept/..
-							,
-								update replace $newConcept/.. with $mergedSynonymGroup
-							)
+						(
+							for $oldSynonym in $oldSynonymGroup/concept[@idRef != $oldConcept/@idRef]
+							where not(exists($newSynonymGroup/concept[@idRef = $oldSynonym/@idRef]))
+							return
+								(: old concept's sub concept is not a sub concept for the new concept name - so insert it :)
+								update insert $oldSynonym into $newSynonymGroup
+						,
+							update delete $oldSynonymGroup
+						)
 			return 1
 };
 
-declare function concept-fns:rename-additional-concept($conceptId as xs:string, $newConceptId) as xs:integer
+declare function concept-fns:rename-additional-concept($oldConceptId as xs:string, $newConceptId, $dataCollection) as xs:integer
 {
-	let $additionalTags := collection('/db/archives/data')/session/transcript/(superSegment|superContent)/tag[@type eq 'concept' and @value eq $conceptId]
+	let $additionalTags := $dataCollection/session/transcript/(superSegment|superContent)/tag[@type eq 'concept' and @value eq $oldConceptId]
 	let $null :=
 		for $additionalTag in $additionalTags
 		return
