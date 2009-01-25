@@ -254,80 +254,6 @@ package org.ishafoundation.archives.transcript.model
 			}
 		}
 		
-		public function addConceptSubType(conceptId:String, subTypeId:String):Boolean {
-			if (conceptId == subTypeId) {
-				throw new ArgumentError("Cannot make subtype of itself: " + conceptId);
-			}
-			var descendants:ISet = getConceptDescendantsAndSelf(subTypeId);
-			if (descendants.contains(conceptId)) {
-				return false;
-			}
-			var conceptHierarchyElement:XML = referenceXML.conceptHierarchy[0];
-			var conceptElement:XML = getTopLevelConceptElementInHierarchy(conceptId);
-			if (conceptElement == null) {
-				conceptElement = <concept idRef={conceptId}/>;
-				conceptHierarchyElement.appendChild(conceptElement);
-			}
-			conceptElement.appendChild(<concept idRef={subTypeId}/>);
-			this.unsavedChanges = true;
-			return true;
-		}
-		
-		public function removeConceptSubType(conceptId:String, subTypeId:String):void {
-			if (conceptId == null || subTypeId == null) {
-				return;
-			}
-			var subTypeElements:XMLList = this.referenceXML.conceptHierarchy.concept.(@idRef == conceptId).concept.(@idRef == subTypeId);
-			XMLUtils.removeAllElements(subTypeElements);
-			this.unsavedChanges = true;
-		}
-		
-		public function addConceptSynonym(synonym1:String, synonym2:String):Boolean {
-			if (synonym1 == synonym2) {
-				throw new ArgumentError("Cannot set a concept as a synonym of itself");
-			}
-			var synonym1GroupElement:XML = getConceptSynonymGroupElement(synonym1);
-			var synonym2GroupElement:XML = getConceptSynonymGroupElement(synonym2);
-			if (synonym1GroupElement != null && synonym1GroupElement == synonym2GroupElement) {
-				// these are already synonyms
-				return false;
-			}
-			if (synonym1GroupElement == null && synonym2GroupElement == null) {
-				// neither synonym already appears in a group so create new group
-				var group:XML = <conceptSynonymGroup/>;
-				group.appendChild(<concept idRef={synonym1}/>);
-				group.appendChild(<concept idRef={synonym2}/>);
-				(this.referenceXML.conceptSynonymGroups[0] as XML).appendChild(group);
-			}
-			else if (synonym1GroupElement != null && synonym2GroupElement != null) {
-				// merge the two groups together
-				synonym1GroupElement.* += synonym2GroupElement.*;
-				XMLUtils.removeElement(synonym2GroupElement);
-			}
-			else if (synonym1GroupElement == null) {
-				synonym2GroupElement.appendChild(<concept idRef={synonym1}/>);
-			}
-			else {
-				synonym1GroupElement.appendChild(<concept idRef={synonym2}/>);
-			}
-			this.unsavedChanges = true;
-			return true;
-		}
-		
-		public function removeConceptSynonym(conceptId:String):Boolean {
-			var groupElement:XML = getConceptSynonymGroupElement(conceptId);
-			if (groupElement == null) {
-				return false;
-			}
-			XMLUtils.removeAllElements(groupElement.concept.(@idRef == conceptId));
-			var children:XMLList = groupElement.*;
-			if (groupElement.*.length() <= 1) {
-				XMLUtils.removeElement(groupElement);
-			}
-			this.unsavedChanges = true;
-			return true;
-		}
-		
 		private function getConceptSynonymGroupElement(conceptId:String):XML {
 			var conceptElements:XMLList = this.referenceXML..conceptSynonymGroup.concept.(@idRef == conceptId);
 			switch (conceptElements.length()) {
@@ -600,6 +526,55 @@ package org.ishafoundation.archives.transcript.model
 					successFunc(returnVal);
 				}, failureFunc);
 			}, failureFunc);
+		}
+		
+		public function addSynonyms(conceptIds:Array, successFunc:Function, failureFunc:Function):void {
+			if (conceptIds.length > 2) {
+				throw new Error("Adding more than two synonyms at the same time, not yet supported: " + conceptIds);
+			}
+			trace("Adding synonyms: " + conceptIds);
+			var conceptIdsString:String = conceptIds.join(" ");
+			xqueryExecutor.executeStoredXQuery("add-synonyms.xql", {conceptIds:conceptIdsString}, function(returnVal:Boolean):void {
+				loadReferences(function():void {
+					successFunc(returnVal);
+				}, failureFunc);
+			}, failureFunc);			
+		}
+
+		public function removeSynonym(conceptId:String, successFunc:Function, failureFunc:Function):void {
+			trace("Removing synonym: " + conceptId);
+			xqueryExecutor.executeStoredXQuery("remove-synonym.xql", {conceptId:conceptId}, function(returnVal:Boolean):void {
+				loadReferences(function():void {
+					successFunc(returnVal);
+				}, failureFunc);
+			}, failureFunc);			
+		}
+		
+		public function addSubtype(superConceptId:String, subConceptId:String, successFunc:Function, failureFunc:Function):void {
+			trace("Adding: " + subConceptId + " as subtype of: " + superConceptId);
+			xqueryExecutor.executeStoredXQuery("add-subtype.xql", {superConceptId:superConceptId, subConceptId:subConceptId}, function(returnVal:Boolean):void {
+				loadReferences(function():void {
+					successFunc(returnVal);
+				}, failureFunc);
+			}, failureFunc);			
+		}
+		
+		public function removeSubtype(superConceptId:String, subConceptId:String, successFunc:Function, failureFunc:Function):void {
+			trace("Removing: " + subConceptId + " as subtype of: " + superConceptId);
+			xqueryExecutor.executeStoredXQuery("remove-subtype.xql", {superConceptId:superConceptId, subConceptId:subConceptId}, function(returnVal:Boolean):void {
+				loadReferences(function():void {
+					successFunc(returnVal);
+				}, failureFunc);
+			}, failureFunc);			
+		}
+		
+		public function getAllConcepts(successFunc:Function, failureFunc:Function):void {
+			trace("Fetching all concepts");
+			xqueryExecutor.executeStoredXQuery("get-all-concepts.xql", {}, function(returnVal:String):void {
+				loadReferences(function():void {
+					successFunc(returnVal.split(" "));
+				}, failureFunc);
+			}, failureFunc);			
 		}
 	}
 }
