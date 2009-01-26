@@ -275,7 +275,15 @@
 			{
 				this.status = "Successfully saved transcript";
 				this.session.saveChangesHandler();
+				var selectedMarkup:MSuperNode = this.transcriptPane.markupsPane.selectedMarkup;
+				// this is primarily to refresh the "committedMarkup" in the propertiesPane
 				this.transcriptPane.markupsPane.refresh();
+				if (selectedMarkup != null) {
+					// if we dont do this then the currently selected markup (in the tree) will be deselected
+					callLater(function():void {
+						transcriptPane.markupsPane.selectedMarkup = selectedMarkup;
+					});
+				}
 				Alert.show("Successfully saved transcript changes");
 			}
 			 
