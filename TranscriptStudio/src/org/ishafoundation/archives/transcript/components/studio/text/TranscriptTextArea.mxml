@@ -256,6 +256,9 @@
 		}
 		
 		private function select(newTtaSelection:TranscriptTextSelection):void {
+			if (newTtaSelection == null) {
+				return;
+			}
 			var firstIndexToSelect:int;
 			var lastIndexToSelect:int;
 
