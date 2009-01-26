@@ -77,6 +77,7 @@
 			this.markupsPane.markupsTree.addEventListener(MouseEvent.DOUBLE_CLICK, function(evt:Event):void {
 				if (markupsPane.selectedMarkup != null) {
 					transcriptTextArea.selectMarkup(markupsPane.selectedMarkup);
+					transcriptTextAreaSelectionChange(null);
 				}
 			});
 			this.transcriptTextArea.addEventListener(TranscriptTextArea.SELECTION_CHANGE_EVENT, transcriptTextAreaSelectionChange);
@@ -93,6 +94,7 @@
 			this.markupsPane.generalNodePropertiesPane.addEventListener(GeneralNodePropertiesPane.GENERAL_NODE_PROPERTIES_CHANGE_EVENT, function(evt:Event):void {
 				if (transcriptTextArea.ttSelection == null) {
 					trace("WARN: ttSelection is null - probably because the General Properties pane is enabled when it shouldnt be");
+					return;
 				}
 				transcriptTextArea.transcriptTextChangeHandler(transcriptTextArea.ttSelection.selectedObj);
 			});     		
