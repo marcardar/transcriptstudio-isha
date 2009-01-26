@@ -38,11 +38,9 @@
     	import name.carter.mark.flex.project.mdoc.MSuperNodeProperties;
     	import name.carter.mark.flex.project.mdoc.MSegment;
     	import name.carter.mark.flex.project.mdoc.MSuperContent;
-    	import mx.olap.aggregators.MinAggregator;
     	import name.carter.mark.flex.project.mdoc.MSuperSegment;
     	import name.carter.mark.flex.project.mdoc.TaggableMNode;
     	import org.ishafoundation.archives.transcript.model.Transcript;
-    	import flash.sampler.getInvocationCount;
     	import name.carter.mark.flex.util.icon.IconUtils;
     	
 		private var _transcript:Transcript;
