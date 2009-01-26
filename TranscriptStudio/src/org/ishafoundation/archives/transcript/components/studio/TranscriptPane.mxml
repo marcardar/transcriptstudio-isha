@@ -91,7 +91,9 @@
 				removeMarkup();
 			});     		
 			this.markupsPane.generalNodePropertiesPane.addEventListener(GeneralNodePropertiesPane.GENERAL_NODE_PROPERTIES_CHANGE_EVENT, function(evt:Event):void {
-				/* TODO - bug here where ttSelection is sometimes null */
+				if (transcriptTextArea.ttSelection == null) {
+					trace("WARN: ttSelection is null - probably because the General Properties pane is enabled when it shouldnt be");
+				}
 				transcriptTextArea.transcriptTextChangeHandler(transcriptTextArea.ttSelection.selectedObj);
 			});     		
 		}
