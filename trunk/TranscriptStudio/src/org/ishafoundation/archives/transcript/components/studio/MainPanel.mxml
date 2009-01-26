@@ -26,7 +26,7 @@
 			import org.ishafoundation.archives.transcript.components.studio.importer.CreateEventDialog;
 			import flash.net.navigateToURL;
 			import org.ishafoundation.archives.transcript.db.XQueries;
-			import org.ishafoundation.archives.transcript.components.studio.importer.ImportDialog;
+			import org.ishafoundation.archives.transcript.components.studio.importer.ImportWizard;
 			import org.ishafoundation.archives.transcript.fs.SessionFile;
 			import org.ishafoundation.archives.transcript.fs.Collection;
 			import org.ishafoundation.archives.transcript.fs.DbFileSystem;
@@ -348,8 +348,8 @@
 			private function importTranscript():void {
 				var thisPanel:MainPanel = this;
 				var fileSystem:DbFileSystem = new DbFileSystem(DatabaseConstants.ARCHIVES_COLLECTION_PATH, databaseMgr, function ():void {
-					var popup:ImportDialog = new ImportDialog();
-					popup.addEventListener(ImportDialog.OK_CLICKED, function(event:Event):void {
+					var popup:ImportWizard = new ImportWizard();
+					popup.addEventListener(ImportWizard.OK_CLICKED, function(event:Event):void {
 						session = sessionMgr.createSession(popup.sessionXML, popup.eventFile);
 						transcriptPane.transcript = session.transcript;
 						status = "Successfully imported transcript";
