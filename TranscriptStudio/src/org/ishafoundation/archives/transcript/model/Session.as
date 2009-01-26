@@ -77,7 +77,12 @@ package org.ishafoundation.archives.transcript.model
 				}
 				// replace spaces with underscores
 				filename = filename.replace(/ /g, "-").toLowerCase();
-				filename += ".xml";
+				if (eventFile != null) {
+					filename += "_" + eventFile.name.substring(15)
+				}
+				else {
+					filename += ".xml";
+				}
 				result = eventFile.collection.path + "/" + filename;
 			}
 			else {
