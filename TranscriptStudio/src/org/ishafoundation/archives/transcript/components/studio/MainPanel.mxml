@@ -21,6 +21,8 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" width="100%" height="100%" verticalGap="0">
 	<mx:Script>
 		<![CDATA[
+			import name.carter.mark.flex.project.mdoc.MNode;
+			import org.ishafoundation.archives.transcript.components.studio.collection.RetrieveTranscriptByIdDialog;
 			import org.ishafoundation.archives.transcript.components.studio.importer.CreateEventDialog;
 			import flash.net.navigateToURL;
 			import org.ishafoundation.archives.transcript.db.XQueries;
@@ -124,6 +126,10 @@
 				showUnsavedChangesPopupIfNecessary(showRetrieveTranscriptDialog);
 			}
 			
+			public function retrieveByIdClicked():void {
+				showUnsavedChangesPopupIfNecessary(showRetrieveTranscriptByIdDialog);
+			}
+			
 			private function categoryManagerClicked():void {
 				var thisRef:DisplayObject = this;
 				reloadReferencesBeforeContinuing(function():void {
@@ -164,6 +170,40 @@
 				});
 				PopUpManager.addPopUp(popup, this, true);
 				popup.addEventListener(RetrieveTranscriptDialog.OK_CLICKED, retrieveOKClicked);
+			}
+			
+			private function showRetrieveTranscriptByIdDialog():void {
+				var popup:RetrieveTranscriptByIdDialog = new RetrieveTranscriptByIdDialog();
+				PopUpManager.addPopUp(popup, this, true);
+				popup.okButton.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void {
+					trace("Retrieving transcript using id: " + popup.enteredId);
+					var sessionId:String = popup.enteredId.substr(0, 17);
+					var nodeId:String = popup.enteredId.substr(17);
+					var fileSystem:DbFileSystem = new DbFileSystem(DatabaseConstants.DATA_COLLECTION_PATH, databaseMgr, function ():void {
+						var sessionFile:SessionFile = fileSystem.getSessionFile(sessionId);
+						// first update the reference file - continue even if it fails
+						if (sessionFile.path == null) {
+							Alert.show("Could not find session with id: " + sessionId);
+							return;
+						}
+						reloadReferencesBeforeContinuing(function():void {
+							sessionMgr.retrieveSession(sessionFile, function(session:Session):void {
+								retrieveTranscriptSuccess(session);
+								callLater(function():void {
+									var node:MNode = session.transcript.mdoc.resolveId(nodeId);
+									if (node == null) {
+										Alert.show("Could not find markup with id: " + nodeId);
+										return;
+									}
+									if (node is MSuperNode) {
+										transcriptPane.markupsPane.selectedMarkup = node as MSuperNode;
+										transcriptPane.transcriptTextArea.selectMarkup(node as MSuperNode);
+									}
+								});
+							}, retrieveTranscriptFailure);
+						});
+					}, collectionTreeFailed);
+				});
 			}
 			
 			private function collectionTreeFailed(msg:String):void {
@@ -331,6 +371,9 @@
 				if ( actionName == "retrieve" ) {
 					retrieveClicked();
 				}
+				else if ( actionName == "retrieveById" ) {
+					retrieveByIdClicked();
+				}
 				else if ( actionName == "store" ) {
 					storeTranscript(storeTranscriptSuccess, storeTranscriptFailure);
 				}
@@ -407,6 +450,7 @@
 		<mx:XMLList id="menuData">
 			<menuitem label="File" enabled="{referenceMgr != null}">
 				<menuitem id="retrieve" label="Open..."/>
+				<menuitem id="retrieveById" label="Open by ID..."/>
 				<!-- the enabled attribute value is a workaround because the following do not work:
 					{session != null &amp;&amp; session.unsavedChanges}
 					{session != null}

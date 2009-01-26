@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Transcript Markups Editor: An XML based application that allows users to define 
+   and store contextual metadata for contiguous sections within a text document. 
+
+   Copyright 2008 Mark Carter, Swami Kevala
+
+   This file is part of Transcript Markups Editor.
+
+   Transcript Markups Editor is free software: you can redistribute it and/or modify it 
+   under the terms of the GNU General Public License as  published by the Free Software 
+   Foundation, either version 3 of the License, or (at your option) any later version.
+
+   Transcript Markups Editor is distributed in the hope that it will be useful, but 
+   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along with 
+   Transcript Markups Editor. If not, see http://www.gnu.org/licenses/.
+-->
+
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:collectionNS="org.ishafoundation.archives.transcript.components.studio.collection.*" title="Enter ID..." x="10" y="10" alpha="2.0" layout="vertical" horizontalAlign="center" creationComplete="idTextInput.setFocus()">
+	<mx:Script>
+    <![CDATA[
+    	import org.ishafoundation.archives.transcript.util.IdUtils;
+    	import name.carter.mark.flex.util.Utils;
+       	import mx.managers.PopUpManager;
+       	
+       	public function get enteredId():String {
+       		return idTextInput.text;
+       	}
+       	
+		private function closeMe():void {
+        	PopUpManager.removePopUp(this);
+		}
+		
+		private static function isValidId(id:String):Boolean {
+			// TODO: implement this properly later
+			var idAsPrefix:String = Utils.normalizeSpace(id).substr(0, 17) + ".";
+			return IdUtils.getSessionIdPrefix(idAsPrefix) != null
+		}		
+    ]]>
+	</mx:Script>
+	<mx:TextInput id="idTextInput" width="200" restrict="a-z0-9" enter="okButton.dispatchEvent(new MouseEvent(MouseEvent.CLICK))"/>
+	<mx:HBox width="100%" horizontalAlign="center">
+		<mx:Button id="okButton" label="OK" click="closeMe()" enabled="{isValidId(idTextInput.text)}"/>
+		<mx:Button label="Cancel" click="closeMe()"/>		
+	</mx:HBox>		
+</mx:TitleWindow>
