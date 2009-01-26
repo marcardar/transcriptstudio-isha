@@ -21,6 +21,7 @@
 package name.carter.mark.flex.util
 {
 	import flash.display.DisplayObject;
+	import flash.display.DisplayObjectContainer;
 	import flash.text.StyleSheet;
 	import flash.text.TextField;
 	import flash.utils.ByteArray;
@@ -151,18 +152,18 @@ package name.carter.mark.flex.util
 			return styleSheet;
 		}
 		
-        public static function getTextField(ta:TextArea):TextField{
-            var len:int = ta.numChildren;
+        public static function getTextField(container:DisplayObjectContainer):TextField {
+            var len:int = container.numChildren;
             var r:TextField;
-            for(var i:int=0; i<len; i++){
-                var thisChild:DisplayObject = ta.getChildAt(i);
-                if(thisChild is TextField){
+            for (var i:int=0; i < len; i++){
+                var thisChild:DisplayObject = container.getChildAt(i);
+                if (thisChild is TextField){
                     r = thisChild as TextField;
                 }
             }
             return r;
         }
-        
+                
         public static function getFirstVisibleLineIndex(ta:TextArea):int {
         	var tf:TextField = getTextField(ta);
 			return tf.getLineIndexAtPoint(5, 5);
