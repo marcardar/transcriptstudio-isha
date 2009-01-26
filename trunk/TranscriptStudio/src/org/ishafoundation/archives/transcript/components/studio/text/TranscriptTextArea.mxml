@@ -196,6 +196,7 @@
 		
 		internal function redrawThenSelectMarkup(markup:MSuperNode): void {
 			var newSelectionInfo:TranscriptTextSelection = TranscriptTextSelection.createSuperNodeInstance(markup);
+			ttSelection = null; // without this the old value hangs around too long (because the new value is only set in a callLater)
 			redraw(newSelectionInfo);
 		}
 		
