@@ -189,17 +189,19 @@
 						reloadReferencesBeforeContinuing(function():void {
 							sessionMgr.retrieveSession(sessionFile, function(session:Session):void {
 								retrieveTranscriptSuccess(session);
-								callLater(function():void {
-									var node:MNode = session.transcript.mdoc.resolveId(nodeId);
-									if (node == null) {
-										Alert.show("Could not find markup with id: " + nodeId);
-										return;
-									}
-									if (node is MSuperNode) {
-										transcriptPane.markupsPane.selectedMarkup = node as MSuperNode;
-										transcriptPane.transcriptTextArea.selectMarkup(node as MSuperNode);
-									}
-								});
+								if (nodeId.length > 0) {
+									callLater(function():void {
+										var node:MNode = session.transcript.mdoc.resolveId(nodeId);
+										if (node == null) {
+											Alert.show("Could not find markup with id: " + nodeId);
+											return;
+										}
+										if (node is MSuperNode) {
+											transcriptPane.markupsPane.selectedMarkup = node as MSuperNode;
+											transcriptPane.transcriptTextArea.selectMarkup(node as MSuperNode);
+										}
+									});
+								}
 							}, retrieveTranscriptFailure);
 						});
 					}, collectionTreeFailed);
