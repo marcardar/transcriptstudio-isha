@@ -149,7 +149,7 @@
 				this.selectedMarkup = ttSelection.toSuperNode();
 				this.nodePropertiesPane.selectedChild = this.markupPropertiesPane;					
 			}
-			else {
+			else if (this.selectedMarkup == null) {
 				this.nodePropertiesPane.selectedChild = this.generalNodePropertiesPane;					
 			}
 		}
