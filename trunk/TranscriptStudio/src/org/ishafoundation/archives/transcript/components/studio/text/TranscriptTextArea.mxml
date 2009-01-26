@@ -503,7 +503,9 @@
 		 * TODO - determine whether we really do need to update the HTML
 		 */
 		public function markupPropertiesChangeHandler(markup:MSuperNode):void {
-			redrawThenSelectMarkup(markup);
+			var oldTTSelection:TranscriptTextSelection = ttSelection;
+			redraw(null);
+			callLater(select, [oldTTSelection]);
 		}
 		
 		public function markupHierarchyChangeHandler(markup:MSuperNode):void {
