@@ -2,6 +2,7 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" alpha="2.0" layout="vertical" x="30" y="30" width="700" height="450" title="Concept Manager" horizontalAlign="center" creationComplete="init()" paddingLeft="0" paddingRight="0" paddingTop="0" roundedBottomCorners="false">
 <mx:Script>
 	<![CDATA[
+		import mx.events.CloseEvent;
 		import org.ishafoundation.archives.transcript.components.generic.MessagePopUp;
 		import org.ishafoundation.archives.transcript.util.Constants;
 		import mx.utils.StringUtil;
@@ -157,65 +158,108 @@
 			collectedConceptTextArea.executeBindings();
 		}
 		
+		private function addConcept():void {
+			var newConceptDialog:TextInputDialog = TextInputDialog.display(this, "Enter new concept", null, Constants.CONCEPT_ID_RESTRICTION);
+			newConceptDialog.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+				var conceptId:String = Utils.normalizeSpace(newConceptDialog.textInput.text);
+				if (conceptId != "") {
+					var messagePopUp:MessagePopUp = createMessagePopup("Adding concept: " + conceptId);
+					referenceMgr.addConcept(conceptId, function(returnVal:int):void {
+						init();
+						selectionChange(conceptId);
+						if (returnVal == 0) {
+							messagePopUp.enableOkButton("Concept already exists!");
+						}
+						else {
+							messagePopUp.enableOkButton("Added");
+						}
+					},
+					function(msg:String):void {
+						messagePopUp.enableOkButton("Failed", msg);
+					});
+				}
+			});			
+		}
+		
+		private function renameConcept():void {
+			var oldConceptId:String = conceptList.selectedItem.toString();
+			var thisObj:ConceptManagerDialog = this;
+			referenceMgr.countConceptInstances(oldConceptId, function(count:int):void {
+				if (count == 0) {
+					renameConceptWithoutConfirmation(oldConceptId);
+				}
+				else {
+					Alert.show("Are you sure you want to rename " + count + " instance(s)?", "Renaming concept: " + oldConceptId, Alert.OK | Alert.CANCEL, thisObj, function(evt:CloseEvent):void {
+						if (evt.detail == Alert.OK) {
+							renameConceptWithoutConfirmation(oldConceptId);
+						}
+					});
+				}
+			}, function(msg:String):void {
+				Alert.show(msg, "Error");				
+			});
+		}
+		
+		private function renameConceptWithoutConfirmation(oldConceptId:String):void {
+			var renameConceptDialog:TextInputDialog = TextInputDialog.display(this, "Rename concept", oldConceptId, Constants.CONCEPT_ID_RESTRICTION);
+			renameConceptDialog.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+				var newConceptId:String = Utils.normalizeSpace(renameConceptDialog.textInput.text);
+				if (newConceptId != "") {
+					if (oldConceptId == newConceptId) {
+						Alert.show("Concept name unchanged: " + oldConceptId);
+						return;
+					}
+					var messagePopUp:MessagePopUp = createMessagePopup("Renaming concept: " + oldConceptId + " to: " + newConceptId);
+					referenceMgr.renameConcept(oldConceptId, newConceptId, function(returnVal:int):void {
+						init();
+						if (returnVal == 0) {
+							selectionChange(null);
+							messagePopUp.enableOkButton("Could not find concept!");
+						}
+						else {
+							selectionChange(newConceptId);
+							messagePopUp.enableOkButton("Renamed");
+						}
+					},
+					function(msg:String):void {
+						messagePopUp.enableOkButton("Failed", msg);
+					});
+				}
+			});
+		}
+		
+		private function removeConcept():void {
+			var conceptId:String = conceptList.selectedItem.toString();
+			referenceMgr.countConceptInstances(conceptId, function(count:int):void {
+				if (count == 0) {
+					var messagePopUp:MessagePopUp = createMessagePopup("Removing concept: " + conceptId);
+					referenceMgr.removeConcept(conceptId, function(returnVal:int):void {
+						init();
+						selectionChange(null);
+						messagePopUp.enableOkButton(returnVal == 0 ? "Could not find concept!" : "Removed");
+					},
+					function(msg:String):void {
+						messagePopUp.enableOkButton("Failed", msg);
+					});
+				}
+				else {
+					Alert.show("Cannot remove concept because it appears at least once (" + count + " instance(s)) in all transcripts");
+				}
+			}, function(msg:String):void {
+				Alert.show(msg, "Error");
+			});
+		}
+		
 		private function onMenuClick(evt:MenuEvent):void {
 			var actionName:String = evt.item.@id;
 			if ( actionName == "add" ) {
-				var newConceptDialog:TextInputDialog = TextInputDialog.display(this, "Enter new concept", null, Constants.CONCEPT_ID_RESTRICTION);
-				newConceptDialog.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
-					var conceptId:String = Utils.normalizeSpace(newConceptDialog.textInput.text);
-					if (conceptId != "") {
-						var messagePopUp:MessagePopUp = createMessagePopup("Adding concept: " + conceptId);
-						referenceMgr.addConcept(conceptId, function(returnVal:int):void {
-							init();
-							selectionChange(conceptId);
-							if (returnVal == 0) {
-								messagePopUp.enableOkButton("Concept already exists!");
-							}
-							else {
-								messagePopUp.enableOkButton("Added");
-							}
-						},
-						function(msg:String):void {
-							messagePopUp.enableOkButton("Failed", msg);
-						});
-					}
-				});
+				addConcept();
 			}
 			else if ( actionName == "rename" ) {
-				var oldConceptId:String = conceptList.selectedItem.toString();
-				var renameConceptDialog:TextInputDialog = TextInputDialog.display(this, "Rename concept", oldConceptId, Constants.CONCEPT_ID_RESTRICTION);
-				renameConceptDialog.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
-					var newConceptId:String = Utils.normalizeSpace(renameConceptDialog.textInput.text);
-					if (newConceptId != "") {
-						var messagePopUp:MessagePopUp = createMessagePopup("Renaming concept: " + oldConceptId + " to: " + newConceptId);
-						referenceMgr.renameConcept(oldConceptId, newConceptId, function(returnVal:int):void {
-							init();
-							if (returnVal == 0) {
-								selectionChange(null);
-								messagePopUp.enableOkButton("Could not find concept!");
-							}
-							else {
-								selectionChange(newConceptId);
-								messagePopUp.enableOkButton("Renamed " + returnVal + " instance" + (returnVal != 1 ? "s" : ""));
-							}
-						},
-						function(msg:String):void {
-							messagePopUp.enableOkButton("Failed", msg);
-						});
-					}
-				});
+				renameConcept();
 			}
 			else if ( actionName == "remove" ) {
-				var conceptId:String = conceptList.selectedItem.toString();
-				var messagePopUp:MessagePopUp = createMessagePopup("Removing concept: " + conceptId);
-				referenceMgr.removeConcept(conceptId, function(returnVal:int):void {
-					init();
-					selectionChange(null);
-					messagePopUp.enableOkButton(returnVal == 0 ? "Could not find concept!" : "Removed " + returnVal + " instance" + (returnVal != 1 ? "s" : ""));
-				},
-				function(msg:String):void {
-					messagePopUp.enableOkButton("Failed", msg);
-				});
+				removeConcept();
 			}
 		}
 		
@@ -237,7 +281,7 @@
 	</mx:MenuBar>
 	<mx:HDividedBox width="100%" height="100%" horizontalGap="{Utils.DIVIDER_SIZE}">
 		<mx:VBox width="33%" height="100%" minWidth="100">
-			<mx:Label text="Concepts"/>
+			<mx:Label text="All Concepts"/>
 			<mx:List id="conceptList" width="100%" height="100%" change="selectionChange(conceptList.selectedItem as String)" dragEnabled="true" dragDrop="dragDropToSubTypeList(event)" dragComplete="dragComplete(event)"/>
 		</mx:VBox>
 		<mx:VDividedBox width="67%" height="100%" minWidth="250" verticalGap="{Utils.DIVIDER_SIZE}">

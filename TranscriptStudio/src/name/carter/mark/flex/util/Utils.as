@@ -152,16 +152,19 @@ package name.carter.mark.flex.util
 			return styleSheet;
 		}
 		
-        public static function getTextField(container:DisplayObjectContainer):TextField {
+		public static function getTextField(container:DisplayObjectContainer):TextField {
+			return getChildByClass(container, TextField) as TextField;
+		}
+		
+        public static function getChildByClass(container:DisplayObjectContainer, cls:Class):Object {
             var len:int = container.numChildren;
-            var r:TextField;
             for (var i:int=0; i < len; i++){
                 var thisChild:DisplayObject = container.getChildAt(i);
-                if (thisChild is TextField){
-                    r = thisChild as TextField;
+                if (thisChild is cls){
+                    return thisChild;
                 }
             }
-            return r;
+            return null;
         }
                 
         public static function getFirstVisibleLineIndex(ta:TextArea):int {

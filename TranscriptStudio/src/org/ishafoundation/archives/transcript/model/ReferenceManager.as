@@ -576,6 +576,15 @@ package org.ishafoundation.archives.transcript.model
 				}, failureFunc);
 			}, failureFunc);			
 		}
+		
+		public function countConceptInstances(conceptId:String, successFunc:Function, failureFunc:Function):void {
+			trace("Counting instances of concept: " + conceptId);
+			xqueryExecutor.executeStoredXQuery("count-concept-instances.xql", {conceptId:conceptId}, function(returnVal:int):void {
+				loadReferences(function():void {
+					successFunc(returnVal);
+				}, failureFunc);
+			}, failureFunc);			
+		}
 	}
 }
 		

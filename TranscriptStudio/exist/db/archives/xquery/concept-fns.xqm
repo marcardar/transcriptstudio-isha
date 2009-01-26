@@ -2,6 +2,11 @@ xquery version "1.0";
 
 module namespace concept-fns = "http://www.ishafoundation.org/archives/xquery/concept-fns";
 
+declare function concept-fns:count-concept-instances($conceptId as xs:string) as xs:integer
+{
+	count(collection('/db/archives/data')/session/transcript//tag[@type eq 'concept' and @value=$conceptId])
+};
+
 declare function concept-fns:get-all-concepts() as xs:string*
 {
 	let $reference := collection('/db/archives/reference')/reference
