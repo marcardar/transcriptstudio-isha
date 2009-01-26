@@ -64,6 +64,7 @@
 			this._transcript = transcript;
 			this.markupsTree.setMDoc(this._transcript.mdoc);
 			this.markupPropertiesPane.clearPane();
+			this.generalNodePropertiesPane.clearPane();
 			var speakers:Array = transcript.mdoc.getAllPropertyValues(MSegmentProperties.SPEAKER_PROP_NAME).toArray();
 			if (speakers.indexOf(MSegmentProperties.SPEAKER_DEFAULT) < 0) {
 				speakers.unshift(MSegmentProperties.SPEAKER_DEFAULT);
@@ -129,7 +130,7 @@
 		public function ttSelectionChangeHandler(ttSelection:TranscriptTextSelection):void {
 			if (ttSelection == null) {
 				// nothing selected
-				this.generalNodePropertiesPane.enabled = false;
+				this.generalNodePropertiesPane.clearPane();
 				return;
 			}
 			if (ttSelection.isTextSelected()) {
@@ -143,7 +144,7 @@
 				}
 			} 
 			else {
-				this.generalNodePropertiesPane.enabled = false;
+				this.generalNodePropertiesPane.clearPane();
 			}
 			if (ttSelection.toSuperNode() != null) {
 				this.selectedMarkup = ttSelection.toSuperNode();
