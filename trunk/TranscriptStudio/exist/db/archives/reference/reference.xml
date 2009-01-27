@@ -61,14 +61,14 @@
 		<language id="other"/>
 	</languages>
 	<markupTypes>
-		<markupType id="topic" name="Topic" contentType="outline"/>
-		<markupType id="question" name="Question" contentType="outline"/>
-		<markupType id="joke" name="Joke" contentType="outline"/>
-		<markupType id="story" name="Story" contentType="outline"/>
-		<markupType id="quote" name="Quote" contentType="inline"/>
-		<markupType id="music" name="Music" contentType="outline"/>
-		<markupType id="process" name="Process" contentType="outline"/>
-		<markupType id="soundbite" name="Sound Bite" contentType="both"/>
+		<markupType id="topic" name="Topic" allowOutline="true" allowInline="false"/>
+		<markupType id="question" name="Question" allowOutline="true" allowInline="false"/>
+		<markupType id="joke" name="Joke" allowOutline="true" allowInline="false"/>
+		<markupType id="story" name="Story" allowOutline="true" allowInline="false"/>
+		<markupType id="quote" name="Quote" allowOutline="false" allowInline="true"/>
+		<markupType id="music" name="Music" allowOutline="true" allowInline="false"/>
+		<markupType id="process" name="Process" allowOutline="true" allowInline="false"/>
+		<markupType id="soundbite" name="Sound Bite" allowOutline="true" allowInline="true"/>
 	</markupTypes>
 	<markupCategories/>
 	<concepts/>
