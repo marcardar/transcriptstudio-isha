@@ -41,9 +41,9 @@
     				searchTerms.add(s);
     			}
     		}
-    		var categoryTypeId:String = typeComboBox.selectedItem.toString();
-    		if (categoryTypeId != "all") {
-	    		searchTerms.add(new MTagImpl("type", categoryTypeId));
+    		var markupTypeId:String = typeComboBox.selectedItem.toString();
+    		if (markupTypeId != "all") {
+	    		searchTerms.add(new MTagImpl("markupType", markupTypeId));
 	    	}
 	    	var results:Array;
 	    	if (searchTerms.size() == 0) {
@@ -111,12 +111,12 @@
 		private function performAutoSearch(categoryId:String):void {
 			resultsList.dataProvider = new ArrayCollection([categoryId]);
 			selectedCategoryId = categoryId;
-			var categoryTypeIds:Array = referenceMgr.getCategoryTypeIdsForCategoryId(categoryId);
-			if (categoryTypeIds.length > 1) {
+			var markupTypeIds:Array = referenceMgr.getCategoryTypeIdsForCategoryId(categoryId);
+			if (markupTypeIds.length > 1) {
 				typeComboBox.selectedIndex = 0;
 			}
 			else {
-				typeComboBox.selectedItem = categoryTypeIds[0];
+				typeComboBox.selectedItem = markupTypeIds[0];
 			}
 			var searchString:String = "";
 			for each (var concept:String in referenceMgr.getConceptsForCategoryId(categoryId)) {
@@ -138,12 +138,12 @@
 			return result;
 		}
 		
-		private function comboBoxLabelFunc(categoryTypeId:String):String {
-			if (categoryTypeId == "all") {
+		private function comboBoxLabelFunc(markupTypeId:String):String {
+			if (markupTypeId == "all") {
 				return "All";
 			}
 			else {
-				return this.referenceMgr.getCategoryTypeNameFromId(categoryTypeId);
+				return this.referenceMgr.getCategoryTypeNameFromId(markupTypeId);
 			}
 		}
 		

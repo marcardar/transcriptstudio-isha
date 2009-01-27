@@ -219,7 +219,7 @@
                                     <w:rStyle w:val="Hyperlink"/>
 								</w:rPr>
 								<w:t>
-                                    <xsl:value-of select="$reference/categoryTypes/categoryType[@id = $markupType]/@name"/>
+                                    <xsl:value-of select="$reference/markupTypes/markupType[@id = $markupType]/@name"/>
 									<xsl:if test="$markupCategory">
 										<xsl:text>: </xsl:text>
 										<xsl:value-of select="$reference/categories/category[@id = $markupCategory]/@name"/>
