@@ -137,8 +137,8 @@ package org.ishafoundation.archives.transcript.model
 				result.addAll(getConceptIdsForCategory(categoryId));
 			}
 			// now look at the concept hierarchy and synonym groups
-			result.addAll(XMLUtils.convertToStringISet(referenceXML.concepts.@idRef).toArray());
 			result.addAll(XMLUtils.convertToStringISet(referenceXML.concepts.concept.@idRef).toArray());
+			result.addAll(XMLUtils.convertToStringISet(referenceXML.concepts.concept.concept.@idRef).toArray());
 			result.addAll(XMLUtils.convertToStringISet(referenceXML.synonyms.synonym.concept.@idRef).toArray());
 			return result;
 		}
