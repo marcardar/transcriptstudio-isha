@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <reference>
-    <eventTypes>
-        <eventType id="a" name="Inner Engineering"/>
+	<eventTypes>
+		<eventType id="a" name="Inner Engineering"/>
 		<eventType id="b" name="Isha Yoga"/>
 		<eventType id="c" name="Spiritual Cultural"/>
 		<eventType id="d" name="Samyama"/>
@@ -39,7 +39,7 @@
 		<eventType id="al" name="Ashram Life"/>
 	</eventTypes>
 	<places>
-        <country id="India">
+		<country id="India">
 			<location id="Isha Yoga Center">
 				<venue id="Spanda Hall"/>
 				<venue id="Biksha Hall"/>
@@ -56,12 +56,12 @@
 		</country>
 	</places>
 	<languages>
-        <language id="english"/>
+		<language id="english"/>
 		<language id="tamil"/>
 		<language id="other"/>
 	</languages>
 	<markupTypes>
-        <markupType id="topic" name="Topic" contentType="outline"/>
+		<markupType id="topic" name="Topic" contentType="outline"/>
 		<markupType id="question" name="Question" contentType="outline"/>
 		<markupType id="joke" name="Joke" contentType="outline"/>
 		<markupType id="story" name="Story" contentType="outline"/>
