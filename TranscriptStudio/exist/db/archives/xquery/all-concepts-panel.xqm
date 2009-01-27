@@ -10,8 +10,8 @@ declare function all-concepts-panel:main() as element()*
 {	
 	let $reference := collection('/db/archives/reference')/reference
 	let $categoryConcepts := $reference/markupCategories/markupCategory/tag[@type eq 'concept']/string(@value)
-	let $coreConcepts := $reference/concept/string(@idRef)
-	let $subtypeConcepts := $reference/concept/concept/string(@idRef)
+	let $coreConcepts := $reference/concepts/concept/string(@idRef)
+	let $subtypeConcepts := $reference/concepts/concept/concept/string(@idRef)
 	let $synonymConcepts := $reference/synonyms/synonym/concept/string(@idRef)
 	let $additionalConcepts := collection('/db/archives/data')/session/transcript/(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
 	return
