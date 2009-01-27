@@ -473,29 +473,29 @@ package org.ishafoundation.archives.transcript.model
 		
 		public function getCountries():Array {
 			var result:Array = [];
-			for each (var id:String in referenceXML.places.country.@id) {
-				result.push(id);
+			for each (var name:String in referenceXML.places.country.@name) {
+				result.push(name);
 			}
 			return result;
 		}
 		
-		public function getLocations(countryId:String):Array {
-			var countryElement:XML = referenceXML.places.country.(@id == countryId)[0];
+		public function getLocations(countryName:String):Array {
+			var countryElement:XML = referenceXML.places.country.(@name == countryName)[0];
 			var result:Array = [];
 			if (countryElement != null) {
-				for each (var id:String in countryElement.location.@id) {
-					result.push(id);
+				for each (var name:String in countryElement.location.@name) {
+					result.push(name);
 				}
 			}
 			return result;
 		}
 
-		public function getVenues(countryId:String, locationId:String):Array {
-			var locationElement:XML = referenceXML.places.country.(@id == countryId).location.(@id == locationId)[0];
+		public function getVenues(countryName:String, locationName:String):Array {
+			var locationElement:XML = referenceXML.places.country.(@name == countryName).location.(@name == locationName)[0];
 			var result:Array = [];
 			if (locationElement != null) {
-				for each (var id:String in locationElement.venue.@id) {
-					result.push(id);
+				for each (var name:String in locationElement.venue.@name) {
+					result.push(name);
 				}
 			}
 			return result;

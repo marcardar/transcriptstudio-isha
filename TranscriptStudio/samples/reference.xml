@@ -39,19 +39,19 @@
 		<eventType id="al" name="Ashram Life"/>
 	</eventTypes>
 	<places>
-		<country id="India">
-			<location id="Isha Yoga Center">
-				<venue id="Spanda Hall"/>
-				<venue id="Biksha Hall"/>
+		<country name="India">
+			<location name="Isha Yoga Center">
+				<venue name="Spanda Hall"/>
+				<venue name="Biksha Hall"/>
 			</location>
-			<location id="Coimbatore"/>
-			<location id="Mumbai">
-				<venue id="Bombay Stock Exchange"/>
+			<location name="Coimbatore"/>
+			<location name="Mumbai">
+				<venue name="Bombay Stock Exchange"/>
 			</location>
 		</country>
-		<country id="England">
-			<location id="London">
-				<venue id="Millennium Mayfair Hotel"/>
+		<country name="England">
+			<location name="London">
+				<venue name="Millennium Mayfair Hotel"/>
 			</location>
 		</country>
 	</places>
