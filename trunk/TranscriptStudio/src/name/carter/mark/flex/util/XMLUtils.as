@@ -394,6 +394,14 @@ package name.carter.mark.flex.util
 				result.add(element.toString());
 			}
 			return result;
-		}		
+		}
+		
+		public static function convertToXML(obj:Object, ignoreWhitespace:Boolean = true):XML {
+			var oldIgnoreWhitespace:Boolean = XML.ignoreWhitespace;
+			XML.ignoreWhitespace = ignoreWhitespace;
+			var result:XML = new XML(obj);
+			XML.ignoreWhitespace = oldIgnoreWhitespace;
+			return result;			
+		}
 	}
 }
