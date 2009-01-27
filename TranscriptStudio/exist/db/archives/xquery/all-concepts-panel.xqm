@@ -9,7 +9,7 @@ declare variable $all-concepts-panel:columnWidth := 100;
 declare function all-concepts-panel:main() as element()*
 {	
 	let $reference := collection('/db/archives/reference')/reference
-	let $categoryConcepts := $reference/categories/category/tag[@type eq 'concept']/string(@value)
+	let $categoryConcepts := $reference/markupCategories/markupCategory/tag[@type eq 'concept']/string(@value)
 	let $otherReferenceConcepts := $reference//concept/string(@idRef)
 	let $additionalConcepts := collection('/db/archives/data')/session/transcript/(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
 	return

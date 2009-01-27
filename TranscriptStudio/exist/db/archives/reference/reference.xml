@@ -70,7 +70,7 @@
 		<markupType id="process" name="Process" contentType="outline"/>
 		<markupType id="soundbite" name="Sound Bite" contentType="both"/>
 	</markupTypes>
-	<categories/>
+	<markupCategories/>
 	<concepts/>
 	<synonyms/>
 </reference>

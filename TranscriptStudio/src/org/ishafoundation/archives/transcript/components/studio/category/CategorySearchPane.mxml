@@ -47,7 +47,7 @@
 	    	}
 	    	var results:Array;
 	    	if (searchTerms.size() == 0) {
-	    		trace("Getting all categories"); 
+	    		trace("Getting all markup categories"); 
 	    		results = this.referenceMgr.getAllCategories();
 	    	}
 	    	else {
