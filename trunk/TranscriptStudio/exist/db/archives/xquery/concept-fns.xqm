@@ -11,7 +11,9 @@ declare function concept-fns:get-all-concepts() as xs:string*
 {
 	let $reference := collection('/db/archives/reference')/reference
 	let $categoryConcepts := $reference/markupCategories/markupCategory/tag[@type eq 'concept']/string(@value)
-	let $otherReferenceConcepts := $reference//concept/string(@idRef)
+	let $coreConcepts := $reference/concept/string(@idRef)
+	let $subtypeConcepts := $reference/concept/concept/string(@idRef)
+	let $synonymConcepts := $reference/synonyms/synonym/concept/string(@idRef)
 	let $additionalConcepts := collection('/db/archives/data')/session/transcript/(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
 	return
 		for $concept in distinct-values(($categoryConcepts, $otherReferenceConcepts, $additionalConcepts))
