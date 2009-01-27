@@ -11,12 +11,12 @@ declare function concept-fns:get-all-concepts() as xs:string*
 {
 	let $reference := collection('/db/archives/reference')/reference
 	let $categoryConcepts := $reference/markupCategories/markupCategory/tag[@type eq 'concept']/string(@value)
-	let $coreConcepts := $reference/concepts/concept/string(@idRef)
+	let $coreConcepts := $reference/concepts/concept/string(@id)
 	let $subtypeConcepts := $reference/concepts/concept/concept/string(@idRef)
 	let $synonymConcepts := $reference/synonyms/synonym/concept/string(@idRef)
 	let $additionalConcepts := collection('/db/archives/data')/session/transcript/(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
 	return
-		for $concept in distinct-values(($categoryConcepts, $otherReferenceConcepts, $additionalConcepts))
+		for $concept in distinct-values(($categoryConcepts, $coreConcepts, $subtypeConcepts, $synonymConcepts, $additionalConcepts))
 		order by $concept 
 		return $concept
 };
@@ -84,7 +84,7 @@ declare function concept-fns:remove-synonym($conceptId as xs:string) as xs:boole
 declare function concept-fns:add-subtype($superConceptId as xs:string, $subConceptId as xs:string) as xs:boolean
 {
 	let $conceptsElement := collection('/db/archives/reference')/reference/concepts
-	let $superConcept := $conceptsElement/concept[@idRef eq $superConceptId]
+	let $superConcept := $conceptsElement/concept[@id eq $superConceptId]
 	return
 		if (exists($superConcept)) then
 			if (exists($superConcept/concept[@idRef eq $subConceptId])) then
@@ -104,7 +104,7 @@ declare function concept-fns:add-subtype($superConceptId as xs:string, $subConce
 				{ attribute {'idRef'} {$subConceptId} }
 			let $superConcept :=
 				element { 'concept' }
-				{ (attribute {'idRef'} {$superConceptId}, $subConcept) }
+				{ (attribute {'id'} {$superConceptId}, $subConcept) }
 			let $null :=
 				update insert $superConcept into $conceptsElement
 			return true()
@@ -114,7 +114,7 @@ declare function concept-fns:add-subtype($superConceptId as xs:string, $subConce
 declare function concept-fns:remove-subtype($superConceptId as xs:string, $subConceptId as xs:string) as xs:boolean
 {
 	let $conceptsElement := collection('/db/archives/reference')/reference/concepts
-	return concept-fns:delete-internal($conceptsElement/concept[@idRef eq $superConceptId]/concept[@idRef eq $subConceptId]) > 0
+	return concept-fns:delete-internal($conceptsElement/concept[@id eq $superConceptId]/concept[@idRef eq $subConceptId]) > 0
 };
 
 (: Returns the number of concepts added (0 or 1 depending on whether the concept already exists or not) :)
@@ -122,13 +122,13 @@ declare function concept-fns:add($conceptId as xs:string) as xs:integer
 {
 	let $reference := collection('/db/archives/reference')/reference
 	return
-		if (exists($reference/concepts/concept[@idRef eq $conceptId])) then
+		if (exists($reference/concepts/concept[@id eq $conceptId])) then
 			(: this concept is already at the top level in the hierarchy so do nothing :)
 			0
 		else 
 			let $newConcept := 
 				element { 'concept' }
-				{ attribute {'idRef'} {$conceptId} }
+				{ attribute {'id'} {$conceptId} }
 			let $null := update insert $newConcept into $reference/concepts
 			return 1
 };
@@ -171,16 +171,16 @@ declare function concept-fns:rename-super-concept($oldConceptId as xs:string, $n
 	if ($oldConceptId eq $newConceptId) then
 		0
 	else
-		let $oldConcept := $conceptsElement/concept[@idRef eq $oldConceptId]
+		let $oldConcept := $conceptsElement/concept[@id eq $oldConceptId]
 		return
 			if (not(exists($oldConcept))) then
 				0
 			else
-				let $newConcept := $conceptsElement/concept[@idRef eq $newConceptId]
+				let $newConcept := $conceptsElement/concept[@id eq $newConceptId]
 				let $null :=
 					if (not(exists($newConcept))) then
 						(: only need to rename old value to new value - no danger of merge :)
-						update value $oldConcept/@idRef with $newConceptId
+						update value $oldConcept/@id with $newConceptId
 					else
 						(: append the old subconcepts to the new concept's children :)
 						(
@@ -267,7 +267,7 @@ declare function concept-fns:remove($conceptId as xs:string) as xs:integer
 		(
 		concept-fns:delete-internal($reference/markupCategories/markupCategory/tag[@type eq 'concept' and @value eq $conceptId])
 		,
-		concept-fns:delete-internal($reference/concepts/concept[@idRef eq $conceptId])
+		concept-fns:delete-internal($reference/concepts/concept[@id eq $conceptId])
 		,
 		(: its ok to leave a parent concept with no children because this is what we do if we simply want to "document" a concept :)
 		concept-fns:delete-internal($reference/concepts/concept/concept[@idRef eq $conceptId])
