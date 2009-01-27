@@ -218,7 +218,7 @@ declare function search-fns:markup-as-table-row($markup as element()) as element
 {
 	let $session := $markup/ancestor::session
 	let $markupTypeId := $markup/tag[@type = 'markupType']/@value
-	let $markupType := collection('/db/archives/reference')/reference/categoryTypes/categoryType[@id = $markupTypeId]
+	let $markupType := collection('/db/archives/reference')/reference/markupTypes/markupType[@id = $markupTypeId]
 	let $categoryId := $markup/tag[@type = 'markupCategory']/@value
 	let $markupCategory := collection('/db/archives/reference')/reference/categories/category[@id = $categoryId]
 	let $markupCategoryName := if (exists($markupCategory)) then

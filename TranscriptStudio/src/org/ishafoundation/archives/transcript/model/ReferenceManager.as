@@ -335,7 +335,7 @@ package org.ishafoundation.archives.transcript.model
 		public function getCategoryTypeIdsForCategoryId(categoryId:String):Array {
 			var result:Array = new Array();
 			var categoryElement:XML = getCategoryElement(categoryId);
-			for each (var tagElement:XML in categoryElement.tag.(@type == "type")) {
+			for each (var tagElement:XML in categoryElement.tag.(@type == "markupType")) {
 				result.push(tagElement.@value.toString());
 			}
 			return result;
@@ -369,32 +369,32 @@ package org.ishafoundation.archives.transcript.model
 			return result;
 		}
 		
-        public function getCategoryTypeNameFromId(categoryTypeId:String):String {
-        	return getCategoryTypeElement(categoryTypeId).@name.toString();
+        public function getCategoryTypeNameFromId(markupTypeId:String):String {
+        	return getCategoryTypeElement(markupTypeId).@name.toString();
         }
         
         public function getCategoryTypeIds(allowOutline:Boolean, allowInline:Boolean):Array {
-        	var categoryTypeElements:XMLList = this.referenceXML.categoryTypes.categoryType;
+        	var markupTypeElements:XMLList = this.referenceXML.markupTypes.markupType;
         	var result:Array = new Array();
-        	for each (var categoryTypeElement:XML in categoryTypeElements) {
-        		var contentType:String = categoryTypeElement.@contentType.toString();
+        	for each (var markupTypeElement:XML in markupTypeElements) {
+        		var contentType:String = markupTypeElement.@contentType.toString();
         		if (allowInline && contentType == "inline" || allowOutline && contentType == "outline" || contentType == "both") {
-        			result.push(categoryTypeElement.@id.toString());        			
+        			result.push(markupTypeElement.@id.toString());        			
         		}
         	}
         	return result;
         }
         
-		public function isInlineOnly(categoryTypeId:String):Boolean {
-			return getCategoryTypeElement(categoryTypeId).@contentType.toString() == "inline";
+		public function isInlineOnly(markupTypeId:String):Boolean {
+			return getCategoryTypeElement(markupTypeId).@contentType.toString() == "inline";
 		}
 		
-        private function getCategoryTypeElement(categoryTypeId:String):XML {
-        	var categoryTypeElements:XMLList = this.referenceXML.categoryTypes.categoryType.(@id == categoryTypeId);
-        	if (categoryTypeElements.length() == 0) {
-        		throw new Error("Nothing known about category type: " + categoryTypeId);
+        private function getCategoryTypeElement(markupTypeId:String):XML {
+        	var markupTypeElements:XMLList = this.referenceXML.markupTypes.markupType.(@id == markupTypeId);
+        	if (markupTypeElements.length() == 0) {
+        		throw new Error("Nothing known about category type: " + markupTypeId);
         	}
-			return categoryTypeElements[0];        
+			return markupTypeElements[0];        
         }
         
         public function hasCategoryId(categoryId:String):Boolean {
@@ -412,7 +412,7 @@ package org.ishafoundation.archives.transcript.model
 			return categoryElements[0];
 		}
 		
-		public function editCategory(newName:String, categoryTypeIds:Array, concepts:Array, categoryId:String):XML {
+		public function editCategory(newName:String, markupTypeIds:Array, concepts:Array, categoryId:String):XML {
 			var result:XML;
 			if (categoryId == null) {
 				categoryId = generateCategoryId(newName);
@@ -424,8 +424,8 @@ package org.ishafoundation.archives.transcript.model
 				XMLUtils.removeAllElements(result.*);
 			}
 			result.@name = newName;
-			for each (var typeId:String in categoryTypeIds) {
-				var tagElement:XML = <tag type="type" value={typeId}/>;
+			for each (var typeId:String in markupTypeIds) {
+				var tagElement:XML = <tag type="markupType" value={typeId}/>;
 				result.appendChild(tagElement);
 			}
 			for each (var concept:String in concepts) {

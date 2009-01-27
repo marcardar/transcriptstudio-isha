@@ -60,116 +60,116 @@
 		<language id="tamil"/>
 		<language id="other"/>
 	</languages>
-	<categoryTypes>
-		<categoryType id="topic" name="Topic" contentType="outline"/>
-		<categoryType id="question" name="Question" contentType="outline"/>
-		<categoryType id="joke" name="Joke" contentType="outline"/>
-		<categoryType id="story" name="Story" contentType="outline"/>
-		<categoryType id="quote" name="Quote" contentType="inline"/>
-		<categoryType id="music" name="Music" contentType="outline"/>
-		<categoryType id="process" name="Process" contentType="outline"/>
-		<categoryType id="soundbite" name="Sound Bite" contentType="both"/>
-	</categoryTypes>
+	<markupTypes>
+		<markupType id="topic" name="Topic" contentType="outline"/>
+		<markupType id="question" name="Question" contentType="outline"/>
+		<markupType id="joke" name="Joke" contentType="outline"/>
+		<markupType id="story" name="Story" contentType="outline"/>
+		<markupType id="quote" name="Quote" contentType="inline"/>
+		<markupType id="music" name="Music" contentType="outline"/>
+		<markupType id="process" name="Process" contentType="outline"/>
+		<markupType id="soundbite" name="Sound Bite" contentType="both"/>
+	</markupTypes>
 	<categories>
 		<category id="laotzubecomesthe1" name="Lao Tzu becomes the Chief Judge">
-			<tag type="type" value="story"/>
+			<tag type="markupType" value="story"/>
 			<tag type="concept" value="lao tzu"/>
 		</category>
 		<category id="mygreatgrandmother1" name="My Great Grandmother">
-			<tag type="type" value="story"/>
+			<tag type="markupType" value="story"/>
 			<tag type="concept" value="biography"/>
 		</category>
 		<category id="shivaandparvathi1" name="Shiva and Parvathi get married">
-			<tag type="type" value="story"/>
+			<tag type="markupType" value="story"/>
 			<tag type="concept" value="shiva"/>
 		</category>
 		<category id="boyfindsten1" name="Boy finds ten dollar bill">
-			<tag type="type" value="joke"/>
+			<tag type="markupType" value="joke"/>
 		</category>
 		<category id="doyouwantto1" name="Do you want to listen to Alfonso's show?">
-			<tag type="type" value="joke"/>
+			<tag type="markupType" value="joke"/>
 		</category>
 		<category id="shankaranpillai1" name="shankaran-pillai gets arrested shopping for Diwali">
-			<tag type="type" value="joke"/>
+			<tag type="markupType" value="joke"/>
 			<tag type="concept" value="shankaran-pillai"/>
 		</category>
 		<category id="shankaranpillai2" name="shankaran-pillai goes to women's liberation meeting">
-			<tag type="type" value="joke"/>
+			<tag type="markupType" value="joke"/>
 			<tag type="concept" value="shankaran-pillai"/>
 		</category>
 		<category id="shankaranpillai3" name="shankaran-pillai learns Vedanta">
-			<tag type="type" value="joke"/>
+			<tag type="markupType" value="joke"/>
 			<tag type="concept" value="shankaran-pillai"/>
 		</category>
 		<category id="shankaranpillai4" name="shankaran-pillai gets his donkey painted red">
-			<tag type="type" value="joke"/>
+			<tag type="markupType" value="joke"/>
 			<tag type="concept" value="shankaran-pillai"/>
 		</category>
 		<category id="popechauffeur1" name="Pope Chauffeur">
-			<tag type="type" value="joke"/>
+			<tag type="markupType" value="joke"/>
 			<tag type="concept" value="pope"/>
 		</category>
 		<category id="thinkingspirituality1" name="Thinking spirituality">
-			<tag type="type" value="joke"/>
+			<tag type="markupType" value="joke"/>
 			<tag type="concept" value="spiritual"/>
 		</category>
 		<category id="womanmystic1" name="Woman mystic by the lake">
-			<tag type="type" value="joke"/>
+			<tag type="markupType" value="joke"/>
 		</category>
 		<category id="whysuffering1" name="Why Suffering?">
-			<tag type="type" value="topic"/>
-			<tag type="type" value="question"/>
+			<tag type="markupType" value="topic"/>
+			<tag type="markupType" value="question"/>
 			<tag type="concept" value="suffering"/>
 		</category>
 		<category id="knowinglife1" name="Knowing Life">
-			<tag type="type" value="topic"/>
+			<tag type="markupType" value="topic"/>
 			<tag type="concept" value="enlightenment"/>
 			<tag type="concept" value="life"/>
 		</category>
 		<category id="doyouhavefree1" name="Do we have free will, or is everything pre-destined?">
-			<tag type="type" value="question"/>
+			<tag type="markupType" value="question"/>
 			<tag type="concept" value="destiny"/>
 			<tag type="concept" value="karma"/>
 		</category>
 		<category id="whatarethemain1" name="What are the main benefits of sitting in the Dhyanalinga temple?">
-			<tag type="type" value="question"/>
+			<tag type="markupType" value="question"/>
 			<tag type="concept" value="dhyanalinga"/>
 		</category>
 		<category id="howcaniknow1" name="How can I know the life around me?">
-			<tag type="type" value="question"/>
+			<tag type="markupType" value="question"/>
 			<tag type="concept" value="life"/>
 		</category>
 		<category id="whatisaguru1" name="What is a guru?">
-			<tag type="type" value="question"/>
+			<tag type="markupType" value="question"/>
 			<tag type="concept" value="guru"/>
 		</category>
 		<category id="ifthecreatorscreation1" name="If the Creator's creation is perfect, why is there so much suffering in the world?">
-			<tag type="type" value="question"/>
+			<tag type="markupType" value="question"/>
 			<tag type="concept" value="creation"/>
 			<tag type="concept" value="suffering"/>
 		</category>
 		<category id="canyoutalkaboutishas1" name="Can you talk about Isha's prison-programs?">
-			<tag type="type" value="question"/>
+			<tag type="markupType" value="question"/>
 			<tag type="concept" value="prison-programs"/>
 		</category>
 		<category id="doyouhaveplansto1" name="Do you have plans to extend the prison-programs to other parts of India and abroad?">
-			<tag type="type" value="question"/>
+			<tag type="markupType" value="question"/>
 			<tag type="concept" value="prison-programs"/>
 		</category>
 		<category id="yousaidifone1" name="You said if one is willing it just takes a moment to transcend. What do I need to do for this to happen?">
-			<tag type="type" value="question"/>
+			<tag type="markupType" value="question"/>
 		</category>
 		<category id="soundsofisha1" name="Sounds of Isha">
-			<tag type="type" value="music"/>
+			<tag type="markupType" value="music"/>
 		</category>
 		<category id="outsideartist1" name="Outside Artist">
-			<tag type="type" value="music"/>
+			<tag type="markupType" value="music"/>
 		</category>
 		<category id="recordedmusic1" name="Recorded Music">
-			<tag type="type" value="music"/>
+			<tag type="markupType" value="music"/>
 		</category>
 		<category id="meditationprocess1" name="Meditation Process">
-			<tag type="type" value="process"/>
+			<tag type="markupType" value="process"/>
 		</category>
 	</categories>
 	<concepts>
