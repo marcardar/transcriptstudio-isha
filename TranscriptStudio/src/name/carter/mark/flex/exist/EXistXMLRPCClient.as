@@ -1,9 +1,12 @@
 package name.carter.mark.flex.exist
 {
+	import flash.utils.ByteArray;
+	
 	import mx.utils.Base64Decoder;
 	import mx.utils.Base64Encoder;
 	
 	import name.carter.mark.flex.util.Utils;
+	import name.carter.mark.flex.util.XMLUtils;
 	import name.carter.mark.flex.util.remote.xmlrpc.MethodCall;
 	import name.carter.mark.flex.util.remote.xmlrpc.XMLRPCClient;
 	
@@ -27,10 +30,7 @@ package name.carter.mark.flex.exist
 			methodCall.addParamAsString(Utils.encodePath(xmlPath));
 			methodCall.addParamAsStruct({indent: "yes", encoding: "UTF-8"});
 			xmlRpcClient.call(methodCall.xml, function(response:Object):void {
-				var oldIgnoreWhitespace:Boolean = XML.ignoreWhitespace;
-				XML.ignoreWhitespace = ignoreWhitespace;
-				var xml:XML = new XML(response);
-				XML.ignoreWhitespace = oldIgnoreWhitespace;
+				var xml:XML = XMLUtils.convertToXML(response, ignoreWhitespace);
 				successFunction(xml);			
 			}, function(msg:String):void {
 				failureFunction("XML file could not be retrieved because: " + msg);			
@@ -72,12 +72,10 @@ package name.carter.mark.flex.exist
 			methodCall.addParamAsInt(1);
 			methodCall.addParamAsStruct(struct);
 			xmlRpcClient.call(methodCall.xml, function(response:Object):void {
-				var oldIgnoreWhitespace:Boolean = XML.ignoreWhitespace;
-				XML.ignoreWhitespace = true;
 				var dec:Base64Decoder = new Base64Decoder();
 				dec.decode(response.toString());
-				var xml:XML = new XML(dec.toByteArray());
-				XML.ignoreWhitespace = oldIgnoreWhitespace;
+				var ba:ByteArray = dec.toByteArray();
+				var xml:XML = XMLUtils.convertToXML(ba, false);
 				successFunc(xml);			
 			}, function (msg:String):void {
 				failureFunc("XQuery could not be executed because: " + msg);			

@@ -143,7 +143,7 @@ package org.ishafoundation.archives.transcript.importer
 			var nextName:String = names.shift();
 			xqueryExecutor.query("import module namespace transcriptstudio='http://ishafoundation.org/xquery/archives/transcript' at 'java:org.ishafoundation.archives.transcript.xquery.modules.TranscriptStudioModule';transcriptstudio:import-file-read($arg0)", [nextName], function(resultXML:XML):void {
 				var existNS:Namespace = resultXML.namespace("exist");
-				var wordXML:XML = resultXML.existNS::value.*[0];
+				var wordXML:XML = resultXML.existNS::value.*.(nodeKind() == "element")[0];
 				var audioTranscript:WordMLTransformer = new WordMLTransformer(nextName, wordXML, idFunc);
 				audioTranscripts.push(audioTranscript); 
 				importPathsInternal(names, audioTranscripts, idFunc, successFunc, failureFunc);
