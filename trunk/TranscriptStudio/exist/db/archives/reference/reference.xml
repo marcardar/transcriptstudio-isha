@@ -71,6 +71,6 @@
 		<categoryType id="soundbite" name="Sound Bite" contentType="both"/>
 	</categoryTypes>
 	<categories/>
-	<conceptHierarchy/>
-	<conceptSynonymGroups/>
+	<concepts/>
+	<synonyms/>
 </reference>

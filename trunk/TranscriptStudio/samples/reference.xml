@@ -172,36 +172,41 @@
 			<tag type="type" value="process"/>
 		</category>
 	</categories>
-	<conceptHierarchy>
-		<concept idRef="meditation">
-			<concept idRef="shoonya"/>
-		</concept>
-		<concept idRef="practices">
-			<concept idRef="shoonya"/>
-		</concept>
-		<concept idRef="science">
-			<concept idRef="cosmology"/>
-			<concept idRef="neuroscience"/>
-		</concept>
-		<concept idRef="cosmology">
-			<concept idRef="big-bang"/>
-		</concept>
-		<concept idRef="being">
-			<concept idRef="guru"/>
-		</concept>
+	<concepts>
+		<concept idRef="life"/>
+		<concept idRef="after-life"/>
 		<concept idRef="guru">
 			<concept idRef="sadhguru"/>
 			<concept idRef="dhyanalinga"/>
 		</concept>
-	</conceptHierarchy>
-	<conceptSynonymGroups>
-		<conceptSynonymGroup>
+		<concept idRef="being"/>
+		<concept idRef="master">
+			<concept idRef="sadhguru"/>
+			<concept idRef="jesus"/>
+			<concept idRef="buddha"/>
+		</concept>
+		<concept idRef="mystic">
+			<concept idRef="sadhguru"/>
+		</concept>
+		<concept idRef="dhyanalinga"/>
+		<concept idRef="isha"/>
+		<concept idRef="india"/>
+		<concept idRef="sadhguru"/>
+		<concept idRef="jesus"/>
+		<concept idRef="buddha"/>
+		<concept idRef="shiva"/>
+		<concept idRef="krishna"/>
+		<concept idRef="united-states-of-america"/>
+		<concept idRef="usa"/>
+	</concepts>
+	<synonyms>
+		<synonym>
 			<concept idRef="enlightenment"/>
 			<concept idRef="liberation"/>
-		</conceptSynonymGroup>
-		<conceptSynonymGroup>
+		</synonym>
+		<synonym>
 			<concept idRef="guru"/>
 			<concept idRef="master"/>
-		</conceptSynonymGroup>
-	</conceptSynonymGroups>
+		</synonym>
+	</synonyms>
 </reference>

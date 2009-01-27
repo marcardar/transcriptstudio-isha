@@ -159,7 +159,7 @@ declare function search-fns:expand-concept($concept as xs:string) as xs:string*
 {
 	(: expand by synonyms :)
 	let $synonyms := distinct-values(($concept,
-			for $synonym in collection('/db/archives/reference')/reference/conceptSynonymGroups/conceptSynonymGroup/concept[@idRef = $concept]/../concept
+			for $synonym in collection('/db/archives/reference')/reference/synonyms/synonym/concept[@idRef = $concept]/../concept
 			return string($synonym/@idRef)
 		))
 	(: expand by concept hierarchy :) 
@@ -180,7 +180,7 @@ declare function search-fns:get-sub-concept-ids($unprocessedIds as xs:string*, $
 					()
 				else
 					(: have not processed this one before :)
-					collection('/db/archives/reference')/reference/conceptHierarchy/concept[@idRef = $unprocessedId]/concept/@idRef
+					collection('/db/archives/reference')/reference/concepts/concept[@idRef = $unprocessedId]/concept/@idRef
 	return
 		let $newProcessedIds := ($processedIds, $unprocessedIds)
 		return
