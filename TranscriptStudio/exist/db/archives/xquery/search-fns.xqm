@@ -180,7 +180,7 @@ declare function search-fns:get-sub-concept-ids($unprocessedIds as xs:string*, $
 					()
 				else
 					(: have not processed this one before :)
-					collection('/db/archives/reference')/reference/concepts/concept[@idRef = $unprocessedId]/concept/@idRef
+					collection('/db/archives/reference')/reference/concepts/concept[@id = $unprocessedId]/concept/@idRef
 	return
 		let $newProcessedIds := ($processedIds, $unprocessedIds)
 		return

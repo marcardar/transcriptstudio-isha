@@ -173,31 +173,31 @@
 		</markupCategory>
 	</markupCategories>
 	<concepts>
-		<concept idRef="life"/>
-		<concept idRef="after-life"/>
-		<concept idRef="guru">
+		<concept id="life"/>
+		<concept id="after-life"/>
+		<concept id="guru">
 			<concept idRef="sadhguru"/>
 			<concept idRef="dhyanalinga"/>
 		</concept>
-		<concept idRef="being"/>
-		<concept idRef="master">
+		<concept id="being"/>
+		<concept id="master">
 			<concept idRef="sadhguru"/>
 			<concept idRef="jesus"/>
 			<concept idRef="buddha"/>
 		</concept>
-		<concept idRef="mystic">
+		<concept id="mystic">
 			<concept idRef="sadhguru"/>
 		</concept>
-		<concept idRef="dhyanalinga"/>
-		<concept idRef="isha"/>
-		<concept idRef="india"/>
-		<concept idRef="sadhguru"/>
-		<concept idRef="jesus"/>
-		<concept idRef="buddha"/>
-		<concept idRef="shiva"/>
-		<concept idRef="krishna"/>
-		<concept idRef="united-states-of-america"/>
-		<concept idRef="usa"/>
+		<concept id="dhyanalinga"/>
+		<concept id="isha"/>
+		<concept id="india"/>
+		<concept id="sadhguru"/>
+		<concept id="jesus"/>
+		<concept id="buddha"/>
+		<concept id="shiva"/>
+		<concept id="krishna"/>
+		<concept id="united-states-of-america"/>
+		<concept id="usa"/>
 	</concepts>
 	<synonyms>
 		<synonym>
