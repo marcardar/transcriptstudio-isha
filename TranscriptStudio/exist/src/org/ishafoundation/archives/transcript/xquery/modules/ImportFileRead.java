@@ -6,7 +6,13 @@ import java.util.zip.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.xml.parsers.*;
+
+import org.exist.Namespaces;
+import org.xml.sax.*;
 import org.exist.dom.QName;
+import org.exist.memtree.DocumentImpl;
+import org.exist.memtree.SAXAdapter;
 
 import org.exist.xquery.BasicFunction;
 import org.exist.xquery.Cardinality;
@@ -26,7 +32,7 @@ public class ImportFileRead extends BasicFunction {
 			"Read content of import file. $a is a string representing the import file (not including extension).",
 			new SequenceType[] {				
 				new SequenceType( Type.STRING, Cardinality.EXACTLY_ONE )
-				},				
+				},
 			new SequenceType( Type.STRING, Cardinality.ZERO_OR_ONE ) ),
 		};
 	
@@ -45,18 +51,19 @@ public class ImportFileRead extends BasicFunction {
 	public Sequence eval( Sequence[] args, Sequence contextSequence ) throws XPathException 
 	{
 		TranscriptStudioModule.checkSuperUser(context.getUser());
-
+		
 		String arg = args[0].itemAt(0).getStringValue();
 		String filename = arg + ".docx";
 		
 		File f = new File(TranscriptStudioModule.getImportDir(), filename);
 		
-		String documentString = extractDocumentFromDocxFile(f);
+		String xmlContent = extractXmlContentFromDocxFile(f);
 		
-		return( new StringValue( documentString ) );
+		return new StringValue(xmlContent);
+		//	return convertToNodeValue(xmlContent);
 	}
 	
-	private String extractDocumentFromDocxFile(File docxFile) throws XPathException {
+	private String extractXmlContentFromDocxFile(File docxFile) throws XPathException {
 		FileInputStream fis = null;
 		ZipInputStream zis = null;
 		ByteArrayOutputStream baos = null;
@@ -105,4 +112,32 @@ public class ImportFileRead extends BasicFunction {
 		}
 		throw new XPathException("Could not find document.xml in specified docx file: " + docxFile);
 	}
+	
+	/*private Sequence convertToNodeValue(String xmlContent) throws XPathException {
+		if (xmlContent.length() == 0) {
+			return Sequence.EMPTY_SEQUENCE;
+		}
+		StringReader reader = new StringReader(xmlContent);
+		try {
+			SAXParserFactory factory = SAXParserFactory.newInstance();
+			factory.setNamespaceAware(true);
+			InputSource src = new InputSource(reader);
+			
+			SAXParser parser = factory.newSAXParser();
+			XMLReader xr = parser.getXMLReader();
+			
+			SAXAdapter adapter = new SAXAdapter(context);
+			xr.setContentHandler(adapter);
+			xr.setProperty(Namespaces.SAX_LEXICAL_HANDLER, adapter);
+			xr.parse(src);
+			
+			return (DocumentImpl) adapter.getDocument();
+		} catch (ParserConfigurationException e) {
+			throw new XPathException(getASTNode(), "Error while constructing XML parser: " + e.getMessage(), e);
+		} catch (SAXException e) {
+			throw new XPathException(getASTNode(), "Error while parsing XML: " + e.getMessage(), e);
+		} catch (IOException e) {
+			throw new XPathException(getASTNode(), "Error while parsing XML: " + e.getMessage(), e);
+		}
+	}*/
 }
