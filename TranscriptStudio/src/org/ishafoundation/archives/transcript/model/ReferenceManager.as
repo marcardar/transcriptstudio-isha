@@ -377,18 +377,13 @@ package org.ishafoundation.archives.transcript.model
         	var markupTypeElements:XMLList = this.referenceXML.markupTypes.markupType;
         	var result:Array = new Array();
         	for each (var markupTypeElement:XML in markupTypeElements) {
-        		var contentType:String = markupTypeElement.@contentType.toString();
-        		if (allowInline && contentType == "inline" || allowOutline && contentType == "outline" || contentType == "both") {
+        		if (allowInline && XMLUtils.getAttributeValueAsBoolean(markupTypeElement, "allowInline", false) || allowOutline && XMLUtils.getAttributeValueAsBoolean(markupTypeElement, "allowOutline", false)) {
         			result.push(markupTypeElement.@id.toString());        			
         		}
         	}
         	return result;
         }
         
-		public function isInlineOnly(markupTypeId:String):Boolean {
-			return getCategoryTypeElement(markupTypeId).@contentType.toString() == "inline";
-		}
-		
         private function getCategoryTypeElement(markupTypeId:String):XML {
         	var markupTypeElements:XMLList = this.referenceXML.markupTypes.markupType.(@id == markupTypeId);
         	if (markupTypeElements.length() == 0) {
