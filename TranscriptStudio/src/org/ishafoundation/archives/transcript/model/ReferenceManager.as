@@ -137,8 +137,8 @@ package org.ishafoundation.archives.transcript.model
 				result.addAll(getConceptIdsForCategory(categoryId));
 			}
 			// now look at the concept hierarchy and synonym groups
-			result.addAll(XMLUtils.convertToStringISet(referenceXML.conceptHierarchy..@idRef).toArray());
-			result.addAll(XMLUtils.convertToStringISet(referenceXML.conceptSynonymGroups.conceptSynonymGroup..@idRef).toArray());
+			result.addAll(XMLUtils.convertToStringISet(referenceXML.concepts..@idRef).toArray());
+			result.addAll(XMLUtils.convertToStringISet(referenceXML.synonyms.synonym..@idRef).toArray());
 			return result;
 		}
 		
@@ -217,11 +217,11 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		public function getConceptSubTypes(conceptId:String):ISet {
-			return XMLUtils.convertToStringISet(this.referenceXML.conceptHierarchy.concept.(@idRef == conceptId).concept.@idRef);
+			return XMLUtils.convertToStringISet(this.referenceXML.concepts.concept.(@idRef == conceptId).concept.@idRef);
 		}
 		
 		public function getTopLevelConceptElementInHierarchy(conceptId:String):XML {
-			var conceptElements:XMLList = this.referenceXML.conceptHierarchy.concept.(@idRef == conceptId);
+			var conceptElements:XMLList = this.referenceXML.concepts.concept.(@idRef == conceptId);
 			switch (conceptElements.length()) {
 				case 0:
 					return null;
@@ -255,7 +255,7 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		private function getConceptSynonymGroupElement(conceptId:String):XML {
-			var conceptElements:XMLList = this.referenceXML..conceptSynonymGroup.concept.(@idRef == conceptId);
+			var conceptElements:XMLList = this.referenceXML.synonyms.synonym.concept.(@idRef == conceptId);
 			switch (conceptElements.length()) {
 				case 0:
 					return null;
