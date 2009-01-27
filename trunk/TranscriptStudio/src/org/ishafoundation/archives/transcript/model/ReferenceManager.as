@@ -110,7 +110,7 @@ package org.ishafoundation.archives.transcript.model
 					trace("Must contain one of these: " + searchConcepts + " or category name include: " + searchTerm);
 					resultsForThisSearchTerm = getCategoriesTaggedWithAtLeastOneConcept(searchConcepts);
 					// also look at the category names
-					var categoryElements:XMLList = this.referenceXML.categories.category.(containsWordPrefixedWith(attribute("name"), searchTerm));
+					var categoryElements:XMLList = this.referenceXML.markupCategories.markupCategory.(containsWordPrefixedWith(attribute("name"), searchTerm));
 					for each (var categoryElement:XML in categoryElements) {
 						resultsForThisSearchTerm.add(categoryElement.@id.toString());
 					}
@@ -153,7 +153,7 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		public function getAllCategories():Array {
-			var categoryElements:XMLList = this.referenceXML.categories.category;
+			var categoryElements:XMLList = this.referenceXML.markupCategories.markupCategory;
 			var result:Array = new Array();
 			for each (var categoryElement:XML in categoryElements) {
 				result.push(categoryElement.@id.toString());
@@ -166,7 +166,7 @@ package org.ishafoundation.archives.transcript.model
 		 * converting to lowercase, the strings are equal
 		 */
 		public function isNewCategoryNameValid(categoryName:String):Boolean {
-			var nameAttrs:XMLList = referenceXML..category.@name;
+			var nameAttrs:XMLList = referenceXML.markupCategories.markupCategory.@name;
 			var newNormalizedName:String = normalizeString(categoryName);
 			if (newNormalizedName.length == 0) {
 				return false;
@@ -189,7 +189,7 @@ package org.ishafoundation.archives.transcript.model
 		
 		private function getCategoriesTaggedWith(tag:MTag):ISet {
 			var result:ISet = new HashSet();
-			var tagElements:XMLList = this.referenceXML.categories.category.tag.(@type == tag.type && @value == tag.value);
+			var tagElements:XMLList = this.referenceXML.markupCategories.markupCategory.tag.(@type == tag.type && @value == tag.value);
 			for each (var tagElement:XML in tagElements) {
 				var categoryElement:XML = tagElement.parent() as XML;
 				result.add(categoryElement.@id.toString());
@@ -199,7 +199,7 @@ package org.ishafoundation.archives.transcript.model
 		
 		private function getCategoriesTaggedWithConcept(concept:String):ISet {
 			var result:ISet = new HashSet();
-			var tagElements:XMLList = this.referenceXML.categories.category.tag.(@type == "concept" && @value == concept);
+			var tagElements:XMLList = this.referenceXML.markupCategories.markupCategory.tag.(@type == "concept" && @value == concept);
 			for each (var tagElement:XML in tagElements) {
 				var categoryElement:XML = tagElement.parent() as XML;
 				result.add(categoryElement.@id.toString());
@@ -398,11 +398,11 @@ package org.ishafoundation.archives.transcript.model
         }
         
         public function hasCategoryId(categoryId:String):Boolean {
-        	return (this.referenceXML.categories.category.(@id == categoryId) as XMLList).length() > 0;
+        	return (this.referenceXML.markupCategories.markupCategory.(@id == categoryId) as XMLList).length() > 0;
         }
             	
 		public function getCategoryElement(categoryId:String):XML {
-			var categoryElements:XMLList = this.referenceXML.categories.category.(@id == categoryId);
+			var categoryElements:XMLList = this.referenceXML.markupCategories.markupCategory.(@id == categoryId);
 			if (categoryElements.length() == 0) {
 				throw new Error("Category id does not exist: " + categoryId);
 			} 
@@ -416,8 +416,8 @@ package org.ishafoundation.archives.transcript.model
 			var result:XML;
 			if (categoryId == null) {
 				categoryId = generateCategoryId(newName);
-				result = <category id={categoryId}/>;
-				(this.referenceXML.categories[0] as XML).appendChild(result);
+				result = <markupCategory id={categoryId}/>;
+				(this.referenceXML.markupCategories[0] as XML).appendChild(result);
 			}
 			else {
 				result = getCategoryElement(categoryId);

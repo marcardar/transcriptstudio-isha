@@ -202,7 +202,7 @@
 <xsl:for-each select="//superSegment">
   <xsl:value-of select="./tag[@type='markupType']/@value"/>
   <xsl:variable name="markupCategory" select="./tag[@type='markupCategory']/@value"/> 
-  <xsl:value-of select="$reference/categories/categoryId[@id=$markupCategory]/@name"/>
+  <xsl:value-of select="$reference/markupCategories/markupCategoryId[@id=$markupCategory]/@name"/>
 </xsl:for-each>
 -->
 				<xsl:for-each select="//superSegment | //superContent">
@@ -222,7 +222,7 @@
                                     <xsl:value-of select="$reference/markupTypes/markupType[@id = $markupType]/@name"/>
 									<xsl:if test="$markupCategory">
 										<xsl:text>: </xsl:text>
-										<xsl:value-of select="$reference/categories/category[@id = $markupCategory]/@name"/>
+										<xsl:value-of select="$reference/markupCategories/markupCategory[@id = $markupCategory]/@name"/>
 									</xsl:if>
 								</w:t>
 							</w:r>

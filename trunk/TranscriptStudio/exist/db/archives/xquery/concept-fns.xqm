@@ -10,7 +10,7 @@ declare function concept-fns:count-concept-instances($conceptId as xs:string) as
 declare function concept-fns:get-all-concepts() as xs:string*
 {
 	let $reference := collection('/db/archives/reference')/reference
-	let $categoryConcepts := $reference/categories/category/tag[@type eq 'concept']/string(@value)
+	let $categoryConcepts := $reference/markupCategories/markupCategory/tag[@type eq 'concept']/string(@value)
 	let $otherReferenceConcepts := $reference//concept/string(@idRef)
 	let $additionalConcepts := collection('/db/archives/data')/session/transcript/(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
 	return
@@ -137,7 +137,7 @@ declare function concept-fns:rename($conceptId as xs:string, $newConceptId) as x
 	let $reference := collection('/db/archives/reference')/reference
 	let $renameValues :=
 		(
-		concept-fns:rename-category-concept($conceptId, $newConceptId, $reference/categories)
+		concept-fns:rename-category-concept($conceptId, $newConceptId, $reference/markupCategories)
 		,
 		concept-fns:rename-super-concept($conceptId, $newConceptId, $reference/concepts)
 		,
@@ -150,9 +150,9 @@ declare function concept-fns:rename($conceptId as xs:string, $newConceptId) as x
 	return sum($renameValues)
 };
 
-declare function concept-fns:rename-category-concept($conceptId as xs:string, $newConceptId as xs:string, $categories as element()) as xs:integer
+declare function concept-fns:rename-category-concept($conceptId as xs:string, $newConceptId as xs:string, $markupCategories as element()) as xs:integer
 {
-	let $categoryTags := $categories/category/tag[@type eq 'concept' and @value eq $conceptId]
+	let $categoryTags := $markupCategories/markupCategory/tag[@type eq 'concept' and @value eq $conceptId]
 	let $null :=
 		for $categoryTag in $categoryTags
 		return
@@ -263,7 +263,7 @@ declare function concept-fns:remove($conceptId as xs:string) as xs:integer
 	let $reference := collection('/db/archives/reference')/reference
 	let $deleteValues :=
 		(
-		concept-fns:delete-internal($reference/categories/category/tag[@type eq 'concept' and @value eq $conceptId])
+		concept-fns:delete-internal($reference/markupCategories/markupCategory/tag[@type eq 'concept' and @value eq $conceptId])
 		,
 		concept-fns:delete-internal($reference/concepts/concept[@idRef eq $conceptId])
 		,

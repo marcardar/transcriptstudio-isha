@@ -13,9 +13,9 @@ declare function categories-panel:main() as element()*
 	let $reference := collection('/db/archives/reference')/reference
 	let $categories := 
 		if ($conceptId) then
-			$reference/categories/category/tag[@type eq 'concept' and @value eq $conceptId]/..
+			$reference/markupCategories/markupCategory/tag[@type eq 'concept' and @value eq $conceptId]/..
 		else
-			$reference/categories/category
+			$reference/markupCategories/markupCategory
 	return
 	(
 		<center><h2>Isha Foundation Markup Categories
