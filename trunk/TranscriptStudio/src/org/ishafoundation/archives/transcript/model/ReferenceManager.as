@@ -139,7 +139,7 @@ package org.ishafoundation.archives.transcript.model
 			// now look at the concept hierarchy and synonym groups
 			result.addAll(XMLUtils.convertToStringISet(referenceXML.concepts.concept.@id).toArray());
 			result.addAll(XMLUtils.convertToStringISet(referenceXML.concepts.concept.concept.@idRef).toArray());
-			result.addAll(XMLUtils.convertToStringISet(referenceXML.synonyms.synonym.concept.@idRef).toArray());
+			result.addAll(XMLUtils.convertToStringISet(referenceXML.synonymGroups.synonymGroup.synonym.@idRef).toArray());
 			return result;
 		}
 		
@@ -256,7 +256,7 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		private function getConceptSynonymGroupElement(conceptId:String):XML {
-			var conceptElements:XMLList = this.referenceXML.synonyms.synonym.concept.(@idRef == conceptId);
+			var conceptElements:XMLList = this.referenceXML.synonymGroups.synonymGroup.synonym.(@idRef == conceptId);
 			switch (conceptElements.length()) {
 				case 0:
 					return null;
@@ -279,7 +279,7 @@ package org.ishafoundation.archives.transcript.model
 				return result;
 			}
 			else {
-				return XMLUtils.convertToStringISet(synonymGroupElement.concept.@idRef);
+				return XMLUtils.convertToStringISet(synonymGroupElement.synonym.@idRef);
 			}
 		}
 		
@@ -300,7 +300,7 @@ package org.ishafoundation.archives.transcript.model
 			for each (conceptElement in this.referenceXML.concepts.concept.concept.(containsWordPrefixedWith(attribute("idRef").toString(), prefix))) {
 				result.add(conceptElement.@idRef.toString());				
 			}
-			for each (conceptElement in this.referenceXML.synonyms.synonym.concept.(containsWordPrefixedWith(attribute("idRef").toString(), prefix))) {
+			for each (conceptElement in this.referenceXML.synonymGroups.synonymGroup.synonym.(containsWordPrefixedWith(attribute("idRef").toString(), prefix))) {
 				result.add(conceptElement.@idRef.toString());				
 			}
 			// also search the tag elements
