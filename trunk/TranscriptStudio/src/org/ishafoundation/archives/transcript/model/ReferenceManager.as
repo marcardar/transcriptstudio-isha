@@ -45,9 +45,6 @@ package org.ishafoundation.archives.transcript.model
 		[Bindable]
 		public var referenceXML:XML;
 		
-		[Bindable]
-		public var unsavedChanges:Boolean = false;
-			
 		public function ReferenceManager(xmlRetrieverStorer:XMLRetrieverStorer, xqueryExecutor:XQueryExecutor) {
 			this.xmlRetrieverStorer = xmlRetrieverStorer;
 			this.xqueryExecutor = xqueryExecutor;
@@ -57,30 +54,8 @@ package org.ishafoundation.archives.transcript.model
 			// recreate the xmlRetriever because the old one might be still in progress (not timedout)
 			this.xmlRetrieverStorer.retrieveXML(REFERENCE_XML_PATH, function(xml:XML):void {
 				referenceXML = xml;
-				unsavedChanges = false;
 				retrieveXMLSuccess();
 			}, retrieveXMLFailure);
-		}
-		
-		public function storeReferences(successFunction:Function = null, failureFunction:Function = null):void {
-			if (referenceXML == null) {
-				throw new Error("Cannot store reference xml because it is null");
-			}
-			if (!unsavedChanges) {
-				Alert.show("Saving reference file even though there were no changes made");
-			}
-			this.xmlRetrieverStorer.storeXML(REFERENCE_XML_PATH, referenceXML, function ():void {
-				trace("References saved");
-				unsavedChanges = false;
-				if (successFunction != null) {
-					successFunction();
-				}
-			}, function(msg:String):void {
-				trace("Failed to store references because: " + msg);
-				if (failureFunction != null) {
-					failureFunction(msg);
-				};
-			});
 		}
 		
 		/**
@@ -128,19 +103,6 @@ package org.ishafoundation.archives.transcript.model
 			else {
 				return resultSet.toArray();
 			}
-		}
-		
-		public function getAllConceptIds():ISet {
-			// first look at the categories
-			var result:ISet = new HashSet();
-			for each (var categoryId:String in getAllCategories()) {
-				result.addAll(getConceptIdsForCategory(categoryId));
-			}
-			// now look at the concept hierarchy and synonym groups
-			result.addAll(XMLUtils.convertToStringISet(referenceXML.coreConcepts.concept.@id).toArray());
-			result.addAll(XMLUtils.convertToStringISet(referenceXML.coreConcepts.concept.subtype.@idRef).toArray());
-			result.addAll(XMLUtils.convertToStringISet(referenceXML.synonymGroups.synonymGroup.synonym.@idRef).toArray());
-			return result;
 		}
 		
 		private function getConceptIdsForCategory(categoryId:String):Array {
@@ -413,28 +375,21 @@ package org.ishafoundation.archives.transcript.model
 			return categoryElements[0];
 		}
 		
-		public function editCategory(newName:String, markupTypeIds:Array, concepts:Array, categoryId:String):XML {
-			var result:XML;
+		public function editCategory(newName:String, markupTypeIds:Array, conceptIds:Array, categoryId:String, successFunc:Function, failureFunc:Function):void {
 			if (categoryId == null) {
 				categoryId = generateCategoryId(newName);
-				result = <markupCategory id={categoryId}/>;
-				(this.referenceXML.markupCategories[0] as XML).appendChild(result);
+				trace("Adding new markup category: " + categoryId);
 			}
 			else {
-				result = getCategoryElement(categoryId);
-				XMLUtils.removeAllElements(result.*);
+				trace("Editing markup category: " + categoryId);
 			}
-			result.@name = newName;
-			for each (var typeId:String in markupTypeIds) {
-				var tagElement:XML = <tag type="markupType" value={typeId}/>;
-				result.appendChild(tagElement);
-			}
-			for each (var concept:String in concepts) {
-				tagElement = <tag type="concept" value={concept}/>;
-				result.appendChild(tagElement);
-			}
-			unsavedChanges = true;
-			return result;
+			var markupTypeIdsString:String = markupTypeIds.join(" ");
+			var conceptIdsString:String = conceptIds.join(" ");
+			xqueryExecutor.executeStoredXQuery("update-markup-category.xql", {id:categoryId, name:newName, markupTypeIds:markupTypeIdsString, conceptIds:conceptIdsString}, function(returnVal:Boolean):void {
+				loadReferences(function():void {
+					successFunc(categoryId);
+				}, failureFunc);
+			}, failureFunc);
 		}
 		
 		/**

@@ -85,25 +85,23 @@
 				categoryEditDialog.closeMe();
 				var typeIds:Array = categoryEditDialog.typeIds.toArray();
 				var concepts:Array = categoryEditDialog.concepts.toArray();
-				var categoryElement:XML = referenceMgr.editCategory(categoryName, typeIds, concepts, categoryId);
-				referenceMgr.storeReferences(function():void {
+				referenceMgr.editCategory(categoryName, typeIds, concepts, categoryId, function(categoryId:String):void {
 					if (newCategory) {
-						Alert.show("New category successfully saved");
+						Alert.show("Successfully added new category");
 					}
 					else {
-						Alert.show("Predefined category successfully edited");						
+						Alert.show("Successfully edited category");						
 					}
-					var categoryId:String = categoryElement.@id;
 					performAutoSearch(categoryId);
 					dispatchCategoryEditEvent();
 				}, function(msg:String):void {
-					Alert.show("Could not save changes because: " + msg);
+					Alert.show(msg, "Failed");
 				});
 				if (alreadySearched) {
 					searchClicked();
 					resultsList.validateDisplayList();
 					// try to select this category in the results list
-					resultsList.selectedItem = categoryElement.@id.toString();
+					resultsList.selectedItem = categoryId;
 				}
 			}); 
 		}
