@@ -159,7 +159,7 @@ declare function search-fns:expand-concept($concept as xs:string) as xs:string*
 {
 	(: expand by synonyms :)
 	let $synonyms := distinct-values(($concept,
-			for $synonym in collection('/db/archives/reference')/reference/synonyms/synonym/concept[@idRef = $concept]/../concept
+			for $synonym in collection('/db/archives/reference')/reference/synonymGroups/synonymGroup/synonym[@idRef = $concept]/../synonym
 			return string($synonym/@idRef)
 		))
 	(: expand by concept hierarchy :) 

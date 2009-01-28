@@ -199,14 +199,14 @@
 		<concept id="united-states-of-america"/>
 		<concept id="usa"/>
 	</concepts>
-	<synonyms>
-		<synonym>
-			<concept idRef="enlightenment"/>
-			<concept idRef="liberation"/>
-		</synonym>
-		<synonym>
-			<concept idRef="guru"/>
-			<concept idRef="master"/>
-		</synonym>
-	</synonyms>
+	<synonymGroups>
+		<synonymGroup>
+			<synonym idRef="enlightenment"/>
+			<synonym idRef="liberation"/>
+		</synonymGroup>
+		<synonymGroup>
+			<synonym idRef="guru"/>
+			<synonym idRef="master"/>
+		</synonymGroup>
+	</synonymGroups>
 </reference>

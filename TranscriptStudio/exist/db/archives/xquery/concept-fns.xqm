@@ -13,7 +13,7 @@ declare function concept-fns:get-all-concepts() as xs:string*
 	let $categoryConcepts := $reference/markupCategories/markupCategory/tag[@type eq 'concept']/string(@value)
 	let $coreConcepts := $reference/concepts/concept/string(@id)
 	let $subtypeConcepts := $reference/concepts/concept/concept/string(@idRef)
-	let $synonymConcepts := $reference/synonyms/synonym/concept/string(@idRef)
+	let $synonymConcepts := $reference/synonymGroups/synonymGroup/synonym/string(@idRef)
 	let $additionalConcepts := collection('/db/archives/data')/session/transcript/(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
 	return
 		for $concept in distinct-values(($categoryConcepts, $coreConcepts, $subtypeConcepts, $synonymConcepts, $additionalConcepts))
@@ -26,16 +26,16 @@ declare function concept-fns:add-synonyms($conceptIds as xs:string*) as xs:boole
 	if (count($conceptIds) < 2) then
 		false()
 	else
-		let $synonymsElement := collection('/db/archives/reference')/reference/synonyms
-		let $existingGroups := $synonymsElement/synonym/concept[@idRef = $conceptIds]/..
+		let $synonymGroupsElement := collection('/db/archives/reference')/reference/synonymGroups
+		let $existingGroups := $synonymGroupsElement/synonymGroup/synonym[@idRef = $conceptIds]/..
 		return
 			let $targetGroup :=
 				if (count($existingGroups) = 0) then
 				(
-					let $newGroup := <synonym/>
-					let $null := update insert $newGroup into $synonymsElement
+					let $newGroup := <synonymGroup/>
+					let $null := update insert $newGroup into $synonymGroupsElement
 					(: cannot return $newGroup because "update" cannot handle elements that have been constructed in memory - so grab what we just persisted instead :)
-					return $synonymsElement/synonym[last()]
+					return $synonymGroupsElement/synonymGroup[last()]
 				)
 				else if (count($existingGroups) = 1) then
 				(
@@ -45,7 +45,7 @@ declare function concept-fns:add-synonyms($conceptIds as xs:string*) as xs:boole
 				(
 					let $null :=
 					(
-						update insert $existingGroups[position() > 1]/concept into $existingGroups[1]
+						update insert $existingGroups[position() > 1]/synonym into $existingGroups[1]
 						,
 						update delete $existingGroups[position() > 1]
 					)
@@ -53,9 +53,9 @@ declare function concept-fns:add-synonyms($conceptIds as xs:string*) as xs:boole
 				)
 			let $newGroupMembers :=
 				for $conceptId in $conceptIds
-				where not(exists($targetGroup/concept[@idRef eq $conceptId]))
+				where not(exists($targetGroup/synonym[@idRef eq $conceptId]))
 				return
-					element { 'concept' }
+					element { 'synonym' }
 					{ attribute {'idRef'} {$conceptId} }
 			let $null :=
 				if (exists($newGroupMembers)) then
@@ -67,11 +67,11 @@ declare function concept-fns:add-synonyms($conceptIds as xs:string*) as xs:boole
 
 declare function concept-fns:remove-synonym($conceptId as xs:string) as xs:boolean
 {
-	let $synonym := collection('/db/archives/reference')/reference/synonyms/synonym/concept[@idRef eq $conceptId]
+	let $synonym := collection('/db/archives/reference')/reference/synonymGroups/synonymGroup/synonym[@idRef eq $conceptId]
 	return
 		if (exists($synonym)) then
 			let $null :=
-				if (count($synonym/../concept) <= 2) then
+				if (count($synonym/../synonym) <= 2) then
 					(: deleting this synonym will leave this group meaningless so remove whole group :)
 					update delete $synonym/..
 				else
@@ -145,7 +145,7 @@ declare function concept-fns:rename($conceptId as xs:string, $newConceptId) as x
 		,
 		concept-fns:rename-sub-concept($conceptId, $newConceptId, $reference/concepts)
 		,
-		concept-fns:rename-synonym-concept($conceptId, $newConceptId, $reference/synonyms)
+		concept-fns:rename-synonym-concept($conceptId, $newConceptId, $reference/synonymGroups)
 		,
 		concept-fns:rename-additional-concept($conceptId, $newConceptId, collection('/db/archives/data'))
 		)
@@ -212,21 +212,21 @@ declare function concept-fns:rename-sub-concept($oldConceptId as xs:string, $new
 };
 
 (: a synonym can appear in at most ONE group :)
-declare function concept-fns:rename-synonym-concept($oldConceptId as xs:string, $newConceptId as xs:string, $synonymsElement as element()) as xs:integer
+declare function concept-fns:rename-synonym-concept($oldConceptId as xs:string, $newConceptId as xs:string, $synonymGroupsElement as element()) as xs:integer
 {
-	let $oldConcept := $synonymsElement/synonym/concept[@idRef eq $oldConceptId]
+	let $oldConcept := $synonymGroupsElement/synonymGroup/synonym[@idRef eq $oldConceptId]
 	return
 		if (not(exists($oldConcept))) then
 			0
 		else
-			let $newConcept := $synonymsElement/synonym/concept[@idRef eq $newConceptId]
+			let $newConcept := $synonymGroupsElement/synonymGroup/synonym[@idRef eq $newConceptId]
 			let $null :=
 				if (not(exists($newConcept))) then
 					(: only need to rename old value to new value - no danger of new concept appearing twice :)
 					update value $oldConcept/@idRef with $newConceptId
 				else
 					(: need to be careful because renaming to something that is already a synonym :)
-					if (exists($oldConcept/../concept[@idRef eq $newConceptId])) then 
+					if (exists($oldConcept/../synonym[@idRef eq $newConceptId])) then 
 						(: already in the same synonym group so just delete old one :)
 						update delete $oldConcept
 					else
@@ -235,8 +235,8 @@ declare function concept-fns:rename-synonym-concept($oldConceptId as xs:string, 
 						let $newSynonymGroup := $newConcept/..
 						return
 						(
-							for $oldSynonym in $oldSynonymGroup/concept[@idRef != $oldConcept/@idRef]
-							where not(exists($newSynonymGroup/concept[@idRef = $oldSynonym/@idRef]))
+							for $oldSynonym in $oldSynonymGroup/synonym[@idRef != $oldConcept/@idRef]
+							where not(exists($newSynonymGroup/synonym[@idRef = $oldSynonym/@idRef]))
 							return
 								(: old concept's sub concept is not a sub concept for the new concept name - so insert it :)
 								update insert $oldSynonym into $newSynonymGroup
@@ -272,7 +272,7 @@ declare function concept-fns:remove($conceptId as xs:string) as xs:integer
 		(: its ok to leave a parent concept with no children because this is what we do if we simply want to "document" a concept :)
 		concept-fns:delete-internal($reference/concepts/concept/concept[@idRef eq $conceptId])
 		,
-		for $synonymConcept in $reference/synonyms/synonym/concept[@idRef eq $conceptId]
+		for $synonymConcept in $reference/synonymGroups/synonymGroup/synonym[@idRef eq $conceptId]
 		return
 			if (count($synonymConcept/../*) <= 2) then
 				(: deleting this concept will leave at most one other concept - which is not enough for a group :) 
