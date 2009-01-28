@@ -172,7 +172,7 @@
 			<tag type="markupType" value="process"/>
 		</markupCategory>
 	</markupCategories>
-	<concepts>
+	<coreConcepts>
 		<concept id="life"/>
 		<concept id="after-life"/>
 		<concept id="guru">
@@ -198,7 +198,7 @@
 		<concept id="krishna"/>
 		<concept id="united-states-of-america"/>
 		<concept id="usa"/>
-	</concepts>
+	</coreConcepts>
 	<synonymGroups>
 		<synonymGroup>
 			<synonym idRef="enlightenment"/>
