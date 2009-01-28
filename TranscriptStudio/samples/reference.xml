@@ -176,17 +176,17 @@
 		<concept id="life"/>
 		<concept id="after-life"/>
 		<concept id="guru">
-			<concept idRef="sadhguru"/>
-			<concept idRef="dhyanalinga"/>
+			<subtype idRef="sadhguru"/>
+			<subtype idRef="dhyanalinga"/>
 		</concept>
 		<concept id="being"/>
 		<concept id="master">
-			<concept idRef="sadhguru"/>
-			<concept idRef="jesus"/>
-			<concept idRef="buddha"/>
+			<subtype idRef="sadhguru"/>
+			<subtype idRef="jesus"/>
+			<subtype idRef="buddha"/>
 		</concept>
 		<concept id="mystic">
-			<concept idRef="sadhguru"/>
+			<subtype idRef="sadhguru"/>
 		</concept>
 		<concept id="dhyanalinga"/>
 		<concept id="isha"/>
