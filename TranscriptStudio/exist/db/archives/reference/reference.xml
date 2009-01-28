@@ -71,6 +71,6 @@
 		<markupType id="soundbite" name="Sound Bite" allowOutline="true" allowInline="true"/>
 	</markupTypes>
 	<markupCategories/>
-	<concepts/>
+	<coreConcepts/>
 	<synonymGroups/>
 </reference>

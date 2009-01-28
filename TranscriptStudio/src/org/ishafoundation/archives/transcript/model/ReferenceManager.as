@@ -137,8 +137,8 @@ package org.ishafoundation.archives.transcript.model
 				result.addAll(getConceptIdsForCategory(categoryId));
 			}
 			// now look at the concept hierarchy and synonym groups
-			result.addAll(XMLUtils.convertToStringISet(referenceXML.concepts.concept.@id).toArray());
-			result.addAll(XMLUtils.convertToStringISet(referenceXML.concepts.concept.concept.@idRef).toArray());
+			result.addAll(XMLUtils.convertToStringISet(referenceXML.coreConcepts.concept.@id).toArray());
+			result.addAll(XMLUtils.convertToStringISet(referenceXML.coreConcepts.concept.concept.@idRef).toArray());
 			result.addAll(XMLUtils.convertToStringISet(referenceXML.synonymGroups.synonymGroup.synonym.@idRef).toArray());
 			return result;
 		}
@@ -218,11 +218,11 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		public function getConceptSubTypes(conceptId:String):ISet {
-			return XMLUtils.convertToStringISet(this.referenceXML.concepts.concept.(@id == conceptId).concept.@idRef);
+			return XMLUtils.convertToStringISet(this.referenceXML.coreConcepts.concept.(@id == conceptId).concept.@idRef);
 		}
 		
 		public function getTopLevelConceptElementInHierarchy(conceptId:String):XML {
-			var conceptElements:XMLList = this.referenceXML.concepts.concept.(@id == conceptId);
+			var conceptElements:XMLList = this.referenceXML.coreConcepts.concept.(@id == conceptId);
 			switch (conceptElements.length()) {
 				case 0:
 					return null;
@@ -294,10 +294,10 @@ package org.ishafoundation.archives.transcript.model
 		
 		private function getConceptIdsStartingWith(prefix:String):ISet {
 			var result:ISet = new HashSet();
-			for each (var conceptElement:XML in this.referenceXML.concepts.concept.(containsWordPrefixedWith(attribute("id").toString(), prefix))) {
+			for each (var conceptElement:XML in this.referenceXML.coreConcepts.concept.(containsWordPrefixedWith(attribute("id").toString(), prefix))) {
 				result.add(conceptElement.@id.toString());				
 			}
-			for each (conceptElement in this.referenceXML.concepts.concept.concept.(containsWordPrefixedWith(attribute("idRef").toString(), prefix))) {
+			for each (conceptElement in this.referenceXML.coreConcepts.concept.concept.(containsWordPrefixedWith(attribute("idRef").toString(), prefix))) {
 				result.add(conceptElement.@idRef.toString());				
 			}
 			for each (conceptElement in this.referenceXML.synonymGroups.synonymGroup.synonym.(containsWordPrefixedWith(attribute("idRef").toString(), prefix))) {
