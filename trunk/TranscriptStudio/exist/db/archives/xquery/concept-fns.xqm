@@ -205,6 +205,9 @@ declare function concept-fns:rename-sub-concept($oldConceptId as xs:string, $new
 			if (exists($oldSubConcept/../subtype[@idRef eq $newConceptId])) then
 				(: super content already has concept we are renaming to :)
 				update delete $oldSubConcept
+			else if (exists($oldSubConcept/..[@id eq $newConceptId])) then
+				(: super concept is what we are renaming to so we dont want that cycle :)
+				update delete $oldSubConcept
 			else
 				(: we can safely rename :)
 				update value $oldSubConcept/@idRef with $newConceptId
