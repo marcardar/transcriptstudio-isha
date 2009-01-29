@@ -4,7 +4,7 @@
 	<description>Isha Foundation Transcript Studio</description>
 	
 	<!-- import default properties from file -->
-	<!--property file="build.properties"/-->
+	<property file="build.properties"/>
 
 	<path id="classpath.core">
 		<fileset dir="${exist.home}/lib/core">
@@ -104,8 +104,9 @@
 				<include name="assets/**"/>
 			</fileset>
 		</copy>
-		<zip destfile="transcriptstudio.zip" basedir="${dist.dir}"/>
-		<property name="tar.file" value="transcriptstudio.tar"/>
+		<property name="archive.name" value="transcriptstudio-${project.version}"/>
+		<zip destfile="${archive.name}.zip" basedir="${dist.dir}"/>
+		<property name="tar.file" value="${archive.name}.tar"/>
 		<tar destfile="${tar.file}" basedir="${dist.dir}"/>
 		<gzip destfile="${tar.file}.gz" src="${tar.file}"/>
 		<delete file="${tar.file}"/>
