@@ -51,7 +51,6 @@
 		</jar>
 		<!-- Build the swf file - TODO - for now, just copy it from bin -->
 		<mxmlc file="./src/TranscriptStudio.mxml" output="${build.dir}/TranscriptStudio.swf" fork="true" debug="false">
-			<source-path path-element="src"/>
 		</mxmlc>
 	</target>
 	
