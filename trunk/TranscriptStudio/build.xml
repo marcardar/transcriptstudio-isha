@@ -28,6 +28,8 @@
 	<property name="dist.dir" location="./dist"/>
 	<property name="dist.exist.dir" location="${dist.dir}/exist"/>
 
+	<taskdef resource="flexTasks.tasks" classpath="${basedir}/libs/flex_ant/flexTasks.jar" />
+
 	<target name="build">
 		<delete dir="${build.dir}"/>
 		<mkdir dir="${build.classes.dir}"/>
@@ -48,7 +50,9 @@
 			</manifest>
 		</jar>
 		<!-- Build the swf file - TODO - for now, just copy it from bin -->
-		<copy todir="${build.dir}" file="bin/TranscriptStudio.swf"/>
+		<mxmlc file="./src/TranscriptStudio.mxml" output="${build.dir}/TranscriptStudio.swf" fork="true" debug="true">
+			<source-path path-element="src"/>
+		</mxmlc>
 	</target>
 	
 	<target name="dist">
@@ -99,6 +103,11 @@
 				<include name="assets/**"/>
 			</fileset>
 		</copy>
+		<zip destfile="transcriptstudio.zip" basedir="${dist.dir}"/>
+		<property name="tar.file" value="transcriptstudio.tar"/>
+		<tar destfile="${tar.file}" basedir="${dist.dir}"/>
+		<gzip destfile="${tar.file}.gz" src="${tar.file}"/>
+		<delete file="${tar.file}"/>
 	</target>
 
 	<target name="init-exist">
