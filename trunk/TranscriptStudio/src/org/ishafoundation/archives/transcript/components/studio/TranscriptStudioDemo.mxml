@@ -37,23 +37,23 @@
 				this.mainPanel.retrieveClicked();
 			}
 
-			[Embed(source="../assets/chant.png")]
+			[Embed(source="/../assets/chant.png")]
 			public static var CHANT_ICON_CLASS:Class;
-			[Embed(source="../assets/default.png")]
+			[Embed(source="/../assets/default.png")]
 			public static var DEFAULT_ICON_CLASS:Class;
-			[Embed(source="../assets/joke.png")]
+			[Embed(source="/../assets/joke.png")]
 			public static var JOKE_ICON_CLASS:Class;
-			[Embed(source="../assets/music.png")]
+			[Embed(source="/../assets/music.png")]
 			public static var MUSIC_ICON_CLASS:Class;
-			[Embed(source="../assets/process.png")]
+			[Embed(source="/../assets/process.png")]
 			public static var PROCESS_ICON_CLASS:Class;
-			[Embed(source="../assets/question.png")]
+			[Embed(source="/../assets/question.png")]
 			public static var QUESTION_ICON_CLASS:Class;
-			[Embed(source="../assets/quote.png")]
+			[Embed(source="/../assets/quote.png")]
 			public static var QUOTE_ICON_CLASS:Class;
-			[Embed(source="../assets/story.png")]
+			[Embed(source="/../assets/story.png")]
 			public static var STORY_ICON_CLASS:Class;
-			[Embed(source="../assets/topic.png")]
+			[Embed(source="/../assets/topic.png")]
 			public static var TOPIC_ICON_CLASS:Class;
 
 			private function preloadIcons():void {

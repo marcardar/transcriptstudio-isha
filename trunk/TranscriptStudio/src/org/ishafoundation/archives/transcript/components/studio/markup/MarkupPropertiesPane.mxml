@@ -35,9 +35,9 @@
     	import org.ishafoundation.archives.transcript.model.Transcript;
     	import name.carter.mark.flex.project.mdoc.MSuperNodeProperties;
 
-		[Embed(source="../assets/star_grey.png")]
+		[Embed(source="/../assets/star_grey.png")]
 		public static const STAR_GREY_ICON_CLASS:Class;
-		[Embed(source="../assets/star_yellow.png")]
+		[Embed(source="/../assets/star_yellow.png")]
 		public static const STAR_YELLOW_ICON_CLASS:Class;
 
 		public static const MARKUP_REMOVE_EVENT:String = "MARKUP_REMOVE_EVENT";
