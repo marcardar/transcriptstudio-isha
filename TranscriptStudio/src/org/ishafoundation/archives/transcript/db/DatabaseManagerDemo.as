@@ -25,16 +25,16 @@ package org.ishafoundation.archives.transcript.db
 	
 	public class DatabaseManagerDemo implements DatabaseManager
 	{		
-		[Embed("../samples/reference.xml", mimeType="application/octet-stream")]
+		[Embed("/../samples/reference.xml", mimeType="application/octet-stream")]
 		private static const referenceXMLClass:Class;
 
-		[Embed("../samples/demo1.xml", mimeType="application/octet-stream")]
+		[Embed("/../samples/demo1.xml", mimeType="application/octet-stream")]
 		private static const demo1XMLClass:Class;
 
-		[Embed("../samples/demo1_markups.xml", mimeType="application/octet-stream")]
+		[Embed("/../samples/demo1_markups.xml", mimeType="application/octet-stream")]
 		private static const demo1MarkupsXMLClass:Class;
 
-		[Embed("../samples/demo2.xml", mimeType="application/octet-stream")]
+		[Embed("/../samples/demo2.xml", mimeType="application/octet-stream")]
 		private static const demo2XMLClass:Class;
 
 		private var referenceXML:XML = Utils.getXML(referenceXMLClass);

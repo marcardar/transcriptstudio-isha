@@ -35,11 +35,11 @@ package name.carter.mark.flex.util
 	
 	public class Utils
 	{
-		[Embed(source="../assets/default.png")]
+		[Embed(source="/../assets/default.png")]
 		public static const DEFAULT_ICON_CLASS:Class;
-		[Embed(source="../assets/pencil.png")]
+		[Embed(source="/../assets/pencil.png")]
 		public static const PENCIL_ICON_CLASS:Class;
-		[Embed(source="../assets/search.png")]
+		[Embed(source="/../assets/search.png")]
 		public static const SEARCH_ICON_CLASS:Class;
 		
 		private static const ASSETS_PATH:String = "./assets";

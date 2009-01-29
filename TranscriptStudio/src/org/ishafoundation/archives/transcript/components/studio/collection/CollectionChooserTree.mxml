@@ -32,7 +32,7 @@
 	
 		public static var SELECTED_COLLECTION_PATH_CHANGED:String = "SELECTED_COLLECTION_PATH_CHANGED";
 		
-		[Embed(source="../assets/folder.png")]
+		[Embed(source="/../assets/folder.png")]
 		private var FOLDER_ICON_CLASS:Class;
 		
 		public function init():void {
