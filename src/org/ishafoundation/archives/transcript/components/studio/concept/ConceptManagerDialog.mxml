@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" alpha="2.0" layout="vertical" x="30" y="30" width="700" height="450" title="Concept Manager" horizontalAlign="center" creationComplete="init()">
+<mx:Script>
+	<![CDATA[
+		import mx.collections.ArrayCollection;
+		import mx.managers.DragManager;
+		import mx.binding.utils.BindingUtils;
+		import mx.controls.Alert;
+		import mx.events.DragEvent;
+		import name.carter.mark.flex.util.Utils;
+		import mx.managers.PopUpManager;
+		import org.ishafoundation.archives.transcript.model.ReferenceManager;
+		
+		[Bindable]
+    	private var referenceMgr:ReferenceManager;
+    	[Bindable]
+    	public var selectedConceptId:String;
+    	
+		public static function createInstance(referenceMgr:ReferenceManager):ConceptManagerDialog {
+			var result:ConceptManagerDialog = new ConceptManagerDialog();
+			result.referenceMgr = referenceMgr; 
+			return result;
+		}
+		
+		private function init():void {
+			var allConcepts:Array = this.referenceMgr.getAllConceptIds().toArray();
+			conceptList.dataProvider = allConcepts.sort();
+		}
+
+    	private function selectionChanged(evt:Event):void {
+    		if (DragManager.isDragging) {
+    			return;
+    		}
+    		if (this.selectedConceptId != conceptList.selectedItem) {
+	    		trace("Selection changed to: " + conceptList.selectedItem);
+    			this.selectedConceptId = conceptList.selectedItem as String;
+    		}
+    	}
+
+		private function saveClicked():void {
+			this.referenceMgr.storeReferences(function():void {
+				trace("Saved changes for concept manager");
+			}, function(msg:String):void {
+				Alert.show("Could not save changes because: " + msg);
+			});			
+		}
+		
+		private function cancelClicked():void {
+			this.referenceMgr.loadReferences(function():void {
+				trace("Any changes to reference file have been discarded");
+			}, function(msg:String):void {
+				Alert.show("Unable to retrieve reference file from database. You should restart the application.\n\n" + msg);
+			});
+		}
+		
+    	/**
+    	 * Convenience method
+    	 */
+    	private static function sort(arr:Array):Array {
+    		var result:Array = arr;
+    		arr.sort();
+    		return result;
+    	}
+    	
+		private function closeMe():void {
+        	PopUpManager.removePopUp(this);
+		}
+
+		private function dragDropToSubTypeList(evt:DragEvent):void {
+			if (!evt.dragSource.hasFormat("items")) {
+				return;
+			}
+			evt.preventDefault();
+			evt.currentTarget.hideDropFeedback(evt);
+			var itemsArray:Array = evt.dragSource.dataForFormat("items") as Array;
+			var draggedConceptId:String = itemsArray[0].toString();
+			trace("Concept dropped: " + draggedConceptId);
+			if (this.selectedConceptId == draggedConceptId) {
+				Alert.show("Cannot assign concept as subtype of itself: " + draggedConceptId);
+			}
+			else {
+				var success:Boolean = referenceMgr.addConceptSubType(this.selectedConceptId, draggedConceptId);
+				if (success) {
+					refresh();
+				}
+				else {
+					Alert.show("Subtype not added: " + draggedConceptId);
+				}
+			}
+		}
+		
+		private function dragDropToSynonymList(evt:DragEvent):void {
+			if (!evt.dragSource.hasFormat("items")) {
+				return;
+			}
+			evt.preventDefault();
+			evt.currentTarget.hideDropFeedback(evt);
+			var itemsArray:Array = evt.dragSource.dataForFormat("items") as Array;
+			var draggedConceptId:String = itemsArray[0].toString();
+			trace("Concept dropped: " + draggedConceptId);
+			if (this.selectedConceptId == draggedConceptId) {
+				Alert.show("Cannot assign concept as synonym of itself: " + draggedConceptId);
+			}
+			else {
+				var success:Boolean = referenceMgr.addConceptSynonym(this.selectedConceptId, draggedConceptId);
+				if (success) {
+					refresh();
+				}
+				else {
+					Alert.show("Synonym not added: " + draggedConceptId);
+				}
+			}
+		}
+		
+		private function dragComplete(evt:DragEvent):void {
+			conceptList.selectedItem = this.selectedConceptId;			
+		}
+		
+		private function generateCollectedConcepts(conceptId:String):String {
+			if (conceptId == null) {
+				return "";
+			}
+			else {
+				return sort(referenceMgr.getCollectedConceptIds(conceptId).toArray()).toString().replace(/,/g, ", ")
+			}
+		}
+		
+		private function subTypeRemoveHandler():void {
+			this.referenceMgr.removeConceptSubType(this.selectedConceptId, subTypeList.selectedItem as String);
+			refresh();
+		}
+		
+		private function synonymsLeaveHandler():void {
+			this.referenceMgr.removeConceptSynonym(this.selectedConceptId);
+			refresh();
+		}
+		
+		private function refresh():void {
+			subTypeList.executeBindings();
+			synonymList.executeBindings();
+			collectedConceptTextArea.executeBindings();
+		}
+	]]>
+	</mx:Script>
+	<mx:HDividedBox width="100%" height="100%" horizontalGap="{Utils.DIVIDER_SIZE}">
+		<mx:VBox width="33%" height="100%" minWidth="100">
+			<mx:Label text="Concepts"/>
+			<mx:List id="conceptList" width="100%" height="100%" change="selectionChanged(event)" dragEnabled="true" dragDrop="dragDropToSubTypeList(event)" dragComplete="dragComplete(event)"/>
+		</mx:VBox>
+		<mx:VDividedBox width="67%" height="100%" minWidth="250" verticalGap="{Utils.DIVIDER_SIZE}">
+			<mx:HDividedBox width="100%" height="60%" minHeight="100" horizontalGap="{Utils.DIVIDER_SIZE}" paddingBottom="10">
+				<mx:VBox width="100%" height="100%" minWidth="130" horizontalAlign="center">
+					<mx:Label text="Immediate subtypes" width="100%"/>
+					<mx:List id="subTypeList" height="100%" width="100%" enabled="{this.selectedConceptId != null}" dropEnabled="true" dragDrop="dragDropToSubTypeList(event)" dataProvider="{this.selectedConceptId == null ? null : sort(this.referenceMgr.getConceptSubTypes(this.selectedConceptId).toArray())}"/>
+					<mx:Button label="Remove" click="subTypeRemoveHandler()" enabled="false"/>
+				</mx:VBox>
+				<mx:VBox width="100%" height="100%" minWidth="100" horizontalAlign="center">
+					<mx:Label text="Synonym group" width="100%"/>
+					<mx:List id="synonymList" height="100%" width="100%" enabled="{this.selectedConceptId != null}" selectable="false" dropEnabled="true" dragDrop="dragDropToSynonymList(event)" dataProvider="{this.selectedConceptId == null ? null : sort(referenceMgr.getConceptSynonymsIncludingSelf(this.selectedConceptId).toArray())}"/>
+					<mx:Button label="Leave Group" enabled="{(synonymList.dataProvider as ArrayCollection).length > 1}" click="synonymsLeaveHandler()"/>
+				</mx:VBox>
+			</mx:HDividedBox>
+			<mx:VBox width="100%" height="40%" minHeight="100" paddingTop="10">
+				<mx:Label text="Collected synonyms and subtypes"/>
+				<mx:TextArea id="collectedConceptTextArea" width="100%" height="100%" editable="false" selectable="false" wordWrap="true" enabled="{this.selectedConceptId != null}" text="{generateCollectedConcepts(this.selectedConceptId)}"/>
+			</mx:VBox>
+		</mx:VDividedBox>
+	</mx:HDividedBox>
+	<mx:HBox>
+		<mx:Button label="Save" enabled="{this.referenceMgr.unsavedChanges}" click="saveClicked();closeMe()"/>
+		<mx:Button label="Cancel" click="cancelClicked();closeMe()"/>		
+	</mx:HBox>	
+</mx:TitleWindow>
