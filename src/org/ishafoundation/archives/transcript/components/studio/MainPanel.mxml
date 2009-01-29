@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+   Transcript Markups Editor: An XML based application that allows users to define 
+   and store contextual metadata for contiguous sections within a text document. 
+
+   Copyright 2008 Mark Carter, Swami Kevala
+
+   This file is part of Transcript Markups Editor.
+
+   Transcript Markups Editor is free software: you can redistribute it and/or modify it 
+   under the terms of the GNU General Public License as  published by the Free Software 
+   Foundation, either version 3 of the License, or (at your option) any later version.
+
+   Transcript Markups Editor is distributed in the hope that it will be useful, but 
+   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along with 
+   Transcript Markups Editor. If not, see http://www.gnu.org/licenses/.
+
+-->
+
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" width="100%" height="100%" verticalGap="0">
+	<mx:Script>
+		<![CDATA[
+			import org.ishafoundation.archives.transcript.db.XQueries;
+			import org.ishafoundation.archives.transcript.components.studio.importer.ImportDialog;
+			import org.ishafoundation.archives.transcript.fs.SessionFile;
+			import org.ishafoundation.archives.transcript.fs.Collection;
+			import org.ishafoundation.archives.transcript.fs.FileSystem;
+			import org.ishafoundation.archives.transcript.db.DatabaseConstants;
+			import org.ishafoundation.archives.transcript.util.IdUtils;
+			import name.carter.mark.flex.util.XMLUtils;
+			import name.carter.mark.flex.util.Utils;
+			import name.carter.mark.flex.project.mdoc.MSuperNode;
+			import mx.binding.utils.ChangeWatcher;
+			import name.carter.mark.flex.project.mdoc.MSuperNodeProperties;
+			import name.carter.mark.flex.project.mdoc.MSegmentSubset;
+			import name.carter.mark.flex.project.mdoc.MContentProperties;
+			import name.carter.mark.flex.project.mdoc.MContent;
+			import name.carter.mark.flex.project.mdoc.MContentRange;
+			import name.carter.mark.flex.util.collection.HashSet;
+			import name.carter.mark.flex.util.collection.ISet;
+			import org.ishafoundation.archives.transcript.components.studio.markup.MarkupsPane;
+			import mx.events.PropertyChangeEvent;
+			import org.ishafoundation.archives.transcript.model.Session;
+			import org.ishafoundation.archives.transcript.importer.MSWordImporter;
+			import name.carter.mark.flex.project.mdoc.MSegmentRange;
+			import org.ishafoundation.archives.transcript.components.studio.concept.ConceptManagerDialog;
+			import org.ishafoundation.archives.transcript.components.generic.UnhandledChangesPopUpManager;
+			import org.ishafoundation.archives.transcript.components.studio.category.CategoryManagerDialog;
+			import org.ishafoundation.archives.transcript.components.studio.text.TranscriptTextArea;
+			import org.ishafoundation.archives.transcript.components.generic.AboutBox;
+			import org.ishafoundation.archives.transcript.components.studio.collection.StoreTranscriptDialog;
+			import org.ishafoundation.archives.transcript.components.generic.DebugPopUp;
+			import org.ishafoundation.archives.transcript.components.studio.collection.RetrieveTranscriptDialog;
+			import org.ishafoundation.archives.transcript.components.studio.category.CategoryManagerDialog;
+			import org.ishafoundation.archives.transcript.model.SessionManager;
+			import mx.controls.Menu;
+			import mx.collections.XMLListCollection;
+			import mx.collections.ArrayCollection;
+			import org.ishafoundation.archives.transcript.components.generic.UnhandledChangesPopUpManager;
+			import mx.core.Application;
+			import mx.core.IFlexDisplayObject;
+			import name.carter.mark.flex.util.icon.IconUtils;
+			import mx.binding.utils.BindingUtils;
+			import org.ishafoundation.archives.transcript.db.DatabaseManager;
+			import org.ishafoundation.archives.transcript.model.ReferenceManager;
+			import org.ishafoundation.archives.transcript.model.Transcript;
+			import org.ishafoundation.archives.transcript.components.studio.text.TranscriptTextArea;
+			import org.ishafoundation.archives.transcript.components.studio.collection.StoreTranscriptDialog;
+			import org.ishafoundation.archives.transcript.components.studio.collection.RetrieveTranscriptDialog;
+			import org.ishafoundation.archives.transcript.components.generic.DebugPopUp;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			import mx.events.MenuEvent;
+			import mx.events.CloseEvent;
+			import mx.controls.Alert;
+
+			public var databaseMgr:DatabaseManager;
+
+			[Bindable]			
+			private var referenceMgr:ReferenceManager;
+
+			[Bindable]
+			private var sessionMgr:SessionManager;
+			
+			[Bindable]
+			private var session:Session;
+			
+			[Bindable]
+			public var title:String = Utils.getApplicationName();
+			[Bindable]
+			public var status:String;
+			
+			public function init(username:String, databaseMgr:DatabaseManager):void {
+				IconUtils.overrideIcon(Utils.DEFAULT_ICON_PATH, Utils.DEFAULT_ICON_CLASS);
+				this.databaseMgr = databaseMgr;
+				this.referenceMgr = new ReferenceManager(databaseMgr);
+				this.sessionMgr = new SessionManager(username, referenceMgr, databaseMgr);
+				this.referenceMgr.loadReferences(referenceXMLRetrieveSuccess, referenceXMLRetrieveFailure);
+			}
+		
+			private function updateTitle():void {
+				var transcriptId:String = this.session.id;
+	  			if (transcriptId == null) {
+	  				this.title = Utils.getApplicationName();
+	  			}
+	  			else {
+	  				this.title = "Transcript Id: " + transcriptId;
+	  			}
+ 			}
+ 			
+			private function referenceXMLRetrieveSuccess():void {
+				this.status = "References loaded";
+			}
+			
+			private static function referenceXMLRetrieveFailure(msg:String):void {
+				throw new Error(msg);
+			}
+			
+			public function retrieveClicked():void {
+				showUnsavedChangesPopupIfNecessary(showRetrieveTranscriptDialog);
+			}
+			
+			private function searchClicked():void {
+				var searchDialog:QueryDialog = new QueryDialog();
+				searchDialog.xQueryExecutor = databaseMgr;
+				PopUpManager.addPopUp(searchDialog, this, true);
+				searchDialog.transcriptTextArea.referenceMgr = referenceMgr;
+			}
+			
+			private function categoryManagerClicked():void {
+				var thisRef:DisplayObject = this;
+				reloadReferencesBeforeContinuing(function():void {
+					var categoryManagerDialog:CategoryManagerDialog = new CategoryManagerDialog();
+					categoryManagerDialog.referenceMgr = referenceMgr;
+					PopUpManager.addPopUp(categoryManagerDialog, thisRef, true);
+					var selectedMarkupProps:MSuperNodeProperties = transcriptPane.markupsPane.selectedMarkupProps;
+					if (selectedMarkupProps != null) {
+						categoryManagerDialog.categorySearchPane.initialCategoryId = selectedMarkupProps.markupCategoryId;
+					}
+				});
+			}
+			
+			private function conceptManagerClicked():void {
+				var thisRef:DisplayObject = this;
+				reloadReferencesBeforeContinuing(function():void {
+					var conceptManagerDialog:ConceptManagerDialog = ConceptManagerDialog.createInstance(referenceMgr);
+					PopUpManager.addPopUp(conceptManagerDialog, thisRef, true);
+				});
+			}
+			
+			private function queryClicked():void {
+				var queryExecutorDialog:XQueryExecutorDialog = new XQueryExecutorDialog();
+				queryExecutorDialog.xQueryExecutor = databaseMgr;
+				PopUpManager.addPopUp(queryExecutorDialog, this, true);
+			}
+			
+			private function showUnsavedChangesPopupIfNecessary(successFunction:Function):void {
+				UnhandledChangesPopUpManager.displayIfNecessaryUsingAsyncFunc(this.session != null && this.session.unsavedChanges, storeTranscript, storeTranscriptFailure, successFunction); 
+			}
+			
+			private function showRetrieveTranscriptDialog():void {
+				var popup:RetrieveTranscriptDialog = new RetrieveTranscriptDialog();
+				popup.addEventListener(FlexEvent.CREATION_COMPLETE, function():void {
+					var fileSystem:FileSystem = new FileSystem(DatabaseConstants.DATA_COLLECTION_PATH, databaseMgr, function ():void {
+						popup.collectionChooserTree.dataProvider = fileSystem.getRootCollection();
+					}, collectionTreeFailed);
+				});
+				PopUpManager.addPopUp(popup, this, true);
+				popup.exportButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+					var sessionFile:SessionFile = popup.selectedFile as SessionFile;
+					var params:Object = {sessionPath: Utils.encodePath(sessionFile.path)};
+					//params.sessionId = sessionFile.nodeId;
+					databaseMgr.executeStoredXQuery("export_msword.xql", params, function(response:Object):void {
+						Alert.show("Successfully exported session");
+					}, function(msg:String):void {
+						Alert.show(msg, "Could not export session");
+					});
+				});
+				popup.addEventListener(RetrieveTranscriptDialog.OK_CLICKED, retrieveOKClicked);
+			}
+			
+			private function collectionTreeFailed(msg:String):void {
+				throw new Error(msg);
+			}
+			
+			private function reloadReferencesBeforeContinuing(nextFunc:Function):void {
+				this.referenceMgr.loadReferences(nextFunc, function(msg:String):void {
+					Alert.show("Could not reload reference file: " + msg);
+				});				
+			}
+
+			private function retrieveOKClicked(event:Event):void {
+				var popup:RetrieveTranscriptDialog = (event.currentTarget.document) as RetrieveTranscriptDialog;
+				var retrieveTranscriptFunction:Function = function():void {
+					sessionMgr.retrieveSession(popup.selectedFile as SessionFile, retrieveTranscriptSuccess, retrieveTranscriptFailure); 					
+				}
+				// first update the reference file - continue even if it fails
+				reloadReferencesBeforeContinuing(retrieveTranscriptFunction);
+			}
+			
+			private function retrieveTranscriptSuccess(session:Session):void {
+				this.session = session;
+				this.transcriptPane.transcript = session.transcript;
+				this.status = "Successfully loaded transcript";
+				updateTitle();
+			}
+			
+			private function retrieveTranscriptFailure(msg:String):void {
+				if (msg.indexOf("document not found") >= 0) {
+					// exist message includes this phrase
+					Alert.show("Transcript not found", "Error loading transcript");
+				}
+				else {
+					var index:int = msg.indexOf("PermissionDeniedException:");
+					if (index >= 0) {
+						Alert.show(msg.substr(index + 26), "Error loading transcript");
+					}
+					else {
+						throw new Error(msg);
+					}				
+				}
+			}
+			
+			private function storeTranscript(successFunction:Function, failureFunction:Function):void {
+	  			if (!this.session.unsavedChanges) {
+	  				return;
+	  			}
+				this.sessionMgr.storeTranscript(session, successFunction, failureFunction);
+			}
+			
+			private function showStoreTranscriptDialog(successFunction:Function, failureFunction:Function):void {
+				var popup:StoreTranscriptDialog = new StoreTranscriptDialog();
+				popup.title = "Save transcript location";
+				//callLater(function():void{popup.transcriptIdTextInput.text = session.id;});
+				popup.addEventListener(StoreTranscriptDialog.OK_CLICKED, function(event:Event):void{
+					//session.collectionPath = popup.selectedCollection.path;
+					storeTranscript(successFunction, failureFunction);
+				});
+				var fileSystem:FileSystem = new FileSystem(DatabaseConstants.DATA_COLLECTION_PATH, databaseMgr, function ():void {
+					popup.collectionChooserTree.dataProvider = fileSystem.getRootCollection();
+				}, collectionTreeFailed);					
+				PopUpManager.addPopUp(popup, this, true);
+			}
+			
+			private function storeTranscriptSuccess():void
+			{
+				this.status = "Successfully saved transcript";
+				this.session.saveChangesHandler();
+				this.transcriptPane.markupsPane.refresh();
+				Alert.show("Successfully saved transcript changes");
+			}
+			 
+			private function storeTranscriptFailure(msg:String):void
+			{
+				var index:int = msg.indexOf("PermissionDeniedException:");
+				if (index >= 0) {
+					Alert.show(msg.substr(index + 26), "Error saving transcript");
+				}
+				else {
+					throw new Error(msg);
+				}				
+			}
+			
+			private function reloadClicked():void {
+				if (session.unsavedChanges) {
+					// confirm this operation with the user
+					Alert.show("Are you sure?", "Discarding changes...", Alert.OK | Alert.CANCEL, null, function(evt:CloseEvent):void {
+						if (evt.detail==Alert.OK) {
+							reloadTranscript();
+						}
+					});
+				}
+				else {
+					reloadTranscript();
+				} 
+			}
+			
+			private function reloadTranscript():void {
+				var reloadTranscriptFunction:Function = function():void {
+					session.reload(sessionMgr.retrieveSession, retrieveTranscriptSuccess, retrieveTranscriptFailure);
+				}
+				// first update the reference file - continue even if it fails
+				referenceMgr.loadReferences(reloadTranscriptFunction, function(msg:String):void {
+					trace("Couldnt retrieve reference.xml (continuing anyway): " + msg);
+					reloadTranscriptFunction();
+				});
+			}
+			
+			private function importClicked():void {
+				if (session != null && session.unsavedChanges) {
+					// confirm this operation with the user
+					Alert.show("Are you sure?", "Discarding changes...", Alert.OK | Alert.CANCEL, null, function(evt:CloseEvent):void {
+						if (evt.detail==Alert.OK) {
+							importTranscript();
+						}
+					});
+				}
+				else {
+					importTranscript();
+				} 
+			}
+			
+			private function importTranscript():void {
+				var thisPanel:MainPanel = this;
+				var fileSystem:FileSystem = new FileSystem(DatabaseConstants.ARCHIVES_COLLECTION_PATH, databaseMgr, function ():void {
+					var popup:ImportDialog = new ImportDialog();
+					popup.addEventListener(ImportDialog.OK_CLICKED, function(event:Event):void {
+						session = sessionMgr.createSession(popup.sessionXML, popup.eventFile);
+						transcriptPane.transcript = session.transcript;
+						status = "Successfully imported transcript";
+						updateTitle();
+					});
+					popup.fileSystem = fileSystem;
+					popup.xmlStorer = databaseMgr;
+					popup.importer = new MSWordImporter(databaseMgr);
+					PopUpManager.addPopUp(popup, thisPanel, true);
+				}, collectionTreeFailed);
+			}
+			
+			private function showAboutBox():void {
+				PopUpManager.createPopUp(this, AboutBox, true);
+			}
+			
+			private function onMenuClick(evt:MenuEvent):void {
+				var actionName:String = evt.item.@id;
+				if ( actionName == "retrieve" ) {
+					retrieveClicked();
+				}
+				else if ( actionName == "store" ) {
+					storeTranscript(storeTranscriptSuccess, storeTranscriptFailure);
+				}
+				else if ( actionName == "reloadTranscript" ) {
+					reloadClicked();
+				}
+				else if ( actionName == "search" ) {
+					searchClicked();
+				}
+				else if ( actionName == "import" ) {
+					importClicked();
+				}
+				else if ( actionName == "categoryManager" ) {
+					categoryManagerClicked();
+				}
+				else if ( actionName == "conceptManager" ) {
+					conceptManagerClicked();
+				}
+				else if ( actionName == "query" ) {
+					queryClicked();
+				}
+				else if ( actionName == "markupText" ) {
+					this.transcriptPane.markupText();
+				}
+				else if ( actionName == "removeMarkup" ) {
+					this.transcriptPane.removeMarkup();
+				}
+				else if ( actionName == "editText" ) {
+					this.transcriptPane.editText();
+				}
+				else if ( actionName == "mergeSegmentRange" ) {
+					this.transcriptPane.mergeSegmentRange();
+				}
+				else if ( actionName == "deleteText" ) {
+					this.transcriptPane.deleteText();
+				}
+				else if ( actionName == "nudgeUp" ) {
+					this.transcriptPane.nudgeUp();
+				}
+				else if ( actionName == "nudgeDown" ) {
+					this.transcriptPane.nudgeDown();
+				}
+				else if ( actionName == "showPropertiesPane" ) {
+					var selected:Boolean = evt.item.@toggled.toString() == "true";
+					this.transcriptPane.markupsPane.setNodePropertiesPaneVisibility(selected);
+				}
+				else if ( actionName.indexOf("debug") == 0) {
+					var popup:DebugPopUp = new DebugPopUp();
+					PopUpManager.addPopUp(popup, this, true);
+					if ( actionName == "debugSession") {
+						popup.textArea.text = this.session.sessionXML.toXMLString();
+					}
+					else if ( actionName == "debugReference") {
+						popup.textArea.text = referenceMgr.referenceXML.toXMLString();
+					}
+					else if ( actionName == "debugTranscriptHTML") {
+						popup.textArea.text = transcriptPane.transcriptTextArea.wrappedTextArea.htmlText;
+					}
+				}
+				else if ( actionName == "highlightHTMLElements") {
+					transcriptPane.transcriptTextArea.highlightHTMLElements();
+				}
+				else if ( actionName == "about") {
+					showAboutBox();
+				}
+			}			
+		]]>
+	</mx:Script>
+	<mx:MenuBar id="myMenuBar" width="100%" labelField="@label" itemClick="onMenuClick(event)">
+		<mx:XMLList id="menuData">
+			<menuitem label="File" enabled="{referenceMgr != null}">
+				<menuitem id="retrieve" label="Open..."/>
+				<!-- the enabled attribute value is a workaround because the following do not work:
+					{session != null &amp;&amp; session.unsavedChanges}
+					{session != null}
+					{session != null ? true : false}
+					{true &amp;&amp; session != null}
+					{this &amp;&amp; session != null}
+				-->
+				<menuitem id="store" label="Save" enabled="{myMenuBar != null &amp;&amp; session != null &amp;&amp; session.unsavedChanges}"/>
+				<menuitem id="reloadTranscript" label="Reload from database" enabled="{session != null &amp;&amp; session.sessionFile != null}"/>
+				<menuitem type="separator"/>
+				<menuitem id="search" label="Search..."/>
+			</menuitem>
+			<menuitem label="Admin" enabled="{referenceMgr != null}">
+				<menuitem id="import" label="Import..."/>
+				<menuitem type="separator"/>
+				<menuitem id="categoryManager" label="Categories..."/>
+				<menuitem id="conceptManager" label="Concepts..."/>
+				<menuitem type="separator"/>
+				<menuitem id="query" label="Execute XQuery..."/>				
+			</menuitem>
+			<menuitem id="textMenuItem" label="Selection" enabled="{transcriptPane.transcriptTextArea.ttSelection != null}">
+				<menuitem id="markupText" label="Markup Text" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowMarkup()}"/>
+				<menuitem id="removeMarkup" label="Remove Markup" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowRemoveMarkup()}"/>
+				<menuitem type="separator"/>
+				<menuitem id="editText" label="Edit Text" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowEditText()}"/>
+				<menuitem id="mergeSegmentRange" label="Merge Paragraphs" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowMerge()}"/>
+				<menuitem id="deleteText" label="Delete Text" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowDeleteText()}"/>
+				<menuitem type="separator"/>
+				<menuitem id="nudgeUp" label="Nudge Up" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowNudgeUp()}"/>
+				<menuitem id="nudgeDown" label="Nudge Down" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowNudgeDown()}"/>
+			</menuitem>				
+			<menuitem label="Window" enabled="{transcriptPane.transcript != null}">
+				<menuitem id="showPropertiesPane" label="Properties" type="check" toggled="true"/>
+			</menuitem>
+			<menuitem label="Help">
+				<menuitem label="Debug">
+					<menuitem id="debugSession" label="Session XML"/>
+					<menuitem id="debugReference" label="Reference XML"/>
+					<menuitem id="debugTranscriptHTML" label="Transcript HTML"/>
+					<menuitem id="highlightHTMLElements" label="Highlight HTML Elements"/>
+				</menuitem>					
+				<menuitem id="about" label="About {Utils.getApplicationName()}"/>
+			</menuitem>
+		</mx:XMLList>
+	</mx:MenuBar>
+	<!--mx:TextInput id="textInput" enter="{TranscriptStudio.testId(textInput.text)}"/-->
+	<studioNS:TranscriptPane id="transcriptPane" width="100%" height="100%" referenceMgr="{this.referenceMgr}" visible="{this.transcriptPane.transcript != null}"/>
+</mx:VBox>
