@@ -20,17 +20,19 @@
 
 	<property name="build.dir" location="./build"/>
 	<property name="build.classes.dir" location="${build.dir}/classes"/>
-	<property name="db.dir" location="./db"/>
-	<property name="lib.dir" location="./lib"/>
-	<property name="src.dir" location="./src"/>
-	<property name="webapp.dir" location="./webapp"/>
-	<property name="exist.lib.dir" location="${exist.home}/lib"/>
+	<property name="exist.dir" location="./exist"/>
+	<property name="exist.lib.dir" location="${exist.dir}/lib"/>
+	<property name="exist.src.dir" location="${exist.dir}/src"/>
+	<property name="exist.webapp.dir" location="${exist.dir}/webapp"/>
+
+	<property name="dist.dir" location="./dist"/>
+	<property name="dist.exist.dir" location="${dist.dir}/exist"/>
 
 	<target name="build">
 		<delete dir="${build.dir}"/>
 		<mkdir dir="${build.classes.dir}"/>
 		<echo message="Compiling eXist extension classes..."/>
-		<javac destdir="${build.classes.dir}" srcdir="${src.dir}">
+		<javac destdir="${build.classes.dir}" srcdir="${exist.src.dir}">
             <classpath>
                 <path refid="classpath.core"/>
 			</classpath>
@@ -45,30 +47,69 @@
 				<attribute name="SVN-Revision" value="${svn.revision}"/-->
 			</manifest>
 		</jar>
+		<!-- Build the swf file - TODO - for now, just copy it from bin -->
+		<copy todir="${build.dir}" file="bin/TranscriptStudio.swf"/>
 	</target>
 	
 	<target name="dist">
-		<echo message="Copying TranscriptStudio-specific files to eXist installation..."/>
-		<copy todir="${exist.home}" file="conf.xml"/>
-		<copy todir="${exist.lib.dir}">
-			<fileset dir="${lib.dir}">
-				<include name="**/*.jar"/>
+		<echo message="Create TranscriptStudio distribution..."/>
+		<delete dir="${dist.dir}"/>
+		<copy todir="${dist.exist.dir}">
+			<fileset dir="${exist.dir}">
+				<include name="**"/>
+				<exclude name="src/**"/>
 			</fileset>
 		</copy>
-		<copy todir="${exist.lib.dir}/user">
+		<copy todir="${dist.exist.dir}/lib/user">
 			<fileset dir="${build.dir}">
-				<include name="*.jar"/>
+				<include name="transcript.jar"/>
 			</fileset>
 		</copy>
-		<copy todir="${exist.home}/webapp" includeEmptyDirs="true">
-			<fileset dir="${webapp.dir}">
-				<include name="**/*"/>
+		<mkdir dir="${dist.exist.dir}/webapp/archives/transcript/import"/>
+		<copy todir="${dist.exist.dir}/db/archives">
+			<fileset dir=".">
+				<include name="assets/**"/>
+				<include name="xquery/**"/>
+				<include name="xslt/**"/>
+			</fileset>
+		</copy>
+		<copy todir="${dist.exist.dir}/db/archives/reference">
+			<fileset dir="conf">
+				<include name="reference.xml"/>
+			</fileset>
+		</copy>
+		<mkdir dir="${dist.exist.dir}/db/archives/data/work"/>
+		<copy todir="${dist.dir}">
+			<fileset dir=".">
+				<include name="samples/**"/>
+			</fileset>
+		</copy>
+		<copy todir="${dist.dir}">
+			<fileset dir="install">
+				<include name="**"/>
+			</fileset>
+		</copy>
+		<copy todir="${dist.dir}/bin">
+			<fileset dir="${build.dir}">
+				<include name="TranscriptStudio.swf"/>
+			</fileset>
+			<fileset dir=".">
+				<include name="assets/**"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="deploy">
+		<echo message="Copying TranscriptStudio-specific files to eXist installation..."/>
+		<copy todir="${exist.home}" includeEmptyDirs="true">
+			<fileset dir="${dist.exist.dir}">
+				<exclude name="db/**"/>
 			</fileset>
 		</copy>
 		<echo message="Initialising database..."/>
 		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
-			<fileset dir="${db.dir}">
-				<include name="**/*.*"/>
+			<fileset dir="${dist.exist.dir}/db">
+				<include name="**"/>
 				<exclude name="archives/reference/reference.xml"/>
 			</fileset>
 		</xdb:store>
@@ -88,11 +129,11 @@
 	<target name="store-reference-xml" unless="reference.xml.exists">
 		<echo message="Storing reference.xml"/>
 		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
-			<fileset dir="${db.dir}">
+			<fileset dir="${dist.exist.dir}/db">
 				<include name="archives/reference/reference.xml"/>
 			</fileset>
 		</xdb:store>
 	</target>
-	
-	<target name="all" depends="build,dist,closing-message" description="Build all"/>
+
+	<target name="all" depends="build,dist,deploy,closing-message" description="Build, Distribute and Deploy"/>
 </project>
