@@ -25,11 +25,11 @@ package org.ishafoundation.archives.transcript.model
 	import name.carter.mark.flex.project.mdoc.MContentRange;
 	import name.carter.mark.flex.project.mdoc.MContentRangeSubset;
 	import name.carter.mark.flex.project.mdoc.MNodeRange;
-	import name.carter.mark.flex.project.mdoc.MSuperSegment;
 	import name.carter.mark.flex.project.mdoc.MSegment;
 	import name.carter.mark.flex.project.mdoc.MSegmentProperties;
 	import name.carter.mark.flex.project.mdoc.MSegmentRange;
 	import name.carter.mark.flex.project.mdoc.MSegmentSubset;
+	import name.carter.mark.flex.project.mdoc.MSuperSegment;
 		
 	[Bindable]
 	public class GeneralNodeProperties {
@@ -66,9 +66,23 @@ package org.ishafoundation.archives.transcript.model
 			if (result.confidentialEnabled) {
 				result._confidential = MSegmentProperties.getCumulativePropertyValueAsBoolean(nodeRange as MSegmentRange, MSegmentProperties.CONFIDENTIAL_PROP_NAME);
 			}
+			else {
+				if (ttSelection.selectedObj is MSegmentSubset) {
+					var correspondingSegment:MSegment = (ttSelection.selectedObj as MSegmentSubset).segment;
+					result._confidential = correspondingSegment.props.confidential;
+				}
+				else {
+					var cumulValue:Object = MSegmentProperties.getCumulativePropertyValueAsBoolean(ttSelection.selectedObj as MSegmentRange, MSegmentProperties.CONFIDENTIAL_PROP_NAME);
+					result._confidential = cumulValue;
+				}
+			}
 			result.speakerEnabled = !(ttSelection.selectedObj is MSegmentSubset);
 			if (result.speakerEnabled) {
 				result._speaker = MSegmentProperties.getCumulativePropertyValue(nodeRange as MSegmentRange, MSegmentProperties.SPEAKER_PROP_NAME);
+			}
+			else {
+				correspondingSegment = (ttSelection.selectedObj as MSegmentSubset).segment;
+				result._speaker = correspondingSegment.props.speaker;
 			}
 			result._spokenLanguage = MContentProperties.getCumulativePropertyValue(nodeRange, MContentProperties.SPOKEN_LANGUAGE_PROP_NAME);
 			result.emphasisEnabled = !(ttSelection.selectedObj is MSegmentRange);
