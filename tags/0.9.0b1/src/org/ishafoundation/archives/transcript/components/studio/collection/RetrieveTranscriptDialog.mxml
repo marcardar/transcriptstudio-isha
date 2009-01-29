@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+   Transcript Markups Editor: An XML based application that allows users to define 
+   and store contextual metadata for contiguous sections within a text document. 
+
+   Copyright 2008 Mark Carter, Swami Kevala
+
+   This file is part of Transcript Markups Editor.
+
+   Transcript Markups Editor is free software: you can redistribute it and/or modify it 
+   under the terms of the GNU General Public License as  published by the Free Software 
+   Foundation, either version 3 of the License, or (at your option) any later version.
+
+   Transcript Markups Editor is distributed in the hope that it will be useful, but 
+   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along with 
+   Transcript Markups Editor. If not, see http://www.gnu.org/licenses/.
+-->
+
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:collectionNS="org.ishafoundation.archives.transcript.components.studio.collection.*" title="Open..." x="10" y="10" width="{0.8 * parentDocument.width}" height="{0.8 * parentDocument.height}" alpha="2.0" layout="absolute">
+	<mx:Script>
+    <![CDATA[
+    	import org.ishafoundation.archives.transcript.fs.SessionFile;
+    	import org.ishafoundation.archives.transcript.fs.Collection;
+    	import mx.collections.ArrayCollection;
+    	import org.ishafoundation.archives.transcript.fs.File;
+       	import mx.managers.PopUpManager;
+       	
+       	public static var OK_CLICKED:String = "OK_CLICKED";
+       	
+       	public function get selectedFile():File {
+       		return eventChooserTree.selectedItem as File;
+       	}
+       	
+       	private function transcriptListDoubleClicked(event:MouseEvent):void {
+       		if (eventChooserTree.selectedItem != null) {
+       			okClicked(event);
+       		}
+       	}       	
+       	
+		private function okClicked(event:Event):void {
+			dispatchEvent(new Event(OK_CLICKED));
+			closeMe();
+		}
+		
+		private function closeMe():void {
+        	PopUpManager.removePopUp(this);
+		}
+		
+		private function changeHandler():void {
+			var eventFiles:Array = (collectionChooserTree.selectedItem as Collection).eventFiles;
+			eventFiles.sort();
+			eventChooserTree.dataProvider = new ArrayCollection(eventFiles);
+		}
+		
+		private function doubleClickHandler(file:File):void {
+			if (file is SessionFile) {
+				okClicked(new Event(Event.COMPLETE));
+			} 
+		}
+    ]]>
+	</mx:Script>
+	<mx:VBox width="99%" height="99%">
+		<mx:HDividedBox width="100%" height="100%">
+			<collectionNS:CollectionChooserTree id="collectionChooserTree" width="25%" height="100%" change="changeHandler()"/>
+			<collectionNS:EventChooserTree id="eventChooserTree" width="75%" height="100%" doubleClick="doubleClickHandler(eventChooserTree.selectedItem as File)"/>
+		</mx:HDividedBox>
+		<mx:HBox width="100%" horizontalAlign="center">
+			<mx:Button id="okButton" label="OK" click="okClicked(event)" enabled="{eventChooserTree.selectedItem is SessionFile}"/>
+			<mx:Button label="Cancel" click="closeMe()"/>		
+		</mx:HBox>		
+	</mx:VBox>
+</mx:TitleWindow>

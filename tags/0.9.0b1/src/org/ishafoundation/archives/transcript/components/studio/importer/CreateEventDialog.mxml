@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Create Event" creationComplete="init()" xmlns:importer="org.ishafoundation.archives.transcript.components.studio.importer.*">
+	<mx:Script>
+	<![CDATA[
+		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
+		import org.ishafoundation.archives.transcript.model.ReferenceManager;
+		import org.ishafoundation.archives.transcript.db.DatabaseConstants;
+		import org.ishafoundation.archives.transcript.importer.MSWordImporter;
+		import mx.core.Container;
+		import org.ishafoundation.archives.transcript.db.XMLStorer;
+		import org.ishafoundation.archives.transcript.model.EventProperties;
+		import mx.events.PropertyChangeEvent;
+		import mx.binding.utils.ChangeWatcher;
+		import org.ishafoundation.archives.transcript.model.SessionProperties;
+		import org.ishafoundation.archives.transcript.fs.EventFile;
+		import org.ishafoundation.archives.transcript.fs.DbFileSystem;
+		import org.ishafoundation.archives.transcript.fs.File;
+		import org.ishafoundation.archives.transcript.fs.Collection;
+		import name.carter.mark.flex.util.XMLUtils;
+		import name.carter.mark.flex.util.Utils;
+		import mx.managers.CursorManager;
+		import name.carter.mark.flex.util.Utils;
+		import mx.utils.StringUtil;
+		import name.carter.mark.flex.util.collection.HashSet;
+		import name.carter.mark.flex.util.collection.ISet;
+		import org.ishafoundation.archives.transcript.util.IdUtils;
+		import mx.formatters.DateFormatter;
+		import mx.collections.ArrayCollection;
+		import mx.formatters.DateBase;
+		import mx.controls.TextInput;
+		import mx.controls.Alert;
+		import mx.managers.PopUpManager;
+		
+	   	public static const OK_CLICKED:String = "OK_CLICKED";
+	   	
+	   	public var xmlStorer:XMLStorer;
+	   	
+	   	[Bindable]
+	   	public var referenceMgr:ReferenceManager;
+	   	
+		private var _fileSystem:DbFileSystem;
+
+		public var eventXML:XML;
+		public var eventFile:EventFile;
+	
+		private function init():void {
+			var eventProps:EventProperties = new EventProperties(eventXML);
+			eventPropertiesPane.eventProps = eventProps;
+		}
+		
+		[Bindable]
+		public function set fileSystem(fileSystem:DbFileSystem):void {
+			_fileSystem = fileSystem;
+			eventPropertiesPane.fileSystem = fileSystem;
+			eventPropertiesPane.existingEventIds = fileSystem.getAllEventIds();						
+		}
+		
+		public function get fileSystem():DbFileSystem {
+			return _fileSystem;
+		}
+		
+		private function createEvent(evt:MouseEvent):void {
+			// need to create the new event file
+			var collection:Collection = eventPropertiesPane.collectionChooserTree.selectedItem as Collection;
+			var filename:String = eventPropertiesPane.eventProps.generateFilename();
+			var eventPath:String = collection.path + "/" + filename;
+			xmlStorer.storeXML(eventPath, eventXML, function():void {
+				fileSystem.refresh(collection.path, function():void {
+					eventFile = collection.getEventFile(eventPropertiesPane.eventProps.id);
+					if (eventFile == null) {
+						throw new Error("Could not find the event file we just saved: " + eventPath);
+					}
+				}, function(msg:String):void {
+					throw new Error("Could not refresh collection: " + collection.path + ": " + msg);
+				});
+			}, function (msg:String):void {
+				throw new Error("Could not save event file '" + eventPath + "': " + msg);
+			});
+		}
+			
+		private function okClicked(evt:MouseEvent):void {
+			createEvent(evt);
+			closeMe();
+			dispatchEvent(new Event(OK_CLICKED));
+		}
+		
+		private function closeMe():void {
+			PopUpManager.removePopUp(this);
+		}
+	]]>
+	</mx:Script>
+	
+	<importer:EventPropertiesPane id="eventPropertiesPane" label="Event Properties" width="100%" height="100%" referenceMgr="{referenceMgr}"/>
+	<mx:HBox id="buttonBox">
+		<mx:Button label="OK" enabled="{eventPropertiesPane.ready}" click="okClicked(event)" />
+		<mx:Button label="Cancel" click="closeMe()"/>
+	</mx:HBox>
+	
+</mx:TitleWindow>
