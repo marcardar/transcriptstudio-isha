@@ -16,17 +16,16 @@
 	</typedef>
 
 	<property name="dist.exist.dir" location="exist"/>
+	<property name="dist.exist.db.dir" location="exist-db"/>
 
 	<target name="init-exist">
 		<echo message="Copying TranscriptStudio-specific files to eXist installation..."/>
 		<copy todir="${exist.home}" includeEmptyDirs="true">
-			<fileset dir="${dist.exist.dir}">
-				<exclude name="db/**"/>
-			</fileset>
+			<fileset dir="${dist.exist.dir}"/>
 		</copy>
 		<echo message="Initialising database..."/>
 		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
-			<fileset dir="${dist.exist.dir}/db">
+			<fileset dir="${dist.exist.db.dir}">
 				<include name="**"/>
 				<exclude name="archives/reference/reference.xml"/>
 			</fileset>
@@ -47,7 +46,7 @@
 	<target name="store-reference-xml" unless="reference.xml.exists">
 		<echo message="Storing reference.xml"/>
 		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
-			<fileset dir="${dist.exist.dir}/db">
+			<fileset dir="${dist.exist.db.dir}">
 				<include name="archives/reference/reference.xml"/>
 			</fileset>
 		</xdb:store>
