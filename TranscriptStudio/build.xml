@@ -28,7 +28,7 @@
 	<property name="dist.dir" location="./dist"/>
 	<property name="dist.client.dir" location="${dist.dir}/${project.codename}-client"/>
 	<property name="dist.server.dir" location="${dist.dir}/${project.codename}-server"/>
-	<property name="dist.exist.dir" location="${dist.server.dir}/exist"/>
+	<property name="dist.exist.app.dir" location="${dist.server.dir}/exist-app"/>
 	<property name="dist.exist.db.dir" location="${dist.server.dir}/exist-db"/>
 
 	<taskdef resource="flexTasks.tasks" classpath="${basedir}/libs/flex_ant/flexTasks.jar" />
@@ -72,18 +72,18 @@
 		
 	<target name="dist-server">
 		<delete dir="${dist.server.dir}"/>
-		<copy todir="${dist.exist.dir}">
+		<copy todir="${dist.exist.app.dir}">
 			<fileset dir="${exist.dir}">
 				<exclude name="db/**"/>
 				<exclude name="src/**"/>
 			</fileset>
 		</copy>
-		<copy todir="${dist.exist.dir}/lib/user">
+		<copy todir="${dist.exist.app.dir}/lib/user">
 			<fileset dir="${build.dir}">
 				<include name="transcript.jar"/>
 			</fileset>
 		</copy>
-		<mkdir dir="${dist.exist.dir}/webapp/archives/transcript/import"/>
+		<mkdir dir="${dist.exist.app.dir}/webapp/archives/transcript/import"/>
 		<copy todir="${dist.exist.db.dir}/archives">
 			<fileset dir=".">
 				<include name="assets/**"/>
