@@ -165,7 +165,7 @@ package org.ishafoundation.archives.transcript.components.studio.text
 					// doesnt need to be changed
 					var text:String = (child as MContent).text;
 					if (text != StringUtil.trim(text)) {
-						throw new Error("text node is not trimmed");
+						throw new Error("text node is not trimmed: '" + text + "'");
 					}
 					appendText(child as MContent, parentElement);
 					currentOffset += text.length + 1; // one for the gap after the text
