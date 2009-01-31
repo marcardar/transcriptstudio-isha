@@ -127,7 +127,7 @@
 					url = text.substring(startIndex, endIndex);
 					url = url.replace("|", ":");				
 				}
-				var simpleURL:String = this.url.substring(this.url.indexOf("://") + 4).replace("|", ":");
+				var simpleURL:String = unescape(this.url.substring(this.url.indexOf("://") + 4).replace("|", ":"));
 				if (simpleURL.indexOf("/") == 0) {
 					simpleURL = simpleURL.substring(1);
 				}
