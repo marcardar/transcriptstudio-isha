@@ -25,7 +25,7 @@ return
 		let $eventId := search-fns:get-event-id($doc/@id)
 		let $event := collection('/db/archives/data')/event[@id = $eventId]
 		let $eventPath := concat(util:collection-name($event), '/', util:document-name($event))
-		let $wordML := transform:transform($doc, doc('/db/archives/xslt/export-msword.xsl'), <parameters><param name='eventPath' value='{$eventPath}'/></parameters>)
+		let $wordML := transform:transform($doc, doc('/db/archives/xslt/session-wordml.xsl'), <parameters><param name='eventPath' value='{$eventPath}'/></parameters>)
 		return
 			response:stream-binary(transcriptstudio:create-docx($wordML), "application/zip", $docxFilename)
 	)
