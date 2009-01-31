@@ -17,6 +17,7 @@ package org.ishafoundation.archives.transcript.importer
 	
 	import org.ishafoundation.archives.transcript.model.EventProperties;
 	import org.ishafoundation.archives.transcript.model.SessionProperties;
+	import org.ishafoundation.archives.transcript.util.ApplicationUtils;
 	
 	public class WordMLTransformer
 	{
@@ -65,7 +66,7 @@ package org.ishafoundation.archives.transcript.importer
 			var eventType:String = extractEventTypeFromSourceId(sourceId);
 			
 			this.audioTranscriptElement = <audioTranscript filename={importName}/>;
-			var importedBy:String = Utils.getClassName(this) + "-v" + Utils.getApplicationVersion();
+			var importedBy:String = Utils.getClassName(this) + "-v" + ApplicationUtils.getApplicationVersion();
 			this.sourceElement = <source id={sourceId} type="mixer"/>;
 			this.streamElement = <stream id="default"/>
 			this.sourceElement.appendChild(streamElement);

@@ -66,18 +66,6 @@ package name.carter.mark.flex.util
 			return descriptorXML;
 		}*/
 		
-		public static function getApplicationVersion():String {
-			/*var ns:Namespace = getDescriptorXML().namespace();
-			return getDescriptorXML()..ns::version[0].toString();*/
-			return "1.0.0";
-		}
-		
-		public static function getApplicationName():String {
-			/*var ns:Namespace = getDescriptorXML().namespace();
-			return getDescriptorXML()..ns::name[0].toString();*/
-			return "Transcript Studio";
-		}
-		
 		public static function getClassName(obj:Object):String {
 			var describeXML:XML = describeType(obj);
 			var qName:String = describeXML.@name;

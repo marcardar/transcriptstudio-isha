@@ -21,6 +21,7 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" width="100%" height="100%" verticalGap="0">
 	<mx:Script>
 		<![CDATA[
+			import org.ishafoundation.archives.transcript.util.ApplicationUtils;
 			import name.carter.mark.flex.project.mdoc.MNode;
 			import org.ishafoundation.archives.transcript.components.studio.collection.RetrieveTranscriptByIdDialog;
 			import org.ishafoundation.archives.transcript.components.studio.importer.CreateEventDialog;
@@ -91,8 +92,11 @@
 			[Bindable]
 			private var session:Session;
 			
+			private static const DEFAULT_TITLE:String = ApplicationUtils.getApplicationName();
+			
 			[Bindable]
-			public var title:String = Utils.getApplicationName();
+			public var title:String = DEFAULT_TITLE;
+			
 			[Bindable]
 			public var status:String;
 			
@@ -107,7 +111,7 @@
 			private function updateTitle():void {
 				var transcriptId:String = this.session.id;
 	  			if (transcriptId == null) {
-	  				this.title = Utils.getApplicationName();
+	  				this.title = DEFAULT_TITLE;
 	  			}
 	  			else {
 	  				this.title = "Transcript Id: " + transcriptId;
@@ -501,7 +505,7 @@
 					<menuitem id="debugTranscriptHTML" label="Transcript HTML"/>
 					<menuitem id="highlightHTMLElements" label="Highlight HTML Elements"/>
 				</menuitem>					
-				<menuitem id="about" label="About {Utils.getApplicationName()}"/>
+				<menuitem id="about" label="About {ApplicationUtils.getApplicationName()}"/>
 			</menuitem>
 		</mx:XMLList>
 	</mx:MenuBar>
