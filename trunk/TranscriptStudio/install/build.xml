@@ -15,13 +15,13 @@
 		<classpath refid="classpath.core"/>
 	</typedef>
 
-	<property name="dist.exist.dir" location="exist"/>
+	<property name="dist.exist.app.dir" location="exist-app"/>
 	<property name="dist.exist.db.dir" location="exist-db"/>
 
 	<target name="init-exist">
 		<echo message="Copying TranscriptStudio-specific files to eXist installation..."/>
 		<copy todir="${exist.home}" includeEmptyDirs="true">
-			<fileset dir="${dist.exist.dir}"/>
+			<fileset dir="${dist.exist.app.dir}"/>
 		</copy>
 		<echo message="Initialising database..."/>
 		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
