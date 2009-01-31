@@ -23,6 +23,7 @@
 <mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" x="40" y="40" title="About..." width="410" borderThickness="1" alpha="2.0" layout="absolute">
 	<mx:Script>
 		<![CDATA[
+			import org.ishafoundation.archives.transcript.util.ApplicationUtils;
 			import name.carter.mark.flex.util.Utils;
 			import mx.binding.utils.BindingUtils;
 			import mx.managers.PopUpManager;
@@ -32,7 +33,7 @@
 	</mx:Script>
 	<mx:VBox width="100%" height="100%" horizontalAlign="center" verticalAlign="top" borderThickness="10" fontSize="12">
 		<mx:Image horizontalAlign="center" source="{Utils.DEFAULT_ICON_CLASS}"/>
-		<mx:Text fontSize="16" width="100%" textAlign="center" htmlText="&lt;b&gt;{Utils.getApplicationName()} {Utils.getApplicationVersion()}&lt;/b&gt;"/>
+		<mx:Text fontSize="16" width="100%" textAlign="center" htmlText="&lt;b&gt;{ApplicationUtils.getApplicationName()}&lt;br/&gt;{ApplicationUtils.getApplicationVersion()}&lt;/b&gt;"/>
 		<mx:Text fontSize="14" width="100%">
 			<mx:htmlText>	
 				<![CDATA[<br/>Written for the Isha Foundation.<br/><br/>Main Contributors: Mark Carter, Swami Kevala.<br/><br/>Please read the wiki for more information: <u><a href='http://code.google.com/p/transcriptstudio4isha'>http://code.google.com/p/transcriptstudio4isha</a></u>]]>
