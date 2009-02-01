@@ -470,7 +470,7 @@
 					{this &amp;&amp; session != null}
 				-->
 				<menuitem id="store" label="Save" enabled="{myMenuBar != null &amp;&amp; session != null &amp;&amp; session.unsavedChanges}"/>
-				<menuitem id="reloadTranscript" label="Reload from database" enabled="{session != null &amp;&amp; session.sessionFile != null}"/>
+				<menuitem id="reloadTranscript" label="Reload from database" enabled="{myMenuBar != null &amp;&amp; session != null &amp;&amp; session.sessionFile != null}"/>
 			</menuitem>
 			<menuitem label="Admin" enabled="{databaseMgr != null &amp;&amp; databaseMgr.isSuperUser}">
 				<menuitem id="createEvent" label="Create Event..."/>
