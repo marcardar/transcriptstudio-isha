@@ -38,7 +38,7 @@
 		
 		import org.ishafoundation.archives.transcript.model.ReferenceManager;
 		
-		[Embed(source="/../conf/transcriptTextArea.css",mimeType="application/octet-stream")]
+		[Embed(source="/../conf/transcript-text-area.css",mimeType="application/octet-stream")]
 		private static const StyleSheetClass:Class;
 		private static const STYLE_SHEET:StyleSheet = Utils.getStyleSheet(StyleSheetClass);
 
