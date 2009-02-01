@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+   Transcript Markups Editor: An XML based application that allows users to define 
+   and store contextual metadata for contiguous sections within a text document. 
+
+   Copyright 2008 Mark Carter, Swami Kevala
+
+   This file is part of Transcript Markups Editor.
+
+   Transcript Markups Editor is free software: you can redistribute it and/or modify it 
+   under the terms of the GNU General Public License as  published by the Free Software 
+   Foundation, either version 3 of the License, or (at your option) any later version.
+
+   Transcript Markups Editor is distributed in the hope that it will be useful, but 
+   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along with 
+   Transcript Markups Editor. If not, see http://www.gnu.org/licenses/.
+
+-->
+
+<mx:VDividedBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:markupNS="org.ishafoundation.archives.transcript.components.studio.markup.*" xmlns:textNS="org.ishafoundation.archives.transcript.components.studio.text.*" resizeToContent="true" creationComplete="init()">
+	<mx:Script>
+    <![CDATA[
+    	import org.ishafoundation.archives.transcript.model.GeneralNodeProperties;
+    	import org.ishafoundation.archives.transcript.model.TranscriptTextSelection;
+    	import name.carter.mark.flex.util.Utils;
+    	import mx.events.PropertyChangeEvent;
+    	import mx.binding.utils.ChangeWatcher;
+    	import name.carter.mark.flex.project.mdoc.MContentProperties;
+    	import name.carter.mark.flex.project.mdoc.MSegmentProperties;
+    	import name.carter.mark.flex.project.mdoc.MNode;
+    	import name.carter.mark.flex.project.mdoc.MDocument;
+    	import name.carter.mark.flex.project.mdoc.MSuperNode;
+    	import name.carter.mark.flex.project.mdoc.MSuperNodeProperties;
+    	import name.carter.mark.flex.project.mdoc.MSegment;
+    	import name.carter.mark.flex.project.mdoc.MSuperContent;
+    	import name.carter.mark.flex.project.mdoc.MSuperSegment;
+    	import name.carter.mark.flex.project.mdoc.TaggableMNode;
+    	import org.ishafoundation.archives.transcript.model.Transcript;
+    	import name.carter.mark.flex.util.icon.IconUtils;
+    	
+		private var _transcript:Transcript;
+		
+		private function init():void {
+			ChangeWatcher.watch(markupsTree, "selectedItem", function(evt:Event):void {
+				if (markupsTree.selectedMarkup == null) {
+					markupPropertiesPane.clearPane();
+					if (generalNodePropertiesPane.enabled) {
+						nodePropertiesPane.selectedChild = generalNodePropertiesPane;
+					}				
+				}
+				else {
+					initMarkupEditorPane();
+					nodePropertiesPane.selectedChild = markupPropertiesPane;
+				}
+			});
+		}
+		
+		public function set transcript(transcript:Transcript):void {
+			this._transcript = transcript;
+			this.markupsTree.setMDoc(this._transcript.mdoc);
+			this.markupPropertiesPane.clearPane();
+			this.generalNodePropertiesPane.clearPane();
+			var speakers:Array = transcript.mdoc.getAllPropertyValues(MSegmentProperties.SPEAKER_PROP_NAME).toArray();
+			if (speakers.indexOf(MSegmentProperties.SPEAKER_DEFAULT) < 0) {
+				speakers.unshift(MSegmentProperties.SPEAKER_DEFAULT);
+			}
+			if (speakers.indexOf(MSegmentProperties.SPEAKER_SADHGURU) < 0) {
+				speakers.unshift(MSegmentProperties.SPEAKER_SADHGURU);
+			}
+			this.generalNodePropertiesPane.speakers = speakers;
+			// add any spoken languages in the XML but not in the built in list
+			var spokenLanguages:Array = transcript.mdoc.getAllPropertyValues(MContentProperties.SPOKEN_LANGUAGE_PROP_NAME).toArray();
+			for each (var spokenLanguage:String in spokenLanguages) {
+				if (this.generalNodePropertiesPane.spokenLanguages.indexOf(spokenLanguage) < 0) {
+					this.generalNodePropertiesPane.spokenLanguages.push(spokenLanguage);
+				}
+			}
+		}
+		
+		[Bindable]
+		public function get transcript():Transcript {
+			return this._transcript;
+		}
+		
+		public function refresh():void {
+			markupsTree.setMDoc(this._transcript.mdoc);
+		}
+
+		public function get selectedMarkup():MSuperNode {
+			return markupsTree.selectedMarkup;
+		}
+		
+		public function set selectedMarkup(markup:MSuperNode):void {
+			markupsTree.selectedMarkup = markup;
+		}
+		
+		public function get selectedMarkupProps():MSuperNodeProperties {
+			if (this.selectedMarkup == null) {
+				return null;
+			}
+			return this.selectedMarkup.props;
+		}
+		
+		private function get selectedMarkupPropsBeforeEdit():MSuperNodeProperties {
+			return this._transcript.getCommittedMarkupProps(this.selectedMarkup);
+		}
+		
+		public function markupHierarchyChangeHandler(markup:MSuperNode):void {
+			this.markupsTree.markupHierarchyChangeHandler(markup);
+		}
+		
+		/**
+		 * This could be called because of revert or because of editing in panel, for example.
+		 */
+		public function markupPropertiesChangeHandler(markup:MSuperNode):void {
+			// this is a property change we need to take seriously - i.e. not just initializing fields
+			//this.selectedMarkupAttrs = markup.props;
+			this.markupsTree.markupPropertiesChangeHandler(markup);
+		}
+		
+		/**
+		 * This is called either when the user selects or edits some text - more specifically, any way in which the
+		 * text represented by the selection, changes.
+		 */
+		public function ttSelectionChangeHandler(ttSelection:TranscriptTextSelection):void {
+			if (ttSelection == null) {
+				// nothing selected
+				this.generalNodePropertiesPane.clearPane();
+				return;
+			}
+			if (ttSelection.isTextSelected()) {
+				// text was selected so enable general properties
+				var generalProps:GeneralNodeProperties = GeneralNodeProperties.createInstance(ttSelection);
+				if (generalProps == null) {
+					this.generalNodePropertiesPane.clearPane();
+				}
+				else {
+					this.generalNodePropertiesPane.initPane(generalProps);
+				}
+			} 
+			else {
+				this.generalNodePropertiesPane.clearPane();
+			}
+			if (ttSelection.toSuperNode() != null) {
+				this.selectedMarkup = ttSelection.toSuperNode();
+				this.nodePropertiesPane.selectedChild = this.markupPropertiesPane;					
+			}
+			else if (this.selectedMarkup == null) {
+				this.nodePropertiesPane.selectedChild = this.generalNodePropertiesPane;					
+			}
+		}
+
+		public function getMarkupIconPath(itemObj:Object):String {
+			if (!(itemObj is MSuperNode)) {
+				return null;
+			} 
+			var markup:MSuperNode = itemObj as MSuperNode;
+           	return Utils.getIconPath(markup.props.markupTypeId);
+		}		
+
+        private function labelFunc(item:MNode):String {
+			var label:String;
+			if (item == null || item is MDocument) {
+				return "No markups defined";	
+			}
+			label = createMarkupTitleShowingChangesFromId(item as MSuperNode);
+            return label;
+        }
+        
+        public function createMarkupTitleShowingChangesFromId(markup:MSuperNode):String {
+        	if (markup == null) {
+        		return null;
+        	}
+        	if (markup.parent == null) {
+        		return "Markup already removed: " + markup.id;
+        	}
+			var markupAttrs:MSuperNodeProperties = markup.props;
+			if (markupAttrs == null) {
+				return null;
+			}
+        	var committedMarkupAttrs:MSuperNodeProperties = _transcript.getCommittedMarkupProps(markup);
+        	return titleFuncForMarkupsTree(markupAttrs, committedMarkupAttrs);
+        }
+        
+		private function isMarkupEditorPaneVisible():Boolean {
+			return this.markupPropertiesPane.includeInLayout;
+		}
+		
+		private function initMarkupEditorPane():void {
+			var markup:MSuperNode = markupsTree.selectedMarkup;
+			if (markup == null) {
+				this.markupPropertiesPane.clearPane();
+				return;
+			}
+			var allowOutline:Boolean = markup is MSuperSegment || markup is MSegment;
+			var allowInline:Boolean = markup is MSuperContent || markup as MSegment;
+			this.markupPropertiesPane.initPane(allowOutline, allowInline, this.selectedMarkupProps, _transcript.getCommittedMarkupProps(markup));
+		}
+		
+		public function setNodePropertiesPaneVisibility(visible:Boolean):void {
+			this.nodePropertiesPane.includeInLayout = visible;
+			initMarkupEditorPane();
+		}
+		
+		private function titleFuncForMarkupPropsPane(markupProps:MSuperNodeProperties, committedMarkupProps:MSuperNodeProperties):String {
+			return createMarkupTitleShowingChanges(markupProps, committedMarkupProps, false);
+		}
+
+		private function titleFuncForMarkupsTree(markupProps:MSuperNodeProperties, committedMarkupProps:MSuperNodeProperties):String {
+			return createMarkupTitleShowingChanges(markupProps, committedMarkupProps, true);
+		}
+
+		private function createMarkupTitleShowingChanges(markupAttrs:MSuperNodeProperties, committedMarkupAttrs:MSuperNodeProperties, includeAdditionalConcepts:Boolean):String {
+			var result:String = "";
+			if (committedMarkupAttrs == null) {
+				result += "+";
+			}
+			else if (!committedMarkupAttrs.equals(markupAttrs)) {
+				result += "*";
+			}
+			result += _transcript.createMarkupTitle(markupAttrs, includeAdditionalConcepts);
+			return result;
+		}
+		
+    ]]>
+	</mx:Script>
+	<markupNS:MarkupsTree id="markupsTree" width="100%" height="100%" minHeight="100" fontFamily="arial" fontSize="14" fontWeight="bold" showRoot="false" labelFunction="labelFunc" iconFunction="{IconUtils.getIconFunctionForDataRenderer(markupsTree, getMarkupIconPath, 24, 24, Utils.DEFAULT_ICON_CLASS)}"/>
+	<mx:TabNavigator id="nodePropertiesPane" width="100%" height="100%" minWidth="350" minHeight="370">
+		<markupNS:MarkupPropertiesPane id="markupPropertiesPane" label="Markup" width="100%" height="100%" paddingLeft="5" paddingRight="5" referenceMgr="{this.transcript.referenceMgr}" titleFunc="{titleFuncForMarkupPropsPane}"/>
+		<textNS:GeneralNodePropertiesPane id="generalNodePropertiesPane" label="General" width="100%" height="100%"/>
+		<textNS:TimingsPane id="timingsPane" label="Timings" width="100%" height="100%" enabled="false"/>
+	</mx:TabNavigator>
+</mx:VDividedBox>

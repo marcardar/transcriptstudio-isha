@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="transcript-studio">
+
+	<description>Isha Foundation Transcript Studio - Configure eXist</description>
+	
+	<path id="classpath.core">
+		<fileset dir="${exist.home}/lib/core">
+			<include name="*.jar"/>
+		</fileset>
+		<pathelement path="${exist.home}/exist.jar"/>
+		<pathelement path="${exist.home}/exist-optional.jar"/>
+	</path>
+
+	<typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+		<classpath refid="classpath.core"/>
+	</typedef>
+
+	<property name="dist.exist.app.dir" location="exist-app"/>
+	<property name="dist.exist.db.dir" location="exist-db"/>
+
+	<target name="init-exist">
+		<echo message="Copying TranscriptStudio-specific files to eXist installation..."/>
+		<copy todir="${exist.home}" includeEmptyDirs="true">
+			<fileset dir="${dist.exist.app.dir}"/>
+		</copy>
+		<echo message="Initialising database..."/>
+		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
+			<fileset dir="${dist.exist.db.dir}">
+				<include name="**"/>
+				<exclude name="archives/reference/reference.xml"/>
+			</fileset>
+		</xdb:store>
+		<!-- Cannot get this working properly, so reference.xml will have to be done manually -->
+		<condition property="reference.xml.exists">  
+			<xdb:exist xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives/reference" resource="reference.xml"/>
+		</condition>
+		<antcall target="store-reference-xml"/>
+		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives" collection="data"/>  
+		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives/data" collection="work"/>  
+	</target>
+
+	<target name="closing-message">
+		<echo message="Please restart eXist database for changes to take effect"/> 
+	</target>
+	
+	<target name="store-reference-xml" unless="reference.xml.exists">
+		<echo message="Storing reference.xml"/>
+		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
+			<fileset dir="${dist.exist.db.dir}">
+				<include name="archives/reference/reference.xml"/>
+			</fileset>
+		</xdb:store>
+	</target>
+
+	<target name="all" depends="init-exist,closing-message" description="Configure eXist for TranscriptStudio"/>
+</project>
