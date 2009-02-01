@@ -31,7 +31,7 @@
 	<property name="dist.exist.app.dir" location="${dist.server.dir}/exist-app"/>
 	<property name="dist.exist.db.dir" location="${dist.server.dir}/exist-db"/>
 
-	<taskdef resource="flexTasks.tasks" classpath="${basedir}/libs/flex_ant/flexTasks.jar" />
+	<taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/ant/lib/flexTasks.jar" />
 
 	<target name="build">
 		<delete dir="${build.dir}"/>
