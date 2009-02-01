@@ -19,11 +19,9 @@ set _LIBJARS=%CLASSPATH%;%ANT_HOME%\lib\ant-launcher.jar;%ANT_HOME%\lib\junit-4.
 set JAVA_ENDORSED_DIRS=%EXIST_HOME%\lib\endorsed
 set JAVA_OPTS=-Xms64M -Xmx512M -Djava.endorsed.dirs="%JAVA_ENDORSED_DIRS%" -DFLEX_HOME="%FLEX_HOME%" -Dant.home="%ANT_HOME%" -Dexist.home="%EXIST_HOME%"
 
-echo Isha Foundation Transcript Studio eXist-Modules Build
-echo -------------------
+echo Transcript Studio for Isha Foundation Build
+echo -------------------------------------------
 echo JAVA_HOME=%JAVA_HOME%
-echo EXIST_HOME=%EXIST_HOME%
-echo FLEX_HOME=%FLEX_HOME%
 echo _LIBJARS=%_LIBJARS%
 
 echo Starting Ant...

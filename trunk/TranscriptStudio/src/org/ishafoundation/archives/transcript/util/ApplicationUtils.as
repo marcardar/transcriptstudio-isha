@@ -21,15 +21,19 @@ package org.ishafoundation.archives.transcript.util
 		}
 
 		public static function getApplicationName():String {
-			return getPropertyValue("project.name");
+			return getPropertyValue("application.name");
 		}
 
-		public static function getApplicationCodename():String {
-			return getPropertyValue("project.codename");
+		public static function getApplicationNameCondensed():String {
+			return getPropertyValue("application.name.condensed");
 		}
 
 		public static function getApplicationVersion():String {
-			return getPropertyValue("project.version");
+			return getPropertyValue("application.version");
+		}
+
+		public static function getApplicationWebsite():String {
+			return getPropertyValue("application.website");
 		}
 	}
 }
