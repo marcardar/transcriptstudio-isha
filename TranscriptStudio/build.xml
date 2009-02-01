@@ -26,14 +26,32 @@
 	<property name="exist.webapp.dir" location="${exist.dir}/webapp"/>
 
 	<property name="dist.dir" location="./dist"/>
-	<property name="dist.client.dir" location="${dist.dir}/${project.codename}-client"/>
-	<property name="dist.server.dir" location="${dist.dir}/${project.codename}-server"/>
+	<property name="dist.client.dir" location="${dist.dir}/${application.name.condensed}-client"/>
+	<property name="dist.server.dir" location="${dist.dir}/${application.name.condensed}-server"/>
 	<property name="dist.exist.app.dir" location="${dist.server.dir}/exist-app"/>
 	<property name="dist.exist.db.dir" location="${dist.server.dir}/exist-db"/>
 
 	<taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/ant/lib/flexTasks.jar" />
 
-	<target name="build">
+	<target name="init">
+		<tstamp>
+			<format property='TSTAMP' pattern='MM/dd/yyyy HH:MM:SS z'/>
+		</tstamp> 
+		<echo>Starting at:  ${TSTAMP}</echo>
+		<echo/>
+		<echo>App name:     ${application.name}</echo>
+		<echo>App name2:    ${application.name.condensed}</echo>
+		<echo>App version:  ${application.version}</echo>
+		<echo/>
+		<echo>Flex home:    ${FLEX_HOME}</echo>
+		<echo>eXist home:   ${exist.home}</echo>
+		<echo>JAVA home:    ${java.home}</echo>
+		<echo>JAVA version: ${java.version}</echo> 
+		<echo>ANT home:     ${ant.home}</echo>
+		<echo>ANT version:  ${ant.version}</echo>
+	</target>
+
+	<target name="build" depends="init">
 		<delete dir="${build.dir}"/>
 		<mkdir dir="${build.classes.dir}"/>
 		<echo message="Compiling eXist extension classes..."/>
@@ -46,9 +64,9 @@
 		<jar basedir="${build.classes.dir}" compress="true" jarfile="${build.dir}/transcript.jar">
 			<manifest>
 				<attribute name="Project-Name" value="Transcript Studio eXist extensions"/>
-				<!--attribute name="Project-Version" value="${project.version}"/>
+				<!--attribute name="Project-Version" value="${application.version}"/>
 				<attribute name="Project-Build" value="${DSTAMP}"/>
-				<attribute name="Project-CodeName" value="${project.codename}"/>
+				<attribute name="Project-CodeName" value="${application.name.condensed}"/>
 				<attribute name="SVN-Revision" value="${svn.revision}"/-->
 			</manifest>
 		</jar>
@@ -61,16 +79,15 @@
 		</mxmlc>
 	</target>
 	
-	<target name="dist">
+	<target name="dist" depends="dist-zips"/>
+		
+	<target name="dist-init" depends="init">
 		<echo message="Create TranscriptStudio4Isha distribution..."/>
 		<delete dir="${dist.dir}"/>
 		<mkdir dir="${dist.dir}"/>
-		<antcall target="dist-server"/>
-		<antcall target="dist-client"/>
-		<antcall target="dist-zips"/>		
 	</target>
 		
-	<target name="dist-server">
+	<target name="dist-server" depends="dist-init">
 		<delete dir="${dist.server.dir}"/>
 		<copy todir="${dist.exist.app.dir}">
 			<fileset dir="${exist.dir}">
@@ -113,7 +130,7 @@
 		<copy file="build.sh" tofile="${dist.server.dir}/install.sh"/>
 	</target>
 		
-	<target name="dist-client">
+	<target name="dist-client" depends="dist-init">
 		<delete dir="${dist.client.dir}"/>
 		<copy todir="${dist.client.dir}">
 			<fileset dir="${build.dir}">
@@ -125,18 +142,18 @@
 		</copy>
 	</target>
 		
-	<target name="dist-zips">
-		<property name="simple.archive.name" value="${project.codename}"/>
-		<property name="client.archive.name" value="${simple.archive.name}-${project.version}-client"/>
-		<property name="server.archive.name" value="${simple.archive.name}-${project.version}-server"/>
-		<zip destfile="${dist.dir}/${client.archive.name}.zip" basedir="${dist.client.dir}"/>
-		<zip destfile="${dist.dir}/${server.archive.name}.zip" basedir="${dist.server.dir}"/>
+	<target name="dist-zips" depends="dist-server,dist-client">
+		<property name="simple.archive.name" value="${application.name.condensed}"/>
+		<property name="client.archive.name" value="${simple.archive.name}-${application.version}-client"/>
+		<property name="server.archive.name" value="${simple.archive.name}-${application.version}-server"/>
+		<zip destfile="${dist.dir}/${client.archive.name}.zip" basedir="${dist.dir}" includes="*-client/**"/>
+		<zip destfile="${dist.dir}/${server.archive.name}.zip" basedir="${dist.dir}" includes="*-server/**"/>
 		<property name="client.tar.file" value="${dist.dir}/${client.archive.name}.tar"/>
-		<tar destfile="${client.tar.file}" basedir="${dist.client.dir}"/>
+		<tar destfile="${client.tar.file}" basedir="${dist.dir}" includes="*-client/**"/>
 		<gzip destfile="${client.tar.file}.gz" src="${client.tar.file}"/>
 		<delete file="${client.tar.file}"/>
 		<property name="server.tar.file" value="${dist.dir}/${server.archive.name}.tar"/>
-		<tar destfile="${server.tar.file}" basedir="${dist.server.dir}"/>
+		<tar destfile="${server.tar.file}" basedir="${dist.dir}" includes="*-server/**"/>
 		<gzip destfile="${server.tar.file}.gz" src="${server.tar.file}"/>
 		<delete file="${server.tar.file}"/>
 	</target>
