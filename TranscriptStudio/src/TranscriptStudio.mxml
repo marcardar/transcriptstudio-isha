@@ -171,6 +171,9 @@
 				if (msg.toLowerCase().indexOf("io error") >= 0) {
 					s = "Could not connect to server: " + url; 
 				}
+				else if (msg.toLowerCase().indexOf("version") >= 0) {
+					s = msg;
+				}
 				else {
 					s = "Incorrect username/password";
 				}
