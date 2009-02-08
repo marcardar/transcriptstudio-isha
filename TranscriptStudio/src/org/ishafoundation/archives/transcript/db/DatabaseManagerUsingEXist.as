@@ -43,8 +43,7 @@ package org.ishafoundation.archives.transcript.db
 			// we test the connection by reading the top level collection
 			remoteMgr.testConnection(function(response:Object):void {
 				loggedIn = true;
-				checkForSuperUser();
-				successFunction();
+				checkForSuperUser(successFunction);
 			},
 			function(msg:String):void {
 				loggedIn = false;
@@ -179,11 +178,12 @@ package org.ishafoundation.archives.transcript.db
 			_isSuperUser = value;
 		}
 
-		private function checkForSuperUser():void {
+		private function checkForSuperUser(successFunc:Function):void {
 			var thisObj:DatabaseManagerUsingEXist = this;
 			query("xmldb:is-admin-user(xmldb:get-current-user())", [], function(xml:XML):void {
 				var boolString:String = xml.*.text();
 				thisObj.isSuperUser = boolString == "true";
+				successFunc();
 			}, function(msg:String):void {
 				Alert.show(msg, "Failed checking for super user");
 			});
