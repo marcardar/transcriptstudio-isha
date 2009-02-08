@@ -103,7 +103,7 @@
 			public function init(username:String, databaseMgr:DatabaseManager):void {
 				IconUtils.overrideIcon(Utils.DEFAULT_ICON_PATH, Utils.DEFAULT_ICON_CLASS);
 				this.databaseMgr = databaseMgr;
-				this.referenceMgr = new ReferenceManager(databaseMgr, databaseMgr);
+				this.referenceMgr = new ReferenceManager(databaseMgr);
 				this.sessionMgr = new SessionManager(username, referenceMgr, databaseMgr);
 				this.referenceMgr.loadReferences(referenceXMLRetrieveSuccess, referenceXMLRetrieveFailure);
 			}
