@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-   Transcript Markups Editor: An XML based application that allows users to define 
+   Transcript Studio for Isha Foundation: An XML based application that allows users to define 
    and store contextual metadata for contiguous sections within a text document. 
 
    Copyright 2008 Mark Carter, Swami Kevala
 
-   This file is part of Transcript Markups Editor.
+   This file is part of Transcript Studio for Isha Foundation.
 
-   Transcript Markups Editor is free software: you can redistribute it and/or modify it 
+   Transcript Studio for Isha Foundation is free software: you can redistribute it and/or modify it 
    under the terms of the GNU General Public License as  published by the Free Software 
    Foundation, either version 3 of the License, or (at your option) any later version.
 
-   Transcript Markups Editor is distributed in the hope that it will be useful, but 
+   Transcript Studio for Isha Foundation is distributed in the hope that it will be useful, but 
    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
    FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License along with 
-   Transcript Markups Editor. If not, see http://www.gnu.org/licenses/.
+   Transcript Studio for Isha Foundation. If not, see http://www.gnu.org/licenses/.
 -->
 
 <mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" x="40" y="40" title="About..." width="410" borderThickness="1" alpha="2.0" layout="absolute">
