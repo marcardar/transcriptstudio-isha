@@ -20,7 +20,7 @@
 
 package org.ishafoundation.archives.transcript.model
 {
-	import mx.controls.Alert;
+	import mx.binding.utils.BindingUtils;
 	
 	import name.carter.mark.flex.project.mdoc.MTag;
 	import name.carter.mark.flex.util.XMLUtils;
@@ -41,13 +41,16 @@ package org.ishafoundation.archives.transcript.model
 		
 		private var xmlRetrieverStorer:XMLRetrieverStorer;
 		private var xqueryExecutor:XQueryExecutor;
+		[Bindable]
+		public var isSuperUser:Boolean;
 		
 		[Bindable]
 		public var referenceXML:XML;
 		
-		public function ReferenceManager(xmlRetrieverStorer:XMLRetrieverStorer, xqueryExecutor:XQueryExecutor) {
-			this.xmlRetrieverStorer = xmlRetrieverStorer;
-			this.xqueryExecutor = xqueryExecutor;
+		public function ReferenceManager(databaseMgr:DatabaseManager) {
+			this.xmlRetrieverStorer = databaseMgr;
+			this.xqueryExecutor = databaseMgr;
+			BindingUtils.bindProperty(this, "isSuperUser", databaseMgr, "isSuperUser");
 		}	
 		
 		public function loadReferences(retrieveXMLSuccess:Function, retrieveXMLFailure:Function):void {
