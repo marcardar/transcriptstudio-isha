@@ -26,6 +26,7 @@ package org.ishafoundation.archives.transcript.db
 	import name.carter.mark.flex.exist.EXistXMLRPCClient;
 	import name.carter.mark.flex.util.remote.ClientManager;
 	
+	import org.ishafoundation.archives.transcript.util.ApplicationUtils;
 	import org.ishafoundation.archives.transcript.util.IdUtils;
 	
 	public class DatabaseManagerUsingEXist implements DatabaseManager
@@ -43,7 +44,9 @@ package org.ishafoundation.archives.transcript.db
 			// we test the connection by reading the top level collection
 			remoteMgr.testConnection(function(response:Object):void {
 				loggedIn = true;
-				checkForSuperUser(successFunction);
+				checkClientVersionAllowed(function():void {
+					checkForSuperUser(successFunction);
+				}, failureFunction);
 			},
 			function(msg:String):void {
 				loggedIn = false;
@@ -178,6 +181,19 @@ package org.ishafoundation.archives.transcript.db
 			_isSuperUser = value;
 		}
 
+		private function checkClientVersionAllowed(successFunc:Function, failureFunc:Function):void {
+			var clientVersion:String = ApplicationUtils.getApplicationVersion();
+			executeStoredXQuery("check-client-version.xql", {clientVersion:clientVersion}, function(minClientVersion:String):void {
+				if (minClientVersion == "") {
+					trace("Client version allowed: " + clientVersion);
+					successFunc();
+				}
+				else {
+					failureFunc("Client version '" + clientVersion + "' is out of date. Min version required: " + minClientVersion);  
+				}
+			}, failureFunc);
+		}
+		
 		private function checkForSuperUser(successFunc:Function):void {
 			var thisObj:DatabaseManagerUsingEXist = this;
 			query("xmldb:is-admin-user(xmldb:get-current-user())", [], function(xml:XML):void {
