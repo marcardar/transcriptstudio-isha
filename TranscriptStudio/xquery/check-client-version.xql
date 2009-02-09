@@ -30,9 +30,9 @@ declare function check-client-version:compare-versions($ver1 as xs:string, $ver2
 };
 
 let $clientVersion := request:get-parameter('clientVersion', ())
-(: sometimes we want to disallow all betas :)
-let $isBeta := contains($clientVersion, 'b')
 let $fullVersion := replace($clientVersion, '[a-zA-Z]+.*', '')
+(: sometimes we want to disallow non-releases (like betas) :)
+let $isRelease := $clientVersion = $fullVersion
 let $cmp :=	check-client-version:compare-versions($fullVersion, $check-client-version:minClientVersion)
 return
 	if ($cmp >= 0) then 
