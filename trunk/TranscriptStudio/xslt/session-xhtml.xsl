@@ -2,7 +2,6 @@
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0">
 	<xsl:output method="xhtml"/>
 	<xsl:strip-space elements="*"/>
-	<xsl:param name="highlightId"/>
 	
 	<xsl:template match="/">
 		<div style="font-size:20;margin-bottom:100px;width:750px;margin-left:auto;margin-right:auto;text-align:left;">
