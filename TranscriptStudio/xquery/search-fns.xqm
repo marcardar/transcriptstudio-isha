@@ -36,11 +36,11 @@ declare function search-fns:main($searchString as xs:string, $defaultType as xs:
 						search-fns:segment-as-table-row($segment)					
 				else
 					if (exists($eventSearchTerms)) then
-						(: just searching events - so the results are transcripts :)
-						for $transcript in $transcripts
-						order by $transcript/../@id descending
+						(: just searching events - so the results are events :)
+						for $event in $events
+						order by $event/@id descending
 						return
-							search-fns:transcript-as-table-row($transcript)
+							search-fns:event-as-table-row($event)
 					else
 						(<p>No meaningful terms in search string</p>)
 		return
@@ -68,6 +68,11 @@ declare function search-fns:get-transcripts($eventIds as xs:string*) as element(
 	collection('/db/archives/data')/session[search-fns:get-event-id(@id) = $eventIds]/transcript 
 };
 
+declare function search-fns:get-sessions-for-event-ids($eventIds as xs:string*) as element()*
+{
+	collection('/db/archives/data')/session[search-fns:get-event-id(@id) = $eventIds]
+};
+
 (:
 if $eventSearchTerms is empty then $baseTranscripts is returned
 otherwise some subset of "baseTranscripts is returned
@@ -88,8 +93,13 @@ declare function search-fns:get-events($baseEvents as element()*, $eventSearchTe
 					(: this is an event year :)
 					$baseEvents[starts-with(@startAt, $searchTerm)]
 				else 
-					(: it could be anything :)
-					$baseEvents[matches(@*, $searchTerm, 'i')]
+					if (matches($searchTerm, '^[A-Z]{1,2}\d{3,}$')) then
+						(: this is a media code :)
+						let $sessions := search-fns:get-sessions-for-event-ids($baseEvents/@id)
+						return search-fns:get-events-for-session-ids($sessions[source/@id = lower-case($searchTerm)]/@id)
+					else 
+						(: it could be anything :)
+						$baseEvents[matches(@*, $searchTerm, 'i')]
 		return
 			search-fns:get-events($newBaseEvents, $newEventSearchTerms)
 };
@@ -306,19 +316,16 @@ declare function search-fns:segment-as-table-row($segment as element()) as eleme
 		</div>
 };
 
-declare function search-fns:transcript-as-table-row($transcript as element()) as element()
+declare function search-fns:event-as-table-row($event as element()) as element()
 {
-	let $session := $transcript/..
-	return
-		<div class="single-result">
-			<div class="result-header">
-				{search-fns:get-result-header($session, (), (), search-fns:get-session-title($session))}
-			</div>
-			<div class="result-footer">
-				{string($session/@id)}
-				{search-fns:get-html-word-links($session/@id)}
-			</div>
+	<div class="single-result">
+		<div class="result-header">
+			{search-fns:get-result-header-for-event($event, search-fns:get-event-title($event))}
 		</div>
+		<div class="result-footer">
+			{string($event/@id)}
+		</div>
+	</div>
 };
 
 declare function search-fns:get-result-header($session as element(), $highlightId as xs:string?, $targetId as xs:string?, $text as xs:string) as element()
@@ -327,6 +334,11 @@ declare function search-fns:get-result-header($session as element(), $highlightI
 	let $targetParam := if ($targetId) then concat('#', $targetId) else ''
 	return
 		<a class="result-header" href="main.xql?panel=session&amp;id={$session/@id}{$highlightParam}{$targetParam}">{$text}</a>
+};
+
+declare function search-fns:get-result-header-for-event($event as element(), $text as xs:string) as element()
+{
+	<a class="result-header" href="main.xql?panel=event&amp;id={$event/@id}">{$text}</a>
 };
 
 declare function search-fns:get-html-word-links($sessionId as xs:string) as element()
@@ -343,6 +355,15 @@ declare function search-fns:get-html-word-links($sessionId as xs:string) as elem
 declare function search-fns:get-event-id($sessionId as xs:string) as xs:string
 {
 	substring-before($sessionId, "s")
+};
+
+declare function search-fns:get-events-for-session-ids($sessionIds as xs:string*) as element()*
+{
+	let $dataCollection := collection('/db/archives/data')
+	for $sessionId in $sessionIds
+	let $eventId := search-fns:get-event-id($sessionId)
+	return
+		$dataCollection/event[@id = $eventId] 
 };
 
 declare function search-fns:element-text($element as element()) as xs:string

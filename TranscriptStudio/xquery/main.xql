@@ -17,6 +17,7 @@ declare option exist:serialize "media-type=text/html";
 
 import module namespace login-panel = "http://www.ishafoundation.org/archives/xquery/login-panel" at "login-panel.xqm";
 import module namespace search-panel = "http://www.ishafoundation.org/archives/xquery/search-panel" at "search-panel.xqm";
+import module namespace event-panel = "http://www.ishafoundation.org/archives/xquery/event-panel" at "event-panel.xqm";
 import module namespace session-panel = "http://www.ishafoundation.org/archives/xquery/session-panel" at "session-panel.xqm";
 import module namespace all-concepts-panel = "http://www.ishafoundation.org/archives/xquery/all-concepts-panel" at "all-concepts-panel.xqm";
 import module namespace categories-panel = "http://www.ishafoundation.org/archives/xquery/categories-panel" at "categories-panel.xqm";
@@ -33,6 +34,10 @@ declare function main:display-panel($panel) as element()*
 	else if ($panel eq "search") then
 	(
 		search-panel:main()
+	)
+	else if ($panel eq "event") then
+	(
+		event-panel:main()
 	)
 	else if ($panel eq "session") then
 	(
