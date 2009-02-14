@@ -223,7 +223,7 @@
 		}
 		
 		private function isBackEnabled():Boolean {
-			return viewstack != null && viewstack.selectedIndex > 0;
+			return viewstack != null && viewstack.selectedIndex > 0 && viewstack.selectedChild != sessionPropertiesPane;
 		}
 		
 		private function isNextEnabled():Boolean {
