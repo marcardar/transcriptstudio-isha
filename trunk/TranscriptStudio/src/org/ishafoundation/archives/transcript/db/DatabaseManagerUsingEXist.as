@@ -28,22 +28,29 @@ package org.ishafoundation.archives.transcript.db
 	
 	import org.ishafoundation.archives.transcript.util.ApplicationUtils;
 	import org.ishafoundation.archives.transcript.util.IdUtils;
+	import org.ishafoundation.archives.transcript.util.PreferencesSharedObject;
 	
 	public class DatabaseManagerUsingEXist implements DatabaseManager
 	{
 		private var remoteMgr:ClientManager;
+		private var username:String;
 		private var loggedIn:Boolean = false;
 		private var _isSuperUser:Boolean = false;
 		
 		public function DatabaseManagerUsingEXist(username:String, password:String) {
 			trace("Using eXist URL: " + DatabaseConstants.EXIST_URL);
 			this.remoteMgr = new ClientManager(DatabaseConstants.EXIST_URL, username, password);
+			this.username = username;
 		}
 
 		public function testConnection(successFunction:Function, failureFunction:Function):void {
 			// we test the connection by reading the top level collection
 			remoteMgr.testConnection(function(response:Object):void {
 				loggedIn = true;
+				// write db config to the shared object
+				PreferencesSharedObject.writeDbURL(DatabaseConstants.EXIST_URL);
+				PreferencesSharedObject.writeDbUsername(username);
+				
 				checkClientVersionAllowed(function():void {
 					checkForSuperUser(successFunction);
 				}, failureFunction);
