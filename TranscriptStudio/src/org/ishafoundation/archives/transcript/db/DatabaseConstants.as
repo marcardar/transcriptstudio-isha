@@ -20,9 +20,12 @@
 
 package org.ishafoundation.archives.transcript.db
 {
+	import org.ishafoundation.archives.transcript.util.PreferencesSharedObject;
+	
 	public class DatabaseConstants
 	{
-		public static var EXIST_URL:String = "http://127.0.0.1:8080/exist";
+		public static var EXIST_URL:String = PreferencesSharedObject.readDbURL("http://127.0.0.1:8080/exist");
+		public static var EXIST_USERNAME:String = PreferencesSharedObject.readDbUsername("admin");
 		public static const ARCHIVES_COLLECTION_PATH:String = "/db/archives";
 		public static const REFERENCE_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/reference";
 		public static const DATA_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/data";
