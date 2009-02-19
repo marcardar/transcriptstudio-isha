@@ -101,6 +101,7 @@
 			</fileset>
 		</copy>
 		<mkdir dir="${dist.exist.app.dir}/webapp/archives/transcript/import"/>
+		<mkdir dir="${dist.exist.app.dir}/webapp/archives/transcript/media"/>
 		<copy todir="${dist.exist.db.dir}/archives">
 			<fileset dir=".">
 				<include name="assets/**"/>
