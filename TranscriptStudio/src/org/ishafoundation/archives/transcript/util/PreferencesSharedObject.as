@@ -28,11 +28,11 @@ package org.ishafoundation.archives.transcript.util
 			PREFS_SO.flush();			
 		}
 
-		public static function readDbURL(defaultValue:String):String {
+		public static function readDbURL(defaultValue:String = null):String {
 			return readValue(DB_URL_KEY, defaultValue);
 		}
 
-		public static function readDbUsername(defaultValue:String):String {
+		public static function readDbUsername(defaultValue:String = null):String {
 			return readValue(DB_USERNAME_KEY, defaultValue);
 		}
 		

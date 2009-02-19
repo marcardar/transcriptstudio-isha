@@ -20,16 +20,34 @@
 
 package org.ishafoundation.archives.transcript.db
 {
+	import mx.controls.Alert;
+	import mx.core.Application;
+	
 	import org.ishafoundation.archives.transcript.util.PreferencesSharedObject;
 	
 	public class DatabaseConstants
 	{
-		public static var EXIST_URL:String = PreferencesSharedObject.readDbURL("http://127.0.0.1:8080/exist");
+		public static var EXIST_URL:String = getDefaultEXistURL();
 		public static var EXIST_USERNAME:String = PreferencesSharedObject.readDbUsername("admin");
 		public static const ARCHIVES_COLLECTION_PATH:String = "/db/archives";
 		public static const REFERENCE_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/reference";
 		public static const DATA_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/data";
 		public static const XQUERY_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/xquery";
 		public static const XSLT_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/xslt";
+	
+		private static function getDefaultEXistURL():String {
+			var result:String = PreferencesSharedObject.readDbURL();
+			if (result == null) {
+				var url:String = Application.application.url;
+				if (url.indexOf("http://") == 0) {
+					var index:int = url.indexOf("/exist");
+					result = unescape(url.substring(0, index)) + "/exist";
+				}
+				else {
+					result = "http://127.0.0.1:8080/exist";
+				}
+			}
+			return result;
+		}
 	}
 }
