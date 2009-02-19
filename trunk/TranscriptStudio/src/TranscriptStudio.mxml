@@ -119,19 +119,12 @@
 			}
 			
 			private function showSecurityAlert(text:String):void {
-				var url:String = "<local swf path>";
-				var startIndex:int = text.indexOf("file:///");
+				var startIndex:int = this.url.indexOf("file:///");
 				this.enabled = false; // don't allow the user to do ANYTHING?
 				var pathToAdd:String;
 				if (startIndex >= 0) {
-					startIndex += 8;
-					var endIndex:int = text.indexOf(" cannot ", startIndex);
-					url = text.substring(startIndex, endIndex);
-					url = url.replace("|", ":");				
-					pathToAdd = unescape(this.url.substring(this.url.indexOf("file:///") + "file:///".length).replace("|", ":"));
-					/*if (pathToAdd.indexOf("/") == 0) {
-						pathToAdd = pathToAdd.substring(1);
-					}*/
+					pathToAdd = unescape(this.url.substring("file:///".length).replace("|", ":"));
+					pathToAdd.replace("|", ":");
 				}
 				else {
 					pathToAdd = null;
@@ -141,7 +134,7 @@
 					msg = "Try this:\n\nRight click -> Settings... -> Advanced...\n\n(...takes you to browser...)\n\n-> Global Security Settings Panel\n\nAdd the following URL to \"Always trust files in these locations\":\n\n" + pathToAdd + "\n\nFinally, restart application\n\nOriginal Exception:\n\n";
 				}
 				msg += text;
-				var al:Alert = Alert.show(msg, "Security Error");
+				var al:Alert = Alert.show(msg, "Security Sandbox Violation");
 				// important to move the Alert to the top left because the settings box also comes up in the middle (and its modal!)
 				al.callLater(function():void {
 					al.x = 20;
