@@ -124,7 +124,6 @@
 				var pathToAdd:String;
 				if (startIndex >= 0) {
 					pathToAdd = unescape(this.url.substring("file:///".length).replace("|", ":"));
-					pathToAdd.replace("|", ":");
 				}
 				else {
 					pathToAdd = null;
