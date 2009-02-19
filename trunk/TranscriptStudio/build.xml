@@ -100,6 +100,14 @@
 				<include name="transcript.jar"/>
 			</fileset>
 		</copy>
+		<copy todir="${dist.exist.app.dir}/webapp/archives/transcript">
+			<fileset dir="${build.dir}">
+				<include name="TranscriptStudio.swf"/>
+			</fileset>
+			<fileset dir=".">
+				<include name="assets/**"/>
+			</fileset>
+		</copy>
 		<mkdir dir="${dist.exist.app.dir}/webapp/archives/transcript/import"/>
 		<mkdir dir="${dist.exist.app.dir}/webapp/archives/transcript/media"/>
 		<copy todir="${dist.exist.db.dir}/archives">
@@ -121,8 +129,6 @@
 				<exclude name="samples/**/*.doc"/>
 				<exclude name="samples/**/~*"/>
 			</fileset>
-		</copy>
-		<copy todir="${dist.server.dir}">
 			<fileset dir="install">
 				<include name="build.xml"/>
 			</fileset>
