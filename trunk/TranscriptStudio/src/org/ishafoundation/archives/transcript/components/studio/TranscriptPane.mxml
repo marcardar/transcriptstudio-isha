@@ -96,7 +96,9 @@
 					trace("WARN: ttSelection is null - probably because the General Properties pane is enabled when it shouldnt be");
 					return;
 				}
-				transcriptTextArea.transcriptTextChangeHandler(transcriptTextArea.ttSelection.selectedObj);
+				var affectedObj:Object = markupsPane.generalNodePropertiesPane.affectedObj;
+				markupsPane.ttSelectionChangeHandler(new TranscriptTextSelection(affectedObj));
+				transcriptTextArea.transcriptTextChangeHandler(affectedObj);
 			});     		
 		}
 		
@@ -158,30 +160,6 @@
 			this.transcriptTextArea.markupHierarchyChangeHandler(markup);
 		}
 
-		internal function editText():void {
-			var allowMultipleSegments:Boolean = this.ttSelection.toSegmentRange() != null;
-			if (this.ttSelection.toSegment() != null) {
-				// check if the segment is also an inline
-				var segment:MSegment = this.ttSelection.toSegment();
-				if (segment.toContentRange().toSuperContent() != null) {
-					// don't allow the contents of an inline to go multi-segment
-					allowMultipleSegments = false;
-				}
-			}
-			var popup:AbstractEditDialog = allowMultipleSegments ? new EditSegmentDialog() : new EditSegmentSubsetDialog();
-			popup.addEventListener(EditSegmentDialog.OK_CLICKED, function(evt:Event):void{
-				var affectedObj:Object = ttSelection.editText(popup.texts);
-				if (affectedObj == null) {
-					Alert.show("Text has not changed");
-					return;					
-				}
-				markupsPane.ttSelectionChangeHandler(new TranscriptTextSelection(affectedObj));
-				transcriptTextArea.transcriptTextChangeHandler(affectedObj);
-			});
-			PopUpManager.addPopUp(popup, this, true);
-			popup.texts = [ttSelection.getText()];
-		}
-		
 		internal function mergeSegmentRange():void {
 			var segment:MSegment = this.ttSelection.merge();
 			this.markupsPane.ttSelectionChangeHandler(new TranscriptTextSelection(segment));
