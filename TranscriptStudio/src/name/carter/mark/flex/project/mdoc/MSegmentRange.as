@@ -182,7 +182,20 @@ package name.carter.mark.flex.project.mdoc
 			}			
 			return result;			
 		}	
-			
+		
+		public function getTextCondensed():String {
+			// we don't want to show the whole of a range
+			var result:String = first.getText() + "\n\n";
+			if (first != last) {
+				var length:int = nodesInRange.length;
+				if (length > 2) {
+					result += "[..." + (length - 2) + " hidden paragraph(s)...]\n\n";
+				}
+				result += last.getText();
+			}
+			return result;			
+		}	
+		
 		public function toString():String {
 			return "selected segment range: " + first.id + " to " + last.id; 
 		}

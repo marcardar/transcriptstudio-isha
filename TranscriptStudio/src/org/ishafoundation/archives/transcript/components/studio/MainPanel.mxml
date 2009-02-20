@@ -412,9 +412,6 @@
 				else if ( actionName == "removeMarkup" ) {
 					this.transcriptPane.removeMarkup();
 				}
-				else if ( actionName == "editText" ) {
-					this.transcriptPane.editText();
-				}
 				else if ( actionName == "mergeSegmentRange" ) {
 					this.transcriptPane.mergeSegmentRange();
 				}
@@ -485,7 +482,6 @@
 				<menuitem id="markupText" label="Markup Text" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowMarkup()}"/>
 				<menuitem id="removeMarkup" label="Remove Markup" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowRemoveMarkup()}"/>
 				<menuitem type="separator"/>
-				<menuitem id="editText" label="Edit Text" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowEditText()}"/>
 				<menuitem id="mergeSegmentRange" label="Merge Paragraphs" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowMerge()}"/>
 				<menuitem id="deleteText" label="Delete Text" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowDeleteText()}"/>
 				<menuitem type="separator"/>

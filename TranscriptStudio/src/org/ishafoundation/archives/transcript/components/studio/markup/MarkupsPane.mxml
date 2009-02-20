@@ -140,7 +140,7 @@
 					this.generalNodePropertiesPane.clearPane();
 				}
 				else {
-					this.generalNodePropertiesPane.initPane(generalProps);
+					this.generalNodePropertiesPane.initPane(generalProps, ttSelection);
 				}
 			} 
 			else {
