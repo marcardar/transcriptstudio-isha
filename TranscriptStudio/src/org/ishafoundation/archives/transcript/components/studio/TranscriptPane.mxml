@@ -1,7 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-
 <!--
-
    Transcript Studio for Isha Foundation: An XML based application that allows users to define 
    and store contextual metadata for contiguous sections within a text document. 
 
@@ -19,9 +16,7 @@
 
    You should have received a copy of the GNU General Public License along with 
    Transcript Studio for Isha Foundation. If not, see http://www.gnu.org/licenses/.
-
 -->
-
 <mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:markupNS="org.ishafoundation.archives.transcript.components.studio.markup.*" xmlns:textNS="org.ishafoundation.archives.transcript.components.studio.text.*" horizontalGap="{Utils.DIVIDER_SIZE}" resizeToContent="true" creationComplete="init()">
 	<mx:Script>
     <![CDATA[
@@ -42,10 +37,8 @@
     	import name.carter.mark.flex.project.mdoc.MSegment;
     	import name.carter.mark.flex.project.mdoc.TaggableMNode;
     	import name.carter.mark.flex.util.Utils;
-    	import org.ishafoundation.archives.transcript.components.studio.text.EditSegmentSubsetDialog;
     	import mx.utils.StringUtil;
     	import mx.managers.PopUpManager;
-    	import org.ishafoundation.archives.transcript.components.studio.text.EditSegmentDialog;
     	import org.ishafoundation.archives.transcript.components.studio.text.TranscriptTextArea;
     	import org.ishafoundation.archives.transcript.components.studio.markup.MarkupsTree;
 		import flash.events.Event;
@@ -71,16 +64,16 @@
 				var markup:MSuperNode = markupsPane.selectedMarkup;
 				if (markup != null && ttSelection != null && ttSelection.toSuperNode() != null && ttSelection.toSuperNode() != markup) {
 					// don't allow different tree selection to text markup selection
-					transcriptTextArea.ttSelection = null;
+					textPane.transcriptTextArea.ttSelection = null;
 				}
 			});
 			this.markupsPane.markupsTree.addEventListener(MouseEvent.DOUBLE_CLICK, function(evt:Event):void {
 				if (markupsPane.selectedMarkup != null) {
-					transcriptTextArea.selectMarkup(markupsPane.selectedMarkup);
+					textPane.transcriptTextArea.selectMarkup(markupsPane.selectedMarkup);
 					transcriptTextAreaSelectionChange(null);
 				}
 			});
-			this.transcriptTextArea.addEventListener(TranscriptTextArea.SELECTION_CHANGE_EVENT, transcriptTextAreaSelectionChange);
+			this.textPane.addEventListener(TranscriptTextArea.SELECTION_CHANGE_EVENT, transcriptTextAreaSelectionChange);
 			this.markupsPane.markupPropertiesPane.addEventListener(MarkupPropertiesPane.MARKUP_PROPERTIES_CHANGE_EVENT, function(evt:Event):void {
 				// TODO - this selectedMarkup is sometimes null when it shouldnt be
 				if (markupsPane.selectedMarkup == null) {
@@ -90,16 +83,7 @@
 			});     		
 			this.markupsPane.markupPropertiesPane.addEventListener(MarkupPropertiesPane.MARKUP_REMOVE_EVENT, function(evt:Event):void {
 				removeMarkup();
-			});     		
-			this.markupsPane.generalNodePropertiesPane.addEventListener(GeneralNodePropertiesPane.GENERAL_NODE_PROPERTIES_CHANGE_EVENT, function(evt:Event):void {
-				if (transcriptTextArea.ttSelection == null) {
-					trace("WARN: ttSelection is null - probably because the General Properties pane is enabled when it shouldnt be");
-					return;
-				}
-				var affectedObj:Object = markupsPane.generalNodePropertiesPane.affectedObj;
-				markupsPane.ttSelectionChangeHandler(new TranscriptTextSelection(affectedObj));
-				transcriptTextArea.transcriptTextChangeHandler(affectedObj);
-			});     		
+			}); 
 		}
 		
 		public function set transcript(transcript:Transcript):void {
@@ -120,33 +104,33 @@
 		
 		private function markupPropertiesChangeHandler(markup:MSuperNode):void {
 			this.markupsPane.markupPropertiesChangeHandler(markup);
-			this.transcriptTextArea.markupPropertiesChangeHandler(markup);
+			this.textPane.markupPropertiesChangeHandler(markup);
 		}
 		
 		private function get ttSelection():TranscriptTextSelection {
-			return this.transcriptTextArea.ttSelection;
+			return this.textPane.ttSelection;
 		}
 		
 		internal function nudgeUp():void {
 			ttSelection.nudgeUp();
-			this.markupsPane.ttSelectionChangeHandler(transcriptTextArea.ttSelection);
-			this.transcriptTextArea.transcriptTextChangeHandler(transcriptTextArea.ttSelection.selectedObj);
+			this.markupsPane.ttSelectionChangeHandler(textPane.ttSelection);
+			this.textPane.transcriptTextChangeHandler(textPane.ttSelection.selectedObj);
 		}
 
 		internal function nudgeDown():void {
 			ttSelection.nudgeDown();
-			this.markupsPane.ttSelectionChangeHandler(transcriptTextArea.ttSelection);
-			this.transcriptTextArea.transcriptTextChangeHandler(transcriptTextArea.ttSelection.selectedObj);
+			this.markupsPane.ttSelectionChangeHandler(textPane.ttSelection);
+			this.textPane.transcriptTextChangeHandler(textPane.ttSelection.selectedObj);
 		}
 
 		internal function markupText():void {
-			var ttSelection:TranscriptTextSelection = transcriptTextArea.ttSelection;
+			var ttSelection:TranscriptTextSelection = textPane.ttSelection;
 			var markup:MSuperNode = ttSelection.markup();
 			this.markupsPane.markupHierarchyChangeHandler(markup);
 			callLater(function():void {
 				markupsPane.selectedMarkup = markup;
 			});
-			this.transcriptTextArea.markupHierarchyChangeHandler(markup);
+			this.textPane.markupHierarchyChangeHandler(markup);
 			callLater(transcriptTextAreaSelectionChange, [null]);
 		}
 
@@ -157,32 +141,32 @@
 			var markup:MSuperNode = markupsPane.selectedMarkup;
 			markup.remove();
 			this.markupsPane.markupHierarchyChangeHandler(markup);
-			this.transcriptTextArea.markupHierarchyChangeHandler(markup);
+			this.textPane.markupHierarchyChangeHandler(markup);
 		}
 
 		internal function mergeSegmentRange():void {
 			var segment:MSegment = this.ttSelection.merge();
 			this.markupsPane.ttSelectionChangeHandler(new TranscriptTextSelection(segment));
-			this.transcriptTextArea.transcriptTextChangeHandler(segment);
+			this.textPane.transcriptTextChangeHandler(segment);
 		}
 		
 		internal function deleteText():void {
-			transcriptTextArea.ttSelection.deleteText();
+			textPane.ttSelection.deleteText();
 			this.markupsPane.ttSelectionChangeHandler(null);
-			this.transcriptTextArea.transcriptTextChangeHandler();
+			this.textPane.transcriptTextChangeHandler();
 		}
 
 		private function markupsTreeDoubleClicked(event:Event):void {
 			if (this.markupsPane.selectedMarkup != null) {
-				this.transcriptTextArea.selectMarkup(this.markupsPane.selectedMarkup);
+				this.textPane.selectMarkup(this.markupsPane.selectedMarkup);
 			}
 		}
 	
 		private function transcriptTextAreaSelectionChange(evt:Event):void {
-			markupsPane.ttSelectionChangeHandler(transcriptTextArea.ttSelection);
+			markupsPane.ttSelectionChangeHandler(textPane.ttSelection);
 		}		
 	]]>
 	</mx:Script>
 	<markupNS:MarkupsPane id="markupsPane" width="25%" minWidth="355" height="100%" verticalGap="{Utils.DIVIDER_SIZE}" transcript="{this.transcript}"/>
-	<textNS:TranscriptTextArea id="transcriptTextArea" width="75%" height="100%" referenceMgr="{this.referenceMgr}" transcript="{this.transcript}"/>
+	<textNS:TranscriptTextPane id="textPane" width="75%" minWidth="600" height="100%" verticalGap="{Utils.DIVIDER_SIZE}" referenceMgr="{this.referenceMgr}" transcript="{this.transcript}"/>
 </mx:HDividedBox>
