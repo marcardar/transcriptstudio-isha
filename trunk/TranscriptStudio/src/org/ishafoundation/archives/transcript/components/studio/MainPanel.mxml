@@ -202,7 +202,7 @@
 										}
 										if (node is MSuperNode) {
 											transcriptPane.markupsPane.selectedMarkup = node as MSuperNode;
-											transcriptPane.transcriptTextArea.selectMarkup(node as MSuperNode);
+											transcriptPane.textPane.selectMarkup(node as MSuperNode);
 										}
 									});
 								}
@@ -442,11 +442,11 @@
 						popup.textArea.text = referenceMgr.referenceXML.toXMLString();
 					}
 					else if ( actionName == "debugTranscriptHTML") {
-						popup.textArea.text = transcriptPane.transcriptTextArea.wrappedTextArea.htmlText;
+						popup.textArea.text = transcriptPane.textPane.transcriptTextArea.wrappedTextArea.htmlText;
 					}
 				}
 				else if ( actionName == "highlightHTMLElements") {
-					transcriptPane.transcriptTextArea.highlightHTMLElements();
+					transcriptPane.textPane.transcriptTextArea.highlightHTMLElements();
 				}
 				else if ( actionName == "about") {
 					showAboutBox();
@@ -478,15 +478,15 @@
 				<menuitem type="separator"/>
 				<menuitem id="query" label="Execute XQuery..."/>				
 			</menuitem>
-			<menuitem label="Selection" enabled="{transcriptPane.transcriptTextArea.ttSelection != null}">
-				<menuitem id="markupText" label="Markup Text" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowMarkup()}"/>
-				<menuitem id="removeMarkup" label="Remove Markup" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowRemoveMarkup()}"/>
+			<menuitem label="Selection" enabled="{transcriptPane.textPane.ttSelection != null}">
+				<menuitem id="markupText" label="Markup Text" enabled="{transcriptPane.textPane.ttSelection.allowMarkup()}"/>
+				<menuitem id="removeMarkup" label="Remove Markup" enabled="{transcriptPane.textPane.ttSelection.allowRemoveMarkup()}"/>
 				<menuitem type="separator"/>
-				<menuitem id="mergeSegmentRange" label="Merge Paragraphs" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowMerge()}"/>
-				<menuitem id="deleteText" label="Delete Text" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowDeleteText()}"/>
+				<menuitem id="mergeSegmentRange" label="Merge Paragraphs" enabled="{transcriptPane.textPane.ttSelection.allowMerge()}"/>
+				<menuitem id="deleteText" label="Delete Text" enabled="{transcriptPane.textPane.ttSelection.allowDeleteText()}"/>
 				<menuitem type="separator"/>
-				<menuitem id="nudgeUp" label="Nudge Up" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowNudgeUp()}"/>
-				<menuitem id="nudgeDown" label="Nudge Down" enabled="{transcriptPane.transcriptTextArea.ttSelection.allowNudgeDown()}"/>
+				<menuitem id="nudgeUp" label="Nudge Up" enabled="{transcriptPane.textPane.ttSelection.allowNudgeUp()}"/>
+				<menuitem id="nudgeDown" label="Nudge Down" enabled="{transcriptPane.textPane.ttSelection.allowNudgeDown()}"/>
 			</menuitem>				
 			<menuitem label="Window" enabled="{transcriptPane.transcript != null}">
 				<menuitem id="showPropertiesPane" label="Properties" type="check" toggled="true"/>
