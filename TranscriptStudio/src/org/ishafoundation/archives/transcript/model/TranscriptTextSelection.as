@@ -60,6 +60,9 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		public static function createSuperNodeInstance(superNode:MSuperNode):TranscriptTextSelection {
+			if (superNode == null) {
+				return null;
+			}
 			var selectedObj:Object;
 			if (superNode is MSuperSegment) {
 				selectedObj = superNode;

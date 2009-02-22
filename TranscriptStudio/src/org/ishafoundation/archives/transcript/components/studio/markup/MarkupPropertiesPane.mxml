@@ -23,6 +23,7 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" minWidth="345" minHeight="330" horizontalAlign="left" verticalGap="0" paddingBottom="5" backgroundColor="#FFFFFF" enabled="{this.markupAttrs != null}" creationComplete="clearPane()">
 	<mx:Script>
     <![CDATA[
+    	import org.ishafoundation.archives.transcript.components.DataChangeEvent;
     	import org.ishafoundation.archives.transcript.util.Constants;
     	import name.carter.mark.flex.util.Utils;
     	import org.ishafoundation.archives.transcript.model.ReferenceManager;
@@ -44,7 +45,7 @@
 		public static const MARKUP_PROPERTIES_CHANGE_EVENT:String = "MARKUP_PROPERTIES_CHANGE_EVENT";
 
 		public var referenceMgr:ReferenceManager;
-
+		
 		[Bindable]
 		public var markupAttrs:MSuperNodeProperties;
 		[Bindable]
@@ -69,6 +70,8 @@
 		
 		private function somethingChanged():void {
 			setTitle();
+			// TODO - this is a hack - make sure that the buttons are correctly enabled - for example, Revert Properties
+			executeBindings(true);
 			dispatchEvent(new Event(MARKUP_PROPERTIES_CHANGE_EVENT));
 		}
 		
@@ -224,7 +227,7 @@
 		private function removeClicked():void {
 			dispatchEvent(new Event(MARKUP_REMOVE_EVENT));
 		}
-    ]]>
+     ]]>
 	</mx:Script>
   	<mx:HBox width="100%" verticalAlign="top" horizontalGap="0">
 		<mx:Image id="typeImage" height="24" width="24" horizontalAlign="right" verticalAlign="top" source="{this.markupAttrs == null ? Utils.DEFAULT_ICON_CLASS : getTypeIcon(this.markupAttrs.markupTypeId)}"/>

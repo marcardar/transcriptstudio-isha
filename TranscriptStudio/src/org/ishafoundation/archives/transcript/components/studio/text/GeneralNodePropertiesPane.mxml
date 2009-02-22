@@ -23,6 +23,7 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" horizontalAlign="left" backgroundColor="#FFFFFF" enabled="{this.generalProps != null}" creationComplete="init()" minWidth="400" minHeight="200" paddingTop="5" paddingBottom="5" paddingLeft="5" paddingRight="5">
 	<mx:Script>
 	<![CDATA[
+		import org.ishafoundation.archives.transcript.components.DataChangeEvent;
 		import name.carter.mark.flex.project.mdoc.MSuperSegment;
 		import mx.binding.utils.ChangeWatcher;
 		import name.carter.mark.flex.project.mdoc.MSegmentSubset;
@@ -36,12 +37,10 @@
 		import mx.utils.StringUtil;
 		import org.ishafoundation.archives.transcript.model.GeneralNodeProperties;
 		
-		public static const GENERAL_NODE_PROPERTIES_CHANGE_EVENT:String = "GENERAL_NODE_PROPERTIES_CHANGE_EVENT";
-		
 		[Bindable]
 		public var generalProps:GeneralNodeProperties;
 		[Bindable]
-		public var ttSelection:TranscriptTextSelection;
+		private var _ttSelection:TranscriptTextSelection;
 		
 		[Bindable]
 		public var speakers:Array;
@@ -51,22 +50,16 @@
 		[Bindable]
 		public var sourceIds:Array;
 		
-		[Bindable]
-		public var transcriptTextArea:TranscriptTextArea;
-		
-		public var affectedObj:Object;
-		
 		public function init():void {
-			ChangeWatcher.watch(transcriptTextArea, "ttSelection", textAreaSelectionChanged);
 		}
 		
-		private function textAreaSelectionChanged(evt:Event):void {
-			this.ttSelection = transcriptTextArea.ttSelection;
-			if (this.ttSelection == null || this.ttSelection.selectedObj is MSuperSegment) {
+		public function set ttSelection(newValue:TranscriptTextSelection):void {
+			this._ttSelection  = newValue;
+			if (this._ttSelection == null || this._ttSelection.selectedObj is MSuperSegment) {
 				this.generalProps = null;
 			}
 			else {
-				this.generalProps = new GeneralNodeProperties(transcriptTextArea.ttSelection);
+				this.generalProps = GeneralNodeProperties.createInstance(this._ttSelection);
 			}
 		}
 		
@@ -84,8 +77,12 @@
 		}
 		
 		private function somethingChanged(affectedObj:Object = null):void {
-			var event:Event = new Event(GENERAL_NODE_PROPERTIES_CHANGE_EVENT);
-			this.affectedObj = affectedObj;
+			if (affectedObj == null) {
+				// this panel always changes something (so don't pass null to the event)
+				affectedObj = _ttSelection.selectedObj;
+			}
+			var ttSelection:TranscriptTextSelection = new TranscriptTextSelection(affectedObj);
+			var event:Event = new DataChangeEvent(DataChangeEvent.TEXT_CHANGE, ttSelection);
 			dispatchEvent(event);
 		}
 		
@@ -142,7 +139,7 @@
 				textStack.executeBindings(true);
 				return;
 			}
-			var affectedObj:Object = ttSelection.editText(newTextArray);
+			var affectedObj:Object = _ttSelection.editText(newTextArray);
 			if (affectedObj == null) {
 				return;
 			}
@@ -250,13 +247,13 @@
 			</mx:GridRow>
 		</mx:Grid>		
 	</mx:HBox>
-	<mx:Label text="Selected text{ttSelection.allowEditText() ? '' : ' (non-editable)'}:"/>
-	<mx:ViewStack id="textStack" width="100%" selectedIndex="{allowMultipleSegments(ttSelection) ? 0 : 1}">
+	<mx:Label text="Selected text{_ttSelection.allowEditText() ? '' : ' (non-editable)'}:"/>
+	<mx:ViewStack id="textStack" width="100%" selectedIndex="{allowMultipleSegments(_ttSelection) ? 0 : 1}">
 		<mx:HBox width="100%" height="100%">
-			<mx:TextArea id="textTextArea" width="100%" height="100%" minHeight="60" editable="{ttSelection.allowEditText()}" text="{getTextAreaText(ttSelection)}" focusOut="segmentTextChanged()"/>
+			<mx:TextArea id="textTextArea" width="100%" height="100%" minHeight="60" editable="{_ttSelection.allowEditText()}" text="{getTextAreaText(_ttSelection)}" focusOut="segmentTextChanged()"/>
 		</mx:HBox>
 		<mx:HBox width="100%">
-			<mx:TextInput id="textTextInput" width="100%" text="{getTextInputText(ttSelection)}" enter="subSegmentTextChanged()" focusOut="subSegmentTextChanged()"/>
+			<mx:TextInput id="textTextInput" width="100%" text="{getTextInputText(_ttSelection)}" enter="subSegmentTextChanged()" focusOut="subSegmentTextChanged()"/>
 		</mx:HBox>
 	</mx:ViewStack>
 	

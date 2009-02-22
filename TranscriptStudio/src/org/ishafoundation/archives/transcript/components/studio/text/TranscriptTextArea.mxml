@@ -2,6 +2,7 @@
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" minWidth="500" minHeight="200" initialize="init()">
 	<mx:Script>
 	<![CDATA[
+		import org.ishafoundation.archives.transcript.components.SelectionChangeEvent;
 		import org.ishafoundation.archives.transcript.model.TranscriptTextSelection;
 		import name.carter.mark.flex.util.Utils;
 		import name.carter.mark.flex.project.mdoc.MContentRangeSubset;
@@ -43,7 +44,6 @@
 		private static const STYLE_SHEET:StyleSheet = Utils.getStyleSheet(StyleSheetClass);
 
 		public static var ICONS_ENABLED:Boolean = true;
-		public static const SELECTION_CHANGE_EVENT:String = "SELECTION_CHANGE_EVENT";
 		private static const SCROLL_DURATION_IN_MILLIS:Number = 500;
 		private static const MIN_SCROLL_SPEED:int = 50; // lines per second
 
@@ -54,8 +54,6 @@
 		private var _transcript:Transcript;
 		public var transcriptTextAreaMapping:Array;
 		
-		private var _ttSelection:TranscriptTextSelection;
-
 		private function init():void {
 			this.scrollEffect = new AnimateProperty(this.wrappedTextArea)
 			this.scrollEffect.easingFunction = Quadratic.easeInOut;
@@ -102,7 +100,7 @@
 		 *
 		 * Does not trigger change events because not user-driven.
 		 */
-		private function setSelection(newSelectionBeginIndex:int, newSelectionEndIndex:int):void {
+		private function setRawSelection(newSelectionBeginIndex:int, newSelectionEndIndex:int):void {
 			trace("Setting selectionBegin/EndIndex: " + newSelectionBeginIndex + "-" + newSelectionEndIndex);
 			this.wrappedTextArea.selectionBeginIndex = newSelectionBeginIndex;
 			this.wrappedTextArea.selectionEndIndex = newSelectionEndIndex;
@@ -112,56 +110,6 @@
 			this._transcript = transcript;
 			this.wrappedTextArea.verticalScrollPosition = 0;
 			redraw();
-		}
-		
-		public function set ttSelection(newTtaSelection:TranscriptTextSelection):void {
-			/*
-			 * Dont care if it is already set to the same thing for two reasons:
-			 * 1. The text might have changed and so therefore the start/endIndex of the selection may need to change too.
-			 * 2. The newTtaSelection may be the same object but with different internal values
-			 *
-			 * Essentially, this method is most likely to be called with something new anyway. Also it will not trigger
-			 * selectionChangeHandler which should avoid any cyclic recursion
-			 */
-			trace("New selection: " + newTtaSelection);
-			this._ttSelection = newTtaSelection;
-			setSelectionBasedOnSelectionInfo(); // this is necessary because of auto-expansion when creating selection obj
-		}
-		
-		[Bindable]
-		public function get ttSelection():TranscriptTextSelection {
-			return this._ttSelection;
-		}
-		
-		private function setSelectionBasedOnSelectionInfo():void {
-			if (this.ttSelection == null) {
-				// we want to make a blank selection but must be careful that we blank-selected somewhere
-				// already in the view so there is no autoscroll
-				var lineIndex:int = Utils.getFirstVisibleLineIndex(this.wrappedTextArea);
-				var charIndex:int = textField.getLineOffset(lineIndex);
-				setSelection(charIndex, charIndex); // zero length selection at start of existing selection
-				return;
-			}
-			var beginIndex:int;
-			var endIndex:int;
-			if (this.ttSelection.selectedObj is MSuperSegment) {
-				// only select the header
-				beginIndex = getStartIndex(this.ttSelection.toSuperNode().id);
-				var firstTtaRange:TranscriptTextAreaRange = getFirstTtaRangeForNodeId(this.ttSelection.toSuperNode().id);
-				endIndex = firstTtaRange.endIndex; 					
-			}
-			else if (this.ttSelection.toSegmentRange() != null) {
-				beginIndex = getStartIndex(this.ttSelection.toSegmentRange().first.id);
-				endIndex = getEndIndex(this.ttSelection.toSegmentRange().last.id);
-			}
-			else {
-				// segment subset - must be less than one segment so need to take care of the offsets
-				var contentRangeSubset:MContentRangeSubset = this.ttSelection.toSegmentSubset().toContentRangeSubset();
-				beginIndex = getStartIndex(contentRangeSubset.spanningContentRange.first.id) + contentRangeSubset.startOffsetRelativeToFirstContent;
-				endIndex = getStartIndex(contentRangeSubset.spanningContentRange.last.id) + contentRangeSubset.endOffsetRelativeToLastContent;
-			}
-			trace("Calculated text area selection: " + beginIndex + "-" + endIndex);
-			setSelection(beginIndex, endIndex);
 		}
 		
 		// note - this will not be called if the mouse up happens outside the app area
@@ -180,7 +128,11 @@
 			}
 		}
 		
-		private function handleKeyUp(event:Event):void {
+		private function handleKeyUp(event:KeyboardEvent):void {
+			if (!event.shiftKey && !event.ctrlKey) {
+				return;
+			}
+			trace("key up: code=" + event.charCode + ", ctrl=" + event.ctrlKey + ", shift=" + event.shiftKey);
 			selectionChangeHandler();			
 		}
 		
@@ -189,21 +141,20 @@
 		 * DO NOT call if changed programmatically.
 		 */
 		private function selectionChangeHandler():void {
-			this.ttSelection = calculateSelectionInfo(this.wrappedTextArea.selectionBeginIndex, this.wrappedTextArea.selectionEndIndex);
+			var newSelection:Object = calculateSelectionInfo(this.wrappedTextArea.selectionBeginIndex, this.wrappedTextArea.selectionEndIndex);
 			this.wrappedTextArea.setFocus();
-			dispatchEvent(new Event(SELECTION_CHANGE_EVENT));
+			dispatchEvent(new SelectionChangeEvent(SelectionChangeEvent.TRANSCRIPT_TEXT_AREA_SELECTION_CHANGE, newSelection));
 		}
 		
 		internal function redrawThenSelectMarkup(markup:MSuperNode): void {
 			var newSelectionInfo:TranscriptTextSelection = TranscriptTextSelection.createSuperNodeInstance(markup);
-			ttSelection = null; // without this the old value hangs around too long (because the new value is only set in a callLater)
 			redraw(newSelectionInfo);
 		}
 		
 		/**
 		 * id could be segment id or markup id.
 		 */
-		private function redraw(newSelectionInfo:TranscriptTextSelection = null):void {
+		public function redraw(newSelectionInfo:TranscriptTextSelection = null):void {
 			if (this._transcript == null) {
 				this.wrappedTextArea.htmlText = <body/>;
 				return;
@@ -218,7 +169,7 @@
 				//decorateConfidentialSegments();
 				wrappedTextArea.verticalScrollPosition = oldVerticalScrollPosition;
 				if (newSelectionInfo == null) {
-					ttSelection = null;
+					select(null);
 				}
 				else if (newSelectionInfo.toSuperNode() != null) {
 					// this is a markup id - text does not change much for a markup event, so don't adjust scroll position
@@ -228,7 +179,7 @@
 						select(newSelectionInfo);
 					}
 					else {
-						ttSelection = null;
+						select(null);
 					}
 				}
 				else {
@@ -251,12 +202,9 @@
 			return lineIndex >= Utils.getFirstVisibleLineIndex(this.wrappedTextArea) && lineIndex <= Utils.getLastVisibleLineIndex(this.wrappedTextArea);
 		}
 		
-		public function selectMarkup(markup:MSuperNode):void {
-			select(TranscriptTextSelection.createSuperNodeInstance(markup));
-		}
-		
-		private function select(newTtaSelection:TranscriptTextSelection):void {
+		public function select(newTtaSelection:TranscriptTextSelection):void {
 			if (newTtaSelection == null) {
+				selectInternal(null);
 				return;
 			}
 			var firstIndexToSelect:int;
@@ -305,12 +253,10 @@
 			}
 			else {
 				throw new Error("Can this be reached?");
-				this.ttSelection = null;
-				return;
 			}
 			var newVerticalScrollPosition:int = this.wrappedTextArea.verticalScrollPosition;
 			if (linesToDisplayEndIndex - linesToDisplayStartIndex >= numVisibleLines) {
-				newVerticalScrollPosition = linesToDisplayStartIndex;
+				newVerticalScrollPosition = linesToDisplayEndIndex;
 			}
 			else {
 				// manipulate the line index to display values according to preferred values and whether scroll up or down
@@ -340,17 +286,63 @@
 			}
 			if (newVerticalScrollPosition != this.wrappedTextArea.verticalScrollPosition) {
 				// before we scroll and select - clear selection first
-				this.ttSelection = null;
+				selectInternal(null);
 				verticalScrollToPosition(newVerticalScrollPosition, function():void {
-					ttSelection = newTtaSelection;
+					selectInternal(newTtaSelection);
 				});
 			}
 			else {
-				this.ttSelection = newTtaSelection;
+				selectInternal(newTtaSelection);
 			}
 		}
 		
+		/**
+		 * Works out all the relevant offsets from the specified ttSelection and selects the right text.
+		 * 
+		 * Does not both with scrolling etc
+		 */
+		private function selectInternal(ttSelection:TranscriptTextSelection):void {
+			/*
+			 * Dont care if it is already set to the same thing for two reasons:
+			 * 1. The text might have changed and so therefore the start/endIndex of the selection may need to change too.
+			 * 2. The newTtaSelection may be the same object but with different internal values
+			 *
+			 * Essentially, this method is most likely to be called with something new anyway. Also it will not trigger
+			 * selectionChangeHandler which should avoid any cyclic recursion
+			 */
+			trace("New selection: " + ttSelection);
+			if (ttSelection == null) {
+				// we want to make a blank selection but must be careful that we blank-selected somewhere
+				// already in the view so there is no autoscroll
+				var lineIndex:int = Utils.getFirstVisibleLineIndex(this.wrappedTextArea);
+				var charIndex:int = textField.getLineOffset(lineIndex);
+				setRawSelection(charIndex, charIndex); // zero length selection at start of existing selection
+				return;
+			}
+			var beginIndex:int;
+			var endIndex:int;
+			if (ttSelection.selectedObj is MSuperSegment) {
+				// only select the header
+				beginIndex = getStartIndex(ttSelection.toSuperNode().id);
+				var firstTtaRange:TranscriptTextAreaRange = getFirstTtaRangeForNodeId(ttSelection.toSuperNode().id);
+				endIndex = firstTtaRange.endIndex; 					
+			}
+			else if (ttSelection.toSegmentRange() != null) {
+				beginIndex = getStartIndex(ttSelection.toSegmentRange().first.id);
+				endIndex = getEndIndex(ttSelection.toSegmentRange().last.id);
+			}
+			else {
+				// segment subset - must be less than one segment so need to take care of the offsets
+				var contentRangeSubset:MContentRangeSubset = ttSelection.toSegmentSubset().toContentRangeSubset();
+				beginIndex = getStartIndex(contentRangeSubset.spanningContentRange.first.id) + contentRangeSubset.startOffsetRelativeToFirstContent;
+				endIndex = getStartIndex(contentRangeSubset.spanningContentRange.last.id) + contentRangeSubset.endOffsetRelativeToLastContent;
+			}
+			trace("Calculated text area selection: " + beginIndex + "-" + endIndex);
+			setRawSelection(beginIndex, endIndex);
+		}
+		
 		private function verticalScrollToPosition(newVerticalScrollPosition:int, nextFunc:Function, durationInMillis:Number = SCROLL_DURATION_IN_MILLIS):void {
+			trace("Vertical scroll to position: " + newVerticalScrollPosition);
 			this.scrollEffectEndFunc = null;
 			this.scrollEffect.stop(); // make sure there is nothing still running
 			this.scrollEffectEndFunc = nextFunc;
@@ -502,38 +494,6 @@
 			}
 			return null;
 		} 
-		
-		/**
-		 * TODO - determine whether we really do need to update the HTML
-		 */
-		public function markupPropertiesChangeHandler(markup:MSuperNode):void {
-			var oldTTSelection:TranscriptTextSelection = ttSelection;
-			redraw(null);
-			callLater(select, [oldTTSelection]);
-		}
-		
-		public function markupHierarchyChangeHandler(markup:MSuperNode):void {
-			if (markup.parent == null) {
-				// markup was removed so just redraw
-				redraw();
-			}
-			else {
-				redrawThenSelectMarkup(markup);
-			}
-		}
-		
-		public function transcriptTextChangeHandler(affectedObj:Object = null):void {
-			if (affectedObj is TranscriptTextSelection) {
-				throw new Error("Passed an invalid affectedObj: " + affectedObj);
-			}
-			if (affectedObj == null) {
-				redraw();
-			}
-			else {
-				redraw(new TranscriptTextSelection(affectedObj));
-			}
-		}
-		
 	]]>
 	</mx:Script>
 	<mx:TextArea id="wrappedTextArea" paddingLeft="15" paddingRight="25" editable="false" condenseWhite="true" width="100%" height="100%" styleSheet="{STYLE_SHEET}" mouseDown="handleMouseDown(event)" keyUp="handleKeyUp(event)"/>

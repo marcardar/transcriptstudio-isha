@@ -82,21 +82,17 @@
 			}
 		}
 
-		public function markupPropertiesChangeHandler(markup:MSuperNode):void {
-			if (markup == null) {
-				trace("WARNING: Passed a null markup to markupPropertiesChangeHandler");
-				return;
+		public function redraw(markup:MSuperNode, completeRedraw:Boolean):void {
+			trace("MarkupsTree redraw (" + (completeRedraw ? "complete" : "") + "). markup: " + (markup == null ? "<removed>" : markup.id));
+			if (completeRedraw) {
+				// need to reset the dataprovider because otherwise execution flow can get stuck in a loop at line 6343 of ListBase
+				// also, if a markup is added at the top level and we don't reset the dataprovider - the change is not shown even if we perform invalidateList()
+				resetDataProvider(markup);
 			}
-			trace("MarkupsTree handling editMarkupProps. markup: " + markup.id);
-			invalidateList();
-			//drawItem(itemToItemRenderer(markup), true, false);
-		}
-
-		public function markupHierarchyChangeHandler(markup:MSuperNode):void {
-			trace("MarkupsTree hierarchy changed. markup: " + markup.id);
-			// need to reset the dataprovider because otherwise execution flow can get stuck in a loop at line 6343 of ListBase
-			// also, if a markup is added at the top level and we don't reset the dataprovider - the change is not shown even if we perform invalidateList()
-			resetDataProvider(markup);
+			else {
+				invalidateList();
+				//drawItem(itemToItemRenderer(markup), true, false);				
+			}
 		}
 
 		/**
@@ -111,6 +107,10 @@
 			}
 			dataProvider = dataProvider[0]; // this solves a bug where top level (level below root) items are not refreshed
 			openItems = currentOpenItems;
+			// if we dont do callLater then the markup is not selected
+			callLater(function():void {
+				selectedMarkup = markup;
+			});
 		}
 
 	]]>
