@@ -30,6 +30,7 @@ package name.carter.mark.flex.project.mdoc
 		public static const SUMMARY_PROP_NAME:String = "summary";
 		public static const COMMENT_PROP_NAME:String = "comment";
 		public static const RATING_PROP_NAME:String = "rating";
+		public static const RATING_PROP_DEFAULT:int = -1;
 		
 		private var superNode:MSuperNode;
 		
@@ -85,31 +86,32 @@ package name.carter.mark.flex.project.mdoc
 		
 		[Bindable]
 		public function set summary(newValue:String):void {
-			XMLUtils.setAttributeValue(superNode.nodeElement, SUMMARY_PROP_NAME, newValue);
+			superNode.setProperty(SUMMARY_PROP_NAME, newValue);
 		}
 		
 		public function get summary():String {
-			return XMLUtils.getAttributeValue(superNode.nodeElement, SUMMARY_PROP_NAME, "");
+			return superNode.getPropertyValue(SUMMARY_PROP_NAME, "");
 		}
 		
 		[Bindable]
 		public function set comment(newValue:String):void {
-			XMLUtils.setAttributeValue(superNode.nodeElement, COMMENT_PROP_NAME, newValue);
+			superNode.setProperty(COMMENT_PROP_NAME, newValue);
 		}
 		
 		public function get comment():String {
-			return XMLUtils.getAttributeValue(superNode.nodeElement, COMMENT_PROP_NAME, "");
+			return superNode.getPropertyValue(COMMENT_PROP_NAME, "");
 		}
 		
 		[Bindable]
 		public function set rating(newValue:int):void {
-			XMLUtils.setAttributeValue(superNode.nodeElement, RATING_PROP_NAME, newValue >= 0 ? newValue : null);
+			var strValue:String = newValue > RATING_PROP_DEFAULT ? newValue.toString() : null;
+			superNode.setProperty(RATING_PROP_NAME, strValue);
 		}
 		
 		public function get rating():int {
-			var ratingStr:String = XMLUtils.getAttributeValue(superNode.nodeElement, RATING_PROP_NAME);
-			if (ratingStr == null || ratingStr.length == 0) {
-				return -1;
+			var ratingStr:String = superNode.getPropertyValue(RATING_PROP_NAME);
+			if (ratingStr == null) {
+				return RATING_PROP_DEFAULT;
 			}
 			else {
 				return new int(ratingStr);
