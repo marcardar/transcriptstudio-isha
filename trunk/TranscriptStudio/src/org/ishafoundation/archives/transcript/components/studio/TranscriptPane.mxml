@@ -20,6 +20,8 @@
 <mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:markupNS="org.ishafoundation.archives.transcript.components.studio.markup.*" xmlns:textNS="org.ishafoundation.archives.transcript.components.studio.text.*" horizontalGap="{Utils.DIVIDER_SIZE}" resizeToContent="true" creationComplete="init()">
 	<mx:Script>
     <![CDATA[
+    	import org.ishafoundation.archives.transcript.components.DataChangeEvent;
+    	import org.ishafoundation.archives.transcript.components.SelectionChangeEvent;
     	import org.ishafoundation.archives.transcript.components.studio.text.GeneralNodePropertiesPane;
     	import mx.events.PropertyChangeEvent;
     	import mx.binding.utils.ChangeWatcher;
@@ -64,26 +66,28 @@
 				var markup:MSuperNode = markupsPane.selectedMarkup;
 				if (markup != null && ttSelection != null && ttSelection.toSuperNode() != null && ttSelection.toSuperNode() != markup) {
 					// don't allow different tree selection to text markup selection
-					textPane.transcriptTextArea.ttSelection = null;
+					textPane.select(null);
 				}
 			});
 			this.markupsPane.markupsTree.addEventListener(MouseEvent.DOUBLE_CLICK, function(evt:Event):void {
 				if (markupsPane.selectedMarkup != null) {
-					textPane.transcriptTextArea.selectMarkup(markupsPane.selectedMarkup);
-					transcriptTextAreaSelectionChange(null);
+					textPane.selectMarkup(markupsPane.selectedMarkup);
 				}
 			});
-			this.textPane.addEventListener(TranscriptTextArea.SELECTION_CHANGE_EVENT, transcriptTextAreaSelectionChange);
-			this.markupsPane.markupPropertiesPane.addEventListener(MarkupPropertiesPane.MARKUP_PROPERTIES_CHANGE_EVENT, function(evt:Event):void {
-				// TODO - this selectedMarkup is sometimes null when it shouldnt be
-				if (markupsPane.selectedMarkup == null) {
-					throw new Error("Could not handle markup properties change because markupsPane.selectedMarkup is null");
-				}
-				markupPropertiesChangeHandler(markupsPane.selectedMarkup);
+			this.textPane.addEventListener(SelectionChangeEvent.TRANSCRIPT_TEXT_AREA_SELECTION_CHANGE, transcriptTextAreaSelectionChange);
+			this.textPane.addEventListener(DataChangeEvent.TEXT_CHANGE, function(evt:DataChangeEvent):void {
+				textPane.redrawAndSelect(evt.affectedObj as TranscriptTextSelection);
+			});
+			this.markupsPane.addEventListener(DataChangeEvent.MARKUP_PROPERTIES_CHANGE, function(evt:DataChangeEvent):void {
+				var markup:MSuperNode = evt.affectedObj as MSuperNode; 
+				markupsPane.redraw(markup, false);
+				textPane.redrawAndSelectMarkup(markup);
 			});     		
-			this.markupsPane.markupPropertiesPane.addEventListener(MarkupPropertiesPane.MARKUP_REMOVE_EVENT, function(evt:Event):void {
-				removeMarkup();
-			}); 
+			this.markupsPane.addEventListener(DataChangeEvent.MARKUP_HIERARCHY_CHANGE, function(evt:DataChangeEvent):void {
+				var markup:MSuperNode = evt.affectedObj as MSuperNode; 
+				markupsPane.redraw(markup, true);
+				textPane.redrawAndSelectMarkup(markup);
+			});
 		}
 		
 		public function set transcript(transcript:Transcript):void {
@@ -102,11 +106,6 @@
 			});
 		}
 		
-		private function markupPropertiesChangeHandler(markup:MSuperNode):void {
-			this.markupsPane.markupPropertiesChangeHandler(markup);
-			this.textPane.markupPropertiesChangeHandler(markup);
-		}
-		
 		private function get ttSelection():TranscriptTextSelection {
 			return this.textPane.ttSelection;
 		}
@@ -114,24 +113,20 @@
 		internal function nudgeUp():void {
 			ttSelection.nudgeUp();
 			this.markupsPane.ttSelectionChangeHandler(textPane.ttSelection);
-			this.textPane.transcriptTextChangeHandler(textPane.ttSelection.selectedObj);
+			this.textPane.redrawAndSelect(textPane.ttSelection);
 		}
 
 		internal function nudgeDown():void {
 			ttSelection.nudgeDown();
 			this.markupsPane.ttSelectionChangeHandler(textPane.ttSelection);
-			this.textPane.transcriptTextChangeHandler(textPane.ttSelection.selectedObj);
+			this.textPane.redrawAndSelect(textPane.ttSelection);
 		}
 
 		internal function markupText():void {
 			var ttSelection:TranscriptTextSelection = textPane.ttSelection;
 			var markup:MSuperNode = ttSelection.markup();
-			this.markupsPane.markupHierarchyChangeHandler(markup);
-			callLater(function():void {
-				markupsPane.selectedMarkup = markup;
-			});
-			this.textPane.markupHierarchyChangeHandler(markup);
-			callLater(transcriptTextAreaSelectionChange, [null]);
+			this.markupsPane.redraw(markup, true);
+			this.textPane.redrawAndSelectMarkup(markup);
 		}
 
 		/**
@@ -140,20 +135,21 @@
 		public function removeMarkup():void {
 			var markup:MSuperNode = markupsPane.selectedMarkup;
 			markup.remove();
-			this.markupsPane.markupHierarchyChangeHandler(markup);
-			this.textPane.markupHierarchyChangeHandler(markup);
+			this.markupsPane.redraw(null, true);
+			this.textPane.redrawAndSelect(null);
 		}
 
 		internal function mergeSegmentRange():void {
 			var segment:MSegment = this.ttSelection.merge();
-			this.markupsPane.ttSelectionChangeHandler(new TranscriptTextSelection(segment));
-			this.textPane.transcriptTextChangeHandler(segment);
+			var ttSelection:TranscriptTextSelection = new TranscriptTextSelection(segment);
+			this.markupsPane.ttSelectionChangeHandler(ttSelection);
+			this.textPane.redrawAndSelect(ttSelection);
 		}
 		
 		internal function deleteText():void {
 			textPane.ttSelection.deleteText();
 			this.markupsPane.ttSelectionChangeHandler(null);
-			this.textPane.transcriptTextChangeHandler();
+			this.textPane.redrawAndSelect(null);
 		}
 
 		private function markupsTreeDoubleClicked(event:Event):void {
@@ -162,8 +158,15 @@
 			}
 		}
 	
-		private function transcriptTextAreaSelectionChange(evt:Event):void {
-			markupsPane.ttSelectionChangeHandler(textPane.ttSelection);
+		private function transcriptTextAreaSelectionChange(evt:SelectionChangeEvent):void {
+			var ttSelection:TranscriptTextSelection = evt.affectedObj as TranscriptTextSelection;
+			if (ttSelection != null) {
+				var selectedObject:Object = ttSelection.selectedObj;
+				if (selectedObject is MSuperNode) {
+					markupsPane.selectedMarkup = selectedObject as MSuperNode;
+				}
+			}
+			textPane.select(ttSelection);
 		}		
 	]]>
 	</mx:Script>
