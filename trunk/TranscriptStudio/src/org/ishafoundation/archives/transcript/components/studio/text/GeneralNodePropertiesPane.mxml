@@ -23,7 +23,6 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" horizontalAlign="left" backgroundColor="#FFFFFF" enabled="{this.generalProps != null}" creationComplete="init()" minWidth="400" minHeight="200" paddingTop="5" paddingBottom="5" paddingLeft="5" paddingRight="5">
 	<mx:Script>
 	<![CDATA[
-		import org.ishafoundation.archives.transcript.components.DataChangeEvent;
 		import name.carter.mark.flex.project.mdoc.MSuperSegment;
 		import mx.binding.utils.ChangeWatcher;
 		import name.carter.mark.flex.project.mdoc.MSegmentSubset;
@@ -82,7 +81,7 @@
 				affectedObj = _ttSelection.selectedObj;
 			}
 			var ttSelection:TranscriptTextSelection = new TranscriptTextSelection(affectedObj);
-			var event:Event = new DataChangeEvent(DataChangeEvent.TEXT_CHANGE, ttSelection);
+			var event:Event = new TranscriptTextEvent(TranscriptTextEvent.DATA_CHANGE, ttSelection);
 			dispatchEvent(event);
 		}
 		

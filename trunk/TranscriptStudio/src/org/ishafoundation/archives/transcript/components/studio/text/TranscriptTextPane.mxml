@@ -17,11 +17,9 @@
    You should have received a copy of the GNU General Public License along with 
    Transcript Studio for Isha Foundation. If not, see http://www.gnu.org/licenses/.
 -->
-<mx:VDividedBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:textNS="org.ishafoundation.archives.transcript.components.studio.text.*" resizeToContent="true">
+<mx:VDividedBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:textNS="org.ishafoundation.archives.transcript.components.studio.text.*" resizeToContent="true" creationComplete="init()">
 	<mx:Script>
     <![CDATA[
-    	import org.ishafoundation.archives.transcript.components.SelectionChangeEvent;
-    	import org.ishafoundation.archives.transcript.components.DataChangeEvent;
     	import org.ishafoundation.archives.transcript.model.ReferenceManager;
     	import org.ishafoundation.archives.transcript.model.GeneralNodeProperties;
     	import org.ishafoundation.archives.transcript.model.TranscriptTextSelection;
@@ -48,6 +46,15 @@
 		
 		[Bindable]
 		public var ttSelection:TranscriptTextSelection;
+		
+		private function init():void {
+			this.transcriptTextArea.addEventListener(TranscriptTextEvent.SELECTION_CHANGE, function(evt:TranscriptTextEvent):void {
+				select(evt.affectedTtSelection);				
+			});
+			this.generalNodePropertiesPane.addEventListener(TranscriptTextEvent.DATA_CHANGE, function(evt:TranscriptTextEvent):void {
+				redrawAndSelect(evt.affectedTtSelection);
+			});			
+		}
 		
 		public function set transcript(transcript:Transcript):void {
 			this._transcript = transcript;
