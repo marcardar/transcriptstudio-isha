@@ -20,8 +20,8 @@
 <mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:markupNS="org.ishafoundation.archives.transcript.components.studio.markup.*" xmlns:textNS="org.ishafoundation.archives.transcript.components.studio.text.*" horizontalGap="{Utils.DIVIDER_SIZE}" resizeToContent="true" creationComplete="init()">
 	<mx:Script>
     <![CDATA[
-    	import org.ishafoundation.archives.transcript.components.DataChangeEvent;
-    	import org.ishafoundation.archives.transcript.components.SelectionChangeEvent;
+    	import org.ishafoundation.archives.transcript.components.studio.markup.MarkupEvent;
+    	import org.ishafoundation.archives.transcript.components.studio.text.TranscriptTextEvent;
     	import org.ishafoundation.archives.transcript.components.studio.text.GeneralNodePropertiesPane;
     	import mx.events.PropertyChangeEvent;
     	import mx.binding.utils.ChangeWatcher;
@@ -60,33 +60,35 @@
 	    private var _transcript:Transcript;
 	    
 		private function init():void {
-			var thisObj:TranscriptPane = this;
-			// note - cannot bind to "selectedMarkup" because not bindable
-			markupsPane.markupsTree.addEventListener(MarkupsTree.MARKUP_SELECTION_CHANGE_EVENT, function(evt:Event):void {
-				var markup:MSuperNode = markupsPane.selectedMarkup;
-				if (markup != null && ttSelection != null && ttSelection.toSuperNode() != null && ttSelection.toSuperNode() != markup) {
-					// don't allow different tree selection to text markup selection
-					textPane.select(null);
+			this.textPane.addEventListener(TranscriptTextEvent.SELECTION_CHANGE, function (evt:TranscriptTextEvent):void {
+				var ttSelection:TranscriptTextSelection = evt.affectedTtSelection;
+				if (ttSelection != null) {
+					var selectedObject:Object = ttSelection.selectedObj;
+					if (selectedObject is MSuperNode) {
+						markupsPane.selectedMarkup = selectedObject as MSuperNode;
+					}
+				}
+				//textPane.select(ttSelection);
+			});
+			// nothing to do when text data changes
+			/*this.textPane.addEventListener(TranscriptTextEvent.DATA_CHANGE, function(evt:TranscriptTextEvent):void {
+			});*/
+			this.markupsPane.addEventListener(MarkupEvent.SELECTION_CHANGE, function(evt:MarkupEvent):void {
+				if (evt.affectedMarkup != null) {
+					if (evt.isStrongChange) {
+						textPane.selectMarkup(markupsPane.selectedMarkup);
+					}
+					else {
+						// don't allow different tree selection to text markup selection
+						if (ttSelection != null && ttSelection.toSuperNode() != null && ttSelection.toSuperNode() != evt.affectedMarkup) {
+							textPane.select(null);
+						}						
+					}
 				}
 			});
-			this.markupsPane.markupsTree.addEventListener(MouseEvent.DOUBLE_CLICK, function(evt:Event):void {
-				if (markupsPane.selectedMarkup != null) {
-					textPane.selectMarkup(markupsPane.selectedMarkup);
-				}
-			});
-			this.textPane.addEventListener(SelectionChangeEvent.TRANSCRIPT_TEXT_AREA_SELECTION_CHANGE, transcriptTextAreaSelectionChange);
-			this.textPane.addEventListener(DataChangeEvent.TEXT_CHANGE, function(evt:DataChangeEvent):void {
-				textPane.redrawAndSelect(evt.affectedObj as TranscriptTextSelection);
-			});
-			this.markupsPane.addEventListener(DataChangeEvent.MARKUP_PROPERTIES_CHANGE, function(evt:DataChangeEvent):void {
-				var markup:MSuperNode = evt.affectedObj as MSuperNode; 
-				markupsPane.redraw(markup, false);
-				textPane.redrawAndSelectMarkup(markup);
-			});     		
-			this.markupsPane.addEventListener(DataChangeEvent.MARKUP_HIERARCHY_CHANGE, function(evt:DataChangeEvent):void {
-				var markup:MSuperNode = evt.affectedObj as MSuperNode; 
-				markupsPane.redraw(markup, true);
-				textPane.redrawAndSelectMarkup(markup);
+			this.markupsPane.addEventListener(MarkupEvent.DATA_CHANGE, function(evt:MarkupEvent):void {
+				markupsPane.redraw(evt.affectedMarkup, evt.isStrongChange);
+				textPane.redrawAndSelectMarkup(evt.affectedMarkup);
 			});
 		}
 		
@@ -156,18 +158,7 @@
 			if (this.markupsPane.selectedMarkup != null) {
 				this.textPane.selectMarkup(this.markupsPane.selectedMarkup);
 			}
-		}
-	
-		private function transcriptTextAreaSelectionChange(evt:SelectionChangeEvent):void {
-			var ttSelection:TranscriptTextSelection = evt.affectedObj as TranscriptTextSelection;
-			if (ttSelection != null) {
-				var selectedObject:Object = ttSelection.selectedObj;
-				if (selectedObject is MSuperNode) {
-					markupsPane.selectedMarkup = selectedObject as MSuperNode;
-				}
-			}
-			textPane.select(ttSelection);
-		}		
+		}	
 	]]>
 	</mx:Script>
 	<markupNS:MarkupsPane id="markupsPane" width="25%" minWidth="355" height="100%" verticalGap="{Utils.DIVIDER_SIZE}" transcript="{this.transcript}"/>

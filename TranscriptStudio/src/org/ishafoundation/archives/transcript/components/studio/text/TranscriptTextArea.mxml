@@ -2,7 +2,6 @@
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" minWidth="500" minHeight="200" initialize="init()">
 	<mx:Script>
 	<![CDATA[
-		import org.ishafoundation.archives.transcript.components.SelectionChangeEvent;
 		import org.ishafoundation.archives.transcript.model.TranscriptTextSelection;
 		import name.carter.mark.flex.util.Utils;
 		import name.carter.mark.flex.project.mdoc.MContentRangeSubset;
@@ -141,9 +140,9 @@
 		 * DO NOT call if changed programmatically.
 		 */
 		private function selectionChangeHandler():void {
-			var newSelection:Object = calculateSelectionInfo(this.wrappedTextArea.selectionBeginIndex, this.wrappedTextArea.selectionEndIndex);
+			var newSelection:TranscriptTextSelection = calculateSelectionInfo(this.wrappedTextArea.selectionBeginIndex, this.wrappedTextArea.selectionEndIndex);
 			this.wrappedTextArea.setFocus();
-			dispatchEvent(new SelectionChangeEvent(SelectionChangeEvent.TRANSCRIPT_TEXT_AREA_SELECTION_CHANGE, newSelection));
+			dispatchEvent(new TranscriptTextEvent(TranscriptTextEvent.SELECTION_CHANGE, newSelection));
 		}
 		
 		internal function redrawThenSelectMarkup(markup:MSuperNode): void {

@@ -17,9 +17,10 @@
 		import mx.events.TreeEvent;
 		import mx.events.ListEvent;
 		
-		public static const MARKUP_SELECTION_CHANGE_EVENT:String = "MARKUP_SELECTION_CHANGE_EVENT";
-		
 		private function init():void {
+			addEventListener(MouseEvent.DOUBLE_CLICK, function(evt:MouseEvent):void {
+				dispatchEvent(new MarkupEvent(MarkupEvent.SELECTION_CHANGE, true, selectedMarkup));
+			});
 			addEventListener(Event.CHANGE, function(evt:Event):void {
 				if (selectedItem == null) {
 					trace("User cleared selection in MarkupsTree");
@@ -27,7 +28,7 @@
 				else {
 					trace("User changed selection in MarkupsTree: " + selectedItem.id);
 				}
-				dispatchEvent(new Event(MARKUP_SELECTION_CHANGE_EVENT));
+				dispatchEvent(new MarkupEvent(MarkupEvent.SELECTION_CHANGE, false, selectedMarkup));
 				// sometimes this will not be what the user clicked on because of the automatic selection
 				// of the current item when the tree dataprovider is updated
 			});

@@ -20,7 +20,6 @@
 <mx:VDividedBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:markupNS="org.ishafoundation.archives.transcript.components.studio.markup.*" xmlns:textNS="org.ishafoundation.archives.transcript.components.studio.text.*" resizeToContent="true" creationComplete="init()">
 	<mx:Script>
     <![CDATA[
-    	import org.ishafoundation.archives.transcript.components.DataChangeEvent;
     	import org.ishafoundation.archives.transcript.model.GeneralNodeProperties;
     	import org.ishafoundation.archives.transcript.model.TranscriptTextSelection;
     	import name.carter.mark.flex.util.Utils;
@@ -50,8 +49,14 @@
 					initMarkupEditorPane();
 				}
 			});
-			markupPropertiesPane.addEventListener(MarkupPropertiesPane.MARKUP_PROPERTIES_CHANGE_EVENT, markupPropertyChangeHandler);
-			markupPropertiesPane.addEventListener(MarkupPropertiesPane.MARKUP_REMOVE_EVENT, markupRemoveHandler);
+			markupPropertiesPane.addEventListener(MarkupPropertiesPane.MARKUP_REMOVE_EVENT, function (evt:Event):void {
+				selectedMarkup.remove();
+				dispatchEvent(new MarkupEvent(MarkupEvent.DATA_CHANGE, true, null)); // null because it was removed
+			});
+			markupPropertiesPane.addEventListener(MarkupPropertiesPane.MARKUP_PROPERTIES_CHANGE_EVENT, function (evt:Event):void {
+				// don't need to do anything because changes already committed
+				dispatchEvent(new MarkupEvent(MarkupEvent.DATA_CHANGE, false, selectedMarkup));
+			});
 		}
 		
 		public function set transcript(transcript:Transcript):void {
@@ -178,14 +183,6 @@
 			return result;
 		}
 				
-		private function markupPropertyChangeHandler(evt:Event):void {
-			dispatchEvent(new DataChangeEvent(DataChangeEvent.MARKUP_PROPERTIES_CHANGE));			
-		}		
-		
-		private function markupRemoveHandler(evt:Event):void {
-			selectedMarkup.remove();
-			dispatchEvent(new DataChangeEvent(DataChangeEvent.MARKUP_HIERARCHY_CHANGE));
-		}
     ]]>
 	</mx:Script>
 	<markupNS:MarkupsTree id="markupsTree" width="100%" height="100%" minHeight="100" fontFamily="arial" fontSize="14" fontWeight="bold" showRoot="false" labelFunction="labelFunc" iconFunction="{IconUtils.getIconFunctionForDataRenderer(markupsTree, getMarkupIconPath, 24, 24, Utils.DEFAULT_ICON_CLASS)}"/>

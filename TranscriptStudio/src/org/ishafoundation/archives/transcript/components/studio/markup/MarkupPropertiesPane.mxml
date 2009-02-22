@@ -23,7 +23,6 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" minWidth="345" minHeight="330" horizontalAlign="left" verticalGap="0" paddingBottom="5" backgroundColor="#FFFFFF" enabled="{this.markupAttrs != null}" creationComplete="clearPane()">
 	<mx:Script>
     <![CDATA[
-    	import org.ishafoundation.archives.transcript.components.DataChangeEvent;
     	import org.ishafoundation.archives.transcript.util.Constants;
     	import name.carter.mark.flex.util.Utils;
     	import org.ishafoundation.archives.transcript.model.ReferenceManager;
@@ -41,8 +40,8 @@
 		[Embed(source="/../assets/star-yellow.png")]
 		public static const STAR_YELLOW_ICON_CLASS:Class;
 
-		public static const MARKUP_REMOVE_EVENT:String = "MARKUP_REMOVE_EVENT";
-		public static const MARKUP_PROPERTIES_CHANGE_EVENT:String = "MARKUP_PROPERTIES_CHANGE_EVENT";
+		internal static const MARKUP_REMOVE_EVENT:String = "MARKUP_REMOVE_EVENT";
+		internal static const MARKUP_PROPERTIES_CHANGE_EVENT:String = "MARKUP_PROPERTIES_CHANGE_EVENT";
 
 		public var referenceMgr:ReferenceManager;
 		
