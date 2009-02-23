@@ -53,7 +53,10 @@
 		private var _transcript:Transcript;
 		public var transcriptTextAreaMapping:Array;
 		
+		private var oldRawSelection:Object;
+		
 		private function init():void {
+			invalidateOldSelection();
 			this.scrollEffect = new AnimateProperty(this.wrappedTextArea)
 			this.scrollEffect.easingFunction = Quadratic.easeInOut;
 			this.scrollEffect.addEventListener(EffectEvent.EFFECT_END, function(evt:EffectEvent):void {
@@ -64,6 +67,10 @@
 			});
 			this.textField.alwaysShowSelection = true;
 			this.textField.useRichTextClipboard = false;
+		}
+		
+		private function invalidateOldSelection():void {
+			oldRawSelection = {beginIndex:-1, endIndex:-1};
 		}
 		
 		private var nextIndex:int = 0;
@@ -103,6 +110,7 @@
 			trace("Setting selectionBegin/EndIndex: " + newSelectionBeginIndex + "-" + newSelectionEndIndex);
 			this.wrappedTextArea.selectionBeginIndex = newSelectionBeginIndex;
 			this.wrappedTextArea.selectionEndIndex = newSelectionEndIndex;
+			this.oldRawSelection = {beginIndex:newSelectionBeginIndex, endIndex:newSelectionEndIndex};
 		}
 		
 		public function set transcript(transcript:Transcript):void {
@@ -256,7 +264,15 @@
 			}
 			var newVerticalScrollPosition:int = this.wrappedTextArea.verticalScrollPosition;
 			if (linesToDisplayEndIndex - linesToDisplayStartIndex >= numVisibleLines) {
-				newVerticalScrollPosition = linesToDisplayEndIndex;
+				if ((linesToDisplayStartIndex <= visibleLinesEndIndex && linesToDisplayEndIndex >= visibleLinesStartIndex)) {
+					// start happens before the end of visible lines, and end happens after start of visible lines
+					// - so some of highlighted text already show
+					// - so no need to scroll
+					newVerticalScrollPosition = -1;
+				}
+				else {
+					newVerticalScrollPosition = linesToDisplayStartIndex;
+				}
 			}
 			else {
 				// manipulate the line index to display values according to preferred values and whether scroll up or down
@@ -285,9 +301,12 @@
 				}	
 			}
 			var newIndexes:Object = getBeginEndIndexes(newTtaSelection);
-			if (newIndexes.beginIndex == this.wrappedTextArea.selectionBeginIndex && newIndexes.endIndex == this.wrappedTextArea.selectionEndIndex) {
+			if (newIndexes.beginIndex == oldRawSelection.beginIndex && newIndexes.endIndex == oldRawSelection.endIndex) {
 				// the selection is already good so just scroll if necessary
-				verticalScrollToPosition(newVerticalScrollPosition, null);
+				verticalScrollToPosition(newVerticalScrollPosition, function():void {
+					// still need to set the selection - because the actuall selection may have changed (even though the logical selection - eg whole para is the same)
+					setRawSelection(newIndexes.beginIndex, newIndexes.endIndex);					
+				});
 			}
 			else {
 				if (newVerticalScrollPosition == this.wrappedTextArea.verticalScrollPosition) {
@@ -296,7 +315,7 @@
 				}
 				else {
 					// before we scroll and select - clear selection first
-					if (newIndexes.beginIndex != this.wrappedTextArea.selectionBeginIndex && newIndexes.endIndex != this.wrappedTextArea.selectionEndIndex) {
+					if (newIndexes.beginIndex != oldRawSelection.beginIndex && newIndexes.endIndex != oldRawSelection.endIndex) {
 						// the selection is siginificantly different that we should clear before scrolling
 						clearSelection();
 					}
@@ -363,19 +382,25 @@
 			trace("Vertical scroll to position: " + newVerticalScrollPosition);
 			this.scrollEffectEndFunc = null;
 			this.scrollEffect.stop(); // make sure there is nothing still running
-			var linesToScroll:int = Math.abs(newVerticalScrollPosition - this.wrappedTextArea.verticalScrollPosition);
-			if (linesToScroll <= 0) {
-				if (nextFunc != null) {
-					nextFunc();
-				}
+			if (newVerticalScrollPosition < 0) {
+				// this means do not scroll
+				nextFunc();
 			}
 			else {
-				this.scrollEffectEndFunc = nextFunc;
-				this.scrollEffect.property = "verticalScrollPosition";
-				this.scrollEffect.toValue = newVerticalScrollPosition;
-				// don't go too slow
-				this.scrollEffect.duration = Math.min(durationInMillis, (1000 * linesToScroll) / MIN_SCROLL_SPEED);
-				this.scrollEffect.play();
+				var linesToScroll:int = Math.abs(newVerticalScrollPosition - this.wrappedTextArea.verticalScrollPosition);
+				if (linesToScroll <= 0) {
+					if (nextFunc != null) {
+						nextFunc();
+					}
+				}
+				else {
+					this.scrollEffectEndFunc = nextFunc;
+					this.scrollEffect.property = "verticalScrollPosition";
+					this.scrollEffect.toValue = newVerticalScrollPosition;
+					// don't go too slow
+					this.scrollEffect.duration = Math.min(durationInMillis, (1000 * linesToScroll) / MIN_SCROLL_SPEED);
+					this.scrollEffect.play();
+				}
 			}
 		}
 		
