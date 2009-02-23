@@ -119,51 +119,37 @@
 		
 		internal function nudgeUp():void {
 			ttSelection.nudgeUp();
-			this.markupsPane.ttSelectionChangeHandler(textPane.ttSelection);
-			this.textPane.redrawAndSelect(textPane.ttSelection);
+			this.textPane.dispatchEvent(new TranscriptTextEvent(TranscriptTextEvent.DATA_CHANGE, ttSelection));
 		}
 
 		internal function nudgeDown():void {
 			ttSelection.nudgeDown();
-			this.markupsPane.ttSelectionChangeHandler(textPane.ttSelection);
-			this.textPane.redrawAndSelect(textPane.ttSelection);
+			this.textPane.dispatchEvent(new TranscriptTextEvent(TranscriptTextEvent.DATA_CHANGE, ttSelection));
 		}
 
 		internal function markupText():void {
 			var ttSelection:TranscriptTextSelection = textPane.ttSelection;
 			var markup:MSuperNode = ttSelection.markup();
-			this.markupsPane.redraw(markup, true);
-			this.textPane.redrawAndSelectMarkup(markup);
+			this.markupsPane.dispatchEvent(new MarkupEvent(MarkupEvent.DATA_CHANGE, true, markup));
 		}
 
 		/**
 		 * Returns the parent.
 		 */
 		public function removeMarkup():void {
-			var markup:MSuperNode = markupsPane.selectedMarkup;
-			markup.remove();
-			this.markupsPane.redraw(null, true);
-			this.textPane.redrawAndSelect(null);
+			this.markupsPane.removeSelectedMarkup();
 		}
 
 		internal function mergeSegmentRange():void {
 			var segment:MSegment = this.ttSelection.merge();
 			var ttSelection:TranscriptTextSelection = new TranscriptTextSelection(segment);
-			this.markupsPane.ttSelectionChangeHandler(ttSelection);
-			this.textPane.redrawAndSelect(ttSelection);
+			this.textPane.dispatchEvent(new TranscriptTextEvent(TranscriptTextEvent.DATA_CHANGE, ttSelection));
 		}
 		
 		internal function deleteText():void {
 			textPane.ttSelection.deleteText();
-			this.markupsPane.ttSelectionChangeHandler(null);
-			this.textPane.redrawAndSelect(null);
+			this.textPane.dispatchEvent(new TranscriptTextEvent(TranscriptTextEvent.DATA_CHANGE));
 		}
-
-		private function markupsTreeDoubleClicked(event:Event):void {
-			if (this.markupsPane.selectedMarkup != null) {
-				this.textPane.selectMarkup(this.markupsPane.selectedMarkup);
-			}
-		}	
 	]]>
 	</mx:Script>
 	<markupNS:MarkupsPane id="markupsPane" width="25%" minWidth="355" height="100%" verticalGap="{Utils.DIVIDER_SIZE}" transcript="{this.transcript}"/>

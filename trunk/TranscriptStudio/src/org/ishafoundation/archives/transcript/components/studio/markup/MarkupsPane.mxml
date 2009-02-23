@@ -50,16 +50,16 @@
 				}
 			});
 			markupPropertiesPane.addEventListener(MarkupPropertiesPane.MARKUP_REMOVE_EVENT, function (evt:Event):void {
-				selectedMarkup.remove();
-				dispatchEvent(new MarkupEvent(MarkupEvent.DATA_CHANGE, true, null)); // null because it was removed
-			});
-			markupPropertiesPane.addEventListener(MarkupPropertiesPane.MARKUP_PROPERTIES_CHANGE_EVENT, function (evt:Event):void {
-				// don't need to do anything because changes already committed
-				dispatchEvent(new MarkupEvent(MarkupEvent.DATA_CHANGE, false, selectedMarkup));
+				removeSelectedMarkup();
 			});
 			addEventListener(MarkupEvent.DATA_CHANGE, function(evt:MarkupEvent):void {
 				redraw(evt.affectedMarkup, evt.isStrongChange);
 			});
+		}
+		
+		public function removeSelectedMarkup():void {
+			selectedMarkup.remove();
+			dispatchEvent(new MarkupEvent(MarkupEvent.DATA_CHANGE, true, null)); // null because it was removed
 		}
 		
 		public function set transcript(transcript:Transcript):void {
@@ -100,20 +100,6 @@
 			this.markupsTree.redraw(markup, completeRedraw);
 		}
 		
-		/**
-		 * This is called either when the user selects or edits some text - more specifically, any way in which the
-		 * text represented by the selection, changes.
-		 */
-		public function ttSelectionChangeHandler(ttSelection:TranscriptTextSelection):void {
-			if (ttSelection == null) {
-				// nothing selected
-				return;
-			}
-			if (ttSelection.toSuperNode() != null) {
-				this.selectedMarkup = ttSelection.toSuperNode();
-			}
-		}
-
 		public function getMarkupIconPath(itemObj:Object):String {
 			if (!(itemObj is MSuperNode)) {
 				return null;
@@ -185,9 +171,14 @@
 			result += _transcript.createMarkupTitle(markupAttrs, includeAdditionalConcepts);
 			return result;
 		}
+		
+		private function dispatchPropChangeEventFunc():void {
+			var event:MarkupEvent = new MarkupEvent(MarkupEvent.DATA_CHANGE, false, selectedMarkup);
+			dispatchEvent(event);
+		}
 				
     ]]>
 	</mx:Script>
 	<markupNS:MarkupsTree id="markupsTree" width="100%" height="100%" minHeight="100" fontFamily="arial" fontSize="14" fontWeight="bold" showRoot="false" labelFunction="labelFunc" iconFunction="{IconUtils.getIconFunctionForDataRenderer(markupsTree, getMarkupIconPath, 24, 24, Utils.DEFAULT_ICON_CLASS)}"/>
-	<markupNS:MarkupPropertiesPane id="markupPropertiesPane" label="Markup" width="100%" height="100%" paddingLeft="5" paddingRight="5" referenceMgr="{this.transcript.referenceMgr}" titleFunc="{titleFuncForMarkupPropsPane}"/>
+	<markupNS:MarkupPropertiesPane id="markupPropertiesPane" label="Markup" width="100%" height="100%" paddingLeft="5" paddingRight="5" referenceMgr="{this.transcript.referenceMgr}" titleFunc="{titleFuncForMarkupPropsPane}" dispatchPropChangeEventFunc="{dispatchPropChangeEventFunc}"/>
 </mx:VDividedBox>

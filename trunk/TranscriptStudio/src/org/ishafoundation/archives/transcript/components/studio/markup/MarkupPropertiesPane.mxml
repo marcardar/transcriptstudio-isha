@@ -41,7 +41,6 @@
 		public static const STAR_YELLOW_ICON_CLASS:Class;
 
 		internal static const MARKUP_REMOVE_EVENT:String = "MARKUP_REMOVE_EVENT";
-		internal static const MARKUP_PROPERTIES_CHANGE_EVENT:String = "MARKUP_PROPERTIES_CHANGE_EVENT";
 
 		public var referenceMgr:ReferenceManager;
 		
@@ -51,6 +50,7 @@
 		public var committedMarkupAttrs:MSuperNodeProperties;
 
 		public var titleFunc:Function;
+		public var dispatchPropChangeEventFunc:Function;
 		
 		public function initPane(allowOutline:Boolean, allowInline:Boolean, markupAttrs:MSuperNodeProperties, committedMarkupAttrs:MSuperNodeProperties):void {
 			this.markupAttrs = markupAttrs;
@@ -67,11 +67,11 @@
 			setTitle();
 		}
 		
-		private function somethingChanged():void {
+		private function somePropertyChanged():void {
 			setTitle();
 			// TODO - this is a hack - make sure that the buttons are correctly enabled - for example, Revert Properties
 			executeBindings(true);
-			dispatchEvent(new Event(MARKUP_PROPERTIES_CHANGE_EVENT));
+			dispatchPropChangeEventFunc();
 		}
 		
 		private function setTitle():void {
@@ -90,7 +90,7 @@
 				return;
 			}
 			this.markupAttrs.markupTypeId = newTypeId;
-			somethingChanged();
+			somePropertyChanged();
 		}
 		
 		private function predefinedClicked():void {
@@ -110,7 +110,7 @@
 						// the type id is not compatible with the types of this predefined category
 						markupAttrs.markupTypeId = markupTypeIds[0];
 					}
-					somethingChanged();
+					somePropertyChanged();
 				}
 			}); 
 		}
@@ -125,7 +125,7 @@
 				if (text != "" && text != markupAttrs.markupCategorySuggestion) {
 					markupAttrs.markupCategorySuggestion = text;
 					markupAttrs.markupCategoryId = null;
-					somethingChanged();
+					somePropertyChanged();
 				}
 			});
 		}
@@ -133,7 +133,7 @@
 		private function uncategorizedClicked():void {
 			this.markupAttrs.markupCategoryId = null;
 			this.markupAttrs.markupCategorySuggestion = "";
-			somethingChanged();
+			somePropertyChanged();
 		}
 		
 		private function categoryStyleClicked():void {
@@ -171,7 +171,7 @@
 			var newArray:Array = Utils.normalizeSpace(this.additionalConceptsTextInput.text.toString()).split(' ');
 			if (newArray.toString() != this.markupAttrs.additionalConcepts.join(' ')) {
 				this.markupAttrs.additionalConcepts = newArray; 
-				somethingChanged();
+				somePropertyChanged();
 			}
 		}
 		
@@ -183,7 +183,7 @@
 			var newText:String = StringUtil.trim(summaryTextArea.text);
 			if (newText != this.markupAttrs.summary) {
 				this.markupAttrs.summary = newText; 
-				somethingChanged();
+				somePropertyChanged();
 			}
 		}
 		
@@ -195,7 +195,7 @@
 			var newText:String = StringUtil.trim(commentTextArea.text);
 			if (newText != this.markupAttrs.comment) {
 				this.markupAttrs.comment = newText; 
-				somethingChanged();
+				somePropertyChanged();
 			}
 		}
 		
@@ -207,20 +207,20 @@
 			if (this.starButton.selected) {
 				if (this.markupAttrs.rating < 100) {
 					this.markupAttrs.rating = 100;
-					somethingChanged();
+					somePropertyChanged();
 				}
 			}
 			else {
 				if (this.markupAttrs.rating >= 0) {
 					this.markupAttrs.rating = -1;
-					somethingChanged();
+					somePropertyChanged();
 				}
 			}
 		}
 		
 		private function revertClicked():void {
 			this.markupAttrs.overwrite(committedMarkupAttrs);
-			somethingChanged();
+			somePropertyChanged();
 		}
 		
 		private function removeClicked():void {

@@ -48,10 +48,10 @@
 		public var ttSelection:TranscriptTextSelection;
 		
 		private function init():void {
-			this.transcriptTextArea.addEventListener(TranscriptTextEvent.SELECTION_CHANGE, function(evt:TranscriptTextEvent):void {
+			this.addEventListener(TranscriptTextEvent.SELECTION_CHANGE, function(evt:TranscriptTextEvent):void {
 				select(evt.affectedTtSelection);				
 			});
-			this.generalNodePropertiesPane.addEventListener(TranscriptTextEvent.DATA_CHANGE, function(evt:TranscriptTextEvent):void {
+			this.addEventListener(TranscriptTextEvent.DATA_CHANGE, function(evt:TranscriptTextEvent):void {
 				redrawAndSelect(evt.affectedTtSelection);
 			});			
 		}
@@ -89,11 +89,13 @@
 		}
 		
 		public function select(newSelection:TranscriptTextSelection):void {
+			this.ttSelection = null; // hack - to trigger bindings
 			this.ttSelection = newSelection;
 			this.transcriptTextArea.select(newSelection);
 		}
 		
 		public function redrawAndSelect(ttSelection:TranscriptTextSelection):void {
+			this.ttSelection = null; // hack - to trigger bindings
 			this.ttSelection = ttSelection;
 			this.transcriptTextArea.redraw(ttSelection);				
 		}
