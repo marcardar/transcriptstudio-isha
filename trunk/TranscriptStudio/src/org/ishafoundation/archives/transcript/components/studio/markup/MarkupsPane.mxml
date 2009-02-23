@@ -57,6 +57,9 @@
 				// don't need to do anything because changes already committed
 				dispatchEvent(new MarkupEvent(MarkupEvent.DATA_CHANGE, false, selectedMarkup));
 			});
+			addEventListener(MarkupEvent.DATA_CHANGE, function(evt:MarkupEvent):void {
+				redraw(evt.affectedMarkup, evt.isStrongChange);
+			});
 		}
 		
 		public function set transcript(transcript:Transcript):void {
