@@ -87,8 +87,13 @@
 				}
 			});
 			this.markupsPane.addEventListener(MarkupEvent.DATA_CHANGE, function(evt:MarkupEvent):void {
-				markupsPane.redraw(evt.affectedMarkup, evt.isStrongChange);
-				textPane.redrawAndSelectMarkup(evt.affectedMarkup);
+				if (evt.isStrongChange) {
+					textPane.redrawAndSelectMarkup(evt.affectedMarkup);
+				}
+				else {
+					// TODO - is the ttSelection still valid?
+					textPane.redrawAndSelect(textPane.ttSelection);
+				}
 			});
 		}
 		

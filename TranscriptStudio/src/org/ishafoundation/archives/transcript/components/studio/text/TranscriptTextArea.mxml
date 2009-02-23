@@ -171,6 +171,7 @@
 					select(null);
 				}
 				else if (newSelectionInfo.toSuperNode() != null) {
+					// TODO - check all this - because recent refactoring (Issue #49) changes the game a bit
 					// this is a markup id - text does not change much for a markup event, so don't adjust scroll position
 					wrappedTextArea.verticalScrollPosition = oldVerticalScrollPosition;
 					// only select the markup if its visible - because we don't want to scroll unnecessarily
@@ -203,7 +204,7 @@
 		
 		public function select(newTtaSelection:TranscriptTextSelection):void {
 			if (newTtaSelection == null) {
-				selectInternal(null);
+				clearSelection();
 				return;
 			}
 			var firstIndexToSelect:int;
@@ -283,24 +284,43 @@
 					}
 				}	
 			}
-			if (newVerticalScrollPosition != this.wrappedTextArea.verticalScrollPosition) {
-				// before we scroll and select - clear selection first
-				selectInternal(null);
-				verticalScrollToPosition(newVerticalScrollPosition, function():void {
-					selectInternal(newTtaSelection);
-				});
+			var newIndexes:Object = getBeginEndIndexes(newTtaSelection);
+			if (newIndexes.beginIndex == this.wrappedTextArea.selectionBeginIndex && newIndexes.endIndex == this.wrappedTextArea.selectionEndIndex) {
+				// the selection is already good so just scroll if necessary
+				verticalScrollToPosition(newVerticalScrollPosition, null);
 			}
 			else {
-				selectInternal(newTtaSelection);
+				if (newVerticalScrollPosition == this.wrappedTextArea.verticalScrollPosition) {
+					// scroll position is good so just need to change selection
+					setRawSelection(newIndexes.beginIndex, newIndexes.endIndex);					
+				}
+				else {
+					// before we scroll and select - clear selection first
+					if (newIndexes.beginIndex != this.wrappedTextArea.selectionBeginIndex && newIndexes.endIndex != this.wrappedTextArea.selectionEndIndex) {
+						// the selection is siginificantly different that we should clear before scrolling
+						clearSelection();
+					}
+					verticalScrollToPosition(newVerticalScrollPosition, function():void {
+						setRawSelection(newIndexes.beginIndex, newIndexes.endIndex);					
+					});
+				}			
 			}
+		}
+		
+		private function clearSelection():void {
+			// we want to make a blank selection but must be careful that we blank-selected somewhere
+			// already in the view so there is no autoscroll
+			var lineIndex:int = Utils.getFirstVisibleLineIndex(this.wrappedTextArea);
+			var charIndex:int = textField.getLineOffset(lineIndex);
+			setRawSelection(charIndex, charIndex); // zero length selection at start of existing selection			
 		}
 		
 		/**
 		 * Works out all the relevant offsets from the specified ttSelection and selects the right text.
 		 * 
-		 * Does not both with scrolling etc
+		 * Does not bother with scrolling etc
 		 */
-		private function selectInternal(ttSelection:TranscriptTextSelection):void {
+		private function getBeginEndIndexes(ttSelection:TranscriptTextSelection):Object {
 			/*
 			 * Dont care if it is already set to the same thing for two reasons:
 			 * 1. The text might have changed and so therefore the start/endIndex of the selection may need to change too.
@@ -315,8 +335,7 @@
 				// already in the view so there is no autoscroll
 				var lineIndex:int = Utils.getFirstVisibleLineIndex(this.wrappedTextArea);
 				var charIndex:int = textField.getLineOffset(lineIndex);
-				setRawSelection(charIndex, charIndex); // zero length selection at start of existing selection
-				return;
+				return {beginEndex:charIndex, endIndex:charIndex}; // zero length selection at start of existing selection
 			}
 			var beginIndex:int;
 			var endIndex:int;
@@ -337,20 +356,27 @@
 				endIndex = getStartIndex(contentRangeSubset.spanningContentRange.last.id) + contentRangeSubset.endOffsetRelativeToLastContent;
 			}
 			trace("Calculated text area selection: " + beginIndex + "-" + endIndex);
-			setRawSelection(beginIndex, endIndex);
+			return {beginIndex:beginIndex, endIndex:endIndex};
 		}
 		
 		private function verticalScrollToPosition(newVerticalScrollPosition:int, nextFunc:Function, durationInMillis:Number = SCROLL_DURATION_IN_MILLIS):void {
 			trace("Vertical scroll to position: " + newVerticalScrollPosition);
 			this.scrollEffectEndFunc = null;
 			this.scrollEffect.stop(); // make sure there is nothing still running
-			this.scrollEffectEndFunc = nextFunc;
-			this.scrollEffect.property = "verticalScrollPosition";
-			this.scrollEffect.toValue = newVerticalScrollPosition;
 			var linesToScroll:int = Math.abs(newVerticalScrollPosition - this.wrappedTextArea.verticalScrollPosition);
-			// don't go too slow
-			this.scrollEffect.duration = Math.min(durationInMillis, (1000 * linesToScroll) / MIN_SCROLL_SPEED);
-			this.scrollEffect.play();
+			if (linesToScroll <= 0) {
+				if (nextFunc != null) {
+					nextFunc();
+				}
+			}
+			else {
+				this.scrollEffectEndFunc = nextFunc;
+				this.scrollEffect.property = "verticalScrollPosition";
+				this.scrollEffect.toValue = newVerticalScrollPosition;
+				// don't go too slow
+				this.scrollEffect.duration = Math.min(durationInMillis, (1000 * linesToScroll) / MIN_SCROLL_SPEED);
+				this.scrollEffect.play();
+			}
 		}
 		
 		private function getStartIndex(nodeId:String):int {
