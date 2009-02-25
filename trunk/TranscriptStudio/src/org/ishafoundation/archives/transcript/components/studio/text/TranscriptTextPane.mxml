@@ -100,8 +100,9 @@
 			this.transcriptTextArea.redraw(ttSelection);				
 		}
 		
-		public function setGeneralPropertiesPaneVisibility(visible:Boolean):void {
-			this.generalNodePropertiesPane.includeInLayout = visible;
+		public function setPropertiesPaneVisibility(visible:Boolean):void {
+			this.nodePropertiesPane.includeInLayout = visible;
+			this.nodePropertiesPane.visible = visible;
 		}		
 		
     ]]>
@@ -109,6 +110,7 @@
 	<textNS:TranscriptTextArea id="transcriptTextArea" width="100%" height="75%" referenceMgr="{this.referenceMgr}" transcript="{this.transcript}"/>
 	<mx:TabNavigator id="nodePropertiesPane" width="100%" height="25%" minWidth="350" minHeight="200">
 		<textNS:GeneralNodePropertiesPane id="generalNodePropertiesPane" label="Selected Text" width="100%" ttSelection="{this.ttSelection}"/>
+		<!--textNS:MediaPane id="mediaPane" label="Media" width="100%" height="100%" enabled="false"/-->
 		<!--textNS:TimingsPane id="timingsPane" label="Timings" width="100%" height="100%" enabled="false"/-->
 	</mx:TabNavigator>		
 </mx:VDividedBox>
