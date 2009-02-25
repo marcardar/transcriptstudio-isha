@@ -424,9 +424,13 @@
 				else if ( actionName == "nudgeDown" ) {
 					this.transcriptPane.nudgeDown();
 				}
-				else if ( actionName == "showPropertiesPane" ) {
-					var selected:Boolean = evt.item.@toggled.toString() == "true";
-					this.transcriptPane.markupsPane.setNodePropertiesPaneVisibility(selected);
+				else if ( actionName == "showMarkupPropertiesPane" ) {
+					var showMarkupProps:Boolean = evt.item.@toggled.toString() == "true";
+					this.transcriptPane.markupsPane.setNodePropertiesPaneVisibility(showMarkupProps);
+				}
+				else if ( actionName == "showTextPropertiesPane" ) {
+					var showTextProps:Boolean = evt.item.@toggled.toString() == "true";
+					this.transcriptPane.textPane.setPropertiesPaneVisibility(showTextProps);
 				}
 				else if ( actionName == "showHTMLSearchInterface" ) {
 					
@@ -489,7 +493,8 @@
 				<menuitem id="nudgeDown" label="Nudge Down" enabled="{transcriptPane.textPane.ttSelection.allowNudgeDown()}"/>
 			</menuitem>				
 			<menuitem label="Window" enabled="{transcriptPane.transcript != null}">
-				<menuitem id="showPropertiesPane" label="Properties" type="check" toggled="true"/>
+				<menuitem id="showMarkupPropertiesPane" label="Markup Properties" type="check" toggled="true"/>
+				<menuitem id="showTextPropertiesPane" label="Text Properties" type="check" toggled="true"/>
 			</menuitem>
 			<menuitem label="Tools">
 				<menuitem id="showHTMLSearchInterface" label="HTML Search Interface"/>
