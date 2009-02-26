@@ -72,6 +72,7 @@
 		</jar>
 		<!-- Build the swf file - TODO - for now, just copy it from bin -->
 		<mxmlc file="./src/TranscriptStudio.mxml" output="${build.dir}/TranscriptStudio.swf" fork="true">
+			<!--compiler.source-path path-element="../JWPlayer" /-->
 			<!-- first bring in the defaults -->
 			<load-config filename="${FLEX_HOME}/frameworks/flex-config.xml" />
 			<!-- now override with some project specific settings -->
@@ -103,6 +104,9 @@
 		<copy todir="${dist.exist.app.dir}/webapp/archives/transcript">
 			<fileset dir="${build.dir}">
 				<include name="TranscriptStudio.swf"/>
+			</fileset>
+			<fileset dir="./src">
+				<include name="player.swf"/>
 			</fileset>
 			<fileset dir=".">
 				<include name="assets/**"/>
@@ -142,6 +146,9 @@
 		<copy todir="${dist.client.dir}">
 			<fileset dir="${build.dir}">
 				<include name="TranscriptStudio.swf"/>
+			</fileset>
+			<fileset dir="./src">
+				<include name="player.swf"/>
 			</fileset>
 			<fileset dir=".">
 				<include name="assets/**"/>
