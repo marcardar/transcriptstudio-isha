@@ -34,7 +34,7 @@
         - http://exist-db.org/documentation.html
         - http://atomic.exist-db.org/
 
-    $Id: conf.xml.tmpl 8043 2008-07-22 05:07:24Z wolfgang_m $
+    $Id: conf.xml.tmpl 8355 2008-12-03 13:21:33Z wolfgang_m $
 
 -->
 <exist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -138,7 +138,13 @@
             
             - wait-before-shutdown:
                 defines how long the database instance will wait for running
-                operations to complete before it forces a shutdown.
+                operations to complete before it forces a shutdown. Forcing
+				a shutdown may leave the db in an unclean state and may
+				trigger a recovery run on restart.
+
+				Setting wait-before-shutdown="-1" means that the server will
+				wait for all threads to return, no matter how long it takes.
+				No thread will be killed.
         -->
         <pool max="20" min="1" sync-period="120000" wait-before-shutdown="120000"/>
 
@@ -211,9 +217,31 @@
                 XP; not necessary on Linux). However, group-comit="yes"
                 will increase the risk of an already committed 
                 operation being rolled back after a database crash.
+
+			- force-restart:
+				Try to restart the db even if crash recovery failed. This is
+				dangerous because there might be corruptions inside the
+				data files. The transaction log will be cleared, all locks removed
+				and the db reindexed.
+				
+				Set this option to "yes" if you need to make sure that the db is
+				online, even after a fatal crash. Errors encountered during recovery 
+				are written to the log files. Scan the log files to see if any problems
+				occurred.
+
+			- consistency-check:
+				If set to "yes", a consistency check will be run on the database
+				if an error was detected during crash recovery. This option requires
+				force-restart to be set to "yes", otherwise it has no effect.
+
+				The consistency check outputs a report to the directory {files}/sanity
+				and if inconsistencies are found in the db, it writes an emergency
+				backup to the same directory.
         -->
-        <recovery enabled="yes" group-commit="no" journal-dir="webapp/WEB-INF/data" size="100M"
-            sync-on-commit="no"/>
+        <recovery enabled="yes" group-commit="no" 
+			journal-dir="webapp/WEB-INF/data" size="100M"
+            sync-on-commit="no" force-restart="no"
+			consistency-check="yes"/>
 
         <!-- 
             The <security> element in the <db-connection> node is used to select
@@ -569,7 +597,7 @@
             to the parser.   
             
      -->
-    <validation mode="auto">
+    <validation mode="no">
         <!-- 
             Specify the location of one or more catalog files. Catalogs are 
             used to resolve external entities in XML documents.
