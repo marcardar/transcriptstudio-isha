@@ -10,7 +10,7 @@
     | feature or technique, often they are explained in more detail in 
     | the accompanying documentation.
     |
-    | CVS $Id: sitemap.xmap 7197 2008-01-11 21:02:35Z wolfgang_m $
+    | CVS $Id$
     +-->
 <map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
 
@@ -92,34 +92,31 @@
   <map:transformers default="xslt">
 
     <!-- NOTE: This is the default XSLT processor. -->
-    <map:transformer name="xslt"  
-                logger="sitemap.transformer.xslt"  
-                pool-max="32"  
-                src="org.apache.cocoon.transformation.TraxTransformer">  
-		<use-request-parameters>false</use-request-parameters>  
-		<use-session-parameters>false</use-session-parameters>  
-		<use-cookie-parameters>false</use-cookie-parameters>  
-		<xslt-processor-role>saxon</xslt-processor-role>  
-		<check-includes>true</check-includes>  
-	</map:transformer>  
+    <map:transformer logger="sitemap.transformer.xslt" name="xslt" pool-grow="2" pool-max="32" pool-min="8" src="org.apache.cocoon.transformation.TraxTransformer">
+      <use-request-parameters>false</use-request-parameters>
+      <use-session-parameters>false</use-session-parameters>
+      <use-cookie-parameters>false</use-cookie-parameters>
+      <xslt-processor-role>saxon</xslt-processor-role>
+      <check-includes>true</check-includes>
+    </map:transformer>
 
     <!-- NOTE: This is the same as the default processor but with a different name (for compatibility) -->
-    <!--map:transformer logger="sitemap.transformer.xalan" name="xalan" pool-grow="2" pool-max="32" pool-min="8" src="org.apache.cocoon.transformation.TraxTransformer">
+    <map:transformer logger="sitemap.transformer.xalan" name="xalan" pool-grow="2" pool-max="32" pool-min="8" src="org.apache.cocoon.transformation.TraxTransformer">
       <use-request-parameters>false</use-request-parameters>
       <use-session-parameters>false</use-session-parameters>
       <use-cookie-parameters>false</use-cookie-parameters>
       <xslt-processor-role>xalan</xslt-processor-role>
       <check-includes>true</check-includes>
-    </map:transformer-->
+    </map:transformer>
 
     <!-- NOTE: You can also try XSLTC as the default processor. If you use Xalan extensions, use the "xalan" transformer. -->
-    <!--map:transformer logger="sitemap.transformer.xsltc" name="xsltc" pool-grow="2" pool-max="32" pool-min="8" src="org.apache.cocoon.transformation.TraxTransformer">
+    <map:transformer logger="sitemap.transformer.xsltc" name="xsltc" pool-grow="2" pool-max="32" pool-min="8" src="org.apache.cocoon.transformation.TraxTransformer">
       <use-request-parameters>false</use-request-parameters>
       <use-session-parameters>false</use-session-parameters>
       <use-cookie-parameters>false</use-cookie-parameters>
       <xslt-processor-role>xsltc</xslt-processor-role>
       <check-includes>true</check-includes>
-    </map:transformer-->
+    </map:transformer>
 
     <map:transformer logger="sitemap.transformer.xinclude" name="xinclude" pool-grow="2" pool-max="16" pool-min="2" src="org.apache.cocoon.transformation.XIncludeTransformer"/>
     <map:transformer logger="sitemap.transformer.cinclude" name="cinclude" pool-grow="2" pool-max="16" pool-min="2" src="org.apache.cocoon.transformation.CIncludeTransformer"/>
@@ -710,7 +707,7 @@
             </map:match>
 
             <map:match pattern="">
-                <map:redirect-to uri="/exist/index.xml"/>
+                <map:redirect-to uri="index.xml"/>
             </map:match>
             
             <!-- *********** All Cluster information *************** -->
@@ -807,6 +804,13 @@
                 <map:serialize type="html"/>
             </map:match>
             
+			<map:match pattern="articles">
+				<map:generate src="xquery/exist-articles.xq" type="xquery"/>
+				<map:transform type="xinclude"/>
+				<map:transform src="stylesheets/db2html.xsl"/>
+				<map:serialize type="html"/>
+			</map:match>
+
             <map:match pattern="docquery.xq">
             	<map:generate src="docquery.xq" type="xquery"/>
                 <map:transform type="cinclude"/>
