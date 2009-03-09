@@ -6,11 +6,11 @@ set EXIST_HOME=C:\Program Files\eXist
 
 :gotExistHome
 if not "%JAVA_HOME%" == "" goto gotJavaHome
-set JAVA_HOME=C:\Program Files\Java\jdk1.6.0_07
+set JAVA_HOME=C:\Program Files\Java\jdk1.6.0_11
 
 :gotJavaHome
 if not "%FLEX_HOME%" == "" goto gotFlexHome
-set FLEX_HOME=C:\Program Files\Adobe\Flex Builder 3\sdks\3.2.0
+set FLEX_HOME=C:\Program Files\Adobe\Flex Builder 3\sdks\3.3.0
 
 :gotFlexHome
 set ANT_HOME=%EXIST_HOME%\tools\ant

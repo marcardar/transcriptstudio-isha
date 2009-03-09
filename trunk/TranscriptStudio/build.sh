@@ -6,15 +6,15 @@ if [ -z "$EXIST_HOME" ]; then
 fi
 
 if [ -z "$JAVA_HOME" ]; then
-    JAVA_HOME="/usr/lib/jvm/java-6-sun-1.6.0.07"
+    JAVA_HOME="/usr/lib/jvm/java-6-sun-1.6.0.11"
 fi
 
 if [ ! -d "$JAVA_HOME" ]; then
-    JAVA_HOME="/usr/lib/jvm/java-6-sun-1.6.0.07/jre"
+    JAVA_HOME="/usr/lib/jvm/java-6-sun-1.6.0.11/jre"
 fi
 
 if [ -z "$FLEX_HOME" ]; then
-    JAVA_HOME="/usr/lib/Adobe_Flex_Builder/sdks/3.2.0"
+    JAVA_HOME="/usr/lib/Adobe_Flex_Builder/sdks/3.3.0"
 fi
 
 JAVA_CMD="$JAVA_HOME/bin/java"
