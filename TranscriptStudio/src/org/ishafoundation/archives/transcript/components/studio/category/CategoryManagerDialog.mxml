@@ -22,5 +22,5 @@
 	<mx:HBox width="100%" height="100%">
 		<categoryNS:CategorySearchPane id="categorySearchPane" referenceMgr="{referenceMgr}" width="100%" height="100%"/>
 	</mx:HBox>
-	<mx:Button label="Done" click="closeMe()"/>
+	<mx:Button id="doneButton" label="Done" click="closeMe()"/>
 </mx:TitleWindow>

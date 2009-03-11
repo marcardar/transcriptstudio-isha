@@ -141,6 +141,10 @@
 					var categoryManagerDialog:CategoryManagerDialog = new CategoryManagerDialog();
 					categoryManagerDialog.referenceMgr = referenceMgr;
 					PopUpManager.addPopUp(categoryManagerDialog, thisRef, true);
+					categoryManagerDialog.doneButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+						// finished with the dialog box so update screen (to reflect changes)
+						transcriptPane.markupsPane.redraw(transcriptPane.markupsPane.selectedMarkup, true);
+					});
 					var selectedMarkupProps:MSuperNodeProperties = transcriptPane.markupsPane.selectedMarkupProps;
 					if (selectedMarkupProps != null) {
 						categoryManagerDialog.categorySearchPane.initialCategoryId = selectedMarkupProps.markupCategoryId;
