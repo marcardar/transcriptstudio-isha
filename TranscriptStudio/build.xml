@@ -72,8 +72,6 @@
 		</jar>
 		<!-- Build the swf file - TODO - for now, just copy it from bin -->
 		<mxmlc file="./src/TranscriptStudio.mxml" output="${build.dir}/TranscriptStudio.swf" fork="true">
-			<!--runtime-shared-libraries url="player.swf"/-->
-			<!--compiler.source-path path-element="../JWPlayer" /-->
 			<!-- first bring in the defaults -->
 			<load-config filename="${FLEX_HOME}/frameworks/flex-config.xml" />
 			<!-- now override with some project specific settings -->
