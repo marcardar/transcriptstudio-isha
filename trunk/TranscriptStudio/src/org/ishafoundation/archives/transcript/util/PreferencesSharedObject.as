@@ -6,6 +6,7 @@ package org.ishafoundation.archives.transcript.util
 	{
 		private static const DB_URL_KEY:String = "dbURL";
 		private static const DB_USERNAME_KEY:String = "dbUsername";
+		private static const MEDIA_SERVER_URL_KEY:String = "mediaServerURL";
 		
 		public function PreferencesSharedObject()
 		{
@@ -28,6 +29,12 @@ package org.ishafoundation.archives.transcript.util
 			PREFS_SO.flush();			
 		}
 
+		public static function writeMediaServerURL(url:String):void {
+			var PREFS_SO:SharedObject = getSharedObject();
+			PREFS_SO.data[MEDIA_SERVER_URL_KEY] = url;
+			PREFS_SO.flush();			
+		}
+
 		public static function readDbURL(defaultValue:String = null):String {
 			return readValue(DB_URL_KEY, defaultValue);
 		}
@@ -35,6 +42,10 @@ package org.ishafoundation.archives.transcript.util
 		public static function readDbUsername(defaultValue:String = null):String {
 			return readValue(DB_USERNAME_KEY, defaultValue);
 		}
+		
+		public static function readMediaServerURL(defaultValue:String = null):String {
+			return readValue(MEDIA_SERVER_URL_KEY, defaultValue);
+		}		
 		
 		private static function readValue(key:String, defaultValue:String):String {
 			var PREFS_SO:SharedObject = getSharedObject();
