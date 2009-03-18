@@ -112,16 +112,6 @@
 			});			
 		}
 		
-		private static function getClipItem(clipElement:XML):Object {
-			//var sessionElement:XML = XMLUtils.getAncestorOrSelfElement(clipElement, "session");
-			//var sessionId:String = sessionElement.@id;
-			var sessionWideClipId:String = getSessionWideClipId(clipElement);
-			var extension:String = isVideo(clipElement) ? "flv" : "mp3";
-			var filename:String = sessionWideClipId + "." + extension;
-			var result:Object = {filename:filename, id:sessionWideClipId};
-			return result;			
-		}
-		
 		private static function isVideo(clipOrDeviceElement:XML):Boolean {
 			var deviceElement:XML = XMLUtils.getAncestorOrSelfElement(clipOrDeviceElement, "device");
 			return deviceElement.@id.toString().indexOf("v") == 0;
@@ -130,12 +120,11 @@
 		/**
 		 *  sessionWideClipId - eg "v1c001"
 		 */
-		public function play(sessionWideClipId:String, start:int = -1, end:int = -1):void {
-			if (sessionWideClipId == null) {
+		public function play(clipUUID:String, start:int = -1, end:int = -1):void {
+			if (clipUUID == null) {
 				return;
 			}
-			var clipElement:XML = getClipElement(sessionWideClipId);
-			var clipURL:String = sessionWideClipId + "." + (sessionWideClipId.indexOf("v") == 0 ? "flv" : "mp3");
+			var clipURL:String = clipUUID + "." + (clipUUID.indexOf("-v") == 0 ? "flv" : "mp3");
 			var waitPopUp:PleaseWaitPopUp = PleaseWaitPopUp.display(this, "Preparing to stream...");
 			this.slider.value = 0;
 			this.mediaServer.play(clipURL, video, function(msg:String):void {
@@ -167,26 +156,12 @@
 			//videoDisplay.source = mediaURL;
 		}
 		
-		private function getClipElement(sessionWideClipId:String):XML {
-			if (sessionWideClipId == null) {
-				throw new Error("Passed a null sessionWideClipId");
-			}
-			if (sessionWideClipId.length < 6) { // TODO - use proper regexp?
-				throw new Error("Invalid clipId (should be like 'v1c123' or 'a1c234'): " + sessionWideClipId);
-			}
-			var deviceId:String = sessionWideClipId.substring(0, 2);
-			var localClipId:String = sessionWideClipId.substring(2);
-			var deviceElement:XML = devicesElement.device.(@id == deviceId)[0]; 
-			var result:XML = deviceElement.clip.(@id == localClipId)[0];
-			return result;			
-		}
-		
 		private static function getSessionWideClipId(clipElement:XML):String {
 			var deviceElement:XML = clipElement.parent();
 			return deviceElement.@id.toString() + clipElement.@id.toString();
 		}
 		
-		private function getSelectedSessionWideClipId():String {
+		private function getClipUUID():String {
 			var deviceId:String = deviceComboBox.selectedItem as String;
 			if (deviceId == null) {
 				return null;
@@ -195,7 +170,8 @@
 			if (clipId == null) {
 				return null;
 			}
-			return deviceId + clipId;
+			var sessionId:String = devicesElement.parent().@id;
+			return sessionId + "-" + deviceId + "-" + clipId;
 		}
 		
 		private function deviceChangeHandler():void {
@@ -203,13 +179,13 @@
 			var clipIds:Array = getClipIds(deviceComboBox.selectedItem as String);
 			clipComboBox.dataProvider = clipIds;
 			clipComboBox.enabled = clipIds.length > 1;
-			var sessionWideClipId:String = getSelectedSessionWideClipId();
-			if (sessionWideClipId == null) {
+			var clipUUID:String = getClipUUID();
+			if (clipUUID == null) {
 				videoBox.visible = false;				
 				videoBox.includeInLayout = false;
 			}
 			else {
-				if (sessionWideClipId.indexOf("v") == 0) {
+				if (clipUUID.indexOf("-v") == 0) {
 					videoBox.visible = true;
 				}
 				else {
@@ -217,14 +193,14 @@
 				}
 				videoBox.includeInLayout = videoBox.visible;
 				// check the clip id for the old device is not still there
-				play(sessionWideClipId);
+				play(clipUUID);
 			}
 		}
 		
 		private function clipChangeHandler():void {
 			trace("Changing clip");
-			var sessionWideClipId:String = getSelectedSessionWideClipId();
-			play(sessionWideClipId);
+			var clipUUID:String = getClipUUID();
+			play(clipUUID);
 		}
 		
     	public static function display(parent:DisplayObject):MediaPlayerDialog {
