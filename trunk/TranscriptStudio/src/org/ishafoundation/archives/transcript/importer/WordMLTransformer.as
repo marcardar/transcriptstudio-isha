@@ -41,6 +41,8 @@ package org.ishafoundation.archives.transcript.importer
 		public static const PROOFED_AT_ATTR_NAME:String = "proofedAt";
 		public static const PROOFREAD_BY_ATTR_NAME:String = "proofreadBy";
 		public static const PROOFREAD_AT_ATTR_NAME:String = "proofreadAt";
+		
+		private static const AUDIO_QUALITY_ATTR_NAME:String = "audioQuality";
 
 		private static const EMPHASIZED:String = "emphasized";
 		private static const TAMIL:String = "tamil";
@@ -55,8 +57,7 @@ package org.ishafoundation.archives.transcript.importer
 		}
 		
 		public var audioTranscriptElement:XML; // parent for segment elements. Also holds transcribedBy,proofedBy etc 
-		public var sourceElement:XML; // properties and syncPoints
-		public var streamElement:XML;
+		public var clipElement:XML; // properties and syncPoints
 		public var sessionElement:XML; // only properties
 		public var eventElement:XML; // only properties
 		
@@ -67,9 +68,9 @@ package org.ishafoundation.archives.transcript.importer
 			
 			this.audioTranscriptElement = <audioTranscript filename={importName}/>;
 			var importedBy:String = Utils.getClassName(this) + "-v" + ApplicationUtils.getApplicationVersion();
-			this.sourceElement = <source id={sourceId} type="mixer"/>;
-			this.streamElement = <stream id="default"/>
-			this.sourceElement.appendChild(streamElement);
+			// use the last three digits of source id for the clip id
+			var clipId:String = "c" + sourceId.substring(sourceId.length - 3);
+			this.clipElement = <clip id={clipId}/>;
 			this.sessionElement = <session/>;
 			this.eventElement = <event {EventProperties.TYPE_ATTR_NAME}={eventType}/>;
 
@@ -79,7 +80,7 @@ package org.ishafoundation.archives.transcript.importer
 		}
 		
 		public function get sourceId():String {
-			return XMLUtils.getAttributeValue(sourceElement, "id");
+			return XMLUtils.getAttributeValue(clipElement, "id");
 		}
 		
 		public function get name():String {
@@ -204,8 +205,8 @@ package org.ishafoundation.archives.transcript.importer
 				new MSegmentProperties(segmentElement).speaker = speaker;
 				if (startTime >= 0) {
 					var syncPointId:String = idFunc("sp");
-					var syncPointElement:XML = <syncPoint idRef={syncPointId} timecode={startTime}/>;
-					sourceElement.appendChild(syncPointElement);
+					var syncElement:XML = <sync timecode={startTime} sp={syncPointId}/>;
+					clipElement.appendChild(syncElement);
 					var firstContentElement:XML = segmentElement.content[0];
 					XMLUtils.setAttributeValue(firstContentElement, MContentProperties.START_SYNC_POINT_ID_PROP_NAME, syncPointId);
 					startTime = -1; // don't use this start time for any other segment					
@@ -329,7 +330,7 @@ package org.ishafoundation.archives.transcript.importer
  			return result;
  		}
  		 		
-		private function extractHeaders():XML {
+		private function extractHeaders():void {
  			for each (var contentElement:XML in getHeaderContents()) {
  				// actions
  				extractAttributeFromHeader(contentElement, audioTranscriptElement, ["TRANSCRIBED BY"], false, TRANSCRIBED_BY_ATTR_NAME, true);
@@ -338,9 +339,9 @@ package org.ishafoundation.archives.transcript.importer
  				extractAttributeFromHeader(contentElement, audioTranscriptElement, ["EVENT"], false, "name", false);
 
  				// now for the audio stuff
- 				extractAttributeFromHeader(contentElement, sourceElement, ["MEDIA CODE #", "MEDIA CODE"], true, "id", true);
+ 				//extractAttributeFromHeader(contentElement, clipElement, ["MEDIA CODE #", "MEDIA CODE"], true, "id", true);
  				// now this is hardcoded as "mixer": extractAttributeFromHeader(contentElement, sourceElement, ["MEDIA SOURCE"], false, "type", true);
- 				extractAttributeFromHeader(contentElement, streamElement, ["AUDIO CLARITY (E G F P)"], false, "quality", true); 				
+ 				extractAttributeFromHeader(contentElement, clipElement, ["AUDIO CLARITY (E G F P)"], false, AUDIO_QUALITY_ATTR_NAME, true); 				
 
  				// session - allow multiple dates to pile up because dates are in a special format
  				extractAttributeFromHeader(contentElement, sessionElement, ["DATE"], true, SessionProperties.START_AT_ATTR_NAME, false); 
@@ -361,8 +362,8 @@ package org.ishafoundation.archives.transcript.importer
 			processActionBy(PROOFED_AT_ATTR_NAME, PROOFED_BY_ATTR_NAME);
 			processActionBy(PROOFREAD_AT_ATTR_NAME, PROOFREAD_BY_ATTR_NAME);
  			
- 			// handle source element properly
- 			var quality:String = XMLUtils.getAttributeValue(streamElement, "quality");
+ 			// handle clip element properly
+ 			var quality:String = XMLUtils.getAttributeValue(clipElement, AUDIO_QUALITY_ATTR_NAME);
  			if (quality != null) {
  				var ac:String;
  				if (quality == "e") {
@@ -377,9 +378,8 @@ package org.ishafoundation.archives.transcript.importer
  				else if (quality == "p") {
  					quality = "poor";
  				}
- 				XMLUtils.setAttributeValue(streamElement, "quality", quality, "");
+ 				XMLUtils.setAttributeValue(clipElement, AUDIO_QUALITY_ATTR_NAME, quality, "");
  			}
-			return sourceElement;
 		}
 		
 		private function processActionBy(attrAtName:String, attrByName:String):void {
