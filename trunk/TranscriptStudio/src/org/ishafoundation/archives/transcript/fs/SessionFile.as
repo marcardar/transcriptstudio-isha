@@ -15,8 +15,8 @@ package org.ishafoundation.archives.transcript.fs
 		}
 		
 		public function get sessionIndex():uint {
-			var sIndex:int = nodeId.indexOf("s");
-			return new uint(nodeId.substr(sIndex + 1));
+			var sIndex:int = nodeId.indexOf("-s");
+			return new uint(nodeId.substr(sIndex + 2));
 		}
 	}
 }

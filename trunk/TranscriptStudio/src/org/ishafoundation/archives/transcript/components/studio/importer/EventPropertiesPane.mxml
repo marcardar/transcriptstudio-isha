@@ -28,7 +28,7 @@
 		public var existingEventIds:ISet;
 
 		private function creationCompleteHandler():void {
-			eventIndexBox.dataProvider = getArrayCollectionSequence(1, 99, 2, false);
+			eventIndexBox.dataProvider = getArrayCollectionSequence(1, 999, -1, false);
 			eventLanguageComboBox.dataProvider = referenceMgr.getLanguages();
 			eventTypeComboBox.dataProvider = referenceMgr.getEventTypes();
 			eventCountryComboBox.dataProvider = referenceMgr.getCountries();
@@ -81,13 +81,13 @@
 			var eventIndex:int = new uint(eventIndexBox.text);
 			var idDateComponentStr:String;
 			if (eventProps.startAt == null) {
-				idDateComponentStr = "yxxxxmxxdxx";
+				idDateComponentStr = "xxxxxxxx";
 			}
 			else {
 				var startAtDate:Date = eventProps.startAt;
-				idDateComponentStr = "y" + startAtDate.fullYear + "m" + fixWidth(startAtDate.month + 1, 2) + "d" + fixWidth(startAtDate.date, 2);
+				idDateComponentStr = startAtDate.fullYear + fixWidth(startAtDate.month + 1, 2) + fixWidth(startAtDate.date, 2);
 			}
-			eventProps.id = idDateComponentStr + "e" + fixWidth(eventIndex, 2);
+			eventProps.id = idDateComponentStr + "-e" + eventIndex;
 		}
 		
 		private function countryChangeHandler():void {
@@ -122,6 +122,9 @@
 		
 		private static function fixWidth(s:Object, width:int):String {
 			var result:String = s.toString();
+			if (width < 0) {
+				return result;
+			}
 			if (result.length > width) {
 				return result.substring(result.length - width);
 			}

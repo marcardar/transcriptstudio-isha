@@ -2,8 +2,8 @@ package org.ishafoundation.archives.transcript.util
 {
 	public class IdUtils
 	{
-		private static const EVENT_ID_REG_EXP_STR:String = "y((?:19|20)(?:[0-9][0-9x]|xx)|xxxx)m((?:0[1-9x])|(?:1[0-2x])|xx)d((?:0[1-9x])|(?:[12][0-9x])|(?:3[01x])|xx)e([0-9]{2})";
-		private static const SESSION_ID_REG_EXP_STR:String = EVENT_ID_REG_EXP_STR + "s([0-9]{2})";
+		private static const EVENT_ID_REG_EXP_STR:String = "((?:19|20)(?:[0-9][0-9x]|xx)|xxxx)((?:0[1-9x])|(?:1[0-2x])|xx)((?:0[1-9x])|(?:[12][0-9x])|(?:3[01x])|xx)-e([1-9][0-9]*)";
+		private static const SESSION_ID_REG_EXP_STR:String = EVENT_ID_REG_EXP_STR + "-s([1-9]{2})";
 		
 		public static const EVENT_ID_EXACT_MATCH_REG_EXP:RegExp = createExactMatchRegExp(EVENT_ID_REG_EXP_STR);
 		public static const EVENT_ID_PREFIX_REG_EXP:RegExp = createPrefixRegExp(EVENT_ID_REG_EXP_STR);
@@ -24,7 +24,7 @@ package org.ishafoundation.archives.transcript.util
 		 * This avoids us matching session ids when we are testing for event ids
 		 */
 		private static function createPrefixRegExp(regExpString:String):RegExp {
-			var prefixRegExpString:String = "^(" + regExpString + ")[^0-9a-zA-Z].*$";
+			var prefixRegExpString:String = "^(" + regExpString + ")[_\.].*$";
 			return new RegExp(prefixRegExpString);
 		}
 
@@ -40,7 +40,7 @@ package org.ishafoundation.archives.transcript.util
 			if (validate && !isValidSessionId(sessionId)) {
 				return null;
 			}
-			var index:int = sessionId.indexOf("s");
+			var index:int = sessionId.indexOf("-s");
 			if (index < 0) {
 				if (validate) {
 					throw new Error("Could not find first 's' in sessionId, but its supposed to be a valid session id");

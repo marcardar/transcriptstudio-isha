@@ -29,13 +29,13 @@ declare function event-panel:main() as element()*
 		(
 			event-panel:transformToXHTML($event)
 		,
-			let $sessions := xcollection(util:collection-name($event))/session[starts-with(@id, $eventId)]
+			let $sessions := xcollection(util:collection-name($event))/session[starts-with(@id, string-join($eventId, '-'))]
 			return
 				if (exists($sessions)) then
 				(
-					<h2>Source IDs</h2>
+					<h2>Clip IDs</h2>
 				,
-					<p>{event-panel:get-source-ids-csv-for-sessions($sessions)}</p>
+					<p>{event-panel:get-clip-ids-csv-for-sessions($sessions)}</p>
 				,
 					<h2>Sessions ({count($sessions)})</h2>
 				,
@@ -43,7 +43,7 @@ declare function event-panel:main() as element()*
 					{for $session in $sessions
 					return
 						<li>
-							<a href="main.xql?panel=session&amp;id={$session/@id}">Session: {$session/string(@subTitle)} {concat(' ', $session/string(@startAt))} [{event-panel:get-source-ids-csv-for-sessions($session)}]: {$session/string(@id)}</a>
+							<a href="main.xql?panel=session&amp;id={$session/@id}">Session: {$session/string(@subTitle)} {concat(' ', $session/string(@startAt))} [{event-panel:get-clip-ids-csv-for-sessions($session)}]: {$session/string(@id)}</a>
 							<br/>{$session/string(@comment)}<p/>							
 						</li>
 					}				
@@ -57,15 +57,15 @@ declare function event-panel:main() as element()*
 	)
 };
 
-declare function event-panel:get-source-ids-csv-for-sessions($sessions as element()*) as xs:string*
+declare function event-panel:get-clip-ids-csv-for-sessions($sessions as element()*) as xs:string*
 {
-	upper-case(string-join(event-panel:get-source-ids-for-sessions($sessions), ', '))
+	upper-case(string-join(event-panel:get-clip-ids-for-sessions($sessions), ', '))
 };
 
-declare function event-panel:get-source-ids-for-sessions($sessions as element()*) as xs:string*
+declare function event-panel:get-clip-ids-for-sessions($sessions as element()*) as xs:string*
 {
-	let $sourceIds := distinct-values($sessions/source/string(@id))
-	for $sourceId in $sourceIds
-	order by $sourceId
-	return $sourceId
+	let $clipIds := distinct-values($sessions/devices/device/clip/string(@id))
+	for $clipId in $clipIds
+	order by $clipId
+	return $clipId
 };
