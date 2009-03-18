@@ -429,6 +429,10 @@
 				else if ( actionName == "nudgeDown" ) {
 					this.transcriptPane.nudgeDown();
 				}
+				else if ( actionName == "showMediaPlayer" ) {					
+					var mediaPlayerDialog:MediaPlayerDialog = MediaPlayerDialog.display(this);
+					mediaPlayerDialog.devicesElement = session.sessionXML.devices[0];
+				}
 				else if ( actionName == "showMarkupPropertiesPane" ) {
 					var showMarkupProps:Boolean = evt.item.@toggled.toString() == "true";
 					this.transcriptPane.markupsPane.setNodePropertiesPaneVisibility(showMarkupProps);
@@ -439,9 +443,6 @@
 				}
 				else if ( actionName == "showHTMLSearchInterface" ) {					
 					navigateToURL(new URLRequest(DatabaseConstants.EXIST_URL + "/rest/db/archives/xquery/main.xql"), "_blank");
-				}
-				else if ( actionName == "showVideoPlayer" ) {					
-					MediaPlayerDialog.display(this);
 				}
 				else if ( actionName.indexOf("debug") == 0) {
 					var popup:DebugPopUp = new DebugPopUp();
@@ -499,13 +500,14 @@
 				<menuitem id="nudgeUp" label="Nudge Up" enabled="{transcriptPane.textPane.ttSelection.allowNudgeUp()}"/>
 				<menuitem id="nudgeDown" label="Nudge Down" enabled="{transcriptPane.textPane.ttSelection.allowNudgeDown()}"/>
 			</menuitem>				
-			<menuitem label="Window" enabled="{transcriptPane.transcript != null}">
+			<menuitem label="Window" enabled="{myMenuBar != null &amp;&amp; session != null}">
+				<menuitem id="showMediaPlayer" label="Media Player"/>
+				<menuitem type="separator"/>
 				<menuitem id="showMarkupPropertiesPane" label="Markup Properties" type="check" toggled="true"/>
 				<menuitem id="showTextPropertiesPane" label="Text Properties" type="check" toggled="true"/>
 			</menuitem>
 			<menuitem label="Tools">
 				<menuitem id="showHTMLSearchInterface" label="HTML Search Interface"/>
-				<menuitem id="showVideoPlayer" label="Video Player"/>
 			</menuitem>
 			<menuitem label="Help">
 				<menuitem label="Debug">

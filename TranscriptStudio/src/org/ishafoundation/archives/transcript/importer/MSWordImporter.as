@@ -66,10 +66,15 @@ package org.ishafoundation.archives.transcript.importer
 				// remove the name attribute
 				delete sessionElement.@name;
 			}
+			var devicesElement:XML = <devices/>;
+			sessionElement.appendChild(devicesElement);
+			var deviceElement:XML = <device id="a1" name="Mixer"/>
+			devicesElement.appendChild(deviceElement);
 			var transcriptElement:XML = <transcript id="t1"/>;
+			sessionElement.appendChild(transcriptElement);
 			for each (var audioTranscript:WordMLTransformer in audioTranscripts) {
-				var sourceElement:XML = audioTranscript.sourceElement;
-				sessionElement.appendChild(sourceElement);
+				var clipElement:XML = audioTranscript.clipElement;
+				deviceElement.appendChild(clipElement);
 				var lastAction:String;
 				if (audioTranscript.audioTranscriptElement.hasOwnProperty("@proofreadBy")) {
 					lastAction = "proofread";
@@ -99,7 +104,6 @@ package org.ishafoundation.archives.transcript.importer
 				appendSessionCommentLine("\rImported file:", sessionElement);
 				appendAttributesToSessionComment(audioTranscript.audioTranscriptElement, sessionElement);
 			}
-			sessionElement.appendChild(transcriptElement);
 			return sessionElement;
 		}
 		

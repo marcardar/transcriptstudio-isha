@@ -26,22 +26,6 @@
 		[Bindable]
 		public var devicesElement:XML;
 		
-		private static const dummyDevicesElement:XML =
-			<devices>
-				<device id="a1" name="Mixer"> <!-- n124.mp3 -->
-					<clip id="c124" audioQuality="excellent">
-						<syncPoint id="sp1" timecode="15"/>
-						<syncPoint id="sp2" timecode="17"/>
-					</clip>
-					<clip id="c125" audioQuality="excellent">
-					</clip>
-				</device>	
-				<device id="v1" name="Main Camera"> <!-- n866.mp4 -->
-					<clip id="c866" videoQuality="good" audioQuality="good">
-					</clip>
-				</device>
-			</devices>;
-		
 		private var video:Video = new Video();
 		[Bindable]
 		private var mediaServer:MediaConnection = new MediaConnection(); 
@@ -74,14 +58,6 @@
 					monitorTimer.stop();
 				}
 			});
-			// some dummy data
-			/*var my_nc:NetConnection = new NetConnection();
-			my_nc.connect(null);
-
-			var my_ns:NetStream = new NetStream(my_nc);
-			my_video.attachVideo(my_ns);*/
-
-			this.devicesElement = dummyDevicesElement;
 		}
 		
 		private static function getDeviceIds(devicesElement:XML):Array {
