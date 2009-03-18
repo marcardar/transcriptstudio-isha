@@ -78,7 +78,10 @@ package org.ishafoundation.archives.transcript.model
 				// replace spaces with underscores
 				filename = filename.replace(/ /g, "-").toLowerCase();
 				if (eventFile != null) {
-					filename += "_" + eventFile.name.substring(15)
+					var underscoreIndex:int = eventFile.name.indexOf("_");
+					if (underscoreIndex >= 0) {
+						filename += eventFile.name.substring(underscoreIndex);
+					}
 				}
 				else {
 					filename += ".xml";

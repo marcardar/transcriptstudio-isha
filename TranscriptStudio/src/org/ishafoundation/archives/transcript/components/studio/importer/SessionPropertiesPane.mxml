@@ -33,7 +33,20 @@
 		private var idAlreadyExists:Boolean;
 		
 		private function creationCompleteHandler():void {
-			sessionIndexBox.dataProvider = EventPropertiesPane.getArrayCollectionSequence(1, 99, 2, false);
+			var arr:Array = [];
+			// put the zero stuff at the end (because they should only be used when something is unknown)
+			//var zeroArr:Array = [];
+			for (var i:int = 0; i <= 99; i++) {
+				if (i >= 10 && i % 10 != 0) {
+					arr.push(i);
+				}
+				//else {
+					//zeroArr.push(i);
+				//}
+			}
+			//arr = arr.concat(zeroArr);
+			
+			sessionIndexBox.dataProvider = new ArrayCollection(arr);
 			sessionIndexChangeHandler();
 		}
 		
@@ -78,7 +91,7 @@
 			}
 			var sessionIndex:int = new uint(sessionIndexBox.text);
 			idAlreadyExists = existingSessionIndexes.contains(sessionIndex);
-			sessionProps.id = eventFile.nodeId + 's' + sessionIndexBox.text;
+			sessionProps.id = eventFile.nodeId + '-s' + sessionIndexBox.text;
 		}
 
 		private static function generateFullTitle(eventProps:EventProperties, referenceMgr:ReferenceManager):String {

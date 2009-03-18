@@ -96,7 +96,7 @@ declare function search-fns:get-events($baseEvents as element()*, $eventSearchTe
 					if (matches($searchTerm, '^[A-Z]{1,2}\d{3,}$')) then
 						(: this is a media code :)
 						let $sessions := search-fns:get-sessions-for-event-ids($baseEvents/@id)
-						return search-fns:get-events-for-session-ids($sessions[source/@id = lower-case($searchTerm)]/@id)
+						return search-fns:get-events-for-session-ids($sessions[devices/device/clip/@id = lower-case($searchTerm)]/@id)
 					else 
 						(: it could be anything :)
 						$baseEvents[matches(@*, $searchTerm, 'i')]
@@ -108,7 +108,7 @@ declare function search-fns:get-session-title($session as element()) as xs:strin
 {
 	let $eventId := search-fns:get-event-id($session/@id)
 	let $event := collection('/db/archives/data')/event[@id = $eventId]
-	let $sources := concat(' (', string-join($session/source/upper-case(@id), ', '), ')')
+	let $sources := concat(' (', string-join($session/devices/device/clip/upper-case(@id), ', '), ')')
 	return
 		concat(search-fns:get-event-title($event), $sources)
 };
@@ -354,7 +354,7 @@ declare function search-fns:get-html-word-links($sessionId as xs:string) as elem
 
 declare function search-fns:get-event-id($sessionId as xs:string) as xs:string
 {
-	substring-before($sessionId, "s")
+	substring-before($sessionId, "-s")
 };
 
 declare function search-fns:get-events-for-session-ids($sessionIds as xs:string*) as element()*
