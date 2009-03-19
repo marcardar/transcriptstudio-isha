@@ -8,18 +8,20 @@ Here we define the format of UUIDs for the various entities. These UUIDs provide
 
 ==Event UUID (e.g. 20090319-y1)==
 
-  * format: <8-digit event start date>-<event id unique within date>
+  * format: <8-digit date when event started>-<event id unique within date>
   * fixed width: no
-  * order implies: by date, then grouping by event type within date
+  * order: by date
+  * grouping: by event type within date
   * examples:
     * 20090319-d1
     * xxxxxxxx-n124 (this means there are probably at least 124 intro talks on an unknown date)
 
-===<8-digit date>===
+===<8-digit date when event started>===
 
-  * format: <4-digit year><2-digit month><2-digit day-of-month>
-  * fixed width: yes
-  * order implies: chronological order
+  * format: yyyymmdd
+  * fixed width: yes (8)
+  * order: by date
+  * grouping: n/a
   * examples:
     * 20090319 (if date known)
     * xxxxxxxx (if date not known)
@@ -27,11 +29,114 @@ Here we define the format of UUIDs for the various entities. These UUIDs provide
 
 ===<event id unique within date>===
 
-  * format: <variable width event type><variable width integer providing uniqueness>===
+  * format: <variable width event type><variable width integer providing uniqueness>
   * fixed width: no
-  * order implies: nothing significant (although naturally events of same type group together)
+  * order: none
+  * grouping: by event type
   * notes: So for the same date we can have "n1" and "y1" - i.e. we can reuse the integer for different event types.
   * examples:
     * n1 (intro talk)
     * n2 (another intro talk on the same day)
     * y1 (bramhachari meet)
+
+----
+
+==Session UUID (e.g. 20090319-y1-1-1830)==
+
+  * format: <event UUID>-<day within event>-<session start time>
+  * fixed width: no
+  * order: same as event id and then chronologically within event
+  * grouping: n/a
+  * examples:
+    * 20090319-n1-1-1800 (session starting at 6:30pm on first day)
+    * 20090319-n1-x-13 (13th session where the day is unknown)
+
+===<day within event> (e.g. 1)===
+
+  * format: integer (1=first day, x=unknown day)
+  * fixed width: no
+  * order: day within event (unless value is "x")
+  * grouping: n/a
+  * notes: for most events we either know all the "day" values or none of them.  If we have a situation where we know some of them then the order will be messed up...
+  * examples:
+    * 1 (first day)
+    * x (unknown day)
+
+===<session start time> (e.g. 1830) ===
+
+  * format: hhmm
+  * fixed-width (when time known): yes(4)
+  * fixed-width (when time unknown): yes(2)
+  * order: chronological order (unless there is a mixture of known and unknown times)
+  * grouping: n/a
+  * examples:
+    * 1830 (session starts at 6:30pm)
+    * 03 (unknown session start time)
+
+----
+
+===Media UUID (e.g. 20090319-n1-v1-183059)===
+
+  * format: <8-digit date when taken>-<collection id within date>-<device or person id>-<time when taken>
+  * fixed-width: no
+  * order/grouping: first by date taken, then grouping by collection, then grouping by 
+device/person, then order by time taken
+  * notes: Important to note that the first two components together (e.g. 200903190-n1 are NOT the event id)
+  * examples:
+    * 20090319-n1-v1-183059 (a video clip taken at 18:30:59 on 19 March 2009, using the main camera while capturing some intro talk session)
+    * xxxxxxxx-y2-i0-000125 (nothing known about when the photo was taken, or by whom, but final component may indicate that the original media id was y125...)
+
+===<8-digit date when taken>===
+
+  * format: yyyymmdd
+  * fixed width: yes (8)
+  * order: chronological order (date, but not also time)
+  * grouping: n/a
+  * examples:
+    * 20090319 (if date known)
+    * xxxxxxxx (if date not known)
+    * 2009xxxx (if only year known)
+
+===<collection id within date (e.g. n1)>===
+
+  * aim: provides a unique id for a logical grouping of media for a given date.
+  * format: <variable width event type><variable width integer providing uniqueness>
+  * fixed width: no
+  * order: none
+  * grouping: by event type
+  * notes: Typically, this will correspond to a session. In this case, its important not to confuse this value with the last component of an event UUID.
+  * examples:
+    * n1 (a collection related to an intro talk)
+    * n2 (another collection related to an intro talk (could be the same intro talk, or not) on the same day)
+    * y1 (bramhachari meet)
+    * HOW TO REPRESENT UNKNOWN EVENT TYPE?
+
+===<device or person id> (e.g. v1)===
+
+  * aim: group media by device/person for the given collection
+  * format: {v|a|i}<variable width integer providing uniqueness>
+  * fixed width: no
+  * order: none
+  * grouping: by media type (camera media, camcorder media, audio media grouped apart)
+  * notes: v=using camcorder, a=using audio recorder, i=using still camera. IDs beginning with "v" and "a" represent devices, beginning with "i" represents a photographer. Almost always, there is a one-to-one mapping of device-to-operator for a given session at least. Usually, this mapping is also true across sessions, events etc
+  * examples:
+    * v1 (main cam)
+    * v2 (secondary cam)
+    * v0 (unknown or unimportant camcorder)
+    * a1 (mixer)
+    * i1 (main photographer)
+    * i23 (part-time photographers get higher integers)
+    * i0 (unknown or unimportant photographer)
+
+===<time when taken> (e.g. 142513)===
+
+  * aim: order the media within the given device-collection
+  * format: hhmmss (or 1-based integer if not known)
+  * fixed-width: yes (6) (for both known and unknown times)
+  * order: chronological
+  * grouping: n/a
+  * notes: when the time is unknown, we still want to preserve the order. The value does not need to start from zero or one. We can try and use existing IDs where possible. For example, if we have two audio files for a session N123, N124, those can convert to 000123 and 000124 (assuming the order is correct)
+  * examples:
+    * 142513 (taken at 14:25:13)
+    * 000001 (unknown time but the first media in this device-collection)
+    * 001123 (unknown time but id hints at original media filename)
