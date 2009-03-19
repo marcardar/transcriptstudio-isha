@@ -6,7 +6,7 @@ Here we define the format of UUIDs for the various entities. These UUIDs provide
 
 = Details =
 
-==Event UUID==
+==Event UUID (e.g. 20090319-y1)==
 
   * format: <8-digit event start date>-<event id unique within date>
   * fixed width: no
