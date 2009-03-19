@@ -8,6 +8,7 @@ Here we define the format of UUIDs for the various entities. These UUIDs provide
 
 ==Event UUID (e.g. 20090319-y1)==
 
+  * aim: provide ordering and some level of readability to event UUID
   * format: <8-digit date when event started>-<event id unique within date>
   * fixed width: no
   * order: by date
@@ -16,8 +17,9 @@ Here we define the format of UUIDs for the various entities. These UUIDs provide
     * 20090319-d1
     * xxxxxxxx-n124 (this means there are probably at least 124 intro talks on an unknown date)
 
-===<8-digit date when event started>===
+===<8-digit date when event started> (e.g. 20090319)===
 
+  * aim: provide chronological ordering and information about exact date
   * format: yyyymmdd
   * fixed width: yes (8)
   * order: by date
@@ -27,8 +29,9 @@ Here we define the format of UUIDs for the various entities. These UUIDs provide
     * xxxxxxxx (if date not known)
     * 2009xxxx (if only year known)
 
-===<event id unique within date>===
+===<event id unique within date> (e.g. n1)===
 
+  * aim: provide uniqueness within date as well as show the event type. The integer is necessary because there may be more the one event with the same type starting on the same date
   * format: <variable width event type><variable width integer providing uniqueness>
   * fixed width: no
   * order: none
@@ -43,6 +46,7 @@ Here we define the format of UUIDs for the various entities. These UUIDs provide
 
 ==Session UUID (e.g. 20090319-y1-1-1830)==
 
+  * aim: provide ordering and some level of readablity to session UUIDs
   * format: <event UUID>-<day within event>-<session start time>
   * fixed width: no
   * order: same as event id and then chronologically within event
@@ -53,6 +57,7 @@ Here we define the format of UUIDs for the various entities. These UUIDs provide
 
 ===<day within event> (e.g. 1)===
 
+  * aim: provide easy way to tell which day (of the event) the session started on
   * format: integer (1=first day, x=unknown day)
   * fixed width: no
   * order: day within event (unless value is "x")
@@ -64,6 +69,7 @@ Here we define the format of UUIDs for the various entities. These UUIDs provide
 
 ===<session start time> (e.g. 1830) ===
 
+  * aim: provide ordering for sessions within a day and also information about time of day
   * format: hhmm
   * fixed-width (when time known): yes(4)
   * fixed-width (when time unknown): yes(2)
@@ -77,6 +83,7 @@ Here we define the format of UUIDs for the various entities. These UUIDs provide
 
 ===Media UUID (e.g. 20090319-n1-v1-183059)===
 
+  * aim: provide ordering and some level of readablity to media UUIDs
   * format: <8-digit date when taken>-<collection id within date>-<device or person id>-<time when taken>
   * fixed-width: no
   * order/grouping: first by date taken, then grouping by collection, then grouping by 
@@ -88,6 +95,7 @@ device/person, then order by time taken
 
 ===<8-digit date when taken>===
 
+  * aim: provide chronological ordering and information about exact date
   * format: yyyymmdd
   * fixed width: yes (8)
   * order: chronological order (date, but not also time)
