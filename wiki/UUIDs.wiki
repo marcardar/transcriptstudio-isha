@@ -1,0 +1,37 @@
+#summary UUIDs for event, session, video, audio and photos
+
+= Introduction =
+
+Here we define the format of UUIDs for the various entities. These UUIDs provide more than just uniqueness. They also provide a certain level of readability as well as ordering.
+
+= Details =
+
+==Event UUID==
+
+  * format: <8-digit event start date>-<event id unique within date>
+  * fixed width: no
+  * order implies: by date, then grouping by event type within date
+  * examples:
+    * 20090319-d1
+    * xxxxxxxx-n124 (this means there are probably at least 124 intro talks on an unknown date)
+
+===<8-digit date>===
+
+  * format: <4-digit year><2-digit month><2-digit day-of-month>
+  * fixed width: yes
+  * order implies: chronological order
+  * examples:
+    * 20090319 (if date known)
+    * xxxxxxxx (if date not known)
+    * 2009xxxx (if only year known)
+
+===<event id unique within date>===
+
+  * format: <variable width event type><variable width integer providing uniqueness>===
+  * fixed width: no
+  * order implies: nothing significant (although naturally events of same type group together)
+  * notes: So for the same date we can have "n1" and "y1" - i.e. we can reuse the integer for different event types.
+  * examples:
+    * n1 (intro talk)
+    * n2 (another intro talk on the same day)
+    * y1 (bramhachari meet)
