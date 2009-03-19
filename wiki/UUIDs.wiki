@@ -84,7 +84,7 @@ Here we define the format of UUIDs for the various entities. These UUIDs provide
 ===Media UUID (e.g. 20090319-n1-v1-183059)===
 
   * aim: provide ordering and some level of readablity to media UUIDs
-  * format: <8-digit date when taken>-<collection id within date>-<device or person id>-<time when taken>
+  * format: <8-digit date when collection started>-<collection id within date>-<device or person id>-<time when taken>
   * fixed-width: no
   * order/grouping: first by date taken, then grouping by collection, then grouping by 
 device/person, then order by time taken
@@ -93,13 +93,14 @@ device/person, then order by time taken
     * 20090319-n1-v1-183059 (a video clip taken at 18:30:59 on 19 March 2009, using the main camera while capturing some intro talk session)
     * xxxxxxxx-y2-i0-000125 (nothing known about when the photo was taken, or by whom, but final component may indicate that the original media id was y125...)
 
-===<8-digit date when taken>===
+===<8-digit date when collection started>===
 
   * aim: provide chronological ordering and information about exact date
   * format: yyyymmdd
   * fixed width: yes (8)
   * order: chronological order (date, but not also time)
   * grouping: n/a
+  * notes: in nearly all cases this will be the same as the date the shot was taken. However, its important we do it this way because otherwise listing the UUIDs in order could lead to some collections being separated into multiple groups.
   * examples:
     * 20090319 (if date known)
     * xxxxxxxx (if date not known)
@@ -144,7 +145,9 @@ device/person, then order by time taken
   * order: chronological
   * grouping: n/a
   * notes: when the time is unknown, we still want to preserve the order. The value does not need to start from zero or one. We can try and use existing IDs where possible. For example, if we have two audio files for a session N123, N124, those can convert to 000123 and 000124 (assuming the order is correct)
+  * important note: if the collection spans multiple dates (over midnight), then we need to adjust the time accordingly (to keep the order). Therefore, the shots taken on the second day need 24 hours added to their times etc. 
   * examples:
     * 142513 (taken at 14:25:13)
+    * 251031 (taken at 01:10:31 on the day after the collection start date)
     * 000001 (unknown time but the first media in this device-collection)
     * 001123 (unknown time but id hints at original media filename)
