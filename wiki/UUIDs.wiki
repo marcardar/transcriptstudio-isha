@@ -60,7 +60,7 @@ Here we define the format of UUIDs for the various entities. These UUIDs provide
   * aim: provide easy way to tell which day (of the event) the session started on
   * format: integer (1=first day, x=unknown day)
   * fixed width: no
-  * order: day within event (unless value is "x")
+  * order: chronological (but only if less than 10 days in event - very rare)
   * grouping: n/a
   * notes: for most events we either know all the "day" values or none of them.  If we have a situation where we know some of them then the order will be messed up...
   * examples:
