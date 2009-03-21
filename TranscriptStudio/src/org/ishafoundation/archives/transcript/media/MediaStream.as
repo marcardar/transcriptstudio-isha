@@ -7,7 +7,7 @@ package org.ishafoundation.archives.transcript.media
 	
 	public class MediaStream
 	{
-		public var clipURL:String;
+		public var mediaURL:String;
 		private var mediaConnection:MediaConnection;
 		
 		private var ns:NetStream;
@@ -17,9 +17,9 @@ package org.ishafoundation.archives.transcript.media
 		public var statusFunc:Function;
 		public var failureFunc:Function;
 		
-		public function MediaStream(clipURL:String, mediaConnection:MediaConnection, statusFunc:Function, failureFunc:Function)
+		public function MediaStream(mediaURL:String, mediaConnection:MediaConnection, statusFunc:Function, failureFunc:Function)
 		{
-			this.clipURL = clipURL;
+			this.mediaURL = mediaURL;
 			this.mediaConnection = mediaConnection;
 			this.statusFunc = statusFunc;
 			this.failureFunc = failureFunc;
@@ -50,7 +50,7 @@ package org.ishafoundation.archives.transcript.media
 				switch (event.info.code) {
 					case "NetStream.Play.StreamNotFound":
 						// do the same as for "Failed" (i.e. no break)
-						// unfortunately if the clip does not exxist then this event is not fired.
+						// unfortunately if the media does not exist then this event is not fired.
 					case "NetStream.Play.Failed":
 						close();
 						if (failureFunc != null) {
@@ -94,11 +94,11 @@ package org.ishafoundation.archives.transcript.media
 			}
 			if (start < 0) {
 				// ignore start and end
-				ns.play(this.clipURL);
+				ns.play(this.mediaURL);
 			}
 			else if (end < start) {
 				// no relevant end value - so just play to finish
-				ns.play(this.clipURL, start);
+				ns.play(this.mediaURL, start);
 			}
 			else if (end == start) {
 				// no duration so dont play anything
@@ -107,7 +107,7 @@ package org.ishafoundation.archives.transcript.media
 			else {
 				start = Math.max(start, 0);
 				end = Math.max(end, 0);
-				ns.play(this.clipURL, start, end - start);
+				ns.play(this.mediaURL, start, end - start);
 			}
 		}
 		

@@ -3,7 +3,7 @@
 
 declare namespace check-client-version = "http://www.ishafoundation.org/archives/xquery/check-client-version";
 
-declare variable $check-client-version:minClientVersion := '0.9.0';
+declare variable $check-client-version:minClientVersion := '0.9.2';
 
 declare function check-client-version:compare-versions($ver1 as xs:string, $ver2 as xs:string) as xs:integer
 {

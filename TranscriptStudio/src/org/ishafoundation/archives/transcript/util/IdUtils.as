@@ -2,8 +2,8 @@ package org.ishafoundation.archives.transcript.util
 {
 	public class IdUtils
 	{
-		private static const EVENT_ID_REG_EXP_STR:String = "((?:19|20)(?:[0-9][0-9x]|xx)|xxxx)((?:0[1-9x])|(?:1[0-2x])|xx)((?:0[1-9x])|(?:[12][0-9x])|(?:3[01x])|xx)-e([1-9][0-9]*)";
-		private static const SESSION_ID_REG_EXP_STR:String = EVENT_ID_REG_EXP_STR + "-s([1-9]{2})";
+		private static const EVENT_ID_REG_EXP_STR:String = "((?:19|20)(?:[0-9][0-9x]|xx)|xxxx)((?:0[1-9x])|(?:1[0-2x])|xx)((?:0[1-9x])|(?:[12][0-9x])|(?:3[01x])|xx)-([a-z]+[0-9]+)";
+		private static const SESSION_ID_REG_EXP_STR:String = EVENT_ID_REG_EXP_STR + "-((?:[0-9]+|x)-(?:[0-9]{4}|[0-9]{2}))";
 		
 		public static const EVENT_ID_EXACT_MATCH_REG_EXP:RegExp = createExactMatchRegExp(EVENT_ID_REG_EXP_STR);
 		public static const EVENT_ID_PREFIX_REG_EXP:RegExp = createPrefixRegExp(EVENT_ID_REG_EXP_STR);
@@ -40,16 +40,11 @@ package org.ishafoundation.archives.transcript.util
 			if (validate && !isValidSessionId(sessionId)) {
 				return null;
 			}
-			var index:int = sessionId.indexOf("-s");
-			if (index < 0) {
-				if (validate) {
-					throw new Error("Could not find first 's' in sessionId, but its supposed to be a valid session id");
-				}
-				else {
-					return null;
-				}
+			var cmps:Array = sessionId.split('-');
+			if (cmps.length < 2) {
+				throw new Error("Expected at least two components to valid session id: " + sessionId);
 			}
-			var result:String = sessionId.substring(0, index);
+			var result:String = cmps[0] + "-" + cmps[1];
 			if (validate && !isValidEventId(result)) {
 				throw new Error("Extracted event id is not valid even though the session id is valid: " + sessionId);
 			}

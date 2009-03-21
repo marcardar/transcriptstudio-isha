@@ -144,42 +144,42 @@ package name.carter.mark.flex.util
 			return getChildByClass(container, TextField) as TextField;
 		}
 		
-        public static function getChildByClass(container:DisplayObjectContainer, cls:Class):Object {
-            var len:int = container.numChildren;
-            for (var i:int=0; i < len; i++){
-                var thisChild:DisplayObject = container.getChildAt(i);
-                if (thisChild is cls){
-                    return thisChild;
-                }
-            }
-            return null;
-        }
-                
-        public static function getFirstVisibleLineIndex(ta:TextArea):int {
-        	var tf:TextField = getTextField(ta);
+		public static function getChildByClass(container:DisplayObjectContainer, cls:Class):Object {
+			var len:int = container.numChildren;
+			for (var i:int=0; i < len; i++){
+				var thisChild:DisplayObject = container.getChildAt(i);
+				if (thisChild is cls){
+					return thisChild;
+				}
+			}
+			return null;
+		}
+				
+		public static function getFirstVisibleLineIndex(ta:TextArea):int {
+			var tf:TextField = getTextField(ta);
 			return tf.getLineIndexAtPoint(5, 5);
-        }
-        
-        public static function getLastVisibleLineIndex(ta:TextArea):int {
-        	var tf:TextField = getTextField(ta);
+		}
+		
+		public static function getLastVisibleLineIndex(ta:TextArea):int {
+			var tf:TextField = getTextField(ta);
 			return tf.getLineIndexAtPoint(5, ta.height - 5);
-        }
-        
-        public static function getFirstVisibleCharIndex(ta:TextArea):int {
-        	var tf:TextField = getTextField(ta);
-        	return tf.getLineOffset(getFirstVisibleLineIndex(ta));
-        }
-        
-        public static function getNowDateString():String {
-        	return getDateString(new Date());
-        }
-        
-		public static function getDateString(date:Date = null):String {
+		}
+		
+		public static function getFirstVisibleCharIndex(ta:TextArea):int {
+			var tf:TextField = getTextField(ta);
+			return tf.getLineOffset(getFirstVisibleLineIndex(ta));
+		}
+		
+		public static function getNowDateString(includeTime:Boolean):String {
+			return getDateString(new Date(), includeTime);
+		}
+		
+		public static function getDateString(date:Date = null, includeTime:Boolean = false):String {
 			if (date == null) {
 				return null;
 			}
 			var df:DateFormatter = new DateFormatter();
-			df.formatString = "YYYY-MM-DDTJJ:NN:SS";
+			df.formatString = includeTime ? "YYYY-MM-DDTJJ:NN:SS" : "YYYY-MM-DD";
 			return df.format(date);
 		}
 		

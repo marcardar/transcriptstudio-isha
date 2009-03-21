@@ -68,13 +68,13 @@ package org.ishafoundation.archives.transcript.importer
 			}
 			var devicesElement:XML = <devices/>;
 			sessionElement.appendChild(devicesElement);
-			var deviceElement:XML = <device id="a1" name="Mixer"/>
+			var deviceElement:XML = <device id="a1"/>
 			devicesElement.appendChild(deviceElement);
 			var transcriptElement:XML = <transcript id="t1"/>;
 			sessionElement.appendChild(transcriptElement);
 			for each (var audioTranscript:WordMLTransformer in audioTranscripts) {
-				var clipElement:XML = audioTranscript.clipElement;
-				deviceElement.appendChild(clipElement);
+				var mediaElement:XML = audioTranscript.mediaElement;
+				deviceElement.appendChild(mediaElement);
 				var lastAction:String;
 				if (audioTranscript.audioTranscriptElement.hasOwnProperty("@proofreadBy")) {
 					lastAction = "proofread";

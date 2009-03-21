@@ -2,6 +2,8 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Create Event" creationComplete="init()" xmlns:importer="org.ishafoundation.archives.transcript.components.studio.importer.*">
 	<mx:Script>
 	<![CDATA[
+		import org.ishafoundation.archives.transcript.db.DatabaseManager;
+		import mx.events.FlexEvent;
 		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
 		import org.ishafoundation.archives.transcript.model.ReferenceManager;
 		import org.ishafoundation.archives.transcript.db.DatabaseConstants;
@@ -31,57 +33,89 @@
 		import mx.controls.Alert;
 		import mx.managers.PopUpManager;
 		
-	   	public static const OK_CLICKED:String = "OK_CLICKED";
+	   	public static const EVENT_CREATED:String = "EVENT_CREATED";
 	   	
-	   	public var xmlStorer:XMLStorer;
+	   	public var databaseMgr:DatabaseManager;
 	   	
 	   	[Bindable]
 	   	public var referenceMgr:ReferenceManager;
 	   	
 		private var _fileSystem:DbFileSystem;
 
-		public var eventXML:XML;
 		public var eventFile:EventFile;
 	
+		public static function display(parent:DisplayObject, fileSystem:DbFileSystem, databaseMgr:DatabaseManager, referenceMgr:ReferenceManager, eventProps:EventProperties = null):CreateEventDialog {
+			var result:CreateEventDialog = new CreateEventDialog();
+			result.databaseMgr = databaseMgr;
+			result.referenceMgr = referenceMgr;
+			PopUpManager.addPopUp(result, parent, true);
+			result.fileSystem = fileSystem;
+			result.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
+				result.eventPropertiesPane.eventProps = eventProps;
+			});
+			return result;
+		}
+	
 		private function init():void {
-			var eventProps:EventProperties = new EventProperties(eventXML);
-			eventPropertiesPane.eventProps = eventProps;
 		}
 		
 		[Bindable]
 		public function set fileSystem(fileSystem:DbFileSystem):void {
 			_fileSystem = fileSystem;
 			eventPropertiesPane.fileSystem = fileSystem;
-			eventPropertiesPane.existingEventIds = fileSystem.getAllEventIds();						
 		}
 		
 		public function get fileSystem():DbFileSystem {
 			return _fileSystem;
 		}
 		
+		private function get eventProps():EventProperties {
+			return eventPropertiesPane.eventProps;
+		}
+		
+		private function get8DigitDate():String {
+			if (eventProps.startAt == null) {
+				return null;
+			}
+			var startAtDate:Date = eventProps.startAt;
+			var fixWidth:Function = EventPropertiesPane.fixWidth;
+			var result:String = startAtDate.fullYear + fixWidth(startAtDate.month + 1, 2) + fixWidth(startAtDate.date, 2);
+			return result;
+		}
+		
 		private function createEvent(evt:MouseEvent):void {
-			// need to create the new event file
-			var collection:Collection = eventPropertiesPane.collectionChooserTree.selectedItem as Collection;
-			var filename:String = eventPropertiesPane.eventProps.generateFilename();
-			var eventPath:String = collection.path + "/" + filename;
-			xmlStorer.storeXML(eventPath, eventXML, function():void {
-				fileSystem.refresh(collection.path, function():void {
-					eventFile = collection.getEventFile(eventPropertiesPane.eventProps.id);
-					if (eventFile == null) {
-						throw new Error("Could not find the event file we just saved: " + eventPath);
-					}
-				}, function(msg:String):void {
-					throw new Error("Could not refresh collection: " + collection.path + ": " + msg);
+			// need to generate a new ID
+			populateId(function():void {
+				// need to create the new event file
+				var collection:Collection = eventPropertiesPane.collectionChooserTree.selectedItem as Collection;
+				var filename:String = eventPropertiesPane.eventProps.generateFilename();
+				var eventPath:String = collection.path + "/" + filename;
+				databaseMgr.storeXML(eventPath, eventPropertiesPane.eventProps.eventElement, function():void {
+					fileSystem.refresh(collection.path, function():void {
+						closeMe();
+						var evt:Event = new Event(EVENT_CREATED);
+						dispatchEvent(evt);
+					}, function(msg:String):void {
+						throw new Error("Could not refresh collection: " + collection.path + ": " + msg);
+					});
+				}, function (msg:String):void {
+					throw new Error("Could not save event file '" + eventPath + "': " + msg);
 				});
-			}, function (msg:String):void {
-				throw new Error("Could not save event file '" + eventPath + "': " + msg);
+			}, function(msg:String):void {
+				throw new Error("Could not create new event id: " + msg);
 			});
+		}
+		
+		private function populateId(successFunc:Function, failureFunc:Function):void {
+			var eventDate:String = Utils.getDateString(eventProps.startAt);
+			this.databaseMgr.executeStoredXQuery("create-event-id.xql", {eventDate:eventDate, eventType:eventProps.type}, function(returnVal:String):void {
+				eventProps.id = returnVal;
+				successFunc();
+			}, failureFunc);
 		}
 			
 		private function okClicked(evt:MouseEvent):void {
 			createEvent(evt);
-			closeMe();
-			dispatchEvent(new Event(OK_CLICKED));
 		}
 		
 		private function closeMe():void {

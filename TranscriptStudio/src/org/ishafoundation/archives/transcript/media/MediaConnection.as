@@ -79,12 +79,12 @@ package org.ishafoundation.archives.transcript.media
 			return this._nc != null && this._nc.connected && !isConnecting();
 		}
 		
-		public function play(clipURL:String, video:Video, statusFunc:Function, failureFunc:Function, start:int = -1, end:int = -1):void {
+		public function play(mediaURL:String, video:Video, statusFunc:Function, failureFunc:Function, start:int = -1, end:int = -1):void {
 			if (!isConnected()) {
 				throw new Error("Not connected to media server");
 			}
 			if (mediaStream != null) {
-				if (mediaStream.isOpen() && mediaStream.clipURL == clipURL) {
+				if (mediaStream.isOpen() && mediaStream.mediaURL == mediaURL) {
 					// great, we can reuse the existing mediaStream
 					mediaStream.statusFunc = statusFunc;
 					mediaStream.failureFunc = failureFunc;
@@ -95,7 +95,7 @@ package org.ishafoundation.archives.transcript.media
 				}
 			}
 			if (mediaStream == null) {
-				mediaStream = new MediaStream(clipURL, this, statusFunc, failureFunc);
+				mediaStream = new MediaStream(mediaURL, this, statusFunc, failureFunc);
 			}
 			mediaStream.play(video, start, end);
 		}

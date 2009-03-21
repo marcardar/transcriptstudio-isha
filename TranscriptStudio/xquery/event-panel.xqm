@@ -33,17 +33,18 @@ declare function event-panel:main() as element()*
 			return
 				if (exists($sessions)) then
 				(
-					<h2>Clip IDs</h2>
+					<h2>Media IDs</h2>
 				,
-					<p>{event-panel:get-clip-ids-csv-for-sessions($sessions)}</p>
+					<p>{event-panel:get-media-ids-csv-for-sessions($sessions)}</p>
 				,
 					<h2>Sessions ({count($sessions)})</h2>
 				,
 					<ol>
 					{for $session in $sessions
+					order by $session/@id
 					return
 						<li>
-							<a href="main.xql?panel=session&amp;id={$session/@id}">Session: {$session/string(@subTitle)} {concat(' ', $session/string(@startAt))} [{event-panel:get-clip-ids-csv-for-sessions($session)}]: {$session/string(@id)}</a>
+							<a href="main.xql?panel=session&amp;id={$session/@id}">Session: {$session/string(@subTitle)} {concat(' ', $session/string(@startAt))} [{event-panel:get-media-ids-csv-for-sessions($session)}]: {$session/string(@id)}</a>
 							<br/>{$session/string(@comment)}<p/>							
 						</li>
 					}				
@@ -57,15 +58,15 @@ declare function event-panel:main() as element()*
 	)
 };
 
-declare function event-panel:get-clip-ids-csv-for-sessions($sessions as element()*) as xs:string*
+declare function event-panel:get-media-ids-csv-for-sessions($sessions as element()*) as xs:string*
 {
-	upper-case(string-join(event-panel:get-clip-ids-for-sessions($sessions), ', '))
+	upper-case(string-join(event-panel:get-media-ids-for-sessions($sessions), ', '))
 };
 
-declare function event-panel:get-clip-ids-for-sessions($sessions as element()*) as xs:string*
+declare function event-panel:get-media-ids-for-sessions($sessions as element()*) as xs:string*
 {
-	let $clipIds := distinct-values($sessions/devices/device/clip/string(@id))
-	for $clipId in $clipIds
-	order by $clipId
-	return $clipId
+	let $mediaIds := distinct-values($sessions/devices/device/media/string(@id))
+	for $mediaId in $mediaIds
+	order by $mediaId
+	return $mediaId
 };
