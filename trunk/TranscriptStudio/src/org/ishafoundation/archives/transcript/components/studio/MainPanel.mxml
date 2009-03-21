@@ -21,6 +21,8 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" width="100%" height="100%" verticalGap="0">
 	<mx:Script>
 		<![CDATA[
+			import org.ishafoundation.archives.transcript.model.EventProperties;
+			import org.ishafoundation.archives.transcript.components.studio.importer.EventPropertiesPane;
 			import org.ishafoundation.archives.transcript.components.studio.media.MediaPlayerDialog;
 			import org.ishafoundation.archives.transcript.util.ApplicationUtils;
 			import name.carter.mark.flex.project.mdoc.MNode;
@@ -332,16 +334,11 @@
 			public function createEventClicked():void {
 				var thisPanel:MainPanel = this;
 				var fileSystem:DbFileSystem = new DbFileSystem(DatabaseConstants.ARCHIVES_COLLECTION_PATH, databaseMgr, function ():void {
-					var popup:CreateEventDialog = new CreateEventDialog();
-					popup.addEventListener(CreateEventDialog.OK_CLICKED, function(event:Event):void {
+					var popup:CreateEventDialog = CreateEventDialog.display(thisPanel, fileSystem, databaseMgr, referenceMgr, new EventProperties());
+					popup.addEventListener(CreateEventDialog.EVENT_CREATED, function(event:Event):void {
 						status = "Successfully created event";
 						Alert.show("Successfully created event"); 
 					});
-					popup.eventXML = <event/>;
-					PopUpManager.addPopUp(popup, thisPanel, true);
-					popup.fileSystem = fileSystem;
-					popup.xmlStorer = databaseMgr;
-					popup.referenceMgr = referenceMgr;
 				}, collectionTreeFailed);
 			}
 			
@@ -370,8 +367,7 @@
 						updateTitle();
 					});
 					popup.fileSystem = fileSystem;
-					popup.xqueryExecutor = databaseMgr;
-					popup.xmlStorer = databaseMgr;
+					popup.databaseMgr = databaseMgr;
 					popup.referenceMgr = referenceMgr;
 					popup.importer = new MSWordImporter(databaseMgr);
 					PopUpManager.addPopUp(popup, thisPanel, true);

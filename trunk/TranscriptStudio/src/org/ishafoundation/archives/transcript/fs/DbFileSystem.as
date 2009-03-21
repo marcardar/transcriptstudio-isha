@@ -201,14 +201,6 @@ package org.ishafoundation.archives.transcript.fs
 			}
 		}
 		
-		public function getAllEventIds():ISet {
-			var result:ISet = new HashSet();
-			for each (var eventId:String in collectionHierarchyXML..event.@id) {
-				result.add(eventId);
-			}
-			return result;
-		}
-		
 		public function getAllSessionIds():ISet {
 			var result:ISet = new HashSet();
 			for each (var sessionId:String in collectionHierarchyXML..session.@id) {

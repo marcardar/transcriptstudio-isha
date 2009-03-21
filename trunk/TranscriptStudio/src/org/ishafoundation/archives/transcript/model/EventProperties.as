@@ -22,9 +22,18 @@ package org.ishafoundation.archives.transcript.model
 		
 		public var eventElement:XML;
 		
-		public function EventProperties(eventElement:XML)
+		public function EventProperties(eventElement:XML = null)
 		{
-			this.eventElement = eventElement;
+			if (eventElement == null) {
+				this.eventElement = <event/>;
+			}
+			else {
+				this.eventElement = eventElement;
+			}
+		}
+		
+		public function copy():EventProperties {
+			return new EventProperties(eventElement.copy());
 		}
 
 		private static function createTypesArray():Array {
@@ -129,7 +138,7 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		public function generateFilename():String {
-			var filename:String = id + "_" + type;
+			var filename:String = id;
 			if (subTitle != null) {
 				filename += "_" + subTitle;
 			}
@@ -139,9 +148,11 @@ package org.ishafoundation.archives.transcript.model
 			if (venue != null) {
 				filename += "_" + venue;
 			}
-			filename += ".xml";
 			// replace spaces with underscores and make lower case
 			filename = filename.replace(/ /g, "-").toLowerCase();
+			// remove anything thats neither a letter, number, hypen or underscore
+			filename = filename.replace(/[^a-z0-9\-_]/g, "");
+			filename += ".xml";
 			return filename;
 		}
 	}

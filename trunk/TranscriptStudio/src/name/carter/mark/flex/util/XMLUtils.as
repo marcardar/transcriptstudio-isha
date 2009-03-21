@@ -119,11 +119,7 @@ package name.carter.mark.flex.util
 		}
 		
 		public static function setAttributeAsDate(element:XML, attrName:String, date:Date, includeTime:Boolean = true):void {
-			var dateStr:String = Utils.getDateString(date);
-			if (!includeTime && dateStr != null) {
-				var index:int = dateStr.indexOf("T");
-				dateStr = dateStr.substring(0, index);
-			}
+			var dateStr:String = Utils.getDateString(date, includeTime);
 			setAttributeValue(element, attrName, dateStr);
 		}
 		
