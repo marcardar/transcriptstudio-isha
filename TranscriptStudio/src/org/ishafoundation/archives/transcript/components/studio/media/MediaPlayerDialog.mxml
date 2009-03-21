@@ -89,6 +89,23 @@
 			return deviceElement.@id;
 		} 
 		
+		private function mediaLabelFunc(mediaId:String):String {
+			if (mediaId == null || mediaId.length == 0) {
+				return "<Select Device>";
+			}
+			var mediaElement:XML = devicesElement.device.media.(@id == mediaId)[0];
+			var deviceId:String = (mediaElement.parent() as XML).@id;
+			var deviceIdIndex:int = mediaId.indexOf("-" + deviceId + "-");
+			if (deviceIdIndex < 0) {
+				// cannot find the device id in the media id - so just show the whole media id
+				return mediaId;
+			}
+			else {
+				// show the part of the media id after the device id (MAY NOT BE UNIQUE BUT WE'LL TAKE THE RISK)
+				return mediaId.substring(deviceIdIndex + deviceId.length + 2);
+			}
+		} 
+		
 		private function connectToMediaServer():void {
 			var waitPopUp:PleaseWaitPopUp = PleaseWaitPopUp.display(this, "Trying to connect...");
 			var thisHandle:MediaPlayerDialog = this;
@@ -239,7 +256,7 @@
 				if (evt.value == 0 && this.seekFromTime < 0) {
 					return;
 				}
-				if (!mediaServer.mediaStream.isOpen()) {
+				if (mediaServer == null || mediaServer.mediaStream == null || !mediaServer.mediaStream.isOpen()) {
 					return;
 				}
 				// change was not caused by the media itself
@@ -266,7 +283,7 @@
 				<mx:ComboBox id="deviceComboBox" prompt="Select Device..." labelFunction="{deviceLabelFunc}" dataProvider="{getDeviceIds(this.devicesElement)}" change="deviceChangeHandler()"/>
 			</mx:GridItem>
 			<mx:GridItem width="50%" height="100%">
-				<mx:ComboBox minWidth="150" id="mediaComboBox" enabled="false" change="mediaChangeHandler()"/>
+				<mx:ComboBox minWidth="150" id="mediaComboBox" enabled="false" labelFunction="{mediaLabelFunc}" change="mediaChangeHandler()"/>
 			</mx:GridItem>
 		</mx:GridRow>
 	</mx:Grid>

@@ -41,7 +41,7 @@
 		}		
     ]]>
 	</mx:Script>
-	<mx:TextInput id="idTextInput" width="200" restrict="a-z0-9" enter="okButton.dispatchEvent(new MouseEvent(MouseEvent.CLICK))"/>
+	<mx:TextInput id="idTextInput" width="200" restrict="a-z0-9\-" enter="okButton.dispatchEvent(new MouseEvent(MouseEvent.CLICK))"/>
 	<mx:HBox width="100%" horizontalAlign="center">
 		<mx:Button id="okButton" label="OK" click="closeMe()" enabled="{isValidId(idTextInput.text)}"/>
 		<mx:Button label="Cancel" click="closeMe()"/>		
