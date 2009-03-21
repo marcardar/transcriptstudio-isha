@@ -142,7 +142,7 @@
 			if (mediaUUID == null) {
 				return;
 			}
-			var mediaURL:String = mediaUUID + "." + (mediaUUID.indexOf("-v") == 0 ? "flv" : "mp3");
+			var mediaURL:String = mediaUUID + "." + (mediaUUID.indexOf("-v") > 0 ? "flv" : "mp3");
 			var waitPopUp:PleaseWaitPopUp = PleaseWaitPopUp.display(this, "Preparing to stream...");
 			this.slider.value = 0;
 			this.mediaServer.play(mediaURL, video, function(msg:String):void {
@@ -195,7 +195,7 @@
 				videoBox.includeInLayout = false;
 			}
 			else {
-				if (mediaUUID.indexOf("-v") == 0) {
+				if (mediaUUID.indexOf("-v") > 0) {
 					videoBox.visible = true;
 				}
 				else {
