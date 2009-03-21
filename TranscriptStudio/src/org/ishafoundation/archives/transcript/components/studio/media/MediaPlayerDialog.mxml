@@ -85,7 +85,8 @@
 				return "<Select Device>";
 			}
 			var deviceElement:XML = devicesElement.device.(@id == deviceId)[0];
-			return deviceElement.@name;
+			// TODO - read a nice name from the reference
+			return deviceElement.@id;
 		} 
 		
 		private function connectToMediaServer():void {
@@ -162,16 +163,8 @@
 		}
 		
 		private function getMediaUUID():String {
-			var deviceId:String = deviceComboBox.selectedItem as String;
-			if (deviceId == null) {
-				return null;
-			}
 			var mediaId:String = mediaComboBox.selectedItem as String;
-			if (mediaId == null) {
-				return null;
-			}
-			var sessionId:String = devicesElement.parent().@id;
-			return sessionId + "-" + deviceId + "-" + mediaId;
+			return mediaId;
 		}
 		
 		private function deviceChangeHandler():void {
