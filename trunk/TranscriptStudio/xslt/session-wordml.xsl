@@ -68,7 +68,7 @@
 							</w:p>
 							<w:p w:rsidR="00BD70D3" w:rsidRPr="00914051" w:rsidRDefault="00BD70D3" w:rsidP="00021F27">
 								<w:r>
-                                    <w:t>MEDIA CODE: <xsl:value-of select="upper-case(string-join(//source/@id, ', '))"/>
+                                    <w:t>MEDIA CODE: <xsl:value-of select="string-join(//media/@id, ', ')"/>
 									</w:t>
 								</w:r>
 							</w:p>
@@ -258,9 +258,9 @@
 	</xsl:template-->
 	
 	<xsl:template match="segment">
-		<xsl:variable name="syncPoint" select="content[1]/@startSyncPointId"/>
-		<xsl:if test="$syncPoint and not(preceding::segment[position() &lt; 3]/content[1]/@startSyncPointId)">
-			<xsl:variable name="time" select="/session/source/syncPoint[@idRef = $syncPoint]/@timecode"/>
+		<xsl:variable name="syncPoint" select="content[1]/@startId"/>
+		<xsl:if test="$syncPoint and not(preceding::segment[position() &lt; 3]/content[1]/@startId)">
+			<xsl:variable name="time" select="/session/devices/device/media/sync[@timeIdRef = $syncPoint]/@timecode"/>
 			<w:p>
                 <w:r>
                     <w:t>Time <xsl:number format="1" value="floor($time div 60)"/>

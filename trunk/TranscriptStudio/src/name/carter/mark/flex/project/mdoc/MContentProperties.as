@@ -30,8 +30,8 @@ package name.carter.mark.flex.project.mdoc
 		public static const EMPHASIS_PROP_NAME:String = "emphasis";
 		public static const EMPHASIS_DEFAULT:Boolean = false;
 		
-		public static const START_SYNC_POINT_ID_PROP_NAME:String = "startSyncPointId";
-		public static const END_SYNC_POINT_ID_PROP_NAME:String = "endSyncPointId";
+		public static const START_ID_PROP_NAME:String = "startId";
+		public static const END_ID_PROP_NAME:String = "endId";
 
 		private var contentElement:XML;
 		
@@ -56,19 +56,19 @@ package name.carter.mark.flex.project.mdoc
 		}
 		
 		public function set startSyncPointId(newValue:String):void {
-			XMLUtils.setAttributeValue(contentElement, START_SYNC_POINT_ID_PROP_NAME, newValue);			
+			XMLUtils.setAttributeValue(contentElement, START_ID_PROP_NAME, newValue);			
 		}
 		
 		public function get startSyncPointId():String {
-			return XMLUtils.getAttributeValue(contentElement, START_SYNC_POINT_ID_PROP_NAME);			
+			return XMLUtils.getAttributeValue(contentElement, START_ID_PROP_NAME);			
 		}
 		
 		public function set endSyncPointId(newValue:String):void {
-			XMLUtils.setAttributeValue(contentElement, END_SYNC_POINT_ID_PROP_NAME, newValue);			
+			XMLUtils.setAttributeValue(contentElement, END_ID_PROP_NAME, newValue);			
 		}
 		
 		public function get endSyncPointId():String {
-			return XMLUtils.getAttributeValue(contentElement, END_SYNC_POINT_ID_PROP_NAME);			
+			return XMLUtils.getAttributeValue(contentElement, END_ID_PROP_NAME);			
 		}
 		
 		public static function getCumulativePropertyValueAsBoolean(nodeRange:MNodeRange, propName:String):Object {
