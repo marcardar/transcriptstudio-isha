@@ -202,11 +202,11 @@ package org.ishafoundation.archives.transcript.importer
 				}
 				new MSegmentProperties(segmentElement).speaker = speaker;
 				if (startTime >= 0) {
-					var syncPointId:String = idFunc("sp");
-					var syncElement:XML = <sync timecode={startTime} sp={syncPointId}/>;
+					var syncPointId:String = idFunc("t");
+					var syncElement:XML = <sync timecode={startTime} timeIdRef={syncPointId}/>;
 					mediaElement.appendChild(syncElement);
 					var firstContentElement:XML = segmentElement.content[0];
-					XMLUtils.setAttributeValue(firstContentElement, MContentProperties.START_SYNC_POINT_ID_PROP_NAME, syncPointId);
+					XMLUtils.setAttributeValue(firstContentElement, MContentProperties.START_ID_PROP_NAME, syncPointId);
 					startTime = -1; // don't use this start time for any other segment					
 				}
 				audioTranscriptElement.appendChild(segmentElement);

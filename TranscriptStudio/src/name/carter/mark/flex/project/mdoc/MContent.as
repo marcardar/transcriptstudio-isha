@@ -92,8 +92,8 @@ package name.carter.mark.flex.project.mdoc
 			var textToPrepend:String = precedingContent.text + " ";
 			text = textToPrepend + text;
 			// take the start time from the preceding content
-			var startSyncPointId:String = precedingContent.getPropertyValue(MContentProperties.START_SYNC_POINT_ID_PROP_NAME);
-			setProperty(MContentProperties.START_SYNC_POINT_ID_PROP_NAME, startSyncPointId);
+			var startSyncPointId:String = precedingContent.getPropertyValue(MContentProperties.START_ID_PROP_NAME);
+			setProperty(MContentProperties.START_ID_PROP_NAME, startSyncPointId);
 			precedingContent.remove();
 			return textToPrepend;
 		}
@@ -114,8 +114,8 @@ package name.carter.mark.flex.project.mdoc
 			var textToAppend:String = " " + followingContent.text;
 			text += textToAppend;
 			// take the start time from the folllowing content
-			var endSyncPointId:String = followingContent.getPropertyValue(MContentProperties.END_SYNC_POINT_ID_PROP_NAME);
-			setProperty(MContentProperties.END_SYNC_POINT_ID_PROP_NAME, endSyncPointId);
+			var endSyncPointId:String = followingContent.getPropertyValue(MContentProperties.END_ID_PROP_NAME);
+			setProperty(MContentProperties.END_ID_PROP_NAME, endSyncPointId);
 			followingContent.remove();
 			return textToAppend;
 		}

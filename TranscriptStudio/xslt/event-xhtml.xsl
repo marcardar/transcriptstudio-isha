@@ -72,7 +72,7 @@
 		</div>
 		<!--div style="font-size:20;margin-bottom:100px;width:750px;margin-left:auto;margin-right:auto;text-align:left;">
 			<h2 style="text-align:center;font-size:22;">
-				<xsl:value-of select="upper-case(string-join(//source/@id, ', '))"/>
+				<xsl:value-of select="string-join(//media/@id, ', ')"/>
 				<xsl:text>: </xsl:text>
 				<xsl:value-of select="/session/@name"/>
 				<xsl:value-of select="concat(' (',/session/@startAt,')')"/>
