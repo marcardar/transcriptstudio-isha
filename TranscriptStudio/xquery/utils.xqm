@@ -1,6 +1,6 @@
 xquery version "1.0";
 
-module namespace utils = "http://www.ishafoundation.org/archives/xquery/utils";
+module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils";
 
 (:
 	$dateString can be in various formats but must be in order (year(4), month(2), date(2)) with no digits in between

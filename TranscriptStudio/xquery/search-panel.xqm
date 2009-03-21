@@ -1,8 +1,8 @@
 xquery version "1.0";
 
-module namespace search-panel = "http://www.ishafoundation.org/archives/xquery/search-panel";
+module namespace search-panel = "http://www.ishafoundation.org/ts4isha/xquery/search-panel";
 
-import module namespace search-fns = "http://www.ishafoundation.org/archives/xquery/search-fns" at "search-fns.xqm";
+import module namespace search-fns = "http://www.ishafoundation.org/ts4isha/xquery/search-fns" at "search-fns.xqm";
 
 declare namespace request = "http://exist-db.org/xquery/request";
 declare namespace session = "http://exist-db.org/xquery/session";

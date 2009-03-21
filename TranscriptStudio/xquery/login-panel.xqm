@@ -1,6 +1,6 @@
 xquery version "1.0";
 
-module namespace login-panel = "http://www.ishafoundation.org/archives/xquery/login-panel";
+module namespace login-panel = "http://www.ishafoundation.org/ts4isha/xquery/login-panel";
 
 declare namespace request = "http://exist-db.org/xquery/request";
 declare namespace session = "http://exist-db.org/xquery/session";
@@ -9,7 +9,7 @@ import module namespace transform = "http://exist-db.org/xquery/transform";
 
 declare function login-panel:transformToXHTML($doc as element(), $highlightId as xs:string?) as element()
 {
-    transform:transform($doc, doc('/db/archives/xslt/session-xhtml.xsl'), ())
+    transform:transform($doc, doc('/db/ts4isha/xslt/session-xhtml.xsl'), ())
 };
 
 declare function login-panel:main() as element()*

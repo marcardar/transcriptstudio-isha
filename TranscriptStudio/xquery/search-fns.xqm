@@ -1,6 +1,6 @@
 xquery version "1.0";
 
-module namespace search-fns = "http://www.ishafoundation.org/archives/xquery/search-fns";
+module namespace search-fns = "http://www.ishafoundation.org/ts4isha/xquery/search-fns";
 
 declare variable $search-fns:maxTextChars := 560;
 
@@ -16,7 +16,7 @@ declare function search-fns:main($searchString as xs:string, $defaultType as xs:
 	let $markupSearchTerms := search-fns:extract-sub-search-terms($searchString, 'markup')
 	let $textSearchTerms := search-fns:extract-sub-search-terms($searchString, 'text')
 	return
-		let $events := search-fns:get-events(collection('/db/archives/data')/event, $eventSearchTerms)
+		let $events := search-fns:get-events(collection('/db/ts4isha/data')/event, $eventSearchTerms)
 		let $eventIds := trace($events/string(@id), 'eventIds:')
 		let $transcripts := search-fns:get-transcripts($eventIds)
 		let $tableRows := 
@@ -45,7 +45,7 @@ declare function search-fns:main($searchString as xs:string, $defaultType as xs:
 						(<p>No meaningful terms in search string</p>)
 		return
 			let $numRows := count(trace($tableRows, 'table rows'))
-			let $afterSearching := concat('after searching ', count(collection('/db/archives/data')/session/transcript), ' transcripts.')
+			let $afterSearching := concat('after searching ', count(collection('/db/ts4isha/data')/session/transcript), ' transcripts.')
 			return
 				if ($numRows = 0) then
 					(: No results :)
@@ -65,12 +65,12 @@ declare function search-fns:main($searchString as xs:string, $defaultType as xs:
 
 declare function search-fns:get-transcripts($eventIds as xs:string*) as element()*
 {
-	collection('/db/archives/data')/session[search-fns:get-event-id(@id) = $eventIds]/transcript 
+	collection('/db/ts4isha/data')/session[search-fns:get-event-id(@id) = $eventIds]/transcript 
 };
 
 declare function search-fns:get-sessions-for-event-ids($eventIds as xs:string*) as element()*
 {
-	collection('/db/archives/data')/session[search-fns:get-event-id(@id) = $eventIds]
+	collection('/db/ts4isha/data')/session[search-fns:get-event-id(@id) = $eventIds]
 };
 
 (:
@@ -107,7 +107,7 @@ declare function search-fns:get-events($baseEvents as element()*, $eventSearchTe
 declare function search-fns:get-session-title($session as element()) as xs:string
 {
 	let $eventId := search-fns:get-event-id($session/@id)
-	let $event := collection('/db/archives/data')/event[@id = $eventId]
+	let $event := collection('/db/ts4isha/data')/event[@id = $eventId]
 	let $sources := concat(' (', string-join($session/devices/device/media/upper-case(@id), ', '), ')')
 	return
 		concat(search-fns:get-event-title($event), $sources)
@@ -137,7 +137,7 @@ declare function search-fns:markup-search($baseMarkups as element()*, $searchTer
 
 declare function search-fns:is-category-id($categoryId as xs:string) as xs:boolean
 {
-	exists(collection('/db/archives/reference')/reference/markupCategories/markupCategory[@id = $categoryId])
+	exists(collection('/db/ts4isha/reference')/reference/markupCategories/markupCategory[@id = $categoryId])
 };
 
 declare function search-fns:text-search($baseElements as element()*, $searchTerms as xs:string*) as element()*
@@ -169,7 +169,7 @@ declare function search-fns:expand-concept($concept as xs:string) as xs:string*
 {
 	(: expand by synonyms :)
 	let $synonyms := distinct-values(($concept,
-			for $synonym in collection('/db/archives/reference')/reference/synonymGroups/synonymGroup/synonym[@idRef = $concept]/../synonym
+			for $synonym in collection('/db/ts4isha/reference')/reference/synonymGroups/synonymGroup/synonym[@idRef = $concept]/../synonym
 			return string($synonym/@idRef)
 		))
 	(: expand by concept hierarchy :) 
@@ -190,7 +190,7 @@ declare function search-fns:get-sub-concept-ids($unprocessedIds as xs:string*, $
 					()
 				else
 					(: have not processed this one before :)
-					collection('/db/archives/reference')/reference/coreConcepts/concept[@id = $unprocessedId]/subtype/@idRef
+					collection('/db/ts4isha/reference')/reference/coreConcepts/concept[@id = $unprocessedId]/subtype/@idRef
 	return
 		let $newProcessedIds := ($processedIds, $unprocessedIds)
 		return
@@ -202,7 +202,7 @@ declare function search-fns:get-sub-concept-ids($unprocessedIds as xs:string*, $
 
 declare function search-fns:markups-for-any-concept($baseMarkups as element()*, $concepts as xs:string*) as element()*
 {
-	let $markupCategories as element()*:= collection('/db/archives/reference')/reference/markupCategories/markupCategory/tag[@type = "concept" and exists(index-of($concepts, string(@value)))]/..
+	let $markupCategories as element()*:= collection('/db/ts4isha/reference')/reference/markupCategories/markupCategory/tag[@type = "concept" and exists(index-of($concepts, string(@value)))]/..
 	(:
 	let $null := error(QName("http://error.com", "myerror"), concat("Number of markupCategories: ", count($markupCategories)))
 	:)
@@ -228,9 +228,9 @@ declare function search-fns:markup-as-table-row($markup as element()) as element
 {
 	let $session := $markup/ancestor::session
 	let $markupTypeId := $markup/tag[@type = 'markupType']/@value
-	let $markupType := collection('/db/archives/reference')/reference/markupTypes/markupType[@id = $markupTypeId]
+	let $markupType := collection('/db/ts4isha/reference')/reference/markupTypes/markupType[@id = $markupTypeId]
 	let $categoryId := $markup/tag[@type = 'markupCategory']/@value
-	let $markupCategory := collection('/db/archives/reference')/reference/markupCategories/markupCategory[@id = $categoryId]
+	let $markupCategory := collection('/db/ts4isha/reference')/reference/markupCategories/markupCategory[@id = $categoryId]
 	let $markupCategoryName := if (exists($markupCategory)) then
 			concat(': ', $markupCategory/@name, search-fns:get-markup-category-concepts-string($markupCategory))
 		else
@@ -361,7 +361,7 @@ declare function search-fns:get-event-id($sessionId as xs:string) as xs:string
 
 declare function search-fns:get-events-for-session-ids($sessionIds as xs:string*) as element()*
 {
-	let $dataCollection := collection('/db/archives/data')
+	let $dataCollection := collection('/db/ts4isha/data')
 	for $sessionId in $sessionIds
 	let $eventId := search-fns:get-event-id($sessionId)
 	return

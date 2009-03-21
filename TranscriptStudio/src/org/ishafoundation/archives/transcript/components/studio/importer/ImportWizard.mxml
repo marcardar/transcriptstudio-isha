@@ -287,7 +287,7 @@
 		}*/
 		
 		private function setImportListDataProvider(xqueryExecutor:XQueryExecutor):void {
-			xqueryExecutor.query("import module namespace transcriptstudio='http://ishafoundation.org/xquery/archives/transcript' at 'java:org.ishafoundation.archives.transcript.xquery.modules.TranscriptStudioModule';transcriptstudio:import-file-name-list()", [], function(xml:XML):void {
+			xqueryExecutor.query("import module namespace ts4isha='http://ishafoundation.org/ts4isha/xquery' at 'java:org.ishafoundation.ts4isha.xquery.modules.TranscriptStudioModule';ts4isha:import-file-name-list()", [], function(xml:XML):void {
 				var names:Array = [];
 				var nameAttrs:XMLList = xml.*.*.@name;
 				for each (var name:String in nameAttrs) {

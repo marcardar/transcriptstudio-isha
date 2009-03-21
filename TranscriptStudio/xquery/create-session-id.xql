@@ -1,7 +1,7 @@
 (: returns a new session id (not currently in use). e.g. 20090320-n1-1-1830 :)
 
-declare namespace create-session-id = "http://www.ishafoundation.org/archives/xquery/create-session-id";
-import module namespace utils = "http://www.ishafoundation.org/archives/xquery/utils" at "utils.xqm";
+declare namespace create-session-id = "http://www.ishafoundation.org/ts4isha/xquery/create-session-id";
+import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
 
 (:
    $idPrefix is of the format: 20090320-n
@@ -13,7 +13,7 @@ declare function create-session-id:create-id($idPrefix as xs:string, $startId as
 {
 	let $id := concat($idPrefix, utils:left-pad-string(string($startId), 2))
 	return
-		if (exists(collection('/db/archives/data')/session[@id = $id])) then
+		if (exists(collection('/db/ts4isha/data')/session[@id = $id])) then
 		(
 			create-session-id:create-id($idPrefix, $startId + 1)
 		)
@@ -35,7 +35,7 @@ else
 	(: sessionTime: session start time e.g. "1830" (6:30pm), "18xx" (6pm <= ? < 7pm) null means time unknown :)
 	let $sessionTime := xs:integer(request:get-parameter('sessionTime', '1'))
 
-	let $eventDateObj := utils:date-string-to-date(collection('/db/archives/data')/event[@id = $eventId]/@startAt[1])
+	let $eventDateObj := utils:date-string-to-date(collection('/db/ts4isha/data')/event[@id = $eventId]/@startAt[1])
 	let $sessionDateObj := utils:date-string-to-date($sessionDate) 
 	return
 		if (exists($eventDateObj) and exists($sessionDateObj)) then

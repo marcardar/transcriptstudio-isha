@@ -1,7 +1,7 @@
 (: Tests whether the specified client version (e.g. "0.9.0b1") is allowed (otherwise out-of-date) :)
 (: Returns empty string if allowed, otherwise returns min version required string :)
 
-declare namespace check-client-version = "http://www.ishafoundation.org/archives/xquery/check-client-version";
+declare namespace check-client-version = "http://www.ishafoundation.org/ts4isha/xquery/check-client-version";
 
 declare variable $check-client-version:minClientVersion := '0.9.2';
 

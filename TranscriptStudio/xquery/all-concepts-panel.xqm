@@ -1,6 +1,6 @@
 xquery version "1.0";
 
-module namespace all-concepts-panel = "http://www.ishafoundation.org/archives/xquery/all-concepts-panel";
+module namespace all-concepts-panel = "http://www.ishafoundation.org/ts4isha/xquery/all-concepts-panel";
 
 declare variable $all-concepts-panel:numColumns := 8;
 declare variable $all-concepts-panel:minRows := 3;
@@ -8,12 +8,12 @@ declare variable $all-concepts-panel:columnWidth := 100;
 
 declare function all-concepts-panel:main() as element()*
 {	
-	let $reference := collection('/db/archives/reference')/reference
+	let $reference := collection('/db/ts4isha/reference')/reference
 	let $categoryConcepts := $reference/markupCategories/markupCategory/tag[@type eq 'concept']/string(@value)
 	let $coreConcepts := $reference/coreConcepts/concept/string(@id)
 	let $subtypeConcepts := $reference/coreConcepts/concept/subtype/string(@idRef)
 	let $synonymConcepts := $reference/synonymGroups/synonymGroup/synonym/string(@idRef)
-	let $additionalConcepts := collection('/db/archives/data')/session/transcript/(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
+	let $additionalConcepts := collection('/db/ts4isha/data')/session/transcript/(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
 	return
 	(
 		<center><h2>Isha Foundation Markup Concepts</h2></center>

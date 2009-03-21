@@ -4,7 +4,7 @@ xquery version "1.0";
 	Main module of the database administration interface.
 :)
 
-declare namespace main = "http://www.ishafoundation.org/archives/xquery/main";
+declare namespace main = "http://www.ishafoundation.org/ts4isha/xquery/main";
 
 declare namespace request = "http://exist-db.org/xquery/request";
 declare namespace session = "http://exist-db.org/xquery/session";
@@ -15,12 +15,12 @@ declare variable $defaultPanel := "search";
 (:declare option exist:serialize "method=xhtml doctype-public=-//W3C//DTD XHTML 1.1//EN doctype-system=http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd";:) 
 declare option exist:serialize "media-type=text/html"; 
 
-import module namespace login-panel = "http://www.ishafoundation.org/archives/xquery/login-panel" at "login-panel.xqm";
-import module namespace search-panel = "http://www.ishafoundation.org/archives/xquery/search-panel" at "search-panel.xqm";
-import module namespace event-panel = "http://www.ishafoundation.org/archives/xquery/event-panel" at "event-panel.xqm";
-import module namespace session-panel = "http://www.ishafoundation.org/archives/xquery/session-panel" at "session-panel.xqm";
-import module namespace all-concepts-panel = "http://www.ishafoundation.org/archives/xquery/all-concepts-panel" at "all-concepts-panel.xqm";
-import module namespace categories-panel = "http://www.ishafoundation.org/archives/xquery/categories-panel" at "categories-panel.xqm";
+import module namespace login-panel = "http://www.ishafoundation.org/ts4isha/xquery/login-panel" at "login-panel.xqm";
+import module namespace search-panel = "http://www.ishafoundation.org/ts4isha/xquery/search-panel" at "search-panel.xqm";
+import module namespace event-panel = "http://www.ishafoundation.org/ts4isha/xquery/event-panel" at "event-panel.xqm";
+import module namespace session-panel = "http://www.ishafoundation.org/ts4isha/xquery/session-panel" at "session-panel.xqm";
+import module namespace all-concepts-panel = "http://www.ishafoundation.org/ts4isha/xquery/all-concepts-panel" at "all-concepts-panel.xqm";
+import module namespace categories-panel = "http://www.ishafoundation.org/ts4isha/xquery/categories-panel" at "categories-panel.xqm";
 
 (:
 	Select the page to show. Every page is defined in its own module 

@@ -1,4 +1,4 @@
-import module namespace markup-category-fns = "http://www.ishafoundation.org/archives/xquery/markup-category-fns" at "markup-category-fns.xqm";
+import module namespace markup-category-fns = "http://www.ishafoundation.org/ts4isha/xquery/markup-category-fns" at "markup-category-fns.xqm";
 
 let $id := request:get-parameter("id", ())
 let $name := request:get-parameter("name", ())

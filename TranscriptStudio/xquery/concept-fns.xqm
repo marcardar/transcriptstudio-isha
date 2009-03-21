@@ -1,20 +1,20 @@
 xquery version "1.0";
 
-module namespace concept-fns = "http://www.ishafoundation.org/archives/xquery/concept-fns";
+module namespace concept-fns = "http://www.ishafoundation.org/ts4isha/xquery/concept-fns";
 
 declare function concept-fns:count-concept-instances($conceptId as xs:string) as xs:integer
 {
-	count(collection('/db/archives/data')/session/transcript//tag[@type eq 'concept' and @value=$conceptId])
+	count(collection('/db/ts4isha/data')/session/transcript//tag[@type eq 'concept' and @value=$conceptId])
 };
 
 declare function concept-fns:get-all-concepts() as xs:string*
 {
-	let $reference := collection('/db/archives/reference')/reference
+	let $reference := collection('/db/ts4isha/reference')/reference
 	let $categoryConcepts := $reference/markupCategories/markupCategory/tag[@type eq 'concept']/string(@value)
 	let $coreConcepts := $reference/coreConcepts/concept/string(@id)
 	let $subtypeConcepts := $reference/coreConcepts/concept/subtype/string(@idRef)
 	let $synonymConcepts := $reference/synonymGroups/synonymGroup/synonym/string(@idRef)
-	let $additionalConcepts := collection('/db/archives/data')/session/transcript/(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
+	let $additionalConcepts := collection('/db/ts4isha/data')/session/transcript/(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
 	return
 		for $concept in distinct-values(($categoryConcepts, $coreConcepts, $subtypeConcepts, $synonymConcepts, $additionalConcepts))
 		order by $concept 
@@ -26,7 +26,7 @@ declare function concept-fns:add-synonyms($conceptIds as xs:string*) as xs:boole
 	if (count($conceptIds) < 2) then
 		false()
 	else
-		let $synonymGroupsElement := collection('/db/archives/reference')/reference/synonymGroups
+		let $synonymGroupsElement := collection('/db/ts4isha/reference')/reference/synonymGroups
 		let $existingGroups := $synonymGroupsElement/synonymGroup/synonym[@idRef = $conceptIds]/..
 		return
 			let $targetGroup :=
@@ -67,7 +67,7 @@ declare function concept-fns:add-synonyms($conceptIds as xs:string*) as xs:boole
 
 declare function concept-fns:remove-synonym($conceptId as xs:string) as xs:boolean
 {
-	let $synonym := collection('/db/archives/reference')/reference/synonymGroups/synonymGroup/synonym[@idRef eq $conceptId]
+	let $synonym := collection('/db/ts4isha/reference')/reference/synonymGroups/synonymGroup/synonym[@idRef eq $conceptId]
 	return
 		if (exists($synonym)) then
 			let $null :=
@@ -83,7 +83,7 @@ declare function concept-fns:remove-synonym($conceptId as xs:string) as xs:boole
 
 declare function concept-fns:add-subtype($superConceptId as xs:string, $subConceptId as xs:string) as xs:boolean
 {
-	let $coreConceptsElement := collection('/db/archives/reference')/reference/coreConcepts
+	let $coreConceptsElement := collection('/db/ts4isha/reference')/reference/coreConcepts
 	let $superConcept := $coreConceptsElement/concept[@id eq $superConceptId]
 	return
 		if (exists($superConcept)) then
@@ -113,14 +113,14 @@ declare function concept-fns:add-subtype($superConceptId as xs:string, $subConce
 (: removes the sub concept from the super concept - but does not remove the super concept (even if there are no other sub concepts) :)
 declare function concept-fns:remove-subtype($superConceptId as xs:string, $subConceptId as xs:string) as xs:boolean
 {
-	let $coreConceptsElement := collection('/db/archives/reference')/reference/coreConcepts
+	let $coreConceptsElement := collection('/db/ts4isha/reference')/reference/coreConcepts
 	return concept-fns:delete-internal($coreConceptsElement/concept[@id eq $superConceptId]/subtype[@idRef eq $subConceptId]) > 0
 };
 
 (: Returns the number of concepts added (0 or 1 depending on whether the concept already exists or not) :)
 declare function concept-fns:add($conceptId as xs:string) as xs:integer
 {
-	let $reference := collection('/db/archives/reference')/reference
+	let $reference := collection('/db/ts4isha/reference')/reference
 	return
 		if (exists($reference/coreConcepts/concept[@id eq $conceptId])) then
 			(: this concept is already at the top level in the hierarchy so do nothing :)
@@ -136,7 +136,7 @@ declare function concept-fns:add($conceptId as xs:string) as xs:integer
 (: Returns the number of concepts deleted :)
 declare function concept-fns:rename($conceptId as xs:string, $newConceptId) as xs:integer
 {	
-	let $reference := collection('/db/archives/reference')/reference
+	let $reference := collection('/db/ts4isha/reference')/reference
 	let $renameValues :=
 		(
 		concept-fns:rename-category-concept($conceptId, $newConceptId, $reference/markupCategories)
@@ -147,7 +147,7 @@ declare function concept-fns:rename($conceptId as xs:string, $newConceptId) as x
 		,
 		concept-fns:rename-synonym-concept($conceptId, $newConceptId, $reference/synonymGroups)
 		,
-		concept-fns:rename-additional-concept($conceptId, $newConceptId, collection('/db/archives/data'))
+		concept-fns:rename-additional-concept($conceptId, $newConceptId, collection('/db/ts4isha/data'))
 		)
 	return sum($renameValues)
 };
@@ -265,7 +265,7 @@ declare function concept-fns:rename-additional-concept($oldConceptId as xs:strin
 
 declare function concept-fns:remove($conceptId as xs:string) as xs:integer
 {	
-	let $reference := collection('/db/archives/reference')/reference
+	let $reference := collection('/db/ts4isha/reference')/reference
 	let $deleteValues :=
 		(
 		concept-fns:delete-internal($reference/markupCategories/markupCategory/tag[@type eq 'concept' and @value eq $conceptId])
@@ -283,7 +283,7 @@ declare function concept-fns:remove($conceptId as xs:string) as xs:integer
 			else
 				concept-fns:delete-internal($synonymConcept)
 		,
-		concept-fns:delete-internal(collection('/db/archives/data')/session/transcript/(superSegment|superContent)/tag[@type eq 'concept' and @value eq $conceptId])
+		concept-fns:delete-internal(collection('/db/ts4isha/data')/session/transcript/(superSegment|superContent)/tag[@type eq 'concept' and @value eq $conceptId])
 		)
 	return sum($deleteValues)
 };

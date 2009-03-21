@@ -438,7 +438,7 @@
 					this.transcriptPane.textPane.setPropertiesPaneVisibility(showTextProps);
 				}
 				else if ( actionName == "showHTMLSearchInterface" ) {					
-					navigateToURL(new URLRequest(DatabaseConstants.EXIST_URL + "/rest/db/archives/xquery/main.xql"), "_blank");
+					navigateToURL(new URLRequest(DatabaseConstants.EXIST_URL + "/rest/db/ts4isha/xquery/main.xql"), "_blank");
 				}
 				else if ( actionName.indexOf("debug") == 0) {
 					var popup:DebugPopUp = new DebugPopUp();

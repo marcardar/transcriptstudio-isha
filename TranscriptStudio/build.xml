@@ -100,7 +100,7 @@
 				<include name="transcript.jar"/>
 			</fileset>
 		</copy>
-		<copy todir="${dist.exist.app.dir}/webapp/archives/transcript">
+		<copy todir="${dist.exist.app.dir}/webapp/ts4isha">
 			<fileset dir="${build.dir}">
 				<include name="TranscriptStudio.swf"/>
 			</fileset>
@@ -111,21 +111,21 @@
 				<include name="assets/**"/>
 			</fileset>
 		</copy>
-		<mkdir dir="${dist.exist.app.dir}/webapp/archives/transcript/import"/>
-		<mkdir dir="${dist.exist.app.dir}/webapp/archives/transcript/media"/>
-		<copy todir="${dist.exist.db.dir}/archives">
+		<mkdir dir="${dist.exist.app.dir}/webapp/ts4isha/import"/>
+		<mkdir dir="${dist.exist.app.dir}/webapp/ts4isha/media"/>
+		<copy todir="${dist.exist.db.dir}/ts4isha">
 			<fileset dir=".">
 				<include name="assets/**"/>
 				<include name="xquery/**"/>
 				<include name="xslt/**"/>
 			</fileset>
 		</copy>
-		<copy todir="${dist.exist.db.dir}/archives/reference">
+		<copy todir="${dist.exist.db.dir}/ts4isha/reference">
 			<fileset dir="conf">
 				<include name="reference.xml"/>
 			</fileset>
 		</copy>
-		<mkdir dir="${dist.exist.db.dir}/archives/data/work"/>
+		<mkdir dir="${dist.exist.db.dir}/ts4isha/data/work"/>
 		<copy todir="${dist.server.dir}">
 			<fileset dir=".">
 				<include name="samples/**"/>

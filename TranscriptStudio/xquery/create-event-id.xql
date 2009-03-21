@@ -1,6 +1,6 @@
 (: returns a new event id (not currently in use). e.g. 20090320-n1 :)
 
-declare namespace create-event-id = "http://www.ishafoundation.org/archives/xquery/create-event-id";
+declare namespace create-event-id = "http://www.ishafoundation.org/ts4isha/xquery/create-event-id";
 
 (:
    $idPrefix is of the format: 20090320-n
@@ -12,7 +12,7 @@ declare function create-event-id:create-id($idPrefix as xs:string, $startId as x
 {
 	let $id := concat($idPrefix, $startId)
 	return
-		if (exists(collection('/db/archives/data')/event[@id = $id])) then
+		if (exists(collection('/db/ts4isha/data')/event[@id = $id])) then
 		(
 			create-event-id:create-id($idPrefix, $startId + 1)
 		)

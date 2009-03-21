@@ -145,7 +145,8 @@ package org.ishafoundation.archives.transcript.importer
 				return;
 			}
 			var nextName:String = names.shift();
-			xqueryExecutor.query("import module namespace transcriptstudio='http://ishafoundation.org/xquery/archives/transcript' at 'java:org.ishafoundation.archives.transcript.xquery.modules.TranscriptStudioModule';transcriptstudio:import-file-read($arg0)", [nextName], function(resultXML:XML):void {
+			var encodedNextName:String = encodeURIComponent(nextName);
+			xqueryExecutor.query("import module namespace ts4isha='http://ishafoundation.org/ts4isha/xquery' at 'java:org.ishafoundation.ts4isha.xquery.modules.TranscriptStudioModule';ts4isha:import-file-read($arg0)", [encodedNextName], function(resultXML:XML):void {
 				var existNS:Namespace = resultXML.namespace("exist");
 				var wordXML:XML = resultXML.existNS::value.*.(nodeKind() == "element")[0];
 				var audioTranscript:WordMLTransformer = new WordMLTransformer(nextName, wordXML, idFunc);
