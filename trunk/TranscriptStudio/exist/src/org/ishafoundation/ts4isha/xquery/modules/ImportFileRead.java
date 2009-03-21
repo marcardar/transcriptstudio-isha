@@ -1,4 +1,4 @@
-package org.ishafoundation.archives.transcript.xquery.modules;
+package org.ishafoundation.ts4isha.xquery.modules;
 
 import java.io.IOException;
 import java.io.*;
@@ -8,6 +8,7 @@ import java.net.URL;
 
 import javax.xml.parsers.*;
 
+import org.exist.xquery.util.*;
 import org.exist.Namespaces;
 import org.xml.sax.*;
 import org.exist.dom.QName;
@@ -53,7 +54,7 @@ public class ImportFileRead extends BasicFunction {
 		TranscriptStudioModule.checkSuperUser(context.getUser());
 		
 		String arg = args[0].itemAt(0).getStringValue();
-		String filename = arg + ".docx";
+		String filename = URIUtils.urlDecodeUtf8(arg) + ".docx";
 		
 		File f = new File(TranscriptStudioModule.getImportDir(), filename);
 		

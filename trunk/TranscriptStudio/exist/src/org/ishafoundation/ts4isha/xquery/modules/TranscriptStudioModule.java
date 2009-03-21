@@ -1,4 +1,4 @@
-package org.ishafoundation.archives.transcript.xquery.modules;
+package org.ishafoundation.ts4isha.xquery.modules;
 
 import org.exist.xquery.AbstractInternalModule;
 import org.exist.xquery.FunctionDef;
@@ -10,9 +10,9 @@ import java.io.File;
 
 public class TranscriptStudioModule extends AbstractInternalModule
 {
-	public final static String NAMESPACE_URI = "http://ishafoundation.org/xquery/archives/transcript";
+	public final static String NAMESPACE_URI = "http://ishafoundation.org/ts4isha/xquery";
 	
-	public final static String PREFIX = "transcriptstudio";
+	public final static String PREFIX = "ts4isha";
 	
 	private final static FunctionDef[] functions = {
 		new FunctionDef( ImportFileNameList.signatures[0], 	ImportFileNameList.class ),
@@ -29,7 +29,7 @@ public class TranscriptStudioModule extends AbstractInternalModule
 	}
 	
 	public final static File getTranscriptDir() {
-		return new File(new File(SingleInstanceConfiguration.getWebappHome(), "archives"), "transcript");
+		return new File(SingleInstanceConfiguration.getWebappHome(), "ts4isha");
 	}
 	
 	public TranscriptStudioModule() 

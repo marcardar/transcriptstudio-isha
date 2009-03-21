@@ -1,2 +1,2 @@
-for $event in collection('/db/archives/data')/event
+for $event in collection('/db/ts4isha/data')/event
 return $event

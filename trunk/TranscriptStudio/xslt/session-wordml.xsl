@@ -3,7 +3,7 @@
 	<xsl:output method="xml"/>
 	<xsl:strip-space elements="*"/>
  	<xsl:param name="eventPath"/>
-	<xsl:variable name="reference" select="doc('/db/archives/reference/reference.xml')/reference"/>
+	<xsl:variable name="reference" select="doc('/db/ts4isha/reference/reference.xml')/reference"/>
 	<xsl:variable name="eventId" select="substring(/session/@id,1,14)"/>
 	<xsl:variable name="event" select="doc($eventPath)/event"/>
 	

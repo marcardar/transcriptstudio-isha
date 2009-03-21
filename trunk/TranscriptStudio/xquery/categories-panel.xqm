@@ -1,16 +1,16 @@
 xquery version "1.0";
 
-module namespace categories-panel = "http://www.ishafoundation.org/archives/xquery/categories-panel";
+module namespace categories-panel = "http://www.ishafoundation.org/ts4isha/xquery/categories-panel";
 
 declare namespace request = "http://exist-db.org/xquery/request";
 declare namespace session = "http://exist-db.org/xquery/session";
 
-import module namespace search-fns = "http://www.ishafoundation.org/archives/xquery/search-fns" at "search-fns.xqm";
+import module namespace search-fns = "http://www.ishafoundation.org/ts4isha/xquery/search-fns" at "search-fns.xqm";
 
 declare function categories-panel:main() as element()*
 {	
 	let $conceptId := request:get-parameter('conceptId', ())
-	let $reference := collection('/db/archives/reference')/reference
+	let $reference := collection('/db/ts4isha/reference')/reference
 	let $categories := 
 		if ($conceptId) then
 			$reference/markupCategories/markupCategory/tag[@type eq 'concept' and @value eq $conceptId]/..

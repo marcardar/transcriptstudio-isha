@@ -3,7 +3,7 @@
 	<xsl:output method="xhtml"/>
 	<xsl:strip-space elements="*"/>
 	<xsl:variable name="event" select="/event"/>
-	<xsl:variable name="reference" select="doc('/db/archives/reference/reference.xml')/reference"/>
+	<xsl:variable name="reference" select="doc('/db/ts4isha/reference/reference.xml')/reference"/>
 	
 	<xsl:template match="/event">
 		<div>

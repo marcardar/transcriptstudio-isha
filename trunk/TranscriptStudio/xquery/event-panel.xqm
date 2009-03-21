@@ -1,6 +1,6 @@
 xquery version "1.0";
 
-module namespace event-panel = "http://www.ishafoundation.org/archives/xquery/event-panel";
+module namespace event-panel = "http://www.ishafoundation.org/ts4isha/xquery/event-panel";
 
 declare namespace request = "http://exist-db.org/xquery/request";
 declare namespace util = "http://exist-db.org/xquery/util";
@@ -9,13 +9,13 @@ import module namespace transform = "http://exist-db.org/xquery/transform";
 
 declare function event-panel:transformToXHTML($event as element()) as element()
 {
-    transform:transform($event, doc('/db/archives/xslt/event-xhtml.xsl'), ())
+    transform:transform($event, doc('/db/ts4isha/xslt/event-xhtml.xsl'), ())
 };
 
 declare function event-panel:main() as element()*
 {
 	let $eventId := request:get-parameter("id", ())	
-	let $event := collection('/db/archives/data')//event[@id = $eventId]
+	let $event := collection('/db/ts4isha/data')//event[@id = $eventId]
 	return
 	(
 		<center><h1>Isha Foundation Event: {$eventId}</h1></center>

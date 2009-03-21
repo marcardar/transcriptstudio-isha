@@ -29,7 +29,7 @@ package org.ishafoundation.archives.transcript.db
 	{
 		public static var EXIST_URL:String = getDefaultEXistURL();
 		public static var EXIST_USERNAME:String = PreferencesSharedObject.readDbUsername("admin");
-		public static const ARCHIVES_COLLECTION_PATH:String = "/db/archives";
+		public static const ARCHIVES_COLLECTION_PATH:String = "/db/ts4isha";
 		public static const REFERENCE_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/reference";
 		public static const DATA_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/data";
 		public static const XQUERY_COLLECTION_PATH:String = ARCHIVES_COLLECTION_PATH + "/xquery";

@@ -1,4 +1,4 @@
-package org.ishafoundation.archives.transcript.xquery.modules;
+package org.ishafoundation.ts4isha.xquery.modules;
 
 import java.io.File;
 

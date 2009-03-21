@@ -1,10 +1,10 @@
 xquery version "1.0";
 
-module namespace markup-category-fns = "http://www.ishafoundation.org/archives/xquery/markup-category-fns";
+module namespace markup-category-fns = "http://www.ishafoundation.org/ts4isha/xquery/markup-category-fns";
 
 declare function markup-category-fns:edit($id as xs:string, $name as xs:string, $markupTypeIds as xs:string+, $conceptIds as xs:string*) as xs:boolean
 {
-	let $markupCategoriesElement := collection('/db/archives/reference')/reference/markupCategories
+	let $markupCategoriesElement := collection('/db/ts4isha/reference')/reference/markupCategories
 	let $existingElement := $markupCategoriesElement/markupCategory[@id eq $id]
 	let $newElement :=
 		<markupCategory id="{$id}" name="{$name}">

@@ -27,16 +27,16 @@
 		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
 			<fileset dir="${dist.exist.db.dir}">
 				<include name="**"/>
-				<exclude name="archives/reference/reference.xml"/>
+				<exclude name="ts4isha/reference/reference.xml"/>
 			</fileset>
 		</xdb:store>
 		<!-- Cannot get this working properly, so reference.xml will have to be done manually -->
 		<condition property="reference.xml.exists">  
-			<xdb:exist xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives/reference" resource="reference.xml"/>
+			<xdb:exist xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/ts4isha/reference" resource="reference.xml"/>
 		</condition>
 		<antcall target="store-reference-xml"/>
-		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives" collection="data"/>  
-		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/archives/data" collection="work"/>  
+		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/ts4isha" collection="data"/>  
+		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/ts4isha/data" collection="work"/>  
 	</target>
 
 	<target name="closing-message">
@@ -47,7 +47,7 @@
 		<echo message="Storing reference.xml"/>
 		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
 			<fileset dir="${dist.exist.db.dir}">
-				<include name="archives/reference/reference.xml"/>
+				<include name="ts4isha/reference/reference.xml"/>
 			</fileset>
 		</xdb:store>
 	</target>

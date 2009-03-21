@@ -1,6 +1,6 @@
-declare namespace update-concept = "http://www.ishafoundation.org/archives/xquery/update-concept";
+declare namespace update-concept = "http://www.ishafoundation.org/ts4isha/xquery/update-concept";
 
-import module namespace concept-fns = "http://www.ishafoundation.org/archives/xquery/concept-fns" at "concept-fns.xqm";
+import module namespace concept-fns = "http://www.ishafoundation.org/ts4isha/xquery/concept-fns" at "concept-fns.xqm";
 
 let $oldConceptId := request:get-parameter("oldConceptId", '')
 let $newConceptId := request:get-parameter("newConceptId", '')
