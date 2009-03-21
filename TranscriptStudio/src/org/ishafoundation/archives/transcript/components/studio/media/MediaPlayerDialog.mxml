@@ -2,6 +2,7 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" minWidth="320" layout="vertical" horizontalAlign="center" title="Media Player" creationComplete="init()" xmlns:generic="org.ishafoundation.archives.transcript.components.generic.*" xmlns:display="flash.display.*">
 	<mx:Script>
     <![CDATA[
+    	import flash.sampler.getMemberNames;
     	import org.ishafoundation.archives.transcript.media.MediaConstants;
     	import org.ishafoundation.archives.transcript.media.MediaConnection;
     	import mx.events.PropertyChangeEvent;
@@ -93,7 +94,7 @@
 			if (mediaId == null || mediaId.length == 0) {
 				return "<Select Device>";
 			}
-			var mediaElement:XML = devicesElement.device.media.(@id == mediaId)[0];
+			var mediaElement:XML = getMediaElement(mediaId);
 			var deviceId:String = (mediaElement.parent() as XML).@id;
 			var deviceIdIndex:int = mediaId.indexOf("-" + deviceId + "-");
 			if (deviceIdIndex < 0) {
@@ -104,7 +105,7 @@
 				// show the part of the media id after the device id (MAY NOT BE UNIQUE BUT WE'LL TAKE THE RISK)
 				return mediaId.substring(deviceIdIndex + deviceId.length + 2);
 			}
-		} 
+		}
 		
 		private function connectToMediaServer():void {
 			var waitPopUp:PleaseWaitPopUp = PleaseWaitPopUp.display(this, "Trying to connect...");
@@ -130,19 +131,25 @@
 			});			
 		}
 		
-		private static function isVideo(mediaOrDeviceElement:XML):Boolean {
-			var deviceElement:XML = XMLUtils.getAncestorOrSelfElement(mediaOrDeviceElement, "device");
+		private function isVideo(mediaId:String):Boolean {
+			var mediaElement:XML = getMediaElement(mediaId);
+			var deviceElement:XML = XMLUtils.getAncestorOrSelfElement(mediaElement, "device");
 			return deviceElement.@id.toString().indexOf("v") == 0;
+		}
+		
+		private function getMediaElement(mediaId:String):XML {
+			var mediaElement:XML = devicesElement.device.media.(@id == mediaId)[0];
+			return mediaElement;
 		}
 		
 		/**
 		 *  sessionWideMediaId - eg "v1c001"
 		 */
-		public function play(mediaUUID:String, start:int = -1, end:int = -1):void {
-			if (mediaUUID == null) {
+		public function play(mediaId:String, start:int = -1, end:int = -1):void {
+			if (mediaId == null) {
 				return;
 			}
-			var mediaURL:String = mediaUUID + "." + (mediaUUID.indexOf("-v") > 0 ? "flv" : "mp3");
+			var mediaURL:String = mediaId + "." + (isVideo(mediaId) ? "flv" : "mp3");
 			var waitPopUp:PleaseWaitPopUp = PleaseWaitPopUp.display(this, "Preparing to stream...");
 			this.slider.value = 0;
 			this.mediaServer.play(mediaURL, video, function(msg:String):void {
@@ -189,13 +196,13 @@
 			var mediaIds:Array = getMediaIds(deviceComboBox.selectedItem as String);
 			mediaComboBox.dataProvider = mediaIds;
 			mediaComboBox.enabled = mediaIds.length > 1;
-			var mediaUUID:String = getMediaUUID();
-			if (mediaUUID == null) {
+			var mediaId:String = getMediaUUID();
+			if (mediaId == null) {
 				videoBox.visible = false;				
 				videoBox.includeInLayout = false;
 			}
 			else {
-				if (mediaUUID.indexOf("-v") > 0) {
+				if (isVideo(mediaId) > 0) {
 					videoBox.visible = true;
 				}
 				else {
@@ -203,7 +210,7 @@
 				}
 				videoBox.includeInLayout = videoBox.visible;
 				// check the media id for the old device is not still there
-				play(mediaUUID);
+				play(mediaId);
 			}
 		}
 		
