@@ -189,7 +189,6 @@
 			}
 			else if (viewstack.selectedChild == sessionPropertiesPane) {
 				var sp:SessionProperties = new SessionProperties(sessionXML);
-				sessionPropertiesPane.eventFile = eventFile;
 				sessionPropertiesPane.eventProps = eventProps;
 				sessionPropertiesPane.sessionProps = sp;
 			}

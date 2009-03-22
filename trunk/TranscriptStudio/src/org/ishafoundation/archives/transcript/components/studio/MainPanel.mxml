@@ -21,6 +21,8 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" width="100%" height="100%" verticalGap="0">
 	<mx:Script>
 		<![CDATA[
+			import org.ishafoundation.archives.transcript.components.studio.importer.SessionPropertiesEditDialog;
+			import org.ishafoundation.archives.transcript.model.SessionProperties;
 			import org.ishafoundation.archives.transcript.components.studio.importer.EventEditDialog;
 			import org.ishafoundation.archives.transcript.model.EventProperties;
 			import org.ishafoundation.archives.transcript.components.studio.importer.EventPropertiesPane;
@@ -344,7 +346,19 @@
 			}
 			
 			private function editSessionProps():void {
-				
+				var sessionPropsXMLCopy:XML = session.sessionXML.copy();
+				delete sessionPropsXMLCopy.*;
+				var sessionPropsCopy:SessionProperties = new SessionProperties(sessionPropsXMLCopy);
+				var popup:SessionPropertiesEditDialog = SessionPropertiesEditDialog.display(this, databaseMgr, referenceMgr, session.eventFile, sessionPropsCopy); 
+				popup.addEventListener(SessionPropertiesEditDialog.SESSION_PROPS_EDITED, function():void {
+					// copy the session props over the existing ones
+					// first delete the old ones
+					delete session.sessionXML.@*;
+					for each (var attr:XML in sessionPropsXMLCopy.@*) {
+						XMLUtils.setAttributeValue(session.sessionXML, attr.localName(), attr.toString());
+					} 
+					Alert.show("Session properties edited but not yet saved");				
+				});
 			}
 			
 			private function editMediaProps():void {
