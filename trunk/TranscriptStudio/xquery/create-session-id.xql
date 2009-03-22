@@ -33,7 +33,7 @@ else
 	(: sessionDate: e.g. "20090320" (first day of event "20090320-y1"), "2009xxxx" (only year known), null means unknown :)
 	let $sessionDate := request:get-parameter('sessionDate', 'xxxxxxxx')
 	(: sessionTime: session start time e.g. "1830" (6:30pm), "18xx" (6pm <= ? < 7pm) null means time unknown :)
-	let $sessionTime := xs:integer(request:get-parameter('sessionTime', '1'))
+	let $sessionTime := max((xs:integer(request:get-parameter('sessionTime', '1')), 1))
 
 	let $eventDateObj := utils:date-string-to-date(collection('/db/ts4isha/data')/event[@id = $eventId]/@startAt[1])
 	let $sessionDateObj := utils:date-string-to-date($sessionDate) 
