@@ -160,10 +160,15 @@
 				if (eventFile == null) {
 					throw new Error("Tried to progress without selecting event");
 				}
-				databaseMgr.query("collection('/db/archives/data')/event[@id = $arg0]", [eventFile.nodeId], function(returnVal:XML):void {
+				databaseMgr.query("collection('/db/ts4isha/data')/event[@id = $arg0]", [eventFile.nodeId], function(returnVal:XML):void {
 					var eventXML:XML = returnVal.event[0];
-					eventProps = new EventProperties(eventXML);
-					nextInternal();
+					if (eventXML == null) {
+						Alert.show("Could not find event XML: " + eventFile.nodeId);
+					}
+					else {
+						eventProps = new EventProperties(eventXML);
+						nextInternal();
+					}
 				}, function(msg:String):void {
 					Alert.show(msg, "Could not retrieve event XML: " + eventFile.nodeId);
 				});
