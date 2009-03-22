@@ -41,7 +41,7 @@
 			var minuteArr:Array = [];
 			for (var minute:int = 0; minute < 60; minute++) {
 				var minuteStr:String = minute.toString();
-				if (minute % 5 == 0) {
+				if (minute % 15 == 0) {
 					while (minuteStr.length < 2) {
 						minuteStr = "0" + minuteStr;
 					}
@@ -154,7 +154,7 @@
 		</mx:GridRow>
 		<mx:GridRow width="100%" enabled="{startAtDateField.selectedDate != null}">
 			<mx:GridItem height="100%" horizontalAlign="right" verticalAlign="middle">
-				<mx:Label text="Session Time"/>
+				<mx:Label text="Scheduled Start Time"/>
 			</mx:GridItem>
 			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
 				<mx:HBox horizontalGap="2" enabled="{!unknownTimeCheckBox.selected}" verticalAlign="middle">

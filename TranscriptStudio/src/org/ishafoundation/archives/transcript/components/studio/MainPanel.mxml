@@ -392,20 +392,14 @@
 				else if ( actionName == "reloadTranscript" ) {
 					reloadClicked();
 				}
-				else if ( actionName == "createEvent" ) {
-					createEventClicked();
+				else if ( actionName == "eventProps" ) {
+					
 				}
-				else if ( actionName == "import" ) {
-					importClicked();
+				else if ( actionName == "sessionProps" ) {
+					
 				}
-				else if ( actionName == "categoryManager" ) {
-					categoryManagerClicked();
-				}
-				else if ( actionName == "conceptManager" ) {
-					conceptManagerClicked();
-				}
-				else if ( actionName == "query" ) {
-					queryClicked();
+				else if ( actionName == "mediaProps" ) {
+					
 				}
 				else if ( actionName == "markupText" ) {
 					this.transcriptPane.markupText();
@@ -436,6 +430,21 @@
 				else if ( actionName == "showTextPropertiesPane" ) {
 					var showTextProps:Boolean = evt.item.@toggled.toString() == "true";
 					this.transcriptPane.textPane.setPropertiesPaneVisibility(showTextProps);
+				}
+				else if ( actionName == "createEvent" ) {
+					createEventClicked();
+				}
+				else if ( actionName == "import" ) {
+					importClicked();
+				}
+				else if ( actionName == "categoryManager" ) {
+					categoryManagerClicked();
+				}
+				else if ( actionName == "conceptManager" ) {
+					conceptManagerClicked();
+				}
+				else if ( actionName == "query" ) {
+					queryClicked();
 				}
 				else if ( actionName == "showHTMLSearchInterface" ) {					
 					navigateToURL(new URLRequest(DatabaseConstants.EXIST_URL + "/rest/db/ts4isha/xquery/main.xql"), "_blank");
@@ -476,31 +485,35 @@
 				-->
 				<menuitem id="store" label="Save" enabled="{myMenuBar != null &amp;&amp; session != null &amp;&amp; session.unsavedChanges}"/>
 				<menuitem id="reloadTranscript" label="Reload from database" enabled="{myMenuBar != null &amp;&amp; session != null &amp;&amp; session.sessionFile != null}"/>
+				<menuitem type="separator"/>
+				<menuitem id="eventProps" label="Event properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/>
+				<menuitem id="sessionProps" label="Session properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/>
+				<menuitem id="mediaProps" label="Media properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/>
+			</menuitem>
+			<menuitem label="Selection" enabled="{transcriptPane.textPane.ttSelection != null}">
+				<menuitem id="markupText" label="Markup text" enabled="{transcriptPane.textPane.ttSelection.allowMarkup()}"/>
+				<menuitem id="removeMarkup" label="Remove markup" enabled="{transcriptPane.textPane.ttSelection.allowRemoveMarkup()}"/>
+				<menuitem type="separator"/>
+				<menuitem id="mergeSegmentRange" label="Merge paragraphs" enabled="{transcriptPane.textPane.ttSelection.allowMerge()}"/>
+				<menuitem id="deleteText" label="Delete text" enabled="{transcriptPane.textPane.ttSelection.allowDeleteText()}"/>
+				<menuitem type="separator"/>
+				<menuitem id="nudgeUp" label="Nudge up" enabled="{transcriptPane.textPane.ttSelection.allowNudgeUp()}"/>
+				<menuitem id="nudgeDown" label="Nudge down" enabled="{transcriptPane.textPane.ttSelection.allowNudgeDown()}"/>
+			</menuitem>				
+			<menuitem label="Window" enabled="{myMenuBar != null &amp;&amp; session != null}">
+				<menuitem id="showMediaPlayer" label="Media player"/>
+				<menuitem type="separator"/>
+				<menuitem id="showMarkupPropertiesPane" label="Markup properties" type="check" toggled="true"/>
+				<menuitem id="showTextPropertiesPane" label="Text properties" type="check" toggled="true"/>
 			</menuitem>
 			<menuitem label="Admin" enabled="{databaseMgr != null &amp;&amp; databaseMgr.isSuperUser}">
-				<menuitem id="createEvent" label="Create Event..."/>
+				<menuitem id="createEvent" label="Create event..."/>
 				<menuitem id="import" label="Import..."/>
 				<menuitem type="separator"/>
 				<menuitem id="categoryManager" label="Categories..."/>
 				<menuitem id="conceptManager" label="Concepts..."/>
 				<menuitem type="separator"/>
 				<menuitem id="query" label="Execute XQuery..."/>				
-			</menuitem>
-			<menuitem label="Selection" enabled="{transcriptPane.textPane.ttSelection != null}">
-				<menuitem id="markupText" label="Markup Text" enabled="{transcriptPane.textPane.ttSelection.allowMarkup()}"/>
-				<menuitem id="removeMarkup" label="Remove Markup" enabled="{transcriptPane.textPane.ttSelection.allowRemoveMarkup()}"/>
-				<menuitem type="separator"/>
-				<menuitem id="mergeSegmentRange" label="Merge Paragraphs" enabled="{transcriptPane.textPane.ttSelection.allowMerge()}"/>
-				<menuitem id="deleteText" label="Delete Text" enabled="{transcriptPane.textPane.ttSelection.allowDeleteText()}"/>
-				<menuitem type="separator"/>
-				<menuitem id="nudgeUp" label="Nudge Up" enabled="{transcriptPane.textPane.ttSelection.allowNudgeUp()}"/>
-				<menuitem id="nudgeDown" label="Nudge Down" enabled="{transcriptPane.textPane.ttSelection.allowNudgeDown()}"/>
-			</menuitem>				
-			<menuitem label="Window" enabled="{myMenuBar != null &amp;&amp; session != null}">
-				<menuitem id="showMediaPlayer" label="Media Player"/>
-				<menuitem type="separator"/>
-				<menuitem id="showMarkupPropertiesPane" label="Markup Properties" type="check" toggled="true"/>
-				<menuitem id="showTextPropertiesPane" label="Text Properties" type="check" toggled="true"/>
 			</menuitem>
 			<menuitem label="Tools">
 				<menuitem id="showHTMLSearchInterface" label="HTML Search Interface"/>
@@ -510,7 +523,7 @@
 					<menuitem id="debugSession" label="Session XML"/>
 					<menuitem id="debugReference" label="Reference XML"/>
 					<menuitem id="debugTranscriptHTML" label="Transcript HTML"/>
-					<menuitem id="highlightHTMLElements" label="Highlight HTML Elements"/>
+					<!--menuitem id="highlightHTMLElements" label="Highlight HTML Elements"/-->
 				</menuitem>					
 				<menuitem id="about" label="About {ApplicationUtils.getApplicationName()}"/>
 			</menuitem>
