@@ -23,7 +23,6 @@
 		public var referenceMgr:ReferenceManager;
 		
 		private var _sessionProps:SessionProperties;
-		private var _eventFile:EventFile;
 		[Bindable]
 		public var eventProps:EventProperties;
 
@@ -83,18 +82,6 @@
 				result = "0" + result;
 			} 
 			return result;
-		}
-		
-		[Bindable]
-		public function get eventFile():EventFile {
-			return _eventFile;
-		}
-		
-		public function set eventFile(newValue:EventFile):void {
-			if (newValue == null) {
-				throw new ArgumentError("Passed a null eventFile");
-			}
-			this._eventFile = newValue;
 		}
 		
 		private static function generateFullTitle(eventProps:EventProperties, referenceMgr:ReferenceManager):String {
