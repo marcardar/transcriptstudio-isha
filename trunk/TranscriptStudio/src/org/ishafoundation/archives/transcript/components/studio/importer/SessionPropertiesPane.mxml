@@ -28,18 +28,28 @@
 		public var eventProps:EventProperties;
 
 		private function creationCompleteHandler():void {
-			var arr:Array = [];
-			// put the zero stuff at the end (because they should only be used when something is unknown)
-			//var zeroArr:Array = [];
-			for (var i:int = 0; i <= 99; i++) {
-				if (i >= 10 && i % 10 != 0) {
-					arr.push(i);
+			var hourArr:Array = [];
+			for (var hour:int = 0; hour < 24; hour++) {
+				var hourStr:String = hour.toString();
+				while (hourStr.length < 2) {
+					hourStr = "0" + hourStr;
 				}
-				//else {
-					//zeroArr.push(i);
-				//}
+				hourArr.push(hourStr);
 			}
-			//arr = arr.concat(zeroArr);
+			hourComboBox.dataProvider = hourArr;
+			hourComboBox.selectedIndex = hourArr.length / 2;
+			var minuteArr:Array = [];
+			for (var minute:int = 0; minute < 60; minute++) {
+				var minuteStr:String = minute.toString();
+				if (minute % 5 == 0) {
+					while (minuteStr.length < 2) {
+						minuteStr = "0" + minuteStr;
+					}
+					minuteArr.push(minuteStr);
+				}
+			}
+			minuteComboBox.dataProvider = minuteArr;
+			//minuteComboBox.selectedIndex = minuteArr.length / 2;
 		}
 		
 		[Bindable]
@@ -53,8 +63,26 @@
 			}
 			_sessionProps = newProps;
 			sessionSubTitleTextInput.text = _sessionProps.subTitle;
-			startAtDateField.selectedDate = _sessionProps.startAt;
+			var startAt:Date = _sessionProps.startAt;
+			startAtDateField.selectedDate = startAt;
+			if (_sessionProps.startAtIncludesTime()) {
+				unknownTimeCheckBox.selected = false;
+				hourComboBox.selectedItem = fixWidth(startAt.hours, 2);
+				minuteComboBox.selectedItem = fixWidth(startAt.minutes, 2);
+			}
+			else {
+				unknownTimeCheckBox.selected = true;
+			}
+			startAtChangeHandler();
 			commentTextArea.text = _sessionProps.comment;
+		}
+		
+		private static function fixWidth(value:int, minLength:int):String {
+			var result:String = value.toString();
+			while (result.length < minLength) {
+				result = "0" + result;
+			} 
+			return result;
 		}
 		
 		[Bindable]
@@ -77,10 +105,29 @@
 			return result;
 		}
 		
+		private function startAtChangeHandler():void {
+			var startAt:Date = startAtDateField.selectedDate;
+			if (startAt == null) {
+				sessionProps.setStartAt(null, false);
+			}
+			else {
+				// maybe we need to incorporate the time too
+				if (!unknownTimeCheckBox.selected) {
+					startAt.hours = int(hourComboBox.selectedItem);
+					startAt.minutes = int(minuteComboBox.selectedItem);
+					sessionProps.setStartAt(startAt, true);
+				}
+				else {
+					sessionProps.setStartAt(startAt, false);
+				}
+			}
+			mainGrid.executeChildBindings(true);
+		} 
+		
 	]]>
 	</mx:Script>
 	<mx:Boolean id="ready">{true}</mx:Boolean>
-	<mx:Grid width="100%" height="100%">
+	<mx:Grid id="mainGrid" width="100%" height="100%">
 		<mx:GridRow width="100%">
 			<mx:GridItem height="100%" horizontalAlign="right" verticalAlign="middle">
 				<mx:Label text="Session Title"/>
@@ -102,7 +149,21 @@
 				<mx:Label text="Session Date"/>
 			</mx:GridItem>
 			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
-				<mx:DateField id="startAtDateField" formatString="DD/MM/YYYY" change="{sessionProps.startAt = startAtDateField.selectedDate}"/>
+				<mx:DateField id="startAtDateField" formatString="DD/MM/YYYY" change="{startAtChangeHandler()}"/>
+			</mx:GridItem>
+		</mx:GridRow>
+		<mx:GridRow width="100%" enabled="{startAtDateField.selectedDate != null}">
+			<mx:GridItem height="100%" horizontalAlign="right" verticalAlign="middle">
+				<mx:Label text="Session Time"/>
+			</mx:GridItem>
+			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+				<mx:HBox horizontalGap="2" enabled="{!unknownTimeCheckBox.selected}" verticalAlign="middle">
+					<mx:ComboBox width="55" id="hourComboBox" rowCount="13" change="{startAtChangeHandler()}"/>
+					<mx:Label text=":" textAlign="center" maxWidth="10"/>
+					<mx:ComboBox width="55" id="minuteComboBox" rowCount="12" change="{startAtChangeHandler()}"/>
+					<mx:Label text="(hh:mm)"/>					
+				</mx:HBox>
+				<mx:CheckBox label="unknown" labelPlacement="left" width="100%" textAlign="right" id="unknownTimeCheckBox" change="{startAtChangeHandler()}"/>
 			</mx:GridItem>
 		</mx:GridRow>
 		<mx:GridRow width="100%" height="100%">

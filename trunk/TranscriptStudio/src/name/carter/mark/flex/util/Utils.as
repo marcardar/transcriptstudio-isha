@@ -183,6 +183,15 @@ package name.carter.mark.flex.util
 			return df.format(date);
 		}
 		
+		public static function getTimeString(date:Date = null):String {
+			if (date == null) {
+				return null;
+			}
+			var df:DateFormatter = new DateFormatter();
+			df.formatString = "JJ:NN:SS";
+			return df.format(date);
+		}
+		
 		public static function copyArray(arr:Array):Array {
 			return arr.slice();
 		}
