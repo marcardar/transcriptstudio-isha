@@ -44,8 +44,8 @@
 
 		public var eventFile:EventFile;
 	
-		public static function display(parent:DisplayObject, fileSystem:DbFileSystem, databaseMgr:DatabaseManager, referenceMgr:ReferenceManager, eventProps:EventProperties = null):CreateEventDialog {
-			var result:CreateEventDialog = new CreateEventDialog();
+		public static function display(parent:DisplayObject, fileSystem:DbFileSystem, databaseMgr:DatabaseManager, referenceMgr:ReferenceManager, eventProps:EventProperties = null):EventCreateDialog {
+			var result:EventCreateDialog = new EventCreateDialog();
 			result.databaseMgr = databaseMgr;
 			result.referenceMgr = referenceMgr;
 			PopUpManager.addPopUp(result, parent, true);

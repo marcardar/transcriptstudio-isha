@@ -69,8 +69,8 @@
 				if (eventProps.endAt == null) {
 					eventProps.endAt = eventProps.startAt;
 				}
-				var popup:CreateEventDialog = CreateEventDialog.display(thisPanel, fileSystem, databaseMgr, referenceMgr, eventProps.copy());
-				popup.addEventListener(CreateEventDialog.EVENT_CREATED, function(event:Event):void {
+				var popup:EventCreateDialog = EventCreateDialog.display(thisPanel, fileSystem, databaseMgr, referenceMgr, eventProps.copy());
+				popup.addEventListener(EventCreateDialog.EVENT_CREATED, function(event:Event):void {
 					eventProps = popup.eventPropertiesPane.eventProps;
 					eventFile = fileSystem.getEventFile(eventProps.id);
 					if (eventFile == null) {
