@@ -26,7 +26,7 @@ package org.ishafoundation.archives.transcript.db
 	public interface CollectionRetriever
 	{
 		/*
-		 * (eg /db/archives/data)
+		 * (eg /db/ts4isha/data)
 		 */
 		function retrieveCollection(collectionPath:String, successFunction:Function, failureFunction:Function):void;
 	}

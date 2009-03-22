@@ -45,9 +45,9 @@ package org.ishafoundation.archives.transcript.db
 
 		private var collectionHierarchyXML:XML =
 			<collection path={DatabaseConstants.DATA_COLLECTION_PATH}>
-				<collection path="/db/archives/data/demo_collection" name="demo_collection">
-					<transcript textPath="/db/archives/data/demo_collection/demo1.xml" id="demo1" markupsExist="true"/>
-					<transcript textPath="/db/archives/data/demo_collection/demo2.xml" id="demo2" markupsExist="false"/>
+				<collection path="/db/ts4isha/data/demo_collection" name="demo_collection">
+					<transcript textPath="/db/ts4isha/data/demo_collection/demo1.xml" id="demo1" markupsExist="true"/>
+					<transcript textPath="/db/ts4isha/data/demo_collection/demo2.xml" id="demo2" markupsExist="false"/>
 				</collection>
 			</collection>;
 

@@ -26,7 +26,7 @@ package org.ishafoundation.archives.transcript.db
 	public interface XMLRetriever
 	{
 		/*
-		 * (eg /db/archives/reference.xml
+		 * (eg /db/ts4isha/reference.xml
 		 */
 		function retrieveXML(xmlPath:String, successFunction:Function, failureFunction:Function, ignoreWhitespace:Boolean = true):void;
 	}
