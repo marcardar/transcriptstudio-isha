@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Create Event" creationComplete="init()" xmlns:importer="org.ishafoundation.archives.transcript.components.studio.importer.*">
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Create Event" creationComplete="init()" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*">
 	<mx:Script>
 	<![CDATA[
 		import org.ishafoundation.archives.transcript.db.DatabaseManager;
@@ -44,8 +44,8 @@
 
 		public var eventFile:EventFile;
 	
-		public static function display(parent:DisplayObject, fileSystem:DbFileSystem, databaseMgr:DatabaseManager, referenceMgr:ReferenceManager, eventProps:EventProperties = null):EventCreateDialog {
-			var result:EventCreateDialog = new EventCreateDialog();
+		public static function display(parent:DisplayObject, fileSystem:DbFileSystem, databaseMgr:DatabaseManager, referenceMgr:ReferenceManager, eventProps:EventProperties = null):EventPropertiesCreateDialog {
+			var result:EventPropertiesCreateDialog = new EventPropertiesCreateDialog();
 			result.databaseMgr = databaseMgr;
 			result.referenceMgr = referenceMgr;
 			PopUpManager.addPopUp(result, parent, true);
@@ -124,7 +124,7 @@
 	]]>
 	</mx:Script>
 	
-	<importer:EventPropertiesPane id="eventPropertiesPane" label="Event Properties" width="100%" height="100%" referenceMgr="{referenceMgr}"/>
+	<metadata:EventPropertiesPane id="eventPropertiesPane" label="Event Properties" width="100%" height="100%" referenceMgr="{referenceMgr}"/>
 	<mx:HBox id="buttonBox">
 		<mx:Button label="OK" enabled="{eventPropertiesPane.ready}" click="okClicked(event)" />
 		<mx:Button label="Cancel" click="closeMe()"/>

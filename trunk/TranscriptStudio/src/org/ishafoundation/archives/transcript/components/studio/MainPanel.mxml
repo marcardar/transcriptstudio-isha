@@ -18,19 +18,18 @@
    Transcript Studio for Isha Foundation. If not, see http://www.gnu.org/licenses/.
 -->
 
-<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" width="100%" height="100%" verticalGap="0">
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" xmlns:metadataNS="org.ishafoundation.archives.transcript.components.metadata.*" width="100%" height="100%" verticalGap="0">
 	<mx:Script>
 		<![CDATA[
-			import org.ishafoundation.archives.transcript.components.studio.importer.SessionPropertiesEditDialog;
+			import org.ishafoundation.archives.transcript.components.studio.metadata.SessionPropertiesEditDialog;
+			import org.ishafoundation.archives.transcript.components.studio.metadata.EventPropertiesEditDialog;
+			import org.ishafoundation.archives.transcript.components.studio.metadata.EventPropertiesCreateDialog;
 			import org.ishafoundation.archives.transcript.model.SessionProperties;
-			import org.ishafoundation.archives.transcript.components.studio.importer.EventEditDialog;
 			import org.ishafoundation.archives.transcript.model.EventProperties;
-			import org.ishafoundation.archives.transcript.components.studio.importer.EventPropertiesPane;
 			import org.ishafoundation.archives.transcript.components.studio.media.MediaPlayerDialog;
 			import org.ishafoundation.archives.transcript.util.ApplicationUtils;
 			import name.carter.mark.flex.project.mdoc.MNode;
 			import org.ishafoundation.archives.transcript.components.studio.collection.RetrieveTranscriptByIdDialog;
-			import org.ishafoundation.archives.transcript.components.studio.importer.EventCreateDialog;
 			import flash.net.navigateToURL;
 			import org.ishafoundation.archives.transcript.db.XQueries;
 			import org.ishafoundation.archives.transcript.components.studio.importer.ImportWizard;
@@ -337,8 +336,8 @@
 			private function editEventProps():void {
 				var thisPanel:MainPanel = this;
 				var fileSystem:DbFileSystem = new DbFileSystem(DatabaseConstants.ARCHIVES_COLLECTION_PATH, databaseMgr, function ():void {
-					var popup:EventEditDialog = EventEditDialog.display(thisPanel, fileSystem, databaseMgr, referenceMgr, session.eventFile);
-					popup.addEventListener(EventEditDialog.EVENT_EDITED, function(event:Event):void {
+					var popup:EventPropertiesEditDialog = EventPropertiesEditDialog.display(thisPanel, fileSystem, databaseMgr, referenceMgr, session.eventFile);
+					popup.addEventListener(EventPropertiesEditDialog.EVENT_EDITED, function(event:Event):void {
 						status = "Successfully edited event";
 						Alert.show("Successfully edited event"); 
 					});
@@ -356,7 +355,8 @@
 					delete session.sessionXML.@*;
 					for each (var attr:XML in sessionPropsXMLCopy.@*) {
 						XMLUtils.setAttributeValue(session.sessionXML, attr.localName(), attr.toString());
-					} 
+					}
+					session.unsavedChanges = true;
 					Alert.show("Session properties edited but not yet saved");				
 				});
 			}
@@ -368,8 +368,8 @@
 			public function createEventClicked():void {
 				var thisPanel:MainPanel = this;
 				var fileSystem:DbFileSystem = new DbFileSystem(DatabaseConstants.ARCHIVES_COLLECTION_PATH, databaseMgr, function ():void {
-					var popup:EventCreateDialog = EventCreateDialog.display(thisPanel, fileSystem, databaseMgr, referenceMgr, new EventProperties());
-					popup.addEventListener(EventCreateDialog.EVENT_CREATED, function(event:Event):void {
+					var popup:EventPropertiesCreateDialog = EventPropertiesCreateDialog.display(thisPanel, fileSystem, databaseMgr, referenceMgr, new EventProperties());
+					popup.addEventListener(EventPropertiesCreateDialog.EVENT_CREATED, function(event:Event):void {
 						status = "Successfully created event";
 						Alert.show("Successfully created event"); 
 					});

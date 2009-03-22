@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="{getTitle(viewstack.selectedChild)}" creationComplete="init()" xmlns:importer="org.ishafoundation.archives.transcript.components.studio.importer.*">
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="{getTitle(viewstack.selectedChild)}" creationComplete="init()" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*" xmlns:importer="org.ishafoundation.archives.transcript.components.studio.importer.*">
 	<mx:Script>
 	<![CDATA[
+		import org.ishafoundation.archives.transcript.components.studio.metadata.EventPropertiesPane;
+		import org.ishafoundation.archives.transcript.components.studio.metadata.EventPropertiesCreateDialog;
 		import org.ishafoundation.archives.transcript.db.DatabaseManager;
 		import mx.messaging.management.Attribute;
 		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
@@ -69,8 +71,8 @@
 				if (eventProps.endAt == null) {
 					eventProps.endAt = eventProps.startAt;
 				}
-				var popup:EventCreateDialog = EventCreateDialog.display(thisPanel, fileSystem, databaseMgr, referenceMgr, eventProps.copy());
-				popup.addEventListener(EventCreateDialog.EVENT_CREATED, function(event:Event):void {
+				var popup:EventPropertiesCreateDialog = EventPropertiesCreateDialog.display(thisPanel, fileSystem, databaseMgr, referenceMgr, eventProps.copy());
+				popup.addEventListener(EventPropertiesCreateDialog.EVENT_CREATED, function(event:Event):void {
 					eventProps = popup.eventPropertiesPane.eventProps;
 					eventFile = fileSystem.getEventFile(eventProps.id);
 					if (eventFile == null) {
@@ -322,7 +324,7 @@
 		</mx:VBox>
 		<importer:ImportFilesPreviewPane id="importFilesPreviewPane" width="100%" height="100%"/>
 		<importer:EventSelectorPane id="eventSelectorPane" width="100%" height="100%"/>
-		<importer:SessionPropertiesPane id="sessionPropertiesPane" label="Session Properties" width="100%" height="100%" referenceMgr="{referenceMgr}"/>
+		<metadata:SessionPropertiesPane id="sessionPropertiesPane" label="Session Properties" width="100%" height="100%" referenceMgr="{referenceMgr}"/>
 	</mx:ViewStack>
 	<mx:HBox id="buttonBox">
 		<mx:Button label="&lt; Back" enabled="{isBackEnabled()}" click="backClicked(event)"/>
