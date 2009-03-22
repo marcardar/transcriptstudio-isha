@@ -115,7 +115,7 @@
 		
 	]]>
 	</mx:Script>
-	<mx:Boolean id="ready">{collectionChooserTree.selectedItem != null &amp;&amp; eventTypeComboBox.selectedItem != null}</mx:Boolean>
+	<mx:Boolean id="ready">{(eventProps.id != null || collectionChooserTree.selectedItem != null) &amp;&amp; eventTypeComboBox.selectedItem != null}</mx:Boolean>
 	<mx:Grid width="100%" height="100%">
 		<mx:GridRow width="100%">
 			<mx:GridItem height="100%" horizontalAlign="right" verticalAlign="middle">
@@ -189,7 +189,7 @@
 				<mx:ComboBox id="eventLanguageComboBox" width="100" textAlign="center" change="{eventProps.language = eventLanguageComboBox.selectedItem as String}"/>
 			</mx:GridItem>
 		</mx:GridRow>
-		<mx:GridRow width="100%" height="60">
+		<mx:GridRow width="100%" height="100%">
 			<mx:GridItem height="100%" horizontalAlign="right" verticalAlign="top" paddingTop="2">
 				<mx:Label text="Notes"/>
 			</mx:GridItem>
@@ -197,7 +197,7 @@
 				<mx:TextArea id="commentTextArea" width="100%" height="100%" change="{eventProps.comment = commentTextArea.text}"/>
 			</mx:GridItem>
 		</mx:GridRow>
-		<mx:GridRow width="100%" height="100%">
+		<mx:GridRow width="100%" height="100%" id="collectionChooserGridRow">
 			<mx:GridItem height="100%" horizontalAlign="right" verticalAlign="top" paddingTop="2">
 				<mx:Label text="Collection"/>
 			</mx:GridItem>
