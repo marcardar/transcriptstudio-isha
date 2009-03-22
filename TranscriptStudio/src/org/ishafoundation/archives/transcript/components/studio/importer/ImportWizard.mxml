@@ -205,26 +205,26 @@
 		
 		private function finishClicked(event:Event):void {
 			// now we might have the session date so use that to prefix the media UUIDs
-			var mediaUUIDPrefix:String;
+			var mediaIdPrefix:String;
 			if (sessionPropertiesPane.sessionProps.startAt == null) {
-				mediaUUIDPrefix = "xxxxxxxx";
+				mediaIdPrefix = "xxxxxxxx";
 			}
 			else {
 				var startAtDate:Date = sessionPropertiesPane.sessionProps.startAt;
-				mediaUUIDPrefix = startAtDate.fullYear + EventPropertiesPane.fixWidth(startAtDate.month + 1, 2) + EventPropertiesPane.fixWidth(startAtDate.date, 2);
+				mediaIdPrefix = startAtDate.fullYear + EventPropertiesPane.fixWidth(startAtDate.month + 1, 2) + EventPropertiesPane.fixWidth(startAtDate.date, 2);
 			}
 			// use the digits from the sourceId in the new mediaId
-			mediaUUIDPrefix += "-" + eventProps.type;
-			mediaUUIDPrefix += "1"; // TODO: maybe sometimes this should really be "2" or even "3"
-			mediaUUIDPrefix += "-a1";
+			mediaIdPrefix += "-" + eventProps.type;
+			mediaIdPrefix += "1"; // TODO: maybe sometimes this should really be "2" or even "3"
+			mediaIdPrefix += "-a1";
 			populateId(function():void {
 				for each (var mediaElement:XML in sessionXML.devices.device.media) {
 					var sourceId:String = mediaElement.@id.toString();
-					var mediaUUIDSuffix:String = sourceId.replace(/[a-z]/ig, "");
-					while (mediaUUIDSuffix.length < 6) {
-						mediaUUIDSuffix = "0" + mediaUUIDSuffix;
+					var mediaIdSuffix:String = sourceId.replace(/[a-z]/ig, "");
+					while (mediaIdSuffix.length < 6) {
+						mediaIdSuffix = "0" + mediaIdSuffix;
 					}
-					mediaElement.@id = mediaUUIDPrefix + "-" + mediaUUIDSuffix;
+					mediaElement.@id = mediaIdPrefix + "-" + mediaIdSuffix;
 				}
 				dispatchEvent(new Event(OK_CLICKED));
 				closeMe();
@@ -237,7 +237,16 @@
 			// note - eventProps may not be populated (if existing event selected)
 			var eventId:String = eventFile.nodeId;
 			var sessionDate:String = Utils.getDateString(sessionPropertiesPane.sessionProps.startAt);
-			this.databaseMgr.executeStoredXQuery("create-session-id.xql", {eventId:eventId, sessionDate:sessionDate, sessionTime:null}, function(returnVal:String):void {
+			var sessionTime:String = Utils.getTimeString(sessionPropertiesPane.sessionProps.startAt);
+			var sessionTime4:String;
+			if (sessionTime == null) {
+				sessionTime4 = null;
+			}
+			else {
+				var arr:Array = sessionTime.split(":");
+				sessionTime4 = arr[0] + arr[1];
+			}
+			this.databaseMgr.executeStoredXQuery("create-session-id.xql", {eventId:eventId, sessionDate:sessionDate, sessionTime:sessionTime4}, function(returnVal:String):void {
 				sessionPropertiesPane.sessionProps.id = returnVal;
 				successFunc();
 			}, failureFunc);
