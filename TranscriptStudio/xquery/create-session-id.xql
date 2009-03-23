@@ -11,7 +11,7 @@ import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/ut
  :)
 declare function create-session-id:create-id($idPrefix as xs:string, $startId as xs:integer) as xs:string
 {
-	let $id := concat($idPrefix, utils:left-pad-string(string($startId), 2))
+	let $id := concat($idPrefix, utils:left-pad-string(string($startId), 4))
 	return
 		if (exists(collection('/db/ts4isha/data')/session[@id = $id])) then
 		(
@@ -23,17 +23,17 @@ declare function create-session-id:create-id($idPrefix as xs:string, $startId as
 		)
 };
 
-(: eventId: e.g. "20090320-y1", "xxxxxxxx-n14" :)
+(: eventId: e.g. "20090320-y1", "00000000-n14" :)
 let $eventId := request:get-parameter('eventId', ())
 return
 if (not(exists($eventId))) then
 ()
 else
 (
-	(: sessionDate: e.g. "20090320" (first day of event "20090320-y1"), "2009xxxx" (only year known), null means unknown :)
-	let $sessionDate := request:get-parameter('sessionDate', 'xxxxxxxx')
-	(: sessionTime: session start time e.g. "1830" (6:30pm), "18xx" (6pm <= ? < 7pm) null means time unknown :)
-	let $sessionTime := max((xs:integer(request:get-parameter('sessionTime', '1')), 1))
+	(: sessionDate: e.g. "20090320" (first day of event "20090320-y1"), "20090000" (only year known), undefined means unknown :)
+	let $sessionDate := request:get-parameter('sessionDate', ())
+	(: sessionTime: session start time e.g. "1830" (6:30pm), undefined means time unknown :)
+	let $sessionTime := max((xs:integer(request:get-parameter('sessionTime', '0001')), 1))
 
 	let $eventDateObj := utils:date-string-to-date(collection('/db/ts4isha/data')/event[@id = $eventId]/@startAt[1])
 	let $sessionDateObj := utils:date-string-to-date($sessionDate) 
@@ -41,12 +41,12 @@ else
 		if (exists($eventDateObj) and exists($sessionDateObj)) then
 		(
 			let $days := days-from-duration($sessionDateObj - $eventDateObj)
-			let $day := if ($days < 0) then 'x' else $days + 1
+			let $day := if ($days < 0) then '0' else $days + 1
 			return
 				create-session-id:create-id(concat($eventId, '-', $day, '-'), $sessionTime)		
 		)
 		else
 		(
-			create-session-id:create-id(concat($eventId, '-x-'), $sessionTime)		
+			create-session-id:create-id(concat($eventId, '-0-'), $sessionTime)		
 		)
 )

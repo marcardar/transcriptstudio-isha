@@ -22,25 +22,16 @@ declare function create-event-id:create-id($idPrefix as xs:string, $startId as x
 		)
 };
 
-(: event start date: e.g. "2009-03-20" or null :)
+(: event start date: e.g. "2009-03-20" or "20090320" or "00000000" or undefined :)
 let $eventDate := request:get-parameter('eventDate', ())
 let $condensedDate :=
 	if (exists($eventDate)) then
 	(
-		let $simplifiedDate := replace($eventDate, '[^\dx]', '')
-		return
-			if (string-length($simplifiedDate) < 8) then
-			(
-				'xxxxxxxx'
-			)
-			else
-			(
-				substring($simplifiedDate, 1, 8)
-			)
+		replace($eventDate, '[^\d]', '')
 	) 
 	else
-		'xxxxxxxx'
+		'00000000'
 (: event type: e.g. "n" :)
-let $eventType := request:get-parameter('eventType', 'x')
+let $eventType := request:get-parameter('eventType', ())
 return
 	create-event-id:create-id(concat($condensedDate, '-', $eventType), 1)
