@@ -213,7 +213,7 @@
 			// now we might have the session date so use that to prefix the media UUIDs
 			var mediaIdPrefix:String;
 			if (sessionPropertiesPane.sessionProps.startAt == null) {
-				mediaIdPrefix = "xxxxxxxx";
+				mediaIdPrefix = "00000000";
 			}
 			else {
 				var startAtDate:Date = sessionPropertiesPane.sessionProps.startAt;
@@ -241,18 +241,18 @@
 		
 		private function populateId(successFunc:Function, failureFunc:Function):void {
 			// note - eventProps may not be populated (if existing event selected)
-			var eventId:String = eventFile.nodeId;
+			var params:Object = {};
+			params.eventId = eventFile.nodeId;
 			var sessionDate:String = Utils.getDateString(sessionPropertiesPane.sessionProps.startAt);
+			if (sessionDate != null) {
+				params.sessionDate = sessionDate; 
+			}
 			var sessionTime:String = Utils.getTimeString(sessionPropertiesPane.sessionProps.startAt);
-			var sessionTime4:String;
-			if (sessionTime == null) {
-				sessionTime4 = null;
-			}
-			else {
+			if (sessionTime != null) {
 				var arr:Array = sessionTime.split(":");
-				sessionTime4 = arr[0] + arr[1];
+				params.sessionTime = arr[0] + arr[1];
 			}
-			this.databaseMgr.executeStoredXQuery("create-session-id.xql", {eventId:eventId, sessionDate:sessionDate, sessionTime:sessionTime4}, function(returnVal:String):void {
+			this.databaseMgr.executeStoredXQuery("create-session-id.xql", params, function(returnVal:String):void {
 				sessionPropertiesPane.sessionProps.id = returnVal;
 				successFunc();
 			}, failureFunc);

@@ -2,8 +2,8 @@ package org.ishafoundation.archives.transcript.util
 {
 	public class IdUtils
 	{
-		private static const EVENT_ID_REG_EXP_STR:String = "((?:19|20)(?:[0-9][0-9x]|xx)|xxxx)((?:0[1-9x])|(?:1[0-2x])|xx)((?:0[1-9x])|(?:[12][0-9x])|(?:3[01x])|xx)-([a-z]+[0-9]+)";
-		private static const SESSION_ID_REG_EXP_STR:String = EVENT_ID_REG_EXP_STR + "-((?:[0-9]+|x)-(?:[0-9]{4}|[0-9]{2}))";
+		private static const EVENT_ID_REG_EXP_STR:String = "([0-9]{8})-([a-z]+[0-9]+)";
+		private static const SESSION_ID_REG_EXP_STR:String = EVENT_ID_REG_EXP_STR + "-([0-9]+-[0-9]{4})";
 		
 		public static const EVENT_ID_EXACT_MATCH_REG_EXP:RegExp = createExactMatchRegExp(EVENT_ID_REG_EXP_STR);
 		public static const EVENT_ID_PREFIX_REG_EXP:RegExp = createPrefixRegExp(EVENT_ID_REG_EXP_STR);
