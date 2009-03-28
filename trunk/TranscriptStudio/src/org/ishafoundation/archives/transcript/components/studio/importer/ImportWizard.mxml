@@ -16,10 +16,6 @@
 		import mx.events.PropertyChangeEvent;
 		import mx.binding.utils.ChangeWatcher;
 		import org.ishafoundation.archives.transcript.model.SessionProperties;
-		import org.ishafoundation.archives.transcript.fs.EventFile;
-		import org.ishafoundation.archives.transcript.fs.DbFileSystem;
-		import org.ishafoundation.archives.transcript.fs.File;
-		import org.ishafoundation.archives.transcript.fs.Collection;
 		import name.carter.mark.flex.util.XMLUtils;
 		import name.carter.mark.flex.util.Utils;
 		import mx.managers.CursorManager;
@@ -42,16 +38,12 @@
 		[Bindable]
 		public var referenceMgr:ReferenceManager;
 		
-		private var _fileSystem:DbFileSystem;
-
-		[Bindable]
-		private var existingSessionIds:ISet;
-		
 		public var importer:MSWordImporter;
 		
 		public var sessionXML:XML;
-		private var eventProps:EventProperties;
-		public var eventFile:EventFile;
+		private var importedEventProps:EventProperties;
+		private var importedSessionProps:SessionProperties;
+		public var eventProps:EventProperties;
 	
 		private function init():void {
 			for each (var child:Container in viewstack.getChildren()) {
@@ -63,21 +55,13 @@
 			}
 			var thisPanel:ImportWizard = this;
 			eventSelectorPane.createEventButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
-				eventFile = null;
-				if (eventProps.startAt == null) {
-					var sessionProps:SessionProperties = new SessionProperties(sessionXML);
-					eventProps.startAt = sessionProps.startAt;
-				}
-				if (eventProps.endAt == null) {
-					eventProps.endAt = eventProps.startAt;
-				}
-				var popup:EventPropertiesCreateDialog = EventPropertiesCreateDialog.display(thisPanel, fileSystem, databaseMgr, referenceMgr, eventProps.copy());
+				var popup:EventPropertiesCreateDialog = EventPropertiesCreateDialog.display(thisPanel, databaseMgr, referenceMgr, importedEventProps.copy());
+				popup.eventPropertiesPane.eventTypeComboBox.enabled = false;
 				popup.addEventListener(EventPropertiesCreateDialog.EVENT_CREATED, function(event:Event):void {
 					eventProps = popup.eventPropertiesPane.eventProps;
-					eventFile = fileSystem.getEventFile(eventProps.id);
-					if (eventFile == null) {
-						throw new Error("Could not find the event file we just saved: " + eventProps);
-					}
+					sessionPropertiesPane.eventProps = eventProps;
+					sessionPropertiesPane.sessionProps = importedSessionProps;
+					sessionPropertiesPane.sessionProps.eventId = eventProps.id;
 					status = "Successfully created event: " + eventProps.id;
 					Alert.show("Event ID: " + eventProps.id, "Successfully created event");
 					nextInternal();
@@ -105,15 +89,6 @@
 		}
 		
 		[Bindable]
-		public function set fileSystem(fileSystem:DbFileSystem):void {
-			_fileSystem = fileSystem;
-			existingSessionIds = fileSystem.getAllSessionIds();
-		}
-		
-		public function get fileSystem():DbFileSystem {
-			return _fileSystem;
-		}
-		
 		public function get databaseMgr():DatabaseManager {
 			return _databaseMgr;
 		}
@@ -125,9 +100,9 @@
 		
 		private function backClicked(evt:MouseEvent):void {
 			viewstack.selectedIndex--;
-			if (viewstack.selectedChild == eventSelectorPane) {
+			/*if (viewstack.selectedChild == eventSelectorPane) {
 				updateEventsList();
-			}
+			}*/
 		}
 
 		private function nextClicked(evt:MouseEvent):void {
@@ -153,27 +128,23 @@
 			}
 			else if (viewstack.selectedChild == importFilesPreviewPane) {
 				var eventXML:XML = MSWordImporter.createEventElement(importFilesPreviewPane.audioTranscripts);
-				eventProps = new EventProperties(eventXML);
 				sessionXML = MSWordImporter.createSessionElement(importFilesPreviewPane.audioTranscripts);
+				importedEventProps = new EventProperties(eventXML);
+				importedSessionProps = new SessionProperties(sessionXML);
+				if (importedEventProps.startAt == null) {
+					importedEventProps.startAt = importedSessionProps.startAt;
+				}
+				if (importedEventProps.endAt == null) {
+					importedEventProps.endAt = importedEventProps.startAt;
+				}
 				nextInternal();
 			}
 			else if (viewstack.selectedChild == eventSelectorPane) {
-				eventFile = eventSelectorPane.selectedEventFile;
-				if (eventFile == null) {
+				eventProps = eventSelectorPane.selectedEventProps;
+				if (eventProps == null) {
 					throw new Error("Tried to progress without selecting event");
 				}
-				databaseMgr.query("collection('/db/ts4isha/data')/event[@id = $arg0]", [eventFile.nodeId], function(returnVal:XML):void {
-					var eventXML:XML = returnVal.event[0];
-					if (eventXML == null) {
-						Alert.show("Could not find event XML: " + eventFile.nodeId);
-					}
-					else {
-						eventProps = new EventProperties(eventXML);
-						nextInternal();
-					}
-				}, function(msg:String):void {
-					Alert.show(msg, "Could not retrieve event XML: " + eventFile.nodeId);
-				});
+				nextInternal();
 			}
 		}
 			
@@ -186,27 +157,19 @@
 				
 			}
 			else if (viewstack.selectedChild == eventSelectorPane) {
-				eventFile = null; // we don't want any event initially selected
-				updateEventsList();
+				eventProps = null;
+				eventSelectorPane.eventTypeComboBox.selectedItem = importedEventProps.type;
+				eventSelectorPane.eventTypeComboBox.enabled = false;
+				if (importedEventProps.startAt != null) {
+					eventSelectorPane.yearComboBox.selectedItem = importedEventProps.startAt.fullYear.toString();
+				}
+				eventSelectorPane.searchClicked();
 			}
 			else if (viewstack.selectedChild == sessionPropertiesPane) {
-				var sp:SessionProperties = new SessionProperties(sessionXML);
+				importedSessionProps.eventId = eventProps.id;
 				sessionPropertiesPane.eventProps = eventProps;
-				sessionPropertiesPane.sessionProps = sp;
+				sessionPropertiesPane.sessionProps = importedSessionProps;
 			}
-		}
-		
-		private function updateEventsList():void {
-			eventSelectorPane.allEvents = fileSystem.getAllEvents();
-			if (eventFile != null) {
-				callLater(function():void {
-					eventSelectorPane.selectedEventFile = eventFile;
-				});
-			}
-		}
-		
-		private function labelFunc(file:File):String {
-			return file.name;
 		}
 		
 		private function finishClicked(event:Event):void {
@@ -223,41 +186,18 @@
 			mediaIdPrefix += "-" + eventProps.type;
 			mediaIdPrefix += "1"; // TODO: maybe sometimes this should really be "2" or even "3"
 			mediaIdPrefix += "-a1";
-			populateId(function():void {
-				for each (var mediaElement:XML in sessionXML.devices.device.media) {
-					var sourceId:String = mediaElement.@id.toString();
-					var mediaIdSuffix:String = sourceId.replace(/[a-z]/ig, "");
-					while (mediaIdSuffix.length < 6) {
-						mediaIdSuffix = "0" + mediaIdSuffix;
-					}
-					mediaElement.@id = mediaIdPrefix + "-" + mediaIdSuffix;
+			for each (var mediaElement:XML in sessionXML.devices.device.media) {
+				var sourceId:String = mediaElement.@id.toString();
+				var mediaIdSuffix:String = sourceId.replace(/[a-z]/ig, "");
+				while (mediaIdSuffix.length < 6) {
+					mediaIdSuffix = "0" + mediaIdSuffix;
 				}
-				dispatchEvent(new Event(OK_CLICKED));
-				closeMe();
-			}, function(msg:String):void {
-				throw new Error("Could not create new session id: " + msg);
-			});
+				mediaElement.@id = mediaIdPrefix + "-" + mediaIdSuffix;
+			}
+			dispatchEvent(new Event(OK_CLICKED));
+			closeMe();
 		}
 		
-		private function populateId(successFunc:Function, failureFunc:Function):void {
-			// note - eventProps may not be populated (if existing event selected)
-			var params:Object = {};
-			params.eventId = eventFile.nodeId;
-			var sessionDate:String = Utils.getDateString(sessionPropertiesPane.sessionProps.startAt);
-			if (sessionDate != null) {
-				params.sessionDate = sessionDate; 
-			}
-			var sessionTime:String = Utils.getTimeString(sessionPropertiesPane.sessionProps.startAt);
-			if (sessionTime != null) {
-				var arr:Array = sessionTime.split(":");
-				params.sessionTime = arr[0] + arr[1];
-			}
-			this.databaseMgr.executeStoredXQuery("create-session-id.xql", params, function(returnVal:String):void {
-				sessionPropertiesPane.sessionProps.id = returnVal;
-				successFunc();
-			}, failureFunc);
-		}
-			
 		private function closeMe():void {
 			PopUpManager.removePopUp(this);
 		}
@@ -323,7 +263,7 @@
 			<mx:List id="importList" width="100%" height="100%" allowMultipleSelection="true" change="buttonBox.executeBindings(true)"/>
 		</mx:VBox>
 		<importer:ImportFilesPreviewPane id="importFilesPreviewPane" width="100%" height="100%"/>
-		<importer:EventSelectorPane id="eventSelectorPane" width="100%" height="100%"/>
+		<metadata:EventSelectorPane id="eventSelectorPane" width="100%" height="100%" xqueryExecutor="{databaseMgr}" referenceMgr="{referenceMgr}"/>
 		<metadata:SessionPropertiesPane id="sessionPropertiesPane" label="Session Properties" width="100%" height="100%" referenceMgr="{referenceMgr}"/>
 	</mx:ViewStack>
 	<mx:HBox id="buttonBox">

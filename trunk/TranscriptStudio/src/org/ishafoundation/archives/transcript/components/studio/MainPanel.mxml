@@ -21,69 +21,38 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" xmlns:metadataNS="org.ishafoundation.archives.transcript.components.metadata.*" width="100%" height="100%" verticalGap="0">
 	<mx:Script>
 		<![CDATA[
-			import org.ishafoundation.archives.transcript.components.studio.metadata.SessionPropertiesEditDialog;
-			import org.ishafoundation.archives.transcript.components.studio.metadata.EventPropertiesEditDialog;
-			import org.ishafoundation.archives.transcript.components.studio.metadata.EventPropertiesCreateDialog;
-			import org.ishafoundation.archives.transcript.model.SessionProperties;
-			import org.ishafoundation.archives.transcript.model.EventProperties;
-			import org.ishafoundation.archives.transcript.components.studio.media.MediaPlayerDialog;
+			import org.ishafoundation.archives.transcript.components.studio.metadata.SessionSelectorDialog;
+			import org.ishafoundation.archives.transcript.components.studio.metadata.OpenDialog;
+			import org.ishafoundation.archives.transcript.components.studio.metadata.OpenByIdDialog;
 			import org.ishafoundation.archives.transcript.util.ApplicationUtils;
-			import name.carter.mark.flex.project.mdoc.MNode;
-			import org.ishafoundation.archives.transcript.components.studio.collection.RetrieveTranscriptByIdDialog;
-			import flash.net.navigateToURL;
-			import org.ishafoundation.archives.transcript.db.XQueries;
-			import org.ishafoundation.archives.transcript.components.studio.importer.ImportWizard;
-			import org.ishafoundation.archives.transcript.fs.SessionFile;
-			import org.ishafoundation.archives.transcript.fs.Collection;
-			import org.ishafoundation.archives.transcript.fs.DbFileSystem;
 			import org.ishafoundation.archives.transcript.db.DatabaseConstants;
-			import org.ishafoundation.archives.transcript.util.IdUtils;
+			import org.ishafoundation.archives.transcript.importer.MSWordImporter;
 			import name.carter.mark.flex.util.XMLUtils;
 			import name.carter.mark.flex.util.Utils;
-			import name.carter.mark.flex.project.mdoc.MSuperNode;
-			import mx.binding.utils.ChangeWatcher;
-			import name.carter.mark.flex.project.mdoc.MSuperNodeProperties;
-			import name.carter.mark.flex.project.mdoc.MSegmentSubset;
-			import name.carter.mark.flex.project.mdoc.MContentProperties;
-			import name.carter.mark.flex.project.mdoc.MContent;
-			import name.carter.mark.flex.project.mdoc.MContentRange;
-			import name.carter.mark.flex.util.collection.HashSet;
-			import name.carter.mark.flex.util.collection.ISet;
-			import org.ishafoundation.archives.transcript.components.studio.markup.MarkupsPane;
-			import mx.events.PropertyChangeEvent;
-			import org.ishafoundation.archives.transcript.model.Session;
-			import org.ishafoundation.archives.transcript.importer.MSWordImporter;
-			import name.carter.mark.flex.project.mdoc.MSegmentRange;
-			import org.ishafoundation.archives.transcript.components.studio.concept.ConceptManagerDialog;
-			import org.ishafoundation.archives.transcript.components.generic.UnhandledChangesPopUpManager;
-			import org.ishafoundation.archives.transcript.components.studio.category.CategoryManagerDialog;
-			import org.ishafoundation.archives.transcript.components.studio.text.TranscriptTextArea;
-			import org.ishafoundation.archives.transcript.components.generic.AboutBox;
-			import org.ishafoundation.archives.transcript.components.studio.collection.StoreTranscriptDialog;
-			import org.ishafoundation.archives.transcript.components.generic.DebugPopUp;
-			import org.ishafoundation.archives.transcript.components.studio.collection.RetrieveTranscriptDialog;
-			import org.ishafoundation.archives.transcript.components.studio.category.CategoryManagerDialog;
-			import org.ishafoundation.archives.transcript.model.SessionManager;
-			import mx.controls.Menu;
-			import mx.collections.XMLListCollection;
-			import mx.collections.ArrayCollection;
-			import org.ishafoundation.archives.transcript.components.generic.UnhandledChangesPopUpManager;
-			import mx.core.Application;
-			import mx.core.IFlexDisplayObject;
 			import name.carter.mark.flex.util.icon.IconUtils;
-			import mx.binding.utils.BindingUtils;
-			import org.ishafoundation.archives.transcript.db.DatabaseManager;
+			import org.ishafoundation.archives.transcript.components.generic.UnhandledChangesPopUpManager;
+			import org.ishafoundation.archives.transcript.db.DatabaseManagerUtils;
+			import mx.controls.Alert;
+			import org.ishafoundation.archives.transcript.components.generic.AboutBox;
+			import org.ishafoundation.archives.transcript.components.studio.metadata.SessionPropertiesEditDialog;
+			import org.ishafoundation.archives.transcript.model.SessionProperties;
+			import org.ishafoundation.archives.transcript.model.SessionManager;
 			import org.ishafoundation.archives.transcript.model.ReferenceManager;
-			import org.ishafoundation.archives.transcript.model.Transcript;
-			import org.ishafoundation.archives.transcript.components.studio.text.TranscriptTextArea;
-			import org.ishafoundation.archives.transcript.components.studio.collection.StoreTranscriptDialog;
-			import org.ishafoundation.archives.transcript.components.studio.collection.RetrieveTranscriptDialog;
-			import org.ishafoundation.archives.transcript.components.generic.DebugPopUp;
-			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
+			import org.ishafoundation.archives.transcript.util.IdUtils;
+			import name.carter.mark.flex.project.mdoc.*;
+			import org.ishafoundation.archives.transcript.components.studio.media.MediaPlayerDialog;
+			import org.ishafoundation.archives.transcript.components.studio.importer.ImportWizard;
+			import org.ishafoundation.archives.transcript.components.studio.metadata.EventPropertiesEditDialog;
+			import org.ishafoundation.archives.transcript.components.studio.metadata.EventPropertiesCreateDialog;
+			import org.ishafoundation.archives.transcript.model.EventProperties;
+			import org.ishafoundation.archives.transcript.components.generic.DebugPopUp;
+			import org.ishafoundation.archives.transcript.components.studio.concept.ConceptManagerDialog;
+			import org.ishafoundation.archives.transcript.components.studio.category.CategoryManagerDialog;
+			import org.ishafoundation.archives.transcript.model.Session;
 			import mx.events.MenuEvent;
 			import mx.events.CloseEvent;
-			import mx.controls.Alert;
+			import org.ishafoundation.archives.transcript.db.DatabaseManager;
 
 			[Bindable]
 			public var databaseMgr:DatabaseManager;
@@ -132,7 +101,7 @@
 			}
 			
 			public function retrieveClicked():void {
-				showUnsavedChangesPopupIfNecessary(showRetrieveTranscriptDialog);
+				showUnsavedChangesPopupIfNecessary(showOpenDialog);
 			}
 			
 			public function retrieveByIdClicked():void {
@@ -174,34 +143,35 @@
 				UnhandledChangesPopUpManager.displayIfNecessaryUsingAsyncFunc(this.session != null && this.session.unsavedChanges, storeTranscript, storeTranscriptFailure, successFunction); 
 			}
 			
-			private function showRetrieveTranscriptDialog():void {
-				var popup:RetrieveTranscriptDialog = new RetrieveTranscriptDialog();
-				popup.addEventListener(FlexEvent.CREATION_COMPLETE, function():void {
-					var fileSystem:DbFileSystem = new DbFileSystem(DatabaseConstants.DATA_COLLECTION_PATH, databaseMgr, function ():void {
-						popup.collectionChooserTree.dataProvider = fileSystem.getRootCollection();
-					}, collectionTreeFailed);
+			private function showOpenDialog():void {
+				var popup:OpenDialog = OpenDialog.display(this, databaseMgr, referenceMgr);
+				popup.addEventListener(OpenDialog.OPEN_SESSION_REQUEST, function(evt:Event):void {
+					var sessionId:String = popup.selectedSessionId;
+					// first update the reference file - continue even if it fails
+					reloadReferencesBeforeContinuing(function():void {
+						sessionMgr.retrieveSession(sessionId, null, openSessionSuccess, openSessionFailure);
+					});					
 				});
-				PopUpManager.addPopUp(popup, this, true);
-				popup.addEventListener(RetrieveTranscriptDialog.OK_CLICKED, retrieveOKClicked);
 			}
 			
 			private function showRetrieveTranscriptByIdDialog():void {
-				var popup:RetrieveTranscriptByIdDialog = new RetrieveTranscriptByIdDialog();
+				var popup:OpenByIdDialog = new OpenByIdDialog();
 				PopUpManager.addPopUp(popup, this, true);
 				popup.okButton.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void {
-					trace("Retrieving transcript using id: " + popup.enteredId);
-					var sessionId:String = popup.enteredId.substr(0, 17);
-					var nodeId:String = popup.enteredId.substr(17);
-					var fileSystem:DbFileSystem = new DbFileSystem(DatabaseConstants.DATA_COLLECTION_PATH, databaseMgr, function ():void {
-						var sessionFile:SessionFile = fileSystem.getSessionFile(sessionId);
-						// first update the reference file - continue even if it fails
-						if (sessionFile.path == null) {
-							Alert.show("Could not find session with id: " + sessionId);
-							return;
-						}
+					var sessionId:String = IdUtils.getSessionIdPrefix(popup.enteredId);
+					if (sessionId == null) {
+						Alert.show(popup.enteredId, "Invalid Session ID");
+						return;
+					}
+					trace("Retrieving transcript using id: " + sessionId);
+					var nodeId:String = popup.enteredId.substring(sessionId.length + 1);
+					var eventId:String = IdUtils.getEventId(sessionId);
+					DatabaseManagerUtils.retrieveEventXML(eventId, databaseMgr, function(eventXML:XML):void {
+						var eventProps:EventProperties = new EventProperties(eventXML);
 						reloadReferencesBeforeContinuing(function():void {
-							sessionMgr.retrieveSession(sessionFile, function(session:Session):void {
-								retrieveTranscriptSuccess(session);
+							sessionMgr.retrieveSession(sessionId, null, function(session:Session):void {
+								openSessionSuccess(session);
+								// the nodeId might refer to a markup or something
 								if (nodeId.length > 0) {
 									callLater(function():void {
 										var node:MNode = session.transcript.mdoc.resolveId(nodeId);
@@ -215,9 +185,11 @@
 										}
 									});
 								}
-							}, retrieveTranscriptFailure);
+							}, openSessionFailure);
 						});
-					}, collectionTreeFailed);
+					}, function(msg:String):void {
+						Alert.show(msg, "Could not retrieve event metadata corresponding to session: " + sessionId);
+					});
 				});
 			}
 			
@@ -231,23 +203,14 @@
 				});				
 			}
 
-			private function retrieveOKClicked(event:Event):void {
-				var popup:RetrieveTranscriptDialog = (event.currentTarget.document) as RetrieveTranscriptDialog;
-				var retrieveTranscriptFunction:Function = function():void {
-					sessionMgr.retrieveSession(popup.selectedFile as SessionFile, retrieveTranscriptSuccess, retrieveTranscriptFailure); 					
-				}
-				// first update the reference file - continue even if it fails
-				reloadReferencesBeforeContinuing(retrieveTranscriptFunction);
-			}
-			
-			private function retrieveTranscriptSuccess(session:Session):void {
+			private function openSessionSuccess(session:Session):void {
 				this.session = session;
 				this.transcriptPane.transcript = session.transcript;
 				this.status = "Successfully loaded transcript";
 				updateTitle();
 			}
 			
-			private function retrieveTranscriptFailure(msg:String):void {
+			private function openSessionFailure(msg:String):void {
 				if (msg.indexOf("document not found") >= 0) {
 					// exist message includes this phrase
 					Alert.show("Transcript not found", "Error loading transcript");
@@ -270,20 +233,6 @@
 				this.sessionMgr.storeTranscript(session, successFunction, failureFunction);
 			}
 			
-			private function showStoreTranscriptDialog(successFunction:Function, failureFunction:Function):void {
-				var popup:StoreTranscriptDialog = new StoreTranscriptDialog();
-				popup.title = "Save transcript location";
-				//callLater(function():void{popup.transcriptIdTextInput.text = session.id;});
-				popup.addEventListener(StoreTranscriptDialog.OK_CLICKED, function(event:Event):void{
-					//session.collectionPath = popup.selectedCollection.path;
-					storeTranscript(successFunction, failureFunction);
-				});
-				var fileSystem:DbFileSystem = new DbFileSystem(DatabaseConstants.DATA_COLLECTION_PATH, databaseMgr, function ():void {
-					popup.collectionChooserTree.dataProvider = fileSystem.getRootCollection();
-				}, collectionTreeFailed);					
-				PopUpManager.addPopUp(popup, this, true);
-			}
-			
 			private function storeTranscriptSuccess():void
 			{
 				this.status = "Successfully saved transcript";
@@ -304,7 +253,7 @@
 					Alert.show(msg.substr(index + 26), "Error saving transcript");
 				}
 				else {
-					throw new Error(msg);
+					Alert.show(msg, "Error saving transcript");
 				}				
 			}
 			
@@ -324,7 +273,7 @@
 			
 			private function reloadTranscript():void {
 				var reloadTranscriptFunction:Function = function():void {
-					session.reload(sessionMgr.retrieveSession, retrieveTranscriptSuccess, retrieveTranscriptFailure);
+					session.reload(sessionMgr.retrieveSession, openSessionSuccess, openSessionFailure);
 				}
 				// first update the reference file - continue even if it fails
 				referenceMgr.loadReferences(reloadTranscriptFunction, function(msg:String):void {
@@ -335,20 +284,23 @@
 			
 			private function editEventProps():void {
 				var thisPanel:MainPanel = this;
-				var fileSystem:DbFileSystem = new DbFileSystem(DatabaseConstants.ARCHIVES_COLLECTION_PATH, databaseMgr, function ():void {
-					var popup:EventPropertiesEditDialog = EventPropertiesEditDialog.display(thisPanel, fileSystem, databaseMgr, referenceMgr, session.eventFile);
+				DatabaseManagerUtils.retrieveEventXML(session.props.eventId, databaseMgr, function(eventXML:XML):void {
+					var eventProps:EventProperties = new EventProperties(eventXML);
+					var popup:EventPropertiesEditDialog = EventPropertiesEditDialog.display(thisPanel, databaseMgr, referenceMgr, eventProps);
 					popup.addEventListener(EventPropertiesEditDialog.EVENT_EDITED, function(event:Event):void {
 						status = "Successfully edited event";
 						Alert.show("Successfully edited event"); 
 					});
-				}, collectionTreeFailed);				
+				}, function(msg:String):void {;				
+					Alert.show(msg, "Could not retrieve event XML");
+				});
 			}
 			
 			private function editSessionProps():void {
 				var sessionPropsXMLCopy:XML = session.sessionXML.copy();
 				delete sessionPropsXMLCopy.*;
 				var sessionPropsCopy:SessionProperties = new SessionProperties(sessionPropsXMLCopy);
-				var popup:SessionPropertiesEditDialog = SessionPropertiesEditDialog.display(this, databaseMgr, referenceMgr, session.eventFile, sessionPropsCopy); 
+				var popup:SessionPropertiesEditDialog = SessionPropertiesEditDialog.display(this, databaseMgr, referenceMgr, sessionPropsCopy); 
 				popup.addEventListener(SessionPropertiesEditDialog.SESSION_PROPS_EDITED, function():void {
 					// copy the session props over the existing ones
 					// first delete the old ones
@@ -366,14 +318,11 @@
 			}
 			
 			public function createEventClicked():void {
-				var thisPanel:MainPanel = this;
-				var fileSystem:DbFileSystem = new DbFileSystem(DatabaseConstants.ARCHIVES_COLLECTION_PATH, databaseMgr, function ():void {
-					var popup:EventPropertiesCreateDialog = EventPropertiesCreateDialog.display(thisPanel, fileSystem, databaseMgr, referenceMgr, new EventProperties());
-					popup.addEventListener(EventPropertiesCreateDialog.EVENT_CREATED, function(event:Event):void {
-						status = "Successfully created event";
-						Alert.show("Successfully created event"); 
-					});
-				}, collectionTreeFailed);
+				var popup:EventPropertiesCreateDialog = EventPropertiesCreateDialog.display(this, databaseMgr, referenceMgr, new EventProperties());
+				popup.addEventListener(EventPropertiesCreateDialog.EVENT_CREATED, function(event:Event):void {
+					status = "Successfully created event";
+					Alert.show("Successfully created event"); 
+				});
 			}
 			
 			private function importClicked():void {
@@ -392,20 +341,17 @@
 			
 			private function importTranscript():void {
 				var thisPanel:MainPanel = this;
-				var fileSystem:DbFileSystem = new DbFileSystem(DatabaseConstants.ARCHIVES_COLLECTION_PATH, databaseMgr, function ():void {
-					var popup:ImportWizard = new ImportWizard();
-					popup.addEventListener(ImportWizard.OK_CLICKED, function(event:Event):void {
-						session = sessionMgr.createSession(popup.sessionXML, popup.eventFile);
-						transcriptPane.transcript = session.transcript;
-						status = "Successfully imported transcript";
-						updateTitle();
-					});
-					popup.fileSystem = fileSystem;
-					popup.databaseMgr = databaseMgr;
-					popup.referenceMgr = referenceMgr;
-					popup.importer = new MSWordImporter(databaseMgr);
-					PopUpManager.addPopUp(popup, thisPanel, true);
-				}, collectionTreeFailed);
+				var popup:ImportWizard = new ImportWizard();
+				popup.addEventListener(ImportWizard.OK_CLICKED, function(event:Event):void {
+					session = sessionMgr.createSession(popup.sessionXML, popup.eventProps);
+					transcriptPane.transcript = session.transcript;
+					status = "Successfully imported transcript";
+					updateTitle();
+				});
+				popup.databaseMgr = databaseMgr;
+				popup.referenceMgr = referenceMgr;
+				popup.importer = new MSWordImporter(databaseMgr);
+				PopUpManager.addPopUp(popup, thisPanel, true);
 			}
 			
 			private function showAboutBox():void {
@@ -518,7 +464,7 @@
 					{this &amp;&amp; session != null}
 				-->
 				<menuitem id="store" label="Save" enabled="{myMenuBar != null &amp;&amp; session != null &amp;&amp; session.unsavedChanges}"/>
-				<menuitem id="reloadTranscript" label="Reload from database" enabled="{myMenuBar != null &amp;&amp; session != null &amp;&amp; session.sessionFile != null}"/>
+				<menuitem id="reloadTranscript" label="Reload from database" enabled="{myMenuBar != null &amp;&amp; session != null}"/>
 				<menuitem type="separator"/>
 				<menuitem id="eventProps" label="Event properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/>
 				<menuitem id="sessionProps" label="Session properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/>

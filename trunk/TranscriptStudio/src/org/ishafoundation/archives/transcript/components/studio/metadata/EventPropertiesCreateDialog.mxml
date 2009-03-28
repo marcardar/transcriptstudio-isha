@@ -14,10 +14,6 @@
 		import mx.events.PropertyChangeEvent;
 		import mx.binding.utils.ChangeWatcher;
 		import org.ishafoundation.archives.transcript.model.SessionProperties;
-		import org.ishafoundation.archives.transcript.fs.EventFile;
-		import org.ishafoundation.archives.transcript.fs.DbFileSystem;
-		import org.ishafoundation.archives.transcript.fs.File;
-		import org.ishafoundation.archives.transcript.fs.Collection;
 		import name.carter.mark.flex.util.XMLUtils;
 		import name.carter.mark.flex.util.Utils;
 		import mx.managers.CursorManager;
@@ -40,16 +36,11 @@
 	   	[Bindable]
 	   	public var referenceMgr:ReferenceManager;
 	   	
-		private var _fileSystem:DbFileSystem;
-
-		public var eventFile:EventFile;
-	
-		public static function display(parent:DisplayObject, fileSystem:DbFileSystem, databaseMgr:DatabaseManager, referenceMgr:ReferenceManager, eventProps:EventProperties = null):EventPropertiesCreateDialog {
+		public static function display(parent:DisplayObject, databaseMgr:DatabaseManager, referenceMgr:ReferenceManager, eventProps:EventProperties = null):EventPropertiesCreateDialog {
 			var result:EventPropertiesCreateDialog = new EventPropertiesCreateDialog();
 			result.databaseMgr = databaseMgr;
 			result.referenceMgr = referenceMgr;
 			PopUpManager.addPopUp(result, parent, true);
-			result.fileSystem = fileSystem;
 			result.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
 				result.eventPropertiesPane.eventProps = eventProps;
 			});
@@ -57,16 +48,6 @@
 		}
 	
 		private function init():void {
-		}
-		
-		[Bindable]
-		public function set fileSystem(fileSystem:DbFileSystem):void {
-			_fileSystem = fileSystem;
-			eventPropertiesPane.fileSystem = fileSystem;
-		}
-		
-		public function get fileSystem():DbFileSystem {
-			return _fileSystem;
 		}
 		
 		private function get eventProps():EventProperties {
@@ -84,36 +65,17 @@
 		}
 		
 		private function createEvent(evt:MouseEvent):void {
-			// need to generate a new ID
-			populateId(function():void {
-				// need to create the new event file
-				var collection:Collection = eventPropertiesPane.collectionChooserTree.selectedItem as Collection;
-				var filename:String = eventPropertiesPane.eventProps.generateFilename();
-				var eventPath:String = collection.path + "/" + filename;
-				databaseMgr.storeXML(eventPath, eventPropertiesPane.eventProps.eventElement, function():void {
-					fileSystem.refresh(collection.path, function():void {
-						closeMe();
-						var evt:Event = new Event(EVENT_CREATED);
-						dispatchEvent(evt);
-					}, function(msg:String):void {
-						throw new Error("Could not refresh collection: " + collection.path + ": " + msg);
-					});
-				}, function (msg:String):void {
-					throw new Error("Could not save event file '" + eventPath + "': " + msg);
-				});
-			}, function(msg:String):void {
-				throw new Error("Could not create new event id: " + msg);
+			// need to create the new event file
+			databaseMgr.storeXML(eventPropertiesPane.eventProps.eventElement, function(eventId:String):void {
+				eventProps.id = eventId;
+				closeMe();
+				var evt:Event = new Event(EVENT_CREATED);
+				dispatchEvent(evt);
+			}, function (msg:String):void {
+				Alert.show(msg, "Could not save event");
 			});
 		}
 		
-		private function populateId(successFunc:Function, failureFunc:Function):void {
-			var eventDate:String = Utils.getDateString(eventProps.startAt);
-			this.databaseMgr.executeStoredXQuery("create-event-id.xql", {eventDate:eventDate, eventType:eventProps.type}, function(returnVal:String):void {
-				eventProps.id = returnVal;
-				successFunc();
-			}, failureFunc);
-		}
-			
 		private function okClicked(evt:MouseEvent):void {
 			createEvent(evt);
 		}

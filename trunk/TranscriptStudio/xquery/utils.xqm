@@ -2,6 +2,46 @@ xquery version "1.0";
 
 module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils";
 
+import module namespace functx = "http://www.functx.com" at "functx.xqm";
+declare namespace xmldb = "http://exist-db.org/xquery/xmldb";
+
+declare function utils:get-event($eventId as xs:string) as element()
+{
+	collection('/db/ts4isha/data')/event[@id = $eventId]
+};
+
+declare function utils:store($documentURI as xs:string, $xml as element()) as xs:string
+{
+	let $xml := utils:remove-attributes($xml, '_document-uri')
+	let $docName := tokenize($documentURI, '/')[last()]
+	let $collectionName := substring-before($documentURI, concat('/', $docName))
+	return
+		xmldb:store($collectionName, $docName, $xml)
+};
+
+(: modified because there seems to be a bug in eXist usign the QName - https://sourceforge.net/tracker/index.php?func=detail&aid=1992594&group_id=17691&atid=117691 :)
+declare function utils:add-attributes($elements as element()*, $attrNames as xs:string*, $attrValues as xs:anyAtomicType*) as element()? {
+	for $element in $elements
+	return element { node-name($element)}
+	{
+		for $attrName at $seq in $attrNames
+		return if ($element/@*[local-name(.) = $attrNames])
+		       then ()
+		       else attribute {$attrName}
+		                      {$attrValues[$seq]},
+		$element/@*,
+		$element/node()
+	}
+};
+
+declare function utils:remove-attributes ($elements as element()*, $attrNames as xs:string*) as element() {
+	for $element in $elements
+	return element
+		{node-name($element)}
+		{$element/@*[not(local-name(.) = $attrNames)],
+		$element/node() }
+};
+ 
 declare function utils:is-valid-date-string($dateString as xs:string?) as xs:boolean
 {
 	if (not(exists($dateString))) then
@@ -56,3 +96,17 @@ declare function utils:left-pad-string($stringToPad as xs:string, $minLength as 
 		)
 };
 
+(: if either (or both) args are empty then empty sequence is returned :)
+declare function utils:days-diff($date1 as xs:date?, $date2 as xs:date?) as xs:integer?
+{
+	if (count(($date1, $date2)) < 2) then
+		()
+	else
+		let $days := days-from-duration($date2 - $date1)
+		return $days
+};
+
+declare function utils:make-filename-friendly($rawFilename as xs:string) as xs:string
+{
+	replace(replace($rawFilename, '\s+', '-'), '[^a-z0-9\-_]', '')
+};

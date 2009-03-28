@@ -7,6 +7,7 @@ package org.ishafoundation.archives.transcript.model
 	public class SessionProperties
 	{
 		public static const ID_ATTR_NAME:String = "id";
+		public static const EVENT_ID_ATTR_NAME:String = "eventId";
 		public static const SUB_TITLE_ATTR_NAME:String = "subTitle";
 		public static const START_AT_ATTR_NAME:String = "startAt";
 		public static const COMMENT_ATTR_NAME:String = "comment";
@@ -20,7 +21,7 @@ package org.ishafoundation.archives.transcript.model
 
 		[Bindable]
 		public function get id():String {
-			return sessionElement.@id;
+			return sessionElement.attribute(ID_ATTR_NAME);
 		}
 		
 		public function set id(newValue:String):void {
@@ -28,6 +29,15 @@ package org.ishafoundation.archives.transcript.model
 				throw new Error("Passed an invalid session id: " + newValue);
 			} 
 			XMLUtils.setAttributeValue(sessionElement, ID_ATTR_NAME, newValue);
+		}
+		
+		[Bindable]
+		public function get eventId():String {
+			return sessionElement.attribute(EVENT_ID_ATTR_NAME);
+		}
+		
+		public function set eventId(newValue:String):void {
+			XMLUtils.setAttributeValue(sessionElement, EVENT_ID_ATTR_NAME, newValue);
 		}
 		
 		[Bindable]

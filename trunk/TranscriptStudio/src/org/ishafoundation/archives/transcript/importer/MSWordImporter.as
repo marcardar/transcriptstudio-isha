@@ -23,6 +23,8 @@ package org.ishafoundation.archives.transcript.importer
 	import com.ericfeminella.collections.HashMap;
 	import com.ericfeminella.collections.IMap;
 	
+	import mx.utils.StringUtil;
+	
 	import name.carter.mark.flex.util.XMLUtils;
 	
 	import org.ishafoundation.archives.transcript.db.XQueryExecutor;

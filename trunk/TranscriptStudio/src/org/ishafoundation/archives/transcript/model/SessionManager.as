@@ -29,8 +29,6 @@ package org.ishafoundation.archives.transcript.model
 	import name.carter.mark.flex.util.XMLUtils;
 	
 	import org.ishafoundation.archives.transcript.db.*;
-	import org.ishafoundation.archives.transcript.fs.EventFile;
-	import org.ishafoundation.archives.transcript.fs.SessionFile;
 	
 	public class SessionManager extends EventDispatcher
 	{
@@ -45,16 +43,16 @@ package org.ishafoundation.archives.transcript.model
 			this.xmlRetrieverStorer = xmlRetrieverStorer;
 		}
 		
-		public function createSession(sessionXML:XML, eventFile:EventFile):Session {
-			var result:Session = new Session(sessionXML, username, eventFile, referenceMgr);
+		public function createSession(sessionXML:XML, eventProps:EventProperties):Session {
+			var result:Session = new Session(sessionXML, username, referenceMgr);
 			result.unsavedChanges = true; // need to save all this stuff			
 			return result;
 		} 
 		
-		public function retrieveSession(sessionFile:SessionFile, externalSuccess:Function, externalFailure:Function):void {
-			this.xmlRetrieverStorer.retrieveXML(sessionFile.path, function(sessionXML:XML):void {
+		public function retrieveSession(sessionId:String, eventProps:EventProperties, externalSuccess:Function, externalFailure:Function):void {
+			DatabaseManagerUtils.retrieveSessionXML(sessionId, xmlRetrieverStorer, function(sessionXML:XML):void {
 				trace("Successfully retrieved session");
-				var session:Session = new Session(sessionXML, username, sessionFile, referenceMgr);
+				var session:Session = new Session(sessionXML, username, referenceMgr);
 				externalSuccess(session);
 			}, function (msg:String):void {
 				trace("Could not load session xml because: " + msg);
@@ -68,26 +66,11 @@ package org.ishafoundation.archives.transcript.model
 			}
 			if (session.unsavedChanges) {
 				setActionAttributes(session);
-				xmlRetrieverStorer.storeXML(session.path, session.sessionXML, function():void {
+				xmlRetrieverStorer.storeXML(session.sessionXML, function(sessionId:String):void {
 					trace("Successfully saved transcript");
-					if (session.sessionFile == null) {
-						session.eventFile.refresh(function():void {
-							var sessionFile:SessionFile = session.eventFile.getSessionFileById(session.id);
-							if (sessionFile == null) {
-								externalFailure("Could not find session file after saving: " + session.path);
-								return;
-							}
-							session.sessionFile = sessionFile;
-							session.unsavedChanges = false;
-							externalSuccess();
-						}, function(msg:String):void {
-							externalFailure("Could not refresh filesystem: " + msg);
-						});
-					}
-					else {
-						session.unsavedChanges = false;
-						externalSuccess();
-					}
+					session.id = sessionId;
+					session.unsavedChanges = false;
+					externalSuccess();
 				}, externalFailure);
 			}
 			else {

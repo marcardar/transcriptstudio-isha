@@ -21,7 +21,11 @@ package name.carter.mark.flex.project.mdoc
 		}
 		
 		public function get text():String {
-			return nodeElement.text();
+			var result:String = nodeElement.text();
+			if (result != StringUtil.trim(result)) {
+				new Error("WARNING: text node is not trimmed: '" + result + "'");
+			}
+			return result;
 		}
 		
 		public function set text(newValue:String):void {

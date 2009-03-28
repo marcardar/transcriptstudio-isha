@@ -38,6 +38,9 @@ package name.carter.mark.flex.exist
 		}
 
 		public function storeXML(xmlPath:String, xml:XML, successFunction:Function, failureFunction:Function):void {
+			if (xmlPath == null || Utils.normalizeSpace(xmlPath).length == 0) {
+				throw new Error("Passed blank xmlPath");
+			}
 			var methodCall:MethodCall = new MethodCall("parse");
 			methodCall.addParamAsString(xml.toXMLString());
 			methodCall.addParamAsString(Utils.encodePath(xmlPath));

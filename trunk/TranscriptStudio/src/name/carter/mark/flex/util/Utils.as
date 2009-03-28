@@ -124,6 +124,9 @@ package name.carter.mark.flex.util
 		public static function condenseWhitespaceForArray(texts:Array):Array {
 			var result:Array = new Array();
 			for each (var text:String in texts) {
+				if (text == null) {
+					continue;
+				}
 				text = normalizeSpace(text);
 				if (text != "") {
 					result.push(text);

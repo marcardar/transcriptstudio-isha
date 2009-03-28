@@ -214,14 +214,15 @@ package org.ishafoundation.archives.transcript.importer
 		}
 		
 		private static function appendContentText(contentText:String, styles:ISet, segmentElement:XML):void {
-			contentText = Utils.normalizeSpace(contentText);
 			// change in tagging so lets close off the current tags and then start a new superContent for the new tags
 			contentText = replaceSpecialChars(contentText);
+			contentText = Utils.normalizeSpace(contentText);
 			//contentText = removeTamil(contentText);
 			if (contentText.length == 0) {
 				return;
 			}
-			var contentElement:XML = <content>{contentText}</content>;
+			var contentElement:XML = <content/>;
+			contentElement.appendChild(contentText);
 			if (styles.isEmpty()) {
 				// no need for general properties
 				segmentElement.appendChild(contentElement);
@@ -305,7 +306,10 @@ package org.ishafoundation.archives.transcript.importer
 				return removeLeadingChars(numChars, segmentElement);
 			}
 			else {
-				contentText = contentText.substring(numChars);
+				/* The trim() in this next line was the conclusion to one day's (27.03.2009) debugging work
+				  to find out why there was leading whitespace in content text nodes(). I still do not know
+				  why this error was not showing up before */
+				contentText = StringUtil.trim(contentText.substring(numChars));
 				XMLUtils.setElementText(contentElement, contentText);
 				return true;
 			}

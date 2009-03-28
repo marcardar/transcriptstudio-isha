@@ -153,10 +153,15 @@
 				databaseMgr.testConnection(function():void {
 					PopUpManager.removePopUp(loginPopUp);
 					//status = "Login succeeded";
-					// make sure the transcript collection has been created
-					databaseMgr.retrieveCollection(DatabaseConstants.DATA_COLLECTION_PATH, function():void {
-						mainPanel.init(username, databaseMgr);
-						mainPanel.visible = true;
+					// make sure the data collection has been created
+					databaseMgr.query("xmldb:collection-exists($arg0)", [DatabaseConstants.DATA_COLLECTION_PATH], function(returnVal:Boolean):void {
+						if (returnVal) {
+							mainPanel.init(username, databaseMgr);
+							mainPanel.visible = true;
+						}
+						else {
+							Alert.show(DatabaseConstants.DATA_COLLECTION_PATH, "Could not find data collection");
+						}
 					},
 					function(msg:String):void {
 						Alert.show(msg);

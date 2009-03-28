@@ -2,6 +2,7 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Edit Session Properties" creationComplete="init()" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*">
 	<mx:Script>
 	<![CDATA[
+		import org.ishafoundation.archives.transcript.db.DatabaseManagerUtils;
 		import org.ishafoundation.archives.transcript.db.XMLRetriever;
 		import org.ishafoundation.archives.transcript.db.XMLRetrieverStorer;
 		import org.ishafoundation.archives.transcript.db.DatabaseManager;
@@ -16,10 +17,6 @@
 		import mx.events.PropertyChangeEvent;
 		import mx.binding.utils.ChangeWatcher;
 		import org.ishafoundation.archives.transcript.model.SessionProperties;
-		import org.ishafoundation.archives.transcript.fs.EventFile;
-		import org.ishafoundation.archives.transcript.fs.DbFileSystem;
-		import org.ishafoundation.archives.transcript.fs.File;
-		import org.ishafoundation.archives.transcript.fs.Collection;
 		import name.carter.mark.flex.util.XMLUtils;
 		import name.carter.mark.flex.util.Utils;
 		import mx.managers.CursorManager;
@@ -37,18 +34,12 @@
 		
 	   	public static const SESSION_PROPS_EDITED:String = "SESSION_PROPS_EDITED";
 	   	
-		public static function display(parent:DisplayObject, xmlRetriever:XMLRetriever, referenceMgr:ReferenceManager, eventFile:EventFile, sessionProps:SessionProperties):SessionPropertiesEditDialog {
+		public static function display(parent:DisplayObject, xmlRetriever:XMLRetriever, referenceMgr:ReferenceManager, sessionProps:SessionProperties):SessionPropertiesEditDialog {
 			var result:SessionPropertiesEditDialog = new SessionPropertiesEditDialog();
 			PopUpManager.addPopUp(result, parent, true);
 			result.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
-				xmlRetriever.retrieveXML(eventFile.path, function(eventXML:XML):void {
-					var eventProps:EventProperties = new EventProperties(eventXML);
-					result.sessionPropsPane.eventProps = eventProps;
-					result.sessionPropsPane.sessionProps = sessionProps;
-					result.sessionPropsPane.referenceMgr = referenceMgr;
-				}, function(msg:String):void {
-					Alert.show(msg, "Could not retrieve event XML");
-				});
+				result.sessionPropsPane.referenceMgr = referenceMgr;
+				result.sessionPropsPane.sessionProps = sessionProps;
 			});
 			return result;
 		}

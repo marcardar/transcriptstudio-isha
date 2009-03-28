@@ -21,13 +21,14 @@
 package org.ishafoundation.archives.transcript.db
 {
 	import mx.controls.Alert;
+	import mx.rpc.http.HTTPService;
 	
 	import name.carter.mark.flex.exist.EXistRESTClient;
 	import name.carter.mark.flex.exist.EXistXMLRPCClient;
+	import name.carter.mark.flex.util.XMLUtils;
 	import name.carter.mark.flex.util.remote.ClientManager;
 	
 	import org.ishafoundation.archives.transcript.util.ApplicationUtils;
-	import org.ishafoundation.archives.transcript.util.IdUtils;
 	import org.ishafoundation.archives.transcript.util.PreferencesSharedObject;
 	
 	public class DatabaseManagerUsingEXist implements DatabaseManager
@@ -61,108 +62,56 @@ package org.ishafoundation.archives.transcript.db
 			});
 		}
 		
-		public function retrieveCollection(collectionPath:String, successFunction:Function, failureFunction:Function):void {
-			if (!this.loggedIn) {
-				throw new Error("Tried to find collection but not logged in");
-			}
-			new EXistXMLRPCClient(remoteMgr.getXMLRPCClient()).retrieveCollection(collectionPath, function(struct:Object):void {
-				var collectionElement:XML = createCollectionElement(struct);
-				successFunction(collectionElement);
-			}, function(msg:String):void {
-				failureFunction("Collection path could not be retrieved because: " + msg);			
-			});
-		}
-		
-		public function createCollectionElement(struct:Object):XML {
-			var collections:Array = struct.collections as Array;
-			collections.sort();
-			var documents:Array = struct.documents as Array;
-			//documents.sort();
-			var collectionPath:String = decodeURIComponent(struct.name);
-			var i:int = collectionPath.lastIndexOf("/");
-			if (i < 0) {
-				throw new Error("Illegal collection path: " + collectionPath);
-			}
-			var collectionName:String = collectionPath.substring(i + 1); 
-			var collectionElement:XML = <collection id={collectionPath} name={collectionName}/>;
-			for each (var childCollectionName:String in collections) {
-				childCollectionName = decodeURIComponent(childCollectionName);
-				var childPath:String = collectionPath + "/" + childCollectionName;
-				var childElement:XML = <collection id={childPath} name={childCollectionName}/>
-				collectionElement.appendChild(childElement);
-			}
-			var sessionFilenames:Array = appendNonSessionEntries(documents, collectionElement);
-			for each (var eventElement:XML in collectionElement.event) {
-				var added:Array = appendSessionEntries(sessionFilenames, eventElement);
-				for each (var sessionFilename:String in added) {
-					var index:int = sessionFilenames.indexOf(sessionFilename);
-					sessionFilenames.splice(index, 1);
-				}
-			}
-			if (sessionFilenames.length > 0) {
-				Alert.show("These session files do not have corresponding events: " + sessionFilenames);
-			}
-			return collectionElement;			
-		}
-		
-		/**
-		 * Returns array of session filenames.
-		 */
-		private static function appendNonSessionEntries(documents:Array, collectionElement:XML):Array {
-			var result:Array = [];
-			for each (var document:Object in documents) {
-				var filename:String = decodeURIComponent(document.name);
-				var eventId:String = IdUtils.getEventIdPrefix(filename);
-				if (eventId != null) {
-					var eventElement:XML = <event id={eventId} name={filename}/>;
-					collectionElement.appendChild(eventElement);
-					continue;
-				}
-				var sessionId:String = IdUtils.getSessionIdPrefix(filename);
-				if (sessionId != null) {
-					result.push(filename);
-					continue;
-				}
-				// this is some other file type
-				var otherId:String = collectionElement.@id.toString() + "/" + filename;
-				var otherElement:XML = <other id={otherId} name={filename}/>;
-				collectionElement.appendChild(otherElement);
-			}
-			return result;
-		}
-		
-		private static function appendSessionEntries(sessionFilenames:Array, eventElement:XML):Array {
-			var eventId:String = eventElement.@id;
-			var result:Array = []; // these session filenames are added
-			for (var i:int = 0; i < sessionFilenames.length; i++) {
-				var sessionFilename:String = sessionFilenames[i];
-				var sessionId:String = IdUtils.getSessionIdPrefix(sessionFilename);
-				if (sessionId == null) {
-					// this is not a session file
-					continue;
-				}
-				var eventIdForSessionId:String = IdUtils.getEventId(sessionId);
-				if (eventIdForSessionId == eventId) {
-					var sessionElement:XML = <session id={sessionId} name={sessionFilename}/>;
-					eventElement.appendChild(sessionElement);
-					result.push(sessionFilename);
-				}
-			}
-			return result;
-		}
-
-		public function retrieveXML(xmlPath:String, successFunction:Function, failureFunction:Function, ignoreWhitespace:Boolean = true):void {
+		public function retrieveXML(successFunc:Function, failureFunc:Function, tagName:String, id:String= null, collectionPath:String = null):void {
 			if (!this.loggedIn) {
 				throw new Error("Tried to retrieve xml but not logged in");
 			}
-			new EXistXMLRPCClient(remoteMgr.getXMLRPCClient()).retrieveXML(xmlPath, successFunction, failureFunction, ignoreWhitespace);
+			var params:Object = {tagName:tagName}
+			if (id != null) {
+				params.id = id;
+			}
+			if (collectionPath != null) {
+				params.collectionPath = collectionPath;
+			}
+			executeStoredXQuery("retrieve-xml-doc.xql", params, function(returnVal:Object):void {
+				var returnXML:XML = XMLUtils.convertToXML(returnVal, true);
+				if (returnXML.localName() == tagName) {
+					// just one element returned - perfect
+					trace("Single result returned when retrieving xml doc");
+					successFunc(returnXML);
+				}
+				else {
+					trace("Multiple results returned when retrieving xml doc");
+					var results:XMLList = returnXML.*;
+					switch (results.length()) {
+						case 1:
+							successFunc(results[0]);
+							break;
+						default:
+							var msg:String = (results.length() == 0) ? "Could not find" : "More than one"; 
+							msg += (tagName == null) ? "" : " " + tagName;
+							msg += " xml doc";
+							msg += (id == null) ? "" : " with id: " + id;
+							msg + ": ";
+							msg += results.attribute('_document-uri').toXMLString();
+							failureFunc(msg);
+							break;
+					}
+				}
+			}, failureFunc, HTTPService.RESULT_FORMAT_E4X);
 		}
 		
-		public function storeXML(xmlPath:String, xml:XML, successFunction:Function, failureFunction:Function):void {
+		public function storeXML(xml:XML, successFunc:Function, failureFunc:Function):void {
 			if (!this.loggedIn) {
-				throw new Error("Tried to store collection but not logged in");
+				throw new Error("Tried to store XML but not logged in");
 			}
-			new EXistXMLRPCClient(remoteMgr.getXMLRPCClient()).storeXML(xmlPath, xml, successFunction, failureFunction);
+			//new EXistXMLRPCClient(remoteMgr.getXMLRPCClient()).storeXML(xmlPath, xml, successFunction, failureFunction);
+			var params:Object = {xmlStr:xml.toXMLString()};
+			executeStoredXQuery("store-xml-doc.xql", params, function(id:String):void {
+				trace("Successfully stored xml doc: " + id);
+				successFunc(id);
+			}, failureFunc);
+			
 		}
 		
 		public function query(xQuery:String, args:Array, successFunc:Function, failureFunc:Function):void {
@@ -172,11 +121,11 @@ package org.ishafoundation.archives.transcript.db
 			new EXistXMLRPCClient(remoteMgr.getXMLRPCClient()).query(xQuery, args, successFunc, failureFunc);			
 		}
 		
-		public function executeStoredXQuery(xQueryFilename:String, params:Object, successFunc:Function, failureFunc:Function):void {
+		public function executeStoredXQuery(xQueryFilename:String, params:Object, successFunc:Function, failureFunc:Function, resultFormat:String = null):void {
 			if (!this.loggedIn) {
 				throw new Error("Tried to execute stored xquery but not logged in");
 			}
-			new EXistRESTClient(remoteMgr.getRESTClient()).executeStoredXQuery(DatabaseConstants.XQUERY_COLLECTION_PATH + "/" + xQueryFilename, params, successFunc, failureFunc);
+			new EXistRESTClient(remoteMgr.getRESTClient()).executeStoredXQuery(DatabaseConstants.XQUERY_COLLECTION_PATH + "/" + xQueryFilename, params, successFunc, failureFunc, resultFormat);
 		}
 
 		[Bindable]

@@ -8,6 +8,9 @@ package name.carter.mark.flex.util.remote.rest
 	import mx.rpc.events.ResultEvent;
 	import mx.rpc.http.HTTPService;
 	
+	import name.carter.mark.flex.util.Utils;
+	import name.carter.mark.flex.util.XMLUtils;
+	
 	public class RESTClient {
 		
 		private var restURL:String;
@@ -28,7 +31,7 @@ package name.carter.mark.flex.util.remote.rest
 		 * @param successFunc Takes the form successFunc(response:Object):void
 		 * @param failureFunc Takes the form failureFunc(msg:String):void
 		 */
-		public function call(path:String, params:Object, successFunc:Function, failureFunc:Function):void {
+		public function call(path:String, params:Object, successFunc:Function, failureFunc:Function, resultFormat:String = null):void {
 			var callStartTime:int = getTimer();
 
 			var httpService:HTTPService = new HTTPService();
@@ -37,6 +40,9 @@ package name.carter.mark.flex.util.remote.rest
 			if (authHeader != null) {
 				httpService.headers = new Object();
 				httpService.headers[authHeader.name] = authHeader.value;
+			}
+			if (resultFormat != null) {
+				httpService.resultFormat = resultFormat;
 			}
 			//httpService.requestTimeout = 5;
 			
@@ -51,7 +57,28 @@ package name.carter.mark.flex.util.remote.rest
 
 			httpService.addEventListener(FaultEvent.FAULT, function (evt:FaultEvent):void {
 				trace("Failed to execute REST service. Took " + (getTimer() - callStartTime) + "ms");
-				failureFunc("REST service could not be executed because: " + evt.fault.faultString);
+				var content:Object = evt.fault.content;
+				var msg:String; 
+				if (content == null) {
+					msg = evt.fault.faultString;
+				}
+				else {
+					try {
+						var contentXML:XML = XMLUtils.convertToXML(content);
+						if ((contentXML..title as XMLList).length() > 0) {
+							msg = contentXML..title.toString();
+						}
+						else {
+							msg = contentXML..message.toString();
+						}
+					}
+					catch (e:Error) {
+						// could not parse XML
+						trace("Failed to parse XML fault content: " + content);
+						msg = Utils.normalizeSpace(content.toString());
+					}
+				}
+				failureFunc("REST service failed because: " + msg);
 			});
 
 			httpService.send(params);			
