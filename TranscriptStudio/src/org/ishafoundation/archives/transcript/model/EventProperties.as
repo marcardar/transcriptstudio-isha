@@ -44,6 +44,11 @@ package org.ishafoundation.archives.transcript.model
 			return result;
 		}
 
+		public function get path():String {
+			var result:String = eventElement.attribute("_document-uri");
+			return result;
+		}
+		
 		[Bindable]
 		public function get id():String {
 			return XMLUtils.getAttributeValue(eventElement, ID_ATTR_NAME);
@@ -135,25 +140,6 @@ package org.ishafoundation.archives.transcript.model
 		
 		public function set comment(newValue:String):void {
 			XMLUtils.setAttributeValue(eventElement, COMMENT_ATTR_NAME, newValue);
-		}
-		
-		public function generateFilename():String {
-			var filename:String = id;
-			if (subTitle != null) {
-				filename += "_" + subTitle;
-			}
-			if (location != null) {
-				filename += "_" + location;
-			}
-			if (venue != null) {
-				filename += "_" + venue;
-			}
-			// replace spaces with underscores and make lower case
-			filename = filename.replace(/ /g, "-").toLowerCase();
-			// remove anything thats neither a letter, number, hypen or underscore
-			filename = filename.replace(/[^a-z0-9\-_]/g, "");
-			filename += ".xml";
-			return filename;
 		}
 	}
 }

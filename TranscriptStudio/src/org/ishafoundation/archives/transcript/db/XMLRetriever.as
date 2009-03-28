@@ -26,8 +26,12 @@ package org.ishafoundation.archives.transcript.db
 	public interface XMLRetriever
 	{
 		/*
-		 * (eg /db/ts4isha/reference.xml
+		 * For example,
+		 *
+		 * tagName: "event"
+		 * id: "20090324-n1"
+		 * collectionPath: "/db/ts4isha/data"
 		 */
-		function retrieveXML(xmlPath:String, successFunction:Function, failureFunction:Function, ignoreWhitespace:Boolean = true):void;
+		function retrieveXML(successFunc:Function, failureFunc:Function, tagName:String, id:String= null, collectionPath:String = null):void;
 	}
 }

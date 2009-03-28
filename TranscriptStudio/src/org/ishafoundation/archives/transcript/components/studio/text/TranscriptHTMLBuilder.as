@@ -164,9 +164,6 @@ package org.ishafoundation.archives.transcript.components.studio.text
 				if (child is MContent) {
 					// doesnt need to be changed
 					var text:String = (child as MContent).text;
-					if (text != StringUtil.trim(text)) {
-						throw new Error("text node is not trimmed: '" + text + "'");
-					}
 					appendText(child as MContent, parentElement);
 					currentOffset += text.length + 1; // one for the gap after the text
 				}
@@ -184,9 +181,6 @@ package org.ishafoundation.archives.transcript.components.studio.text
 		private function appendText(content:MContent, parentElement:XML):void {
 			var contentElement:XML = (content as MContent).nodeElement;
 			var text:String = content.text;
-			if (StringUtil.trim(text) != text) {
-				throw new Error("Text was not already trimmed: " + text);
-			}
 			if (contentElement.hasOwnProperty("@emphasis")) {
 				parentElement = appendChild(parentElement, <i/>);
 			}

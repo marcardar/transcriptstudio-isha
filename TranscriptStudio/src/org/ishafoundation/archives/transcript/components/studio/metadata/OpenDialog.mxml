@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Select Event" creationComplete="init()" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*">
+	<mx:Script>
+	<![CDATA[
+		import mx.rpc.http.HTTPService;
+		import org.ishafoundation.archives.transcript.db.DatabaseManagerUtils;
+		import org.ishafoundation.archives.transcript.db.XMLRetrieverStorer;
+		import org.ishafoundation.archives.transcript.db.DatabaseManager;
+		import mx.events.FlexEvent;
+		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
+		import org.ishafoundation.archives.transcript.model.ReferenceManager;
+		import org.ishafoundation.archives.transcript.db.DatabaseConstants;
+		import org.ishafoundation.archives.transcript.importer.MSWordImporter;
+		import mx.core.Container;
+		import org.ishafoundation.archives.transcript.db.XMLStorer;
+		import org.ishafoundation.archives.transcript.model.EventProperties;
+		import mx.events.PropertyChangeEvent;
+		import mx.binding.utils.ChangeWatcher;
+		import org.ishafoundation.archives.transcript.model.SessionProperties;
+		import name.carter.mark.flex.util.XMLUtils;
+		import name.carter.mark.flex.util.Utils;
+		import mx.managers.CursorManager;
+		import name.carter.mark.flex.util.Utils;
+		import mx.utils.StringUtil;
+		import name.carter.mark.flex.util.collection.HashSet;
+		import name.carter.mark.flex.util.collection.ISet;
+		import org.ishafoundation.archives.transcript.util.IdUtils;
+		import mx.formatters.DateFormatter;
+		import mx.collections.ArrayCollection;
+		import mx.formatters.DateBase;
+		import mx.controls.TextInput;
+		import mx.controls.Alert;
+		import mx.managers.PopUpManager;
+
+		public static const OPEN_SESSION_REQUEST:String = "OPEN_SESSION_REQUEST";		
+
+		/* this should really go in the dispatched event */
+		public var selectedSessionId:String;
+
+		public static function display(parent:DisplayObject, xqueryExecutor:XQueryExecutor, referenceMgr:ReferenceManager):OpenDialog {
+			var result:OpenDialog = new OpenDialog();
+			PopUpManager.addPopUp(result, parent, true);
+			result.eventSelectorPane.createEventButton.visible = false;
+			result.eventSelectorPane.createEventButton.includeInLayout = false;
+			result.eventSelectorPane.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
+				result.eventSelectorPane.xqueryExecutor = xqueryExecutor;
+				result.eventSelectorPane.referenceMgr = referenceMgr;
+			}, true);
+			return result;
+		}
+	
+		private function init():void {
+		}
+		
+		private function okClicked(evt:MouseEvent):void {
+			// look up the session props for this event
+			var openDialog:OpenDialog = this;
+			eventSelectorPane.xqueryExecutor.executeStoredXQuery("retrieve-session-props.xql", {eventId:selectedEventProps.id}, function(returnVal:XML):void {
+				var sessionPropsElements:XMLList = returnVal.*;
+				switch (sessionPropsElements.length()) {
+					case 0:
+						Alert.show("No sessions defined for this event");
+						break;
+					case 1:
+						selectedSessionId = (sessionPropsElements[0] as XML).@id
+						dispatchEvent(new Event(OPEN_SESSION_REQUEST, true));
+						openDialog.closeMe();
+						break;
+					default:
+						var dialog:SessionSelectorDialog = SessionSelectorDialog.display(openDialog, sessionPropsElements, selectedEventProps);
+						dialog.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+							// the user has selected a session
+							selectedSessionId = dialog.selectedSessionProps.id;
+							dispatchEvent(new Event(OPEN_SESSION_REQUEST, true));
+							openDialog.closeMe();
+						});						
+				}
+			}, function(msg:String):void {
+				Alert.show(msg, "Could not retrieve sessions for selected event: " + selectedEventProps.id); 
+			}, HTTPService.RESULT_FORMAT_E4X);
+		}
+		
+		private function get selectedEventProps():EventProperties {
+			return eventSelectorPane.eventsList.selectedItem as EventProperties;
+		}
+		
+		private function listDoubleClickHandler(evt:MouseEvent):void {
+			if (selectedEventProps == null) {
+				return;
+			}
+			okClicked(evt);
+		}
+		
+		private function closeMe():void {
+			PopUpManager.removePopUp(this);
+		}
+	]]>
+	</mx:Script>
+	
+	<metadata:EventSelectorPane id="eventSelectorPane" label="Select Event" width="100%" height="100%" doubleClickEnabled="true" doubleClick="{listDoubleClickHandler(event)}"/>
+	<mx:HBox id="buttonBox">
+		<mx:Button label="OK" enabled="{eventSelectorPane.eventsList.selectedItem != null}" click="okClicked(event)" />
+		<mx:Button label="Cancel" click="closeMe()"/>
+	</mx:HBox>
+	
+</mx:TitleWindow>

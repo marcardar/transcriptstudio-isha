@@ -3,9 +3,7 @@ package org.ishafoundation.archives.transcript.model
 	import mx.binding.utils.ChangeWatcher;
 	import mx.events.PropertyChangeEvent;
 	
-	import org.ishafoundation.archives.transcript.fs.EventFile;
-	import org.ishafoundation.archives.transcript.fs.File;
-	import org.ishafoundation.archives.transcript.fs.SessionFile;
+	import name.carter.mark.flex.util.XMLUtils;
 	
 	public class Session
 	{
@@ -13,22 +11,17 @@ package org.ishafoundation.archives.transcript.model
 		
 		public var sessionXML:XML;
 
-		private var sessionOrEventFile:File;
 		public var transcript:Transcript;
 		
 		[Bindable]
 		private var _unsavedChanges:Boolean;
 
-		public function Session(sessionXML:XML, username:String, sessionOrEventFile:File, referenceMgr:ReferenceManager)
+		public function Session(sessionXML:XML, username:String, referenceMgr:ReferenceManager)
 		{
 			if (sessionXML == null) {
 				throw new ArgumentError("Passed a null sessionXML");
 			}
-			if (sessionOrEventFile == null) {
-				throw new ArgumentError("Passed a null sessionOrEventFile");
-			}
 			this.sessionXML = sessionXML;
-			this.sessionOrEventFile = sessionOrEventFile;
 			this.transcript = new Transcript(sessionXML.transcript[0], referenceMgr);
 			ChangeWatcher.watch(this.transcript.mdoc, "modified", function(evt:PropertyChangeEvent):void {
 				// only care about positive changes (because negative changes are driven from outside)
@@ -42,55 +35,8 @@ package org.ishafoundation.archives.transcript.model
 			return new SessionProperties(sessionXML);
 		}
 		
-		[Bindable]
-		/**
-		 * Returns null if this session does not currently exist in the database.
-		 */	
-		public function get sessionFile():SessionFile {
-			if (sessionOrEventFile is SessionFile) {
-				return sessionOrEventFile as SessionFile;
-			}
-			else {
-				return null;
-			}
-		}
-		
-		public function set sessionFile(sessionFile:SessionFile):void {
-			this.sessionOrEventFile = sessionFile;
-		}
-		
-		public function get eventFile():EventFile {
-			if (sessionOrEventFile is EventFile) {
-				return sessionOrEventFile as EventFile;
-			}
-			else {
-				return sessionFile.getEventFile();
-			}
-		}
-		
 		public function get path():String {
-			var result:String;
-			if (sessionFile == null) {
-				var filename:String = id;
-				if (props.subTitle != null) {
-					filename += "_" + props.subTitle;
-				}
-				// replace spaces with underscores
-				filename = filename.replace(/ /g, "-").toLowerCase();
-				if (eventFile != null) {
-					var underscoreIndex:int = eventFile.name.indexOf("_");
-					if (underscoreIndex >= 0) {
-						filename += eventFile.name.substring(underscoreIndex);
-					}
-				}
-				else {
-					filename += ".xml";
-				}
-				result = eventFile.collection.path + "/" + filename;
-			}
-			else {
-				result = sessionFile.path;
-			}
+			var result:String = sessionXML.attribute("_document-uri");
 			return result;
 		}
 		
@@ -134,6 +80,10 @@ package org.ishafoundation.archives.transcript.model
 			return sessionXML.@id;
 		}
 		
+		public function set id(newValue:String):void {
+			XMLUtils.setAttributeValue(sessionXML, SessionProperties.ID_ATTR_NAME, newValue);
+		}
+		
 		[Bindable]
 		public function get unsavedChanges():Boolean {
 			return _unsavedChanges;
@@ -152,7 +102,7 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		public function reload(retrieveFunc:Function, externalSuccess:Function, externalFailure:Function):void {
-			retrieveFunc(sessionFile, externalSuccess, externalFailure);
+			retrieveFunc(sessionXML, externalSuccess, externalFailure);
 		}
 		
 	}

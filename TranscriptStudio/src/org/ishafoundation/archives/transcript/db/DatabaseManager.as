@@ -20,7 +20,7 @@
 
 package org.ishafoundation.archives.transcript.db
 {
-	public interface DatabaseManager extends CollectionRetriever, XMLRetrieverStorer, XQueryExecutor
+	public interface DatabaseManager extends XMLRetrieverStorer, XQueryExecutor
 	{
 		function get isSuperUser():Boolean; 
 	}

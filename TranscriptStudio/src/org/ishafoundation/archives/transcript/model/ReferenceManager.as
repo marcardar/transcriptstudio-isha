@@ -37,8 +37,6 @@ package org.ishafoundation.archives.transcript.model
 	 */
 	public class ReferenceManager {
 
-		public static const REFERENCE_XML_PATH:String = DatabaseConstants.REFERENCE_COLLECTION_PATH + "/reference.xml";
-		
 		private var xmlRetrieverStorer:XMLRetrieverStorer;
 		private var xqueryExecutor:XQueryExecutor;
 		[Bindable]
@@ -53,12 +51,12 @@ package org.ishafoundation.archives.transcript.model
 			BindingUtils.bindProperty(this, "isSuperUser", databaseMgr, "isSuperUser");
 		}	
 		
-		public function loadReferences(retrieveXMLSuccess:Function, retrieveXMLFailure:Function):void {
+		public function loadReferences(successFunc:Function, failureFunc:Function):void {
 			// recreate the xmlRetriever because the old one might be still in progress (not timedout)
-			this.xmlRetrieverStorer.retrieveXML(REFERENCE_XML_PATH, function(xml:XML):void {
+			DatabaseManagerUtils.retrieveReferenceXML(this.xmlRetrieverStorer, function(xml:XML):void {
 				referenceXML = xml;
-				retrieveXMLSuccess();
-			}, retrieveXMLFailure);
+				successFunc();
+			}, failureFunc);
 		}
 		
 		/**

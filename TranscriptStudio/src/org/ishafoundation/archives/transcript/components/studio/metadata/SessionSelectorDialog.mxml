@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" x="50" width="470" horizontalAlign="center" title="Select Session" creationComplete="init()" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*">
+	<mx:Script>
+	<![CDATA[
+		import name.carter.mark.flex.util.DateUtils;
+		import org.ishafoundation.archives.transcript.model.SessionProperties;
+		import org.ishafoundation.archives.transcript.model.EventProperties;
+		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
+		import mx.controls.Alert;
+		import mx.managers.PopUpManager;
+		
+		private static const MILLIS_IN_DAY:Number = 24 * 60 * 60 * 1000;
+		
+		private var startOfEventDay:Date;
+	   	
+		public static function display(parent:DisplayObject, sessionPropsElements:XMLList, eventProps:EventProperties):SessionSelectorDialog {
+			var result:SessionSelectorDialog = new SessionSelectorDialog();
+			result.startOfEventDay = result.getStartOfDay(eventProps.startAt);
+			PopUpManager.addPopUp(result, parent, true);
+			var arr:Array = [];
+			for each (var sessionPropsElement:XML in sessionPropsElements) {
+				arr.push(new SessionProperties(sessionPropsElement));
+			}
+			result.sessionList.dataProvider = arr;
+			return result;
+		}
+	
+		private function init():void {
+		}
+		
+		public function get selectedSessionProps():SessionProperties {
+			return sessionList.selectedItem as SessionProperties;
+		}
+		
+		private function okClicked(evt:MouseEvent):void {
+			closeMe();
+		}
+		
+		private function closeMe():void {
+			PopUpManager.removePopUp(this);
+		}
+
+		private function resultLabelFunc(sessionProps:SessionProperties):String {
+			var eventDay:int = getEventDay(sessionProps);
+			var result:String = "Day " + (eventDay == 0 ? "?" : eventDay) + ": ";
+			if (sessionProps.startAtIncludesTime()) {
+				result += dateFormatter.format(sessionProps.startAt) + " ";
+			}
+			if (sessionProps.subTitle != null) {
+				result += sessionProps.subTitle + " ";
+			}
+			result += "[" + sessionProps.id + "]";
+			return result;
+		}
+		
+		/**
+		 * 1-based day (0, means unknown)
+		 */
+		private function getEventDay(sessionProps:SessionProperties):int {
+			if (startOfEventDay == null || sessionProps.startAt == null) {
+				return 0;
+			}
+			// get start of day
+			var millisDiff:Number = getStartOfDay(sessionProps.startAt).getTime() - startOfEventDay.getTime();
+			if (millisDiff < 0) {
+				return 0;
+			}
+			return int(millisDiff / MILLIS_IN_DAY) + 1;
+		}
+		
+		private function getStartOfDay(date:Date):Date {
+			if (date == null) {
+				return null;
+			}
+			var result:Date = DateUtils.parseStandardDateString(startOfDayFormatter.format(date));
+			return result;
+		} 
+	]]>
+	</mx:Script>
+
+	<mx:DateFormatter id="startOfDayFormatter" formatString="YYYY-MM-DD"/>
+	<mx:DateFormatter id="dateFormatter" formatString="hh:mm"/>
+	<mx:List id="sessionList" width="100%" labelFunction="{resultLabelFunc}"/>
+	<mx:HBox id="buttonBox">
+		<mx:Button id="okButton" label="OK" enabled="{sessionList.selectedItem != null}" click="okClicked(event)" />
+		<mx:Button label="Cancel" click="closeMe()"/>
+	</mx:HBox>
+	
+</mx:TitleWindow>

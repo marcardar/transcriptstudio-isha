@@ -23,7 +23,7 @@ package org.ishafoundation.archives.transcript.db
 	import org.ishafoundation.archives.transcript.model.ReferenceManager;
 	import org.ishafoundation.archives.transcript.util.Utils;
 	
-	public class DatabaseManagerDemo implements DatabaseManager
+	public class DatabaseManagerDemo
 	{		
 		[Embed("/../samples/reference.xml", mimeType="application/octet-stream")]
 		private static const referenceXMLClass:Class;
