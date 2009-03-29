@@ -2,6 +2,7 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()">
 	<mx:Script>
 	<![CDATA[
+		import mx.core.Container;
 		import mx.core.ScrollPolicy;
 		import name.carter.mark.flex.util.Utils;
 		import mx.formatters.DateFormatter;
@@ -90,7 +91,7 @@
 				eventsList.selectedItem = null;
 				return;
 			}
-			Alert.show("Not yet implemented: auto event selection");
+			showAlert("Not yet implemented: auto event selection");
 		}
 		
 		private function searchCriteriaChanged():void {
@@ -98,6 +99,7 @@
 		}
 		
 		public function searchClicked():void {
+			var thisPane:Container = this;
 			this.xqueryExecutor.executeStoredXQuery("event-search.xql", {eventType:eventTypeComboBox.selectedItem, year:yearComboBox.selectedItem.toString(), yearType:yearTypeComboBox.selectedItem, country:countryComboBox.selectedItem}, function(resultXML:XML):void {
 				var eventXMLList:XMLList = resultXML.event;
 				var arr:Array = []
@@ -107,14 +109,14 @@
 				}
 				eventsList.dataProvider = arr;
 				if (arr.length == 0) {
-					Alert.show("No events found");
+					showAlert("No events found");
 				}
 				eventsList.enabled = true;
 				callLater(function():void {
 					eventsList.maxHorizontalScrollPosition = eventsList.measureWidthOfItems() - eventsList.width + 5;
 				});				
 			}, function(msg:String):void {
-				Alert.show(msg, "Search failed");
+				showAlert(msg, "Search failed");
 			}, HTTPService.RESULT_FORMAT_E4X);
 		}
 		
@@ -134,6 +136,10 @@
 			}
 			result += "[" + eventProps.id + "]";
 			return result;
+		}
+		
+		private function showAlert(msg:String, title:String = null):void {
+			Alert.show(msg, title, 0x4, this);			
 		}
 	]]>
 	</mx:Script>

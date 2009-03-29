@@ -149,7 +149,7 @@
 					var sessionId:String = popup.selectedSessionId;
 					// first update the reference file - continue even if it fails
 					reloadReferencesBeforeContinuing(function():void {
-						sessionMgr.retrieveSession(sessionId, null, openSessionSuccess, openSessionFailure);
+						sessionMgr.retrieveSession(sessionId, openSessionSuccess, openSessionFailure);
 					});					
 				});
 			}
@@ -169,7 +169,7 @@
 					DatabaseManagerUtils.retrieveEventXML(eventId, databaseMgr, function(eventXML:XML):void {
 						var eventProps:EventProperties = new EventProperties(eventXML);
 						reloadReferencesBeforeContinuing(function():void {
-							sessionMgr.retrieveSession(sessionId, null, function(session:Session):void {
+							sessionMgr.retrieveSession(sessionId, function(session:Session):void {
 								openSessionSuccess(session);
 								// the nodeId might refer to a markup or something
 								if (nodeId.length > 0) {
@@ -273,7 +273,7 @@
 			
 			private function reloadTranscript():void {
 				var reloadTranscriptFunction:Function = function():void {
-					session.reload(sessionMgr.retrieveSession, openSessionSuccess, openSessionFailure);
+					sessionMgr.retrieveSession(session.id, openSessionSuccess, openSessionFailure);
 				}
 				// first update the reference file - continue even if it fails
 				referenceMgr.loadReferences(reloadTranscriptFunction, function(msg:String):void {
@@ -343,10 +343,13 @@
 				var thisPanel:MainPanel = this;
 				var popup:ImportWizard = new ImportWizard();
 				popup.addEventListener(ImportWizard.OK_CLICKED, function(event:Event):void {
-					session = sessionMgr.createSession(popup.sessionXML, popup.eventProps);
-					transcriptPane.transcript = session.transcript;
-					status = "Successfully imported transcript";
-					updateTitle();
+					session = sessionMgr.createSession(popup.sessionXML, function():void {
+						Alert.show("Successfully created and saved session: " + session.id);
+						transcriptPane.transcript = session.transcript;
+						updateTitle();
+					}, function(msg:String):void {
+						Alert.show(msg, "Failed to create session");
+					});
 				});
 				popup.databaseMgr = databaseMgr;
 				popup.referenceMgr = referenceMgr;
