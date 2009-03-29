@@ -33,11 +33,11 @@
 			private static const flexSdkVersion:String = mx_internal::VERSION;
 			private static const flashPlayerVersion:String = Capabilities.version + " (" + Capabilities.playerType + (Capabilities.isDebugger ? " Debug" : "") + ")";
 			
-			private static const message:String = "<br/>Written for the Isha Foundation.<br/><br/>Main Contributors: Mark Carter, Swami Kevala.<br/><br/>Please visit the website for more details:<br/><br/><u><a href='" + ApplicationUtils.getApplicationWebsite() + "'>" + ApplicationUtils.getApplicationWebsite() + "</a></u>";
+			private static const message:String = "<br/>Written for the Isha Foundation.<br/><br/>Main Contributors: Mark Carter, Swami Kevala.<br/><br/>Please visit the website for more details:<br/><br/><u><a href='" + ApplicationUtils.getApplicationWebsite() + "' target='_blank'>" + ApplicationUtils.getApplicationWebsite() + "</a></u>";
 
 			private var databaseURL:String = DatabaseConstants.EXIST_URL;
 			[Bindable]
-			private var databaseUrlHTML:String = "<u><a href='" + databaseURL + "'>" + databaseURL + "</a></u>";
+			private var databaseUrlHTML:String = "<u><a href='" + databaseURL + "' target='_blank'>" + databaseURL + "</a></u>";
 			[Bindable]
 			private var databaseUsername:String = DatabaseConstants.EXIST_USERNAME;
 		]]>
