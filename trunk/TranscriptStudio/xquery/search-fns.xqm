@@ -2,7 +2,7 @@ xquery version "1.0";
 
 module namespace search-fns = "http://www.ishafoundation.org/ts4isha/xquery/search-fns";
 
-declare variable $search-fns:maxTextChars := 560;
+declare variable $search-fns:maxTextChars := 550;
 
 (: $defaultType is either "markup", "text" or "event" :)
 declare function search-fns:main($searchString as xs:string, $defaultType as xs:string) as element()*
@@ -261,6 +261,7 @@ declare function search-fns:markup-as-table-row($markup as element()) as element
 				<td colspan="2"><div class="result-body">
 					{substring($text, 0, $search-fns:maxTextChars)} 
 					{if (string-length($text) > $search-fns:maxTextChars) then '...' else ()}
+					{search-fns:get-node-uuid-text($session/@id, $markup/@id)}
 				</div></td>
 			</tr>
 			<tr>
@@ -306,7 +307,8 @@ declare function search-fns:segment-as-table-row($segment as element()) as eleme
 			<div class="result-body">
 			{
 				concat(substring($text, 0, $search-fns:maxTextChars), 
-				if (string-length($text) > $search-fns:maxTextChars) then "..." else ())
+				if (string-length($text) > $search-fns:maxTextChars) then "..." else ()),
+				search-fns:get-node-uuid-text($session/@id, $segment/@id)
 			}
 			</div>
 			<div class="result-footer">
@@ -314,6 +316,12 @@ declare function search-fns:segment-as-table-row($segment as element()) as eleme
 				{search-fns:get-html-word-links($session/@id)}
 			</div>
 		</div>
+};
+
+(: returns something like " (20090329-n1-1-1815#o13)" :)
+declare function search-fns:get-node-uuid-text($sessionId as xs:string, $nodeId as xs:string) as element()
+{
+	<i><b>{concat(' (', $sessionId, '#', $nodeId, ')')}</b></i>
 };
 
 declare function search-fns:event-as-table-row($event as element()) as element()
