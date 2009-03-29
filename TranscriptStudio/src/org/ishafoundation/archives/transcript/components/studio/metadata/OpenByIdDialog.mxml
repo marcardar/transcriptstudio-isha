@@ -33,12 +33,6 @@
 		private function closeMe():void {
         	PopUpManager.removePopUp(this);
 		}
-		
-		private static function isValidId(id:String):Boolean {
-			// TODO: implement this properly later
-			var idAsPrefix:String = Utils.normalizeSpace(id).substr(0, 17) + ".";
-			return IdUtils.getSessionIdPrefix(idAsPrefix) != null
-		}		
     ]]>
 	</mx:Script>
 	<mx:TextInput id="idTextInput" width="200" restrict="a-z0-9\-" enter="okButton.dispatchEvent(new MouseEvent(MouseEvent.CLICK))"/>

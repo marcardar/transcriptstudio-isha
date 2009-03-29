@@ -62,11 +62,14 @@ package org.ishafoundation.archives.transcript.db
 			});
 		}
 		
-		public function retrieveXML(successFunc:Function, failureFunc:Function, tagName:String, id:String= null, collectionPath:String = null):void {
+		public function retrieveXML(successFunc:Function, failureFunc:Function, tagName:String, id:String = null, collectionPath:String = null):void {
 			if (!this.loggedIn) {
 				throw new Error("Tried to retrieve xml but not logged in");
 			}
-			var params:Object = {tagName:tagName}
+			var params:Object = {}
+			if (tagName != null) {
+				params.tagName = tagName;
+			}
 			if (id != null) {
 				params.id = id;
 			}

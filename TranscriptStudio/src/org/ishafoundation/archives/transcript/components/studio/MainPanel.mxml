@@ -39,7 +39,6 @@
 			import org.ishafoundation.archives.transcript.model.SessionManager;
 			import org.ishafoundation.archives.transcript.model.ReferenceManager;
 			import mx.managers.PopUpManager;
-			import org.ishafoundation.archives.transcript.util.IdUtils;
 			import name.carter.mark.flex.project.mdoc.*;
 			import org.ishafoundation.archives.transcript.components.studio.media.MediaPlayerDialog;
 			import org.ishafoundation.archives.transcript.components.studio.importer.ImportWizard;
@@ -155,17 +154,21 @@
 			}
 			
 			private function showRetrieveTranscriptByIdDialog():void {
-				var popup:OpenByIdDialog = new OpenByIdDialog();
+			/*	var popup:OpenByIdDialog = new OpenByIdDialog();
 				PopUpManager.addPopUp(popup, this, true);
 				popup.okButton.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void {
-					var sessionId:String = IdUtils.getSessionIdPrefix(popup.enteredId);
-					if (sessionId == null) {
-						Alert.show(popup.enteredId, "Invalid Session ID");
-						return;
-					}
-					trace("Retrieving transcript using id: " + sessionId);
-					var nodeId:String = popup.enteredId.substring(sessionId.length + 1);
-					var eventId:String = IdUtils.getEventId(sessionId);
+					trace("Retrieving event/session using id: " + popup.enteredId);
+					// id is of the form: <event/session id>[#<markup/paragraph id>] (i.e. the last part is optional)
+					// examples: 20090329-n1-1-1800, 20090329-n1-1-1800#p12
+					var hashIndex:int = popup.enteredId.indexOf('#');
+					var docId:String = hashIndex < 0 ? popup.enteredId : popup.enteredId.substring(0, hashIndex);
+					databaseMgr.retrieveXML(docId, function(xml:XML):void {
+						if (xml.localName() == "event") {
+							SessionSelectorDialog.display(
+						}
+					}, function(msg:String):void {
+						Alert.show(msg, "Could not retrieve event metadata corresponding to session: " + sessionId);						
+					});
 					DatabaseManagerUtils.retrieveEventXML(eventId, databaseMgr, function(eventXML:XML):void {
 						var eventProps:EventProperties = new EventProperties(eventXML);
 						reloadReferencesBeforeContinuing(function():void {
@@ -188,9 +191,8 @@
 							}, openSessionFailure);
 						});
 					}, function(msg:String):void {
-						Alert.show(msg, "Could not retrieve event metadata corresponding to session: " + sessionId);
 					});
-				});
+				});*/
 			}
 			
 			private function collectionTreeFailed(msg:String):void {

@@ -1,8 +1,8 @@
 package org.ishafoundation.archives.transcript.model
 {
-	import name.carter.mark.flex.util.XMLUtils;
+	import mx.utils.StringUtil;
 	
-	import org.ishafoundation.archives.transcript.util.IdUtils;
+	import name.carter.mark.flex.util.XMLUtils;
 	
 	public class SessionProperties
 	{
@@ -25,7 +25,7 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		public function set id(newValue:String):void {
-			if (!IdUtils.isValidSessionId(newValue)) {
+			if (newValue == null || StringUtil.trim(newValue).length == 0) {
 				throw new Error("Passed an invalid session id: " + newValue);
 			} 
 			XMLUtils.setAttributeValue(sessionElement, ID_ATTR_NAME, newValue);

@@ -13,7 +13,6 @@
 		import mx.utils.StringUtil;
 		import mx.formatters.DateBase;
 		import name.carter.mark.flex.util.Utils;
-		import org.ishafoundation.archives.transcript.util.IdUtils;
 		import name.carter.mark.flex.util.XMLUtils;
 		import mx.collections.ArrayCollection;
 		

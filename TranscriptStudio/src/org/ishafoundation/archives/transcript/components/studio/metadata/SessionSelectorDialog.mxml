@@ -2,6 +2,7 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" x="50" width="470" horizontalAlign="center" title="Select Session" creationComplete="init()" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*">
 	<mx:Script>
 	<![CDATA[
+		import mx.rpc.http.HTTPService;
 		import name.carter.mark.flex.util.DateUtils;
 		import org.ishafoundation.archives.transcript.model.SessionProperties;
 		import org.ishafoundation.archives.transcript.model.EventProperties;
@@ -13,7 +14,7 @@
 		
 		private var startOfEventDay:Date;
 	   	
-		public static function display(parent:DisplayObject, sessionPropsElements:XMLList, eventProps:EventProperties):SessionSelectorDialog {
+		public static function display(sessionPropsElements:XMLList, eventProps:EventProperties, parent:DisplayObject):SessionSelectorDialog {
 			var result:SessionSelectorDialog = new SessionSelectorDialog();
 			result.startOfEventDay = result.getStartOfDay(eventProps.startAt);
 			PopUpManager.addPopUp(result, parent, true);
@@ -23,6 +24,31 @@
 			}
 			result.sessionList.dataProvider = arr;
 			return result;
+		}
+	
+		public static function displayIfNecessary(eventProps:EventProperties, parent:DisplayObject, xqueryExecutor:XQueryExecutor, successFunc:Function):void {
+			xqueryExecutor.executeStoredXQuery("retrieve-session-props.xql", {eventId:eventProps.id}, function(returnVal:XML):void {
+				var sessionPropsElements:XMLList = returnVal.*;
+				switch (sessionPropsElements.length()) {
+					case 0:
+						Alert.show("No sessions defined for this event");
+						//successFunc(null);
+						break;
+					case 1:
+						var sessionId:String = (sessionPropsElements[0] as XML).@id;
+						successFunc(sessionId);
+						break;
+					default:
+						var dialog:SessionSelectorDialog = display(sessionPropsElements, eventProps, parent);
+						dialog.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+							// the user has selected a session
+							var sessionId:String = dialog.selectedSessionProps.id;
+							successFunc(sessionId);
+						});						
+				}
+			}, function(msg:String):void {
+				Alert.show(msg, "Could not retrieve sessions for selected event: " + eventProps.id); 
+			}, HTTPService.RESULT_FORMAT_E4X);			
 		}
 	
 		private function init():void {
