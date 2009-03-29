@@ -67,6 +67,11 @@ package org.ishafoundation.archives.transcript.model
 				externalFailure(msg);			
 			});
 		}
+		
+		public function openSession(sessionXML:XML):Session {
+			trace("Opening session based on session XML already in memory");
+			return new Session(sessionXML, username, referenceMgr);
+		}
 			
 		public function storeTranscript(session:Session, externalSuccess:Function, externalFailure:Function):void {
 			if (session.id == null) {

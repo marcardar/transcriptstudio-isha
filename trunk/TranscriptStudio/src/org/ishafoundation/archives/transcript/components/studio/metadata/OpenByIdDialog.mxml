@@ -22,7 +22,7 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:collectionNS="org.ishafoundation.archives.transcript.components.studio.collection.*" title="Enter ID..." x="10" y="10" alpha="2.0" layout="vertical" horizontalAlign="center" creationComplete="idTextInput.setFocus()">
 	<mx:Script>
     <![CDATA[
-    	import org.ishafoundation.archives.transcript.util.IdUtils;
+    	import mx.utils.StringUtil;
     	import name.carter.mark.flex.util.Utils;
        	import mx.managers.PopUpManager;
        	
@@ -30,14 +30,14 @@
        		return idTextInput.text;
        	}
        	
-		private function closeMe():void {
+		public function closeMe():void {
         	PopUpManager.removePopUp(this);
 		}
     ]]>
 	</mx:Script>
-	<mx:TextInput id="idTextInput" width="200" restrict="a-z0-9\-" enter="okButton.dispatchEvent(new MouseEvent(MouseEvent.CLICK))"/>
+	<mx:TextInput id="idTextInput" width="200" restrict="a-z0-9\-#" enter="okButton.dispatchEvent(new MouseEvent(MouseEvent.CLICK))"/>
 	<mx:HBox width="100%" horizontalAlign="center">
-		<mx:Button id="okButton" label="OK" click="closeMe()" enabled="{isValidId(idTextInput.text)}"/>
+		<mx:Button id="okButton" label="OK" enabled="{StringUtil.trim(idTextInput.text).length != 0}"/>
 		<mx:Button label="Cancel" click="closeMe()"/>		
 	</mx:HBox>		
 </mx:TitleWindow>

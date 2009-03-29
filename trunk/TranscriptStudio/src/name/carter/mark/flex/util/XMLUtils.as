@@ -393,6 +393,9 @@ package name.carter.mark.flex.util
 		}
 		
 		public static function convertToXML(obj:Object, ignoreWhitespace:Boolean = true):XML {
+			if (obj == null || (obj is String && StringUtil.trim(obj.toString()).length == 0)) {
+				return null;
+			}
 			var oldIgnoreWhitespace:Boolean = XML.ignoreWhitespace;
 			XML.ignoreWhitespace = ignoreWhitespace;
 			var result:XML = new XML(obj);
