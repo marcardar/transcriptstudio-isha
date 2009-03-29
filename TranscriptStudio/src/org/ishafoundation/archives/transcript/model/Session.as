@@ -101,9 +101,5 @@ package org.ishafoundation.archives.transcript.model
 			transcript.populateCommittedMarkupPropsMap();
 		}
 		
-		public function reload(retrieveFunc:Function, externalSuccess:Function, externalFailure:Function):void {
-			retrieveFunc(sessionXML, externalSuccess, externalFailure);
-		}
-		
 	}
 }

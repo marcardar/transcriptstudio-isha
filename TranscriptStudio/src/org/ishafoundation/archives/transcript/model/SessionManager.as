@@ -24,6 +24,8 @@ package org.ishafoundation.archives.transcript.model
 {
 	import flash.events.EventDispatcher;
 	
+	import mx.utils.StringUtil;
+	
 	import name.carter.mark.flex.project.mdoc.MContent;
 	import name.carter.mark.flex.project.mdoc.MNode;
 	import name.carter.mark.flex.util.XMLUtils;
@@ -43,13 +45,19 @@ package org.ishafoundation.archives.transcript.model
 			this.xmlRetrieverStorer = xmlRetrieverStorer;
 		}
 		
-		public function createSession(sessionXML:XML, eventProps:EventProperties):Session {
+		public function createSession(sessionXML:XML, successFunc:Function, failureFunc:Function):Session {
 			var result:Session = new Session(sessionXML, username, referenceMgr);
 			result.unsavedChanges = true; // need to save all this stuff			
+			storeTranscript(result, function():void {
+				successFunc();
+			}, failureFunc);
 			return result;
 		} 
 		
-		public function retrieveSession(sessionId:String, eventProps:EventProperties, externalSuccess:Function, externalFailure:Function):void {
+		public function retrieveSession(sessionId:String, externalSuccess:Function, externalFailure:Function):void {
+			if (sessionId == null || StringUtil.trim(sessionId).length == 0) {
+				throw new Error("Passed a blank sessionId");
+			}
 			DatabaseManagerUtils.retrieveSessionXML(sessionId, xmlRetrieverStorer, function(sessionXML:XML):void {
 				trace("Successfully retrieved session");
 				var session:Session = new Session(sessionXML, username, referenceMgr);
@@ -64,19 +72,16 @@ package org.ishafoundation.archives.transcript.model
 			if (session.id == null) {
 				throw new Error("Tried to store session but either the collection or transcript id was not set");
 			}
-			if (session.unsavedChanges) {
-				setActionAttributes(session);
-				xmlRetrieverStorer.storeXML(session.sessionXML, function(sessionId:String):void {
-					trace("Successfully saved transcript");
-					session.id = sessionId;
-					session.unsavedChanges = false;
-					externalSuccess();
-				}, externalFailure);
+			if (!session.unsavedChanges) {
+				throw new Error("There were no unsaved changes");				
 			}
-			else {
-				// nothing needed to be saved, so this was successful!
+			setActionAttributes(session);
+			xmlRetrieverStorer.storeXML(session.sessionXML, function(sessionId:String):void {
+				trace("Successfully saved transcript");
+				session.id = sessionId;
+				session.unsavedChanges = false;
 				externalSuccess();
-			}				
+			}, externalFailure);
 		}
 		
 		private function setActionAttributes(session:Session):void {

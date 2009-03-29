@@ -2,34 +2,20 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="{getTitle(viewstack.selectedChild)}" creationComplete="init()" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*" xmlns:importer="org.ishafoundation.archives.transcript.components.studio.importer.*">
 	<mx:Script>
 	<![CDATA[
+		import mx.managers.PopUpManager;
 		import org.ishafoundation.archives.transcript.components.studio.metadata.EventPropertiesPane;
+		import mx.managers.CursorManager;
+		import mx.controls.Alert;
 		import org.ishafoundation.archives.transcript.components.studio.metadata.EventPropertiesCreateDialog;
-		import org.ishafoundation.archives.transcript.db.DatabaseManager;
-		import mx.messaging.management.Attribute;
-		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
-		import org.ishafoundation.archives.transcript.model.ReferenceManager;
-		import org.ishafoundation.archives.transcript.db.DatabaseConstants;
-		import org.ishafoundation.archives.transcript.importer.MSWordImporter;
-		import mx.core.Container;
-		import org.ishafoundation.archives.transcript.db.XMLStorer;
+		import org.ishafoundation.archives.transcript.model.SessionProperties;
 		import org.ishafoundation.archives.transcript.model.EventProperties;
+		import org.ishafoundation.archives.transcript.importer.MSWordImporter;
+		import org.ishafoundation.archives.transcript.model.ReferenceManager;
+		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
+		import org.ishafoundation.archives.transcript.db.DatabaseManager;
+		import mx.core.Container;
 		import mx.events.PropertyChangeEvent;
 		import mx.binding.utils.ChangeWatcher;
-		import org.ishafoundation.archives.transcript.model.SessionProperties;
-		import name.carter.mark.flex.util.XMLUtils;
-		import name.carter.mark.flex.util.Utils;
-		import mx.managers.CursorManager;
-		import name.carter.mark.flex.util.Utils;
-		import mx.utils.StringUtil;
-		import name.carter.mark.flex.util.collection.HashSet;
-		import name.carter.mark.flex.util.collection.ISet;
-		import org.ishafoundation.archives.transcript.util.IdUtils;
-		import mx.formatters.DateFormatter;
-		import mx.collections.ArrayCollection;
-		import mx.formatters.DateBase;
-		import mx.controls.TextInput;
-		import mx.controls.Alert;
-		import mx.managers.PopUpManager;
 		
 		public static const OK_CLICKED:String = "OK_CLICKED";
 		
