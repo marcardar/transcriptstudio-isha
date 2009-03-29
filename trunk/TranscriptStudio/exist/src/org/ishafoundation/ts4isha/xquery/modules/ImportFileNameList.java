@@ -85,6 +85,10 @@ public class ImportFileNameList extends BasicFunction
 		LOG.debug( "Found: " + files.length );
 		
 		for( int j = 0; j < files.length; j++ ) {
+			// don't want to include any of the Word temp files
+			if (files[j].getName().indexOf("~") == 0) {
+				continue;
+			}
 			LOG.debug( "Found: " + files[j].getAbsolutePath() );
 			
 			String relPath = files[j].toString().substring( baseDir.toString().length() + 1 );
