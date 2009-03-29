@@ -15,7 +15,7 @@ Here we define the format of UUIDs for the various entities. These UUIDs provide
   * grouping: by event type within date
   * examples:
     * 20090319-d1
-    * xxxxxxxx-n124 (this means there are probably at least 124 intro talks on an unknown date)
+    * 00000000-n124 (this means there are probably at least 124 intro talks on an unknown date)
 
 ===<8-digit date when event started> (e.g. 20090319)===
 
@@ -26,8 +26,8 @@ Here we define the format of UUIDs for the various entities. These UUIDs provide
   * grouping: n/a
   * examples:
     * 20090319 (if date known)
-    * xxxxxxxx (if date not known)
-    * 2009xxxx (if only year known)
+    * 00000000 (if date not known)
+    * 20090000 (if only year known)
 
 ===<event id unique within date> (e.g. n1)===
 
@@ -53,31 +53,31 @@ Here we define the format of UUIDs for the various entities. These UUIDs provide
   * grouping: n/a
   * examples:
     * 20090319-n1-1-1800 (session starting at 6:30pm on first day)
-    * 20090319-n1-x-13 (13th session where the day is unknown)
+    * 20090319-n1-0-0013 (13th session where the day is unknown)
 
 ===<day within event> (e.g. 1)===
 
   * aim: provide easy way to tell which day (of the event) the session started on
-  * format: integer (1=first day, x=unknown day)
+  * format: integer (1=first day, 0=unknown day)
   * fixed width: no
   * order: chronological (but only if less than 10 days in event - very rare)
   * grouping: n/a
   * notes: for most events we either know all the "day" values or none of them.  If we have a situation where we know some of them then the order will be messed up...
   * examples:
     * 1 (first day)
-    * x (unknown day)
+    * 0 (unknown day)
 
 ===<session start time> (e.g. 1830) ===
 
   * aim: provide ordering for sessions within a day and also information about time of day
   * format: hhmm
   * fixed-width (when time known): yes(4)
-  * fixed-width (when time unknown): yes(2)
+  * fixed-width (when time unknown): yes(4)
   * order: chronological order (unless there is a mixture of known and unknown times)
   * grouping: n/a
   * examples:
     * 1830 (session starts at 6:30pm)
-    * 03 (unknown session start time)
+    * 0003 (unknown session start time)
 
 ----
 
@@ -91,7 +91,7 @@ device/person, then order by time taken
   * notes: Important to note that the first two components together (e.g. 200903190-n1 are NOT the event id)
   * examples:
     * 20090319-n1-v1-183059 (a video clip taken at 18:30:59 on 19 March 2009, using the main camera while capturing some intro talk session)
-    * xxxxxxxx-y2-i0-000125 (nothing known about when the photo was taken, or by whom, but final component may indicate that the original media id was y125...)
+    * 00000000-y2-i0-000125 (nothing known about when the photo was taken, or by whom, but final component may indicate that the original media id was y125...)
 
 ===<8-digit date when collection started>===
 
@@ -103,8 +103,8 @@ device/person, then order by time taken
   * notes: in nearly all cases this will be the same as the date the shot was taken. However, its important we do it this way because otherwise listing the UUIDs in order could lead to some collections being separated into multiple groups.
   * examples:
     * 20090319 (if date known)
-    * xxxxxxxx (if date not known)
-    * 2009xxxx (if only year known)
+    * 00000000 (if date not known)
+    * 20090000 (if only year known)
 
 ===<collection id within date (e.g. n1)>===
 
