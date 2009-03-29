@@ -5,6 +5,7 @@ module namespace event-panel = "http://www.ishafoundation.org/ts4isha/xquery/eve
 declare namespace request = "http://exist-db.org/xquery/request";
 declare namespace util = "http://exist-db.org/xquery/util";
 
+import module namespace search-fns = "http://www.ishafoundation.org/ts4isha/xquery/search-fns" at "search-fns.xqm";
 import module namespace transform = "http://exist-db.org/xquery/transform";
 
 declare function event-panel:transformToXHTML($event as element()) as element()
@@ -29,7 +30,7 @@ declare function event-panel:main() as element()*
 		(
 			event-panel:transformToXHTML($event)
 		,
-			let $sessions := xcollection(util:collection-name($event))/session[starts-with(@id, string-join($eventId, '-'))]
+			let $sessions := search-fns:get-sessions-for-event-ids($eventId)
 			return
 				if (exists($sessions)) then
 				(
