@@ -8,7 +8,6 @@
 		import name.carter.mark.flex.util.collection.ISet;
 		import mx.utils.StringUtil;
 		import mx.formatters.DateBase;
-		import org.ishafoundation.archives.transcript.util.IdUtils;
 		import name.carter.mark.flex.util.Utils;
 		import name.carter.mark.flex.util.XMLUtils;
 		import mx.collections.ArrayCollection;

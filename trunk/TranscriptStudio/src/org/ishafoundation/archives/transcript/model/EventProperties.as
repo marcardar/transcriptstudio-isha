@@ -1,8 +1,8 @@
 package org.ishafoundation.archives.transcript.model
 {
-	import name.carter.mark.flex.util.XMLUtils;
+	import mx.utils.StringUtil;
 	
-	import org.ishafoundation.archives.transcript.util.IdUtils;
+	import name.carter.mark.flex.util.XMLUtils;
 	
 	public class EventProperties
 	{
@@ -55,8 +55,8 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		public function set id(newValue:String):void {
-			if (!IdUtils.isValidEventId(newValue)) {
-				throw new Error("Passed an invalid event id: " + newValue);
+			if (newValue == null || StringUtil.trim(newValue).length == 0) {
+				throw new Error("Passed a blank event id");
 			} 
 			XMLUtils.setAttributeValue(eventElement, ID_ATTR_NAME, newValue);
 		}

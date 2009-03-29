@@ -21,7 +21,6 @@
 		import mx.utils.StringUtil;
 		import name.carter.mark.flex.util.collection.HashSet;
 		import name.carter.mark.flex.util.collection.ISet;
-		import org.ishafoundation.archives.transcript.util.IdUtils;
 		import mx.formatters.DateFormatter;
 		import mx.collections.ArrayCollection;
 		import mx.formatters.DateBase;

@@ -24,7 +24,6 @@
 		import mx.utils.StringUtil;
 		import name.carter.mark.flex.util.collection.HashSet;
 		import name.carter.mark.flex.util.collection.ISet;
-		import org.ishafoundation.archives.transcript.util.IdUtils;
 		import mx.formatters.DateFormatter;
 		import mx.collections.ArrayCollection;
 		import mx.formatters.DateBase;
@@ -53,31 +52,11 @@
 		}
 		
 		private function okClicked(evt:MouseEvent):void {
-			// look up the session props for this event
-			var openDialog:OpenDialog = this;
-			eventSelectorPane.xqueryExecutor.executeStoredXQuery("retrieve-session-props.xql", {eventId:selectedEventProps.id}, function(returnVal:XML):void {
-				var sessionPropsElements:XMLList = returnVal.*;
-				switch (sessionPropsElements.length()) {
-					case 0:
-						Alert.show("No sessions defined for this event");
-						break;
-					case 1:
-						selectedSessionId = (sessionPropsElements[0] as XML).@id
-						dispatchEvent(new Event(OPEN_SESSION_REQUEST, true));
-						openDialog.closeMe();
-						break;
-					default:
-						var dialog:SessionSelectorDialog = SessionSelectorDialog.display(openDialog, sessionPropsElements, selectedEventProps);
-						dialog.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
-							// the user has selected a session
-							selectedSessionId = dialog.selectedSessionProps.id;
-							dispatchEvent(new Event(OPEN_SESSION_REQUEST, true));
-							openDialog.closeMe();
-						});						
-				}
-			}, function(msg:String):void {
-				Alert.show(msg, "Could not retrieve sessions for selected event: " + selectedEventProps.id); 
-			}, HTTPService.RESULT_FORMAT_E4X);
+			SessionSelectorDialog.displayIfNecessary(selectedEventProps, this, eventSelectorPane.xqueryExecutor, function(sessionId:String):void {
+				selectedSessionId = sessionId;
+				dispatchEvent(new Event(OPEN_SESSION_REQUEST, true));
+				closeMe();
+			});
 		}
 		
 		private function get selectedEventProps():EventProperties {
