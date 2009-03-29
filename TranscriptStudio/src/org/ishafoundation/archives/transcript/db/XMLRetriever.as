@@ -32,6 +32,6 @@ package org.ishafoundation.archives.transcript.db
 		 * id: "20090324-n1"
 		 * collectionPath: "/db/ts4isha/data"
 		 */
-		function retrieveXML(successFunc:Function, failureFunc:Function, tagName:String, id:String= null, collectionPath:String = null):void;
+		function retrieveXML(successFunc:Function, failureFunc:Function, tagName:String = null, id:String= null, collectionPath:String = null):void;
 	}
 }

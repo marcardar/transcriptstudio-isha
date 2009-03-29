@@ -62,7 +62,7 @@ package org.ishafoundation.archives.transcript.db
 			});
 		}
 		
-		public function retrieveXML(successFunc:Function, failureFunc:Function, tagName:String, id:String = null, collectionPath:String = null):void {
+		public function retrieveXML(successFunc:Function, failureFunc:Function, tagName:String = null, id:String = null, collectionPath:String = null):void {
 			if (!this.loggedIn) {
 				throw new Error("Tried to retrieve xml but not logged in");
 			}
@@ -78,28 +78,32 @@ package org.ishafoundation.archives.transcript.db
 			}
 			executeStoredXQuery("retrieve-xml-doc.xql", params, function(returnVal:Object):void {
 				var returnXML:XML = XMLUtils.convertToXML(returnVal, true);
-				if (returnXML.localName() == tagName) {
-					// just one element returned - perfect
-					trace("Single result returned when retrieving xml doc");
-					successFunc(returnXML);
+				if (returnXML == null) {
+					successFunc(null);
+					return;
+				}
+				var items:XMLList;
+				if (returnXML.localName() == "result") {
+					items = returnXML.*;
 				}
 				else {
-					trace("Multiple results returned when retrieving xml doc");
-					var results:XMLList = returnXML.*;
-					switch (results.length()) {
-						case 1:
-							successFunc(results[0]);
-							break;
-						default:
-							var msg:String = (results.length() == 0) ? "Could not find" : "More than one"; 
-							msg += (tagName == null) ? "" : " " + tagName;
-							msg += " xml doc";
-							msg += (id == null) ? "" : " with id: " + id;
+					items = new XMLList(returnXML);
+				}
+				switch (items.length()) {
+					case 1:
+						successFunc(items[0]);
+						break;
+					default:
+						var msg:String = (items.length() == 0) ? "Could not find" : "More than one"; 
+						msg += (tagName == null) ? "" : " " + tagName;
+						msg += " xml doc";
+						msg += (id == null) ? "" : " with id: " + id;
+						if (items.length() > 0) {
 							msg + ": ";
-							msg += results.attribute('_document-uri').toXMLString();
-							failureFunc(msg);
-							break;
-					}
+							msg += items.attribute('_document-uri').toXMLString();
+						}
+						failureFunc(msg);
+						break;
 				}
 			}, failureFunc, HTTPService.RESULT_FORMAT_E4X);
 		}

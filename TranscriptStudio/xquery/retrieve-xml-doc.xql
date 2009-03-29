@@ -16,5 +16,7 @@ let $topElements :=
 		else
 			collection($collectionPath)/*[local-name(.) = $tagName and @id = $id]
 return
+	<result>{
 		for $topElement in $topElements
 		return utils:add-attributes($topElement, '_document-uri', document-uri(root($topElement)))
+	}</result>
