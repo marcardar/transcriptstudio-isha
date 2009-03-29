@@ -175,7 +175,7 @@
 		</mx:HBox>
 	</mx:VBox>
 	<mx:VBox id="adminVBox" height="100%" horizontalAlign="center" verticalAlign="middle" visible="{referenceMgr.isSuperUser}" includeInLayout="{referenceMgr.isSuperUser}">
-		<mx:Button label="Add..." width="80" click="editClicked(true)"/>
+		<mx:Button label="New..." width="80" click="editClicked(true)"/>
 		<mx:Button label="Edit..." width="80" enabled="{resultsList.selectedIndex &gt;= 0}" click="editClicked(false)"/>
 		<mx:Button label="Remove" width="80" enabled="{false &amp;&amp; resultsList.selectedIndex &gt;= 0}"/>
 	</mx:VBox>
