@@ -65,12 +65,12 @@ declare function search-fns:main($searchString as xs:string, $defaultType as xs:
 
 declare function search-fns:get-transcripts($eventIds as xs:string*) as element()*
 {
-	collection('/db/ts4isha/data')/session[search-fns:get-event-id(@id) = $eventIds]/transcript 
+	collection('/db/ts4isha/data')/session[@eventId = $eventIds]/transcript 
 };
 
 declare function search-fns:get-sessions-for-event-ids($eventIds as xs:string*) as element()*
 {
-	collection('/db/ts4isha/data')/session[search-fns:get-event-id(@id) = $eventIds]
+	collection('/db/ts4isha/data')/session[@eventId = $eventIds]
 };
 
 (:
@@ -106,7 +106,7 @@ declare function search-fns:get-events($baseEvents as element()*, $eventSearchTe
 
 declare function search-fns:get-session-title($session as element()) as xs:string
 {
-	let $eventId := search-fns:get-event-id($session/@id)
+	let $eventId := $session/@eventId
 	let $event := collection('/db/ts4isha/data')/event[@id = $eventId]
 	let $sources := concat(' (', string-join($session/devices/device/media/upper-case(@id), ', '), ')')
 	return
@@ -362,9 +362,7 @@ declare function search-fns:get-html-word-links($sessionId as xs:string) as elem
 
 declare function search-fns:get-event-id($sessionId as xs:string) as xs:string
 {
-	let $cmps := tokenize($sessionId, '-')
-	return
-		concat($cmps[1], '-', $cmps[2])
+	collection('/db/ts4isha/data')/session[@id = $sessionId]/@eventId
 };
 
 declare function search-fns:get-events-for-session-ids($sessionIds as xs:string*) as element()*
