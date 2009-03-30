@@ -490,7 +490,7 @@
 				<menuitem type="separator"/>
 				<menuitem id="eventProps" label="Event properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/>
 				<menuitem id="sessionProps" label="Session properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/>
-				<menuitem id="mediaProps" label="Media properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/>
+				<!--menuitem id="mediaProps" label="Media properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/-->
 			</menuitem>
 			<menuitem label="Selection" enabled="{transcriptPane.textPane.ttSelection != null}">
 				<menuitem id="markupText" label="Markup text" enabled="{transcriptPane.textPane.ttSelection.allowMarkup()}"/>
