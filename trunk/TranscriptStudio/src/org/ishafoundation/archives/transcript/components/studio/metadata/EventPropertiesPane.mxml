@@ -139,7 +139,7 @@
 				<mx:Label text="Event Start Date"/>
 			</mx:GridItem>
 			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
-				<mx:DateField id="startAtDateField" formatString="DD/MM/YYYY" change="{eventProps.startAt = startAtDateField.selectedDate}"/>
+				<mx:DateField id="startAtDateField" formatString="DD/MM/YYYY" change="{eventProps.startAt = startAtDateField.selectedDate}" selectableRange="{{rangeEnd : endAtDateField.selectedDate}}"/>
 			</mx:GridItem>
 		</mx:GridRow>
 		<mx:GridRow width="100%">
@@ -147,7 +147,7 @@
 				<mx:Label text="Event End Date"/>
 			</mx:GridItem>
 			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
-				<mx:DateField id="endAtDateField" formatString="DD/MM/YYYY" change="{eventProps.endAt = endAtDateField.selectedDate}"/>
+				<mx:DateField id="endAtDateField" formatString="DD/MM/YYYY" change="{eventProps.endAt = endAtDateField.selectedDate}" selectableRange="{{rangeStart : startAtDateField.selectedDate}}"/>
 			</mx:GridItem>
 		</mx:GridRow>
 		<mx:GridRow width="100%">
