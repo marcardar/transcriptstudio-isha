@@ -58,6 +58,7 @@
 		
 		public function set transcript(transcript:Transcript):void {
 			this._transcript = transcript;
+			select(null);
 			var speakers:Array = transcript.mdoc.getAllPropertyValues(MSegmentProperties.SPEAKER_PROP_NAME).toArray();
 			if (speakers.indexOf(MSegmentProperties.SPEAKER_DEFAULT) < 0) {
 				speakers.unshift(MSegmentProperties.SPEAKER_DEFAULT);
@@ -90,13 +91,17 @@
 		
 		public function select(newSelection:TranscriptTextSelection):void {
 			this.ttSelection = null; // hack - to trigger bindings
-			this.ttSelection = newSelection;
+			if (newSelection != null) {
+				this.ttSelection = newSelection;
+			}
+			this.generalNodePropertiesPane.ttSelection = newSelection;
 			this.transcriptTextArea.select(newSelection);
 		}
 		
 		public function redrawAndSelect(ttSelection:TranscriptTextSelection):void {
 			this.ttSelection = null; // hack - to trigger bindings
 			this.ttSelection = ttSelection;
+			this.generalNodePropertiesPane.ttSelection = ttSelection;
 			this.transcriptTextArea.redraw(ttSelection);				
 		}
 		
@@ -109,7 +114,7 @@
 	</mx:Script>
 	<textNS:TranscriptTextArea id="transcriptTextArea" width="100%" height="75%" referenceMgr="{this.referenceMgr}" transcript="{this.transcript}"/>
 	<mx:TabNavigator id="nodePropertiesPane" width="100%" height="25%" minWidth="350" minHeight="200">
-		<textNS:GeneralNodePropertiesPane id="generalNodePropertiesPane" label="Selected Text" width="100%" ttSelection="{this.ttSelection}"/>
+		<textNS:GeneralNodePropertiesPane id="generalNodePropertiesPane" label="Selected Text" width="100%"/>
 		<!--textNS:MediaPane id="mediaPane" label="Media" width="100%" height="100%" enabled="false"/-->
 		<!--textNS:TimingsPane id="timingsPane" label="Timings" width="100%" height="100%" enabled="false"/-->
 	</mx:TabNavigator>		

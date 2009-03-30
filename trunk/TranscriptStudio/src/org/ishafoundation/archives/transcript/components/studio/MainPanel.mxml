@@ -21,6 +21,7 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" xmlns:metadataNS="org.ishafoundation.archives.transcript.components.metadata.*" width="100%" height="100%" verticalGap="0">
 	<mx:Script>
 		<![CDATA[
+			import mx.managers.CursorManager;
 			import org.ishafoundation.archives.transcript.components.studio.metadata.SessionSelectorDialog;
 			import org.ishafoundation.archives.transcript.components.studio.metadata.OpenDialog;
 			import org.ishafoundation.archives.transcript.components.studio.metadata.OpenByIdDialog;
@@ -146,6 +147,7 @@
 				var popup:OpenDialog = OpenDialog.display(this, databaseMgr, referenceMgr);
 				popup.addEventListener(OpenDialog.OPEN_SESSION_REQUEST, function(evt:Event):void {
 					var sessionId:String = popup.selectedSessionId;
+					CursorManager.setBusyCursor();
 					// first update the reference file - continue even if it fails
 					reloadReferencesBeforeContinuing(function():void {
 						sessionMgr.retrieveSession(sessionId, openSessionSuccess, openSessionFailure);
@@ -219,21 +221,27 @@
 				this.transcriptPane.transcript = session.transcript;
 				this.status = "Successfully loaded transcript";
 				updateTitle();
+				CursorManager.removeBusyCursor();
 			}
 			
 			private function openSessionFailure(msg:String):void {
-				if (msg.indexOf("document not found") >= 0) {
-					// exist message includes this phrase
-					Alert.show("Transcript not found", "Error loading transcript");
-				}
-				else {
-					var index:int = msg.indexOf("PermissionDeniedException:");
-					if (index >= 0) {
-						Alert.show(msg.substr(index + 26), "Error loading transcript");
+				try {
+					if (msg.indexOf("document not found") >= 0) {
+						// exist message includes this phrase
+						Alert.show("Transcript not found", "Error loading transcript");
 					}
 					else {
-						throw new Error(msg);
-					}				
+						var index:int = msg.indexOf("PermissionDeniedException:");
+						if (index >= 0) {
+							Alert.show(msg.substr(index + 26), "Error loading transcript");
+						}
+						else {
+							throw new Error(msg);
+						}				
+					}
+				}
+				finally {
+					CursorManager.removeBusyCursor();					
 				}
 			}
 			
