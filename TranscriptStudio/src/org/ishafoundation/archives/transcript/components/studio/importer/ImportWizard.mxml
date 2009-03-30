@@ -99,6 +99,7 @@
 				for each (var name:String in importList.selectedItems.reverse()) {
 					selectedPaths.push(name);
 				}
+				selectedPaths.sort();
 				CursorManager.setBusyCursor();
 				importer.importAudioTranscripts(selectedPaths, function(audioTranscripts:Array):void {
 					CursorManager.removeBusyCursor();
