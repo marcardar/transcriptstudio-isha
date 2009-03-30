@@ -363,7 +363,7 @@
 				var popup:ImportWizard = new ImportWizard();
 				popup.addEventListener(ImportWizard.OK_CLICKED, function(event:Event):void {
 					session = sessionMgr.createSession(popup.sessionXML, function():void {
-						Alert.show("Successfully created and saved session: " + session.id);
+						Alert.show("Successfully created and saved session:\n\n" + session.id);
 						transcriptPane.transcript = session.transcript;
 						updateTitle();
 					}, function(msg:String):void {
