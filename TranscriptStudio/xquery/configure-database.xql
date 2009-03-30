@@ -1,5 +1,3 @@
-declare namespace create-data-collections = "http://www.ishafoundation.org/ts4isha/xquery/create-data-collections";
-
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>Isha Foundation - Configure Database</title>
@@ -10,8 +8,12 @@ let $currentUser := xmldb:get-current-user()
 return
 	if (xmldb:is-admin-user($currentUser)) then
 		let $dataCollectionPath := '/db/ts4isha/data'
-		let $newCollectionPaths :=			
+		let $newCollectionPaths :=
+			(: looks like there is a bug in eXist because this line does not work:
 			for $eventType in collection('/db/ts4isha/reference')/reference/eventTypes/eventType/@id
+			   but this line does:
+			:)
+			for $eventType in collection('/db/ts4isha/reference')//*[local-name(.) = 'eventType']/@id
 			return
 				if (xmldb:collection-exists(concat($dataCollectionPath, '/', $eventType))) then
 					()
