@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="all" name="transcript-studio">
+
+	<description>Isha Foundation Transcript Studio</description>
+	
+	<!-- import default properties from file -->
+	<property file="build.properties"/>
+
+	<path id="classpath.core">
+		<fileset dir="${exist.home}/lib/core">
+			<include name="*.jar"/>
+		</fileset>
+		<pathelement path="${exist.home}/exist.jar"/>
+		<pathelement path="${exist.home}/exist-optional.jar"/>
+	</path>
+
+	<typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
+		<classpath refid="classpath.core"/>
+	</typedef>
+
+	<property name="build.dir" location="./build"/>
+	<property name="build.classes.dir" location="${build.dir}/classes"/>
+	<property name="exist.dir" location="./exist"/>
+	<property name="exist.lib.dir" location="${exist.dir}/lib"/>
+	<property name="exist.src.dir" location="${exist.dir}/src"/>
+	<property name="exist.webapp.dir" location="${exist.dir}/webapp"/>
+
+	<property name="dist.dir" location="./dist"/>
+	<property name="dist.client.dir" location="${dist.dir}/${application.name.condensed}-client"/>
+	<property name="dist.server.dir" location="${dist.dir}/${application.name.condensed}-server"/>
+	<property name="dist.exist.app.dir" location="${dist.server.dir}/exist-app"/>
+	<property name="dist.exist.db.dir" location="${dist.server.dir}/exist-db"/>
+
+	<taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/ant/lib/flexTasks.jar" />
+
+	<target name="init">
+		<tstamp>
+			<format property='TSTAMP' pattern='MM/dd/yyyy HH:MM:SS z'/>
+		</tstamp> 
+		<echo>Starting at:  ${TSTAMP}</echo>
+		<echo/>
+		<echo>App name:     ${application.name}</echo>
+		<echo>App name2:    ${application.name.condensed}</echo>
+		<echo>App version:  ${application.version}</echo>
+		<echo/>
+		<echo>Flex home:    ${FLEX_HOME}</echo>
+		<echo>eXist home:   ${exist.home}</echo>
+		<echo>JAVA home:    ${java.home}</echo>
+		<echo>JAVA version: ${java.version}</echo> 
+		<echo>ANT home:     ${ant.home}</echo>
+		<echo>ANT version:  ${ant.version}</echo>
+	</target>
+
+	<target name="build" depends="init">
+		<delete dir="${build.dir}"/>
+		<mkdir dir="${build.classes.dir}"/>
+		<echo message="Compiling eXist extension classes..."/>
+		<javac destdir="${build.classes.dir}" srcdir="${exist.src.dir}">
+            <classpath>
+                <path refid="classpath.core"/>
+			</classpath>
+		</javac>
+		<echo message="Creating transcript.jar..."/>
+		<jar basedir="${build.classes.dir}" compress="true" jarfile="${build.dir}/transcript.jar">
+			<manifest>
+				<attribute name="Project-Name" value="Transcript Studio eXist extensions"/>
+				<!--attribute name="Project-Version" value="${application.version}"/>
+				<attribute name="Project-Build" value="${DSTAMP}"/>
+				<attribute name="Project-CodeName" value="${application.name.condensed}"/>
+				<attribute name="SVN-Revision" value="${svn.revision}"/-->
+			</manifest>
+		</jar>
+		<!-- Build the swf file - TODO - for now, just copy it from bin -->
+		<mxmlc file="./src/TranscriptStudio.mxml" output="${build.dir}/TranscriptStudio.swf" fork="true">
+			<!-- first bring in the defaults -->
+			<load-config filename="${FLEX_HOME}/frameworks/flex-config.xml" />
+			<!-- now override with some project specific settings -->
+			<load-config filename="flex-config.xml" />
+		</mxmlc>
+	</target>
+	
+	<target name="dist" depends="dist-zips"/>
+		
+	<target name="dist-init" depends="init">
+		<echo message="Create TranscriptStudio4Isha distribution..."/>
+		<delete dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}"/>
+	</target>
+		
+	<target name="dist-server" depends="dist-init">
+		<delete dir="${dist.server.dir}"/>
+		<copy todir="${dist.exist.app.dir}">
+			<fileset dir="${exist.dir}">
+				<exclude name="db/**"/>
+				<exclude name="src/**"/>
+			</fileset>
+		</copy>
+		<copy todir="${dist.exist.app.dir}/lib/user">
+			<fileset dir="${build.dir}">
+				<include name="transcript.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="${dist.exist.app.dir}/webapp/ts4isha">
+			<fileset dir="${build.dir}">
+				<include name="TranscriptStudio.swf"/>
+			</fileset>
+			<fileset dir="./src">
+				<include name="player.swf"/>
+			</fileset>
+			<fileset dir=".">
+				<include name="assets/**"/>
+			</fileset>
+		</copy>
+		<mkdir dir="${dist.exist.app.dir}/webapp/ts4isha/import"/>
+		<mkdir dir="${dist.exist.app.dir}/webapp/ts4isha/media"/>
+		<copy todir="${dist.exist.db.dir}/ts4isha">
+			<fileset dir=".">
+				<include name="assets/**"/>
+				<include name="xquery/**"/>
+				<include name="xslt/**"/>
+			</fileset>
+		</copy>
+		<copy todir="${dist.exist.db.dir}/ts4isha/reference">
+			<fileset dir="conf">
+				<include name="reference.xml"/>
+			</fileset>
+		</copy>
+		<mkdir dir="${dist.exist.db.dir}/ts4isha/data/work"/>
+		<copy todir="${dist.server.dir}">
+			<fileset dir=".">
+				<include name="samples/**"/>
+				<exclude name="samples/**/*.doc"/>
+				<exclude name="samples/**/~*"/>
+			</fileset>
+			<fileset dir="install">
+				<include name="build.xml"/>
+			</fileset>
+		</copy>
+		<copy file="build.bat" tofile="${dist.server.dir}/install.bat"/>
+		<copy file="build.sh" tofile="${dist.server.dir}/install.sh"/>
+	</target>
+		
+	<target name="dist-client" depends="dist-init">
+		<delete dir="${dist.client.dir}"/>
+		<copy todir="${dist.client.dir}">
+			<fileset dir="${build.dir}">
+				<include name="TranscriptStudio.swf"/>
+			</fileset>
+			<fileset dir="./src">
+				<include name="player.swf"/>
+			</fileset>
+			<fileset dir=".">
+				<include name="assets/**"/>
+			</fileset>
+		</copy>
+	</target>
+		
+	<target name="dist-zips" depends="dist-server,dist-client">
+		<property name="simple.archive.name" value="${application.name.condensed}"/>
+		<property name="client.archive.name" value="${simple.archive.name}-${application.version}-client"/>
+		<property name="server.archive.name" value="${simple.archive.name}-${application.version}-server"/>
+		<zip destfile="${dist.dir}/${client.archive.name}.zip" basedir="${dist.dir}" includes="*-client/**"/>
+		<zip destfile="${dist.dir}/${server.archive.name}.zip" basedir="${dist.dir}" includes="*-server/**"/>
+		<property name="client.tar.file" value="${dist.dir}/${client.archive.name}.tar"/>
+		<tar destfile="${client.tar.file}" basedir="${dist.dir}" includes="*-client/**"/>
+		<gzip destfile="${client.tar.file}.gz" src="${client.tar.file}"/>
+		<delete file="${client.tar.file}"/>
+		<property name="server.tar.file" value="${dist.dir}/${server.archive.name}.tar"/>
+		<tar destfile="${server.tar.file}" basedir="${dist.dir}" includes="*-server/**"/>
+		<gzip destfile="${server.tar.file}.gz" src="${server.tar.file}"/>
+		<delete file="${server.tar.file}"/>
+	</target>
+
+	<target name="configure-exist">
+		<ant dir="${dist.server.dir}"/>
+	</target>
+
+	<target name="all" depends="build,dist,configure-exist" description="Build, Distribute and Deploy"/>
+</project>

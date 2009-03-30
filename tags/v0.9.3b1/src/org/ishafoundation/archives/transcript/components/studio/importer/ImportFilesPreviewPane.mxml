@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10" horizontalAlign="center">
+	<mx:Script>
+	<![CDATA[
+		import mx.collections.ArrayCollection;
+		import name.carter.mark.flex.util.Utils;
+		import name.carter.mark.flex.project.mdoc.MNode;
+		import name.carter.mark.flex.util.XMLUtils;
+		import org.ishafoundation.archives.transcript.importer.WordMLTransformer;
+		private var _audioTranscripts:Array;
+		
+		[Bindable]
+		public function set audioTranscripts(newValue:Array):void {
+			this._audioTranscripts = newValue;
+			if (newValue.length == 1) {
+				callLater(function():void {
+					importFilesList.selectedIndex = 0;
+				});
+			}
+		}
+		
+		public function get audioTranscripts():Array {
+			return this._audioTranscripts;
+		}
+		
+		private function getActionBy(audioTranscript:WordMLTransformer, attrName:String):String {
+			return XMLUtils.getAttributeValue(audioTranscript.audioTranscriptElement, attrName);
+		}
+		
+		private function getActionAt(audioTranscript:WordMLTransformer, attrName:String):Date {
+			return XMLUtils.getAttributeAsDate(audioTranscript.audioTranscriptElement, attrName);
+		}
+		
+		private function setActionBy(attrName:String, attrValue:String):void {
+			XMLUtils.setAttributeValue((importFilesList.selectedItem as WordMLTransformer).audioTranscriptElement, attrName, attrValue);
+		}
+		
+		private function setActionAt(attrName:String, attrValue:Date):void {
+			XMLUtils.setAttributeAsDate((importFilesList.selectedItem as WordMLTransformer).audioTranscriptElement, attrName, attrValue, false);
+		}
+		
+		private function switchItems(up:Boolean):void {
+			var audioTransctipt:WordMLTransformer = importFilesList.selectedItem as WordMLTransformer;
+			var newIndex:int = up ? importFilesList.selectedIndex - 1 : importFilesList.selectedIndex + 1;
+			Utils.switchItems(audioTranscripts, importFilesList.selectedIndex, newIndex);
+			importFilesList.executeBindings(); // redraws the list contents
+			importFilesList.selectedItem = audioTransctipt; 			
+		}
+		
+		private function getImportFileText(transformer:WordMLTransformer):String {
+			return transformer.text;
+		}
+	]]>
+	</mx:Script>
+	<mx:HBox width="100%">
+		<mx:DataGrid id="importFilesList" width="100%" height="100" dataProvider="{audioTranscripts}" labelField="filePath">
+			<mx:columns>
+				<mx:DataGridColumn sortable="false" width="70" headerText="Source ID" dataField="sourceId"/>
+				<mx:DataGridColumn sortable="false" wordWrap="true" headerText="Name" dataField="name"/>
+			</mx:columns>
+		</mx:DataGrid>
+		<mx:VBox height="100%" verticalAlign="middle">
+			<mx:Button label="Up" width="100%" enabled="{importFilesList.selectedIndex &gt; 0}" click="switchItems(true)"/>
+			<mx:Button label="Down" width="100%" enabled="{importFilesList.selectedItem != null &amp;&amp; importFilesList.selectedIndex &lt; audioTranscripts.length - 1}" click="switchItems(false)"/>
+		</mx:VBox>
+	</mx:HBox>
+	<mx:VBox width="100%" height="100%" enabled="{importFilesList.selectedItem != null}">
+		<mx:Grid paddingTop="20">
+			<mx:GridRow width="100%" height="100%">
+				<mx:GridItem height="100%" verticalAlign="middle" horizontalAlign="right">
+					<mx:Label text="Transcribed"/>
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+					<mx:Label text="by"/>
+					<mx:TextInput id="transcribedByTextInput" width="150" text="{getActionBy(importFilesList.selectedItem as WordMLTransformer, WordMLTransformer.TRANSCRIBED_BY_ATTR_NAME)}" change="{setActionBy(WordMLTransformer.TRANSCRIBED_BY_ATTR_NAME, transcribedByTextInput.text)}"/>
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+					<mx:Label text="on"/>
+					<mx:DateField id="transcribedOnDateField" formatString="DD/MM/YYYY" selectedDate="{getActionAt(importFilesList.selectedItem as WordMLTransformer, WordMLTransformer.TRANSCRIBED_AT_ATTR_NAME)}" change="{setActionAt(WordMLTransformer.TRANSCRIBED_AT_ATTR_NAME, transcribedOnDateField.selectedDate)}"/>
+				</mx:GridItem>
+			</mx:GridRow>
+			<mx:GridRow width="100%" height="100%">
+				<mx:GridItem height="100%" verticalAlign="middle" horizontalAlign="right">
+					<mx:Label text="Proofed"/>
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+					<mx:Label text="by"/>
+					<mx:TextInput id="proofedByTextInput" width="150" text="{getActionBy(importFilesList.selectedItem as WordMLTransformer, WordMLTransformer.PROOFED_BY_ATTR_NAME)}" change="{setActionBy(WordMLTransformer.PROOFED_BY_ATTR_NAME, proofedByTextInput.text)}"/>
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+					<mx:Label text="on"/>
+					<mx:DateField id="proofedOnDateField" formatString="DD/MM/YYYY" selectedDate="{getActionAt(importFilesList.selectedItem as WordMLTransformer, WordMLTransformer.PROOFED_AT_ATTR_NAME)}" change="{setActionAt(WordMLTransformer.PROOFED_AT_ATTR_NAME, proofedOnDateField.selectedDate)}"/>
+				</mx:GridItem>
+			</mx:GridRow>
+			<mx:GridRow width="100%" height="100%">
+				<mx:GridItem height="100%" verticalAlign="middle" horizontalAlign="right">
+					<mx:Label text="Proofread"/>
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+					<mx:Label text="by"/>
+					<mx:TextInput id="proofreadByTextInput" width="150" text="{getActionBy(importFilesList.selectedItem as WordMLTransformer, WordMLTransformer.PROOFREAD_BY_ATTR_NAME)}" change="{setActionBy(WordMLTransformer.PROOFREAD_BY_ATTR_NAME, proofreadByTextInput.text)}"/>
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+					<mx:Label text="on"/>
+					<mx:DateField id="proofreadOnDateField" formatString="DD/MM/YYYY" selectedDate="{getActionAt(importFilesList.selectedItem as WordMLTransformer, WordMLTransformer.PROOFREAD_AT_ATTR_NAME)}" change="{setActionAt(WordMLTransformer.PROOFREAD_AT_ATTR_NAME, proofreadOnDateField.selectedDate)}"/>
+				</mx:GridItem>
+			</mx:GridRow>
+		</mx:Grid>
+		<mx:Label paddingTop="20" text="Import file text" width="100%" fontWeight="bold" textDecoration="underline"/>
+		<mx:TextArea width="100%" height="100%" editable="false" text="{getImportFileText(importFilesList.selectedItem as WordMLTransformer)}"/>		
+	</mx:VBox>
+</mx:VBox>
