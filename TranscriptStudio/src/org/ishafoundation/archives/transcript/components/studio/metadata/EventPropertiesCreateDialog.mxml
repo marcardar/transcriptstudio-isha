@@ -71,6 +71,9 @@
 				var evt:Event = new Event(EVENT_CREATED);
 				dispatchEvent(evt);
 			}, function (msg:String):void {
+				if (msg == null || StringUtil.trim(msg).length == 0) {
+					msg = "Ensure that the event-type collection has been created"; 
+				}
 				Alert.show(msg, "Could not save event");
 			});
 		}
