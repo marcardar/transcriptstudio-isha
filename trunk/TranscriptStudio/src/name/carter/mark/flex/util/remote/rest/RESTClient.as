@@ -78,7 +78,7 @@ package name.carter.mark.flex.util.remote.rest
 						msg = Utils.normalizeSpace(content.toString());
 					}
 				}
-				failureFunc("REST service failed because: " + msg);
+				failureFunc(msg);
 			});
 
 			httpService.send(params);			
