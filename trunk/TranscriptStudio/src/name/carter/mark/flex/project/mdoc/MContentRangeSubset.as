@@ -1,5 +1,7 @@
 package name.carter.mark.flex.project.mdoc
 {
+	import mx.utils.StringUtil;
+	
 	public class MContentRangeSubset
 	{
 		public var spanningContentRange:MContentRange;
@@ -99,11 +101,11 @@ package name.carter.mark.flex.project.mdoc
 				startText = spanningContentRange.first.text;
 				var externalContents:Array = new Array();
 				if (startOffsetRelativeToFirstContent > 0) {
-					externalContents.push(startText.substring(0, startOffsetRelativeToFirstContent));
+					externalContents.push(StringUtil.trim(startText.substring(0, startOffsetRelativeToFirstContent)));
 				}
-				externalContents.push(startText.substring(startOffsetRelativeToFirstContent, endOffsetRelativeToLastContent));
+				externalContents.push(StringUtil.trim(startText.substring(startOffsetRelativeToFirstContent, endOffsetRelativeToLastContent)));
 				if (endOffsetRelativeToLastContent < startText.length) {
-					externalContents.push(startText.substring(endOffsetRelativeToLastContent));
+					externalContents.push(StringUtil.trim(startText.substring(endOffsetRelativeToLastContent)));
 				}
 				var newSingleContentRange:MContentRange = breakContent(spanningContentRange.first, externalContents);
 				if (startOffsetRelativeToFirstContent > 0) {
