@@ -114,6 +114,7 @@
 				eventsList.enabled = true;
 				callLater(function():void {
 					eventsList.maxHorizontalScrollPosition = eventsList.measureWidthOfItems() - eventsList.width + 5;
+					eventsList.horizontalScrollPosition = 0;
 				});				
 			}, function(msg:String):void {
 				showAlert(msg, "Search failed");
