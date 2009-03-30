@@ -363,10 +363,9 @@
 				var popup:ImportWizard = new ImportWizard();
 				popup.addEventListener(ImportWizard.OK_CLICKED, function(event:Event):void {
 					var newSession:Session = sessionMgr.createSession(popup.sessionXML, function():void {
-						Alert.show("Successfully created and saved session:\n\n" + newSession.id);
-						transcriptPane.transcript = newSession.transcript;
-						updateTitle();
 						session = newSession;
+						Alert.show("Successfully created and saved session:\n\n" + session.id);
+						transcriptPane.transcript = session.transcript;
 					}, function(msg:String):void {
 						Alert.show(msg, "Failed to create session");
 					});
