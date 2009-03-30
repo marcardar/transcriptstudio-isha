@@ -45,6 +45,7 @@
 				this.additionalText.text = additionalText;
     		}
     		okButton.enabled = true;
+    		okButton.setFocus();
     	}
     
 		public function closePopUp():void {
@@ -54,5 +55,5 @@
 	</mx:Script>
 	<mx:Label id="mainText" textAlign="center"/>
 	<mx:TextArea id="additionalText" width="100%" minWidth="300" editable="false" visible="{additionalText.text.length > 0}" includeInLayout="{additionalText.visible}"/>
-	<mx:Button id="okButton" label="OK" click="closePopUp()"/>
+	<mx:Button id="okButton" label="OK" click="closePopUp()" keyDown="{if (event.charCode == Keyboard.ENTER) closePopUp()}"/>
 </mx:TitleWindow>
