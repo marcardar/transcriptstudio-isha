@@ -21,6 +21,7 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" xmlns:metadataNS="org.ishafoundation.archives.transcript.components.metadata.*" width="100%" height="100%" verticalGap="0">
 	<mx:Script>
 		<![CDATA[
+			import mx.utils.StringUtil;
 			import mx.managers.CursorManager;
 			import org.ishafoundation.archives.transcript.components.studio.metadata.SessionSelectorDialog;
 			import org.ishafoundation.archives.transcript.components.studio.metadata.OpenDialog;
@@ -270,6 +271,14 @@
 				var index:int = msg.indexOf("PermissionDeniedException:");
 				if (index >= 0) {
 					Alert.show(msg.substr(index + 26), "Error saving transcript");
+				}
+				else if (StringUtil.trim(msg).length == 0) {
+					// nothing in the message
+					databaseMgr.login(function():void {
+						Alert.show("Unknown reason", "Error saving transcript");
+					}, function(msg2:String):void {
+						Alert.show("Could not connect to database", "Error saving transcript");						
+					});
 				}
 				else {
 					Alert.show(msg, "Error saving transcript");
