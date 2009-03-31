@@ -44,7 +44,7 @@ package org.ishafoundation.archives.transcript.db
 			this.username = username;
 		}
 
-		public function testConnection(successFunction:Function, failureFunction:Function):void {
+		public function login(successFunction:Function, failureFunction:Function):void {
 			// we test the connection by reading the top level collection
 			remoteMgr.testConnection(function(response:Object):void {
 				loggedIn = true;
@@ -64,7 +64,12 @@ package org.ishafoundation.archives.transcript.db
 		
 		public function retrieveXML(successFunc:Function, failureFunc:Function, tagName:String = null, id:String = null, collectionPath:String = null):void {
 			if (!this.loggedIn) {
-				throw new Error("Tried to retrieve xml but not logged in");
+				login(function():void {
+					retrieveXML(successFunc, failureFunc, tagName, id, collectionPath);
+				}, function(msg:String):void {
+					failureFunc("Tried to retrieve XML but not connected to database");					
+				});
+				return;
 			}
 			var params:Object = {}
 			if (tagName != null) {
@@ -110,7 +115,12 @@ package org.ishafoundation.archives.transcript.db
 		
 		public function storeXML(xml:XML, successFunc:Function, failureFunc:Function):void {
 			if (!this.loggedIn) {
-				throw new Error("Tried to store XML but not logged in");
+				login(function():void {
+					storeXML(xml, successFunc, failureFunc);
+				}, function(msg:String):void {
+					failureFunc("Tried to store XML but not connected to database");					
+				});
+				return;
 			}
 			//new EXistXMLRPCClient(remoteMgr.getXMLRPCClient()).storeXML(xmlPath, xml, successFunction, failureFunction);
 			var params:Object = {xmlStr:xml.toXMLString()};
@@ -118,19 +128,28 @@ package org.ishafoundation.archives.transcript.db
 				trace("Successfully stored xml doc: " + id);
 				successFunc(id);
 			}, failureFunc);
-			
 		}
 		
 		public function query(xQuery:String, args:Array, successFunc:Function, failureFunc:Function):void {
 			if (!this.loggedIn) {
-				throw new Error("Tried to execute xquery but not logged in");
+				login(function():void {
+					query(xQuery, args, successFunc, failureFunc);
+				}, function(msg:String):void {
+					failureFunc("Tried to execute query but not connected to database");					
+				});
+				return;
 			}
 			new EXistXMLRPCClient(remoteMgr.getXMLRPCClient()).query(xQuery, args, successFunc, failureFunc);			
 		}
 		
 		public function executeStoredXQuery(xQueryFilename:String, params:Object, successFunc:Function, failureFunc:Function, resultFormat:String = null):void {
 			if (!this.loggedIn) {
-				throw new Error("Tried to execute stored xquery but not logged in");
+				login(function():void {
+					executeStoredXQuery(xQueryFilename, params, successFunc, failureFunc);
+				}, function(msg:String):void {
+					failureFunc("Tried to execute stored query but not connected to database");					
+				});
+				return;
 			}
 			new EXistRESTClient(remoteMgr.getRESTClient()).executeStoredXQuery(DatabaseConstants.XQUERY_COLLECTION_PATH + "/" + xQueryFilename, params, successFunc, failureFunc, resultFormat);
 		}
