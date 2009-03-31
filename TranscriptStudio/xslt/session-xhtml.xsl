@@ -52,15 +52,15 @@
 	<xsl:template match="content">
 		<span class="content" id="{@id}">
 			<xsl:choose>
-                <xsl:when test="@emphasis='true'">
-				<xsl:attribute name="style">font-style:italic;</xsl:attribute> 
-			</xsl:when>
-			<xsl:when test="@spokenLanguage='tamil'">
-				<xsl:attribute name="style">color:blue;</xsl:attribute> 
-			</xsl:when>
-			<xsl:when test="@emphasis='true' and @spokenLanguage='tamil'">
-				<xsl:attribute name="style">font-style:italic;color:blue;</xsl:attribute> 
-			</xsl:when>
+				<xsl:when test="@emphasis='true' and @spokenLanguage='tamil'">
+					<xsl:attribute name="style">font-style:italic;color:blue;</xsl:attribute>
+				</xsl:when>
+				<xsl:when test="@emphasis='true'">
+					<xsl:attribute name="style">font-style:italic;</xsl:attribute> 
+				</xsl:when>
+				<xsl:when test="@spokenLanguage='tamil'">
+					<xsl:attribute name="style">color:blue;</xsl:attribute> 
+				</xsl:when>
 			</xsl:choose>
 			<xsl:value-of select="normalize-space(.)"/>
 		</span>
@@ -68,5 +68,4 @@
 			<xsl:text> </xsl:text> 
 		</xsl:if-->		
 	</xsl:template>
-	
 </xsl:stylesheet>
