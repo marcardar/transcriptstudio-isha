@@ -1,0 +1,121 @@
+<!--
+   Transcript Studio for Isha Foundation: An XML based application that allows users to define 
+   and store contextual metadata for contiguous sections within a text document. 
+
+   Copyright 2008 Mark Carter, Swami Kevala
+
+   This file is part of Transcript Studio for Isha Foundation.
+
+   Transcript Studio for Isha Foundation is free software: you can redistribute it and/or modify it 
+   under the terms of the GNU General Public License as  published by the Free Software 
+   Foundation, either version 3 of the License, or (at your option) any later version.
+
+   Transcript Studio for Isha Foundation is distributed in the hope that it will be useful, but 
+   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along with 
+   Transcript Studio for Isha Foundation. If not, see http://www.gnu.org/licenses/.
+-->
+<mx:VDividedBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:textNS="org.ishafoundation.archives.transcript.components.studio.text.*" resizeToContent="true" creationComplete="init()">
+	<mx:Script>
+    <![CDATA[
+    	import org.ishafoundation.archives.transcript.model.ReferenceManager;
+    	import org.ishafoundation.archives.transcript.model.GeneralNodeProperties;
+    	import org.ishafoundation.archives.transcript.model.TranscriptTextSelection;
+    	import name.carter.mark.flex.util.Utils;
+    	import mx.events.PropertyChangeEvent;
+    	import mx.binding.utils.ChangeWatcher;
+    	import name.carter.mark.flex.project.mdoc.MContentProperties;
+    	import name.carter.mark.flex.project.mdoc.MSegmentProperties;
+    	import name.carter.mark.flex.project.mdoc.MNode;
+    	import name.carter.mark.flex.project.mdoc.MDocument;
+    	import name.carter.mark.flex.project.mdoc.MSuperNode;
+    	import name.carter.mark.flex.project.mdoc.MSuperNodeProperties;
+    	import name.carter.mark.flex.project.mdoc.MSegment;
+    	import name.carter.mark.flex.project.mdoc.MSuperContent;
+    	import name.carter.mark.flex.project.mdoc.MSuperSegment;
+    	import name.carter.mark.flex.project.mdoc.TaggableMNode;
+    	import org.ishafoundation.archives.transcript.model.Transcript;
+    	import name.carter.mark.flex.util.icon.IconUtils;
+    	
+    	[Bindable]
+		public var referenceMgr:ReferenceManager;
+
+		private var _transcript:Transcript;
+		
+		[Bindable]
+		public var ttSelection:TranscriptTextSelection;
+		
+		private function init():void {
+			this.addEventListener(TranscriptTextEvent.SELECTION_CHANGE, function(evt:TranscriptTextEvent):void {
+				select(evt.affectedTtSelection);				
+			});
+			this.addEventListener(TranscriptTextEvent.DATA_CHANGE, function(evt:TranscriptTextEvent):void {
+				redrawAndSelect(evt.affectedTtSelection);
+			});			
+		}
+		
+		public function set transcript(transcript:Transcript):void {
+			this._transcript = transcript;
+			select(null);
+			var speakers:Array = transcript.mdoc.getAllPropertyValues(MSegmentProperties.SPEAKER_PROP_NAME).toArray();
+			if (speakers.indexOf(MSegmentProperties.SPEAKER_DEFAULT) < 0) {
+				speakers.unshift(MSegmentProperties.SPEAKER_DEFAULT);
+			}
+			if (speakers.indexOf(MSegmentProperties.SPEAKER_SADHGURU) < 0) {
+				speakers.unshift(MSegmentProperties.SPEAKER_SADHGURU);
+			}
+			this.generalNodePropertiesPane.speakers = speakers;
+			// add any spoken languages in the XML but not in the built in list
+			var spokenLanguages:Array = transcript.mdoc.getAllPropertyValues(MContentProperties.SPOKEN_LANGUAGE_PROP_NAME).toArray();
+			for each (var spokenLanguage:String in spokenLanguages) {
+				if (this.generalNodePropertiesPane.spokenLanguages.indexOf(spokenLanguage) < 0) {
+					this.generalNodePropertiesPane.spokenLanguages.push(spokenLanguage);
+				}
+			}
+		}
+		
+		[Bindable]
+		public function get transcript():Transcript {
+			return this._transcript;
+		}
+		
+		public function selectMarkup(markup:MSuperNode):void {
+			select(TranscriptTextSelection.createSuperNodeInstance(markup));
+		}
+		
+		public function redrawAndSelectMarkup(markup:MSuperNode):void {
+			redrawAndSelect(TranscriptTextSelection.createSuperNodeInstance(markup));
+		}
+		
+		public function select(newSelection:TranscriptTextSelection):void {
+			this.ttSelection = null; // hack - to trigger bindings
+			if (newSelection != null) {
+				this.ttSelection = newSelection;
+			}
+			this.generalNodePropertiesPane.ttSelection = newSelection;
+			this.transcriptTextArea.select(newSelection);
+		}
+		
+		public function redrawAndSelect(ttSelection:TranscriptTextSelection):void {
+			this.ttSelection = null; // hack - to trigger bindings
+			this.ttSelection = ttSelection;
+			this.generalNodePropertiesPane.ttSelection = ttSelection;
+			this.transcriptTextArea.redraw(ttSelection);				
+		}
+		
+		public function setPropertiesPaneVisibility(visible:Boolean):void {
+			this.nodePropertiesPane.includeInLayout = visible;
+			this.nodePropertiesPane.visible = visible;
+		}		
+		
+    ]]>
+	</mx:Script>
+	<textNS:TranscriptTextArea id="transcriptTextArea" width="100%" height="75%" referenceMgr="{this.referenceMgr}" transcript="{this.transcript}"/>
+	<mx:TabNavigator id="nodePropertiesPane" width="100%" height="25%" minWidth="350" minHeight="200">
+		<textNS:GeneralNodePropertiesPane id="generalNodePropertiesPane" label="Selected Text" width="100%"/>
+		<!--textNS:MediaPane id="mediaPane" label="Media" width="100%" height="100%" enabled="false"/-->
+		<!--textNS:TimingsPane id="timingsPane" label="Timings" width="100%" height="100%" enabled="false"/-->
+	</mx:TabNavigator>		
+</mx:VDividedBox>
