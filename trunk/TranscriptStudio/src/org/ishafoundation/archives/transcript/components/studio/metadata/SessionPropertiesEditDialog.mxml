@@ -36,10 +36,10 @@
 		public static function display(parent:DisplayObject, xmlRetriever:XMLRetriever, referenceMgr:ReferenceManager, sessionProps:SessionProperties):SessionPropertiesEditDialog {
 			var result:SessionPropertiesEditDialog = new SessionPropertiesEditDialog();
 			PopUpManager.addPopUp(result, parent, true);
-			result.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
+			result.sessionPropsPane.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
 				result.sessionPropsPane.referenceMgr = referenceMgr;
 				result.sessionPropsPane.sessionProps = sessionProps;
-			});
+			}, true);
 			return result;
 		}
 	

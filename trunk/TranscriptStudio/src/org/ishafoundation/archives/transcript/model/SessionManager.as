@@ -46,7 +46,7 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		public function createSession(sessionXML:XML, successFunc:Function, failureFunc:Function):Session {
-			var result:Session = new Session(sessionXML, username, referenceMgr);
+			var result:Session = new Session(sessionXML, referenceMgr);
 			result.unsavedChanges = true; // need to save all this stuff			
 			storeTranscript(result, function():void {
 				successFunc();
@@ -60,7 +60,7 @@ package org.ishafoundation.archives.transcript.model
 			}
 			DatabaseManagerUtils.retrieveSessionXML(sessionId, xmlRetrieverStorer, function(sessionXML:XML):void {
 				trace("Successfully retrieved session");
-				var session:Session = new Session(sessionXML, username, referenceMgr);
+				var session:Session = new Session(sessionXML, referenceMgr);
 				externalSuccess(session);
 			}, function (msg:String):void {
 				trace("Could not load session xml because: " + msg);
@@ -70,7 +70,7 @@ package org.ishafoundation.archives.transcript.model
 		
 		public function openSession(sessionXML:XML):Session {
 			trace("Opening session based on session XML already in memory");
-			return new Session(sessionXML, username, referenceMgr);
+			return new Session(sessionXML, referenceMgr);
 		}
 			
 		public function storeTranscript(session:Session, externalSuccess:Function, externalFailure:Function):void {

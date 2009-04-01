@@ -2,34 +2,11 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Select Event" creationComplete="init()" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*">
 	<mx:Script>
 	<![CDATA[
-		import mx.rpc.http.HTTPService;
-		import org.ishafoundation.archives.transcript.db.DatabaseManagerUtils;
-		import org.ishafoundation.archives.transcript.db.XMLRetrieverStorer;
-		import org.ishafoundation.archives.transcript.db.DatabaseManager;
-		import mx.events.FlexEvent;
-		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
-		import org.ishafoundation.archives.transcript.model.ReferenceManager;
-		import org.ishafoundation.archives.transcript.db.DatabaseConstants;
-		import org.ishafoundation.archives.transcript.importer.MSWordImporter;
-		import mx.core.Container;
-		import org.ishafoundation.archives.transcript.db.XMLStorer;
-		import org.ishafoundation.archives.transcript.model.EventProperties;
-		import mx.events.PropertyChangeEvent;
-		import mx.binding.utils.ChangeWatcher;
-		import org.ishafoundation.archives.transcript.model.SessionProperties;
-		import name.carter.mark.flex.util.XMLUtils;
-		import name.carter.mark.flex.util.Utils;
-		import mx.managers.CursorManager;
-		import name.carter.mark.flex.util.Utils;
-		import mx.utils.StringUtil;
-		import name.carter.mark.flex.util.collection.HashSet;
-		import name.carter.mark.flex.util.collection.ISet;
-		import mx.formatters.DateFormatter;
-		import mx.collections.ArrayCollection;
-		import mx.formatters.DateBase;
-		import mx.controls.TextInput;
-		import mx.controls.Alert;
 		import mx.managers.PopUpManager;
+		import org.ishafoundation.archives.transcript.model.EventProperties;
+		import mx.events.FlexEvent;
+		import org.ishafoundation.archives.transcript.model.ReferenceManager;
+		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
 
 		public static const OPEN_SESSION_REQUEST:String = "OPEN_SESSION_REQUEST";		
 

@@ -1,7 +1,9 @@
 package org.ishafoundation.archives.transcript.model
 {
+	import mx.formatters.DateFormatter;
 	import mx.utils.StringUtil;
 	
+	import name.carter.mark.flex.util.DateUtils;
 	import name.carter.mark.flex.util.XMLUtils;
 	
 	public class SessionProperties
@@ -12,7 +14,7 @@ package org.ishafoundation.archives.transcript.model
 		public static const START_AT_ATTR_NAME:String = "startAt";
 		public static const COMMENT_ATTR_NAME:String = "comment";
 		
-		private var sessionElement:XML;
+		public var sessionElement:XML;
 		
 		public function SessionProperties(sessionElement:XML)
 		{
@@ -38,6 +40,11 @@ package org.ishafoundation.archives.transcript.model
 		
 		public function set eventId(newValue:String):void {
 			XMLUtils.setAttributeValue(sessionElement, EVENT_ID_ATTR_NAME, newValue);
+		}
+		
+		public function get path():String {
+			var result:String = sessionElement.attribute("_document-uri");
+			return result;
 		}
 		
 		[Bindable]
@@ -87,6 +94,37 @@ package org.ishafoundation.archives.transcript.model
 		
 		public function set comment(newValue:String):void {
 			XMLUtils.setAttributeValue(sessionElement, COMMENT_ATTR_NAME, newValue);
-		}		
+		}
+		
+		private static const TIME_FORMATTER:DateFormatter = DateUtils.createDateFormatter("JJ:NN");
+
+		public function getFullName(eventStartDate:Date):String {
+			var eventDay:int = getEventDay(eventStartDate);
+			var result:String = "Day " + (eventDay == 0 ? "?" : eventDay) + ": ";
+			if (startAtIncludesTime()) {
+				result += TIME_FORMATTER.format(startAt) + " ";
+			}
+			if (subTitle != null) {
+				result += subTitle + " ";
+			}
+			result += "[" + id + "]";
+			return result;
+		}
+		
+		/**
+		 * 1-based day (0, means unknown)
+		 */
+		private function getEventDay(eventStartDate:Date):int {
+			if (eventStartDate == null || startAt == null) {
+				return 0;
+			}
+			// get start of day
+			var startOfEventDay:Date = DateUtils.getStartOfDay(eventStartDate);
+			var millisDiff:Number = DateUtils.getStartOfDay(startAt).getTime() - startOfEventDay.getTime();
+			if (millisDiff < 0) {
+				return 0;
+			}
+			return int(millisDiff / DateUtils.MILLIS_IN_DAY) + 1;
+		}
 	}
 }

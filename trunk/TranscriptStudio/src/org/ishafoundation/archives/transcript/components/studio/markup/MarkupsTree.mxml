@@ -106,6 +106,10 @@
 					currentOpenItems.push(markup);
 				}
 			}
+			if (dataProvider == null) {
+				openItems = null;
+				return;
+			}
 			dataProvider = dataProvider[0]; // this solves a bug where top level (level below root) items are not refreshed
 			openItems = currentOpenItems;
 			// if we dont do callLater then the markup is not selected

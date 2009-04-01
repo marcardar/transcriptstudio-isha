@@ -21,6 +21,9 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" xmlns:metadataNS="org.ishafoundation.archives.transcript.components.metadata.*" width="100%" height="100%" verticalGap="0">
 	<mx:Script>
 		<![CDATA[
+			import mx.events.PropertyChangeEvent;
+			import org.ishafoundation.archives.transcript.components.studio.importer.ExternalTranscriptsSelectorDialog;
+			import org.ishafoundation.archives.transcript.components.studio.importer.ImportDialog;
 			import mx.utils.StringUtil;
 			import mx.managers.CursorManager;
 			import org.ishafoundation.archives.transcript.components.studio.metadata.SessionSelectorDialog;
@@ -43,9 +46,7 @@
 			import mx.managers.PopUpManager;
 			import name.carter.mark.flex.project.mdoc.*;
 			import org.ishafoundation.archives.transcript.components.studio.media.MediaPlayerDialog;
-			import org.ishafoundation.archives.transcript.components.studio.importer.ImportWizard;
 			import org.ishafoundation.archives.transcript.components.studio.metadata.EventPropertiesEditDialog;
-			import org.ishafoundation.archives.transcript.components.studio.metadata.EventPropertiesCreateDialog;
 			import org.ishafoundation.archives.transcript.model.EventProperties;
 			import org.ishafoundation.archives.transcript.components.generic.DebugPopUp;
 			import org.ishafoundation.archives.transcript.components.studio.concept.ConceptManagerDialog;
@@ -207,10 +208,6 @@
 				});
 			}
 			
-			private function collectionTreeFailed(msg:String):void {
-				throw new Error(msg);
-			}
-			
 			private function reloadReferencesBeforeContinuing(nextFunc:Function):void {
 				this.referenceMgr.loadReferences(nextFunc, function(msg:String):void {
 					Alert.show("Could not reload reference file: " + msg);
@@ -345,15 +342,7 @@
 				
 			}
 			
-			public function createEventClicked():void {
-				var popup:EventPropertiesCreateDialog = EventPropertiesCreateDialog.display(this, databaseMgr, referenceMgr, new EventProperties());
-				popup.addEventListener(EventPropertiesCreateDialog.EVENT_CREATED, function(event:Event):void {
-					status = "Successfully created event";
-					Alert.show("Successfully created event"); 
-				});
-			}
-			
-			private function importClicked():void {
+			private function eventSessionBuilderClicked():void {
 				if (session != null && session.unsavedChanges) {
 					// confirm this operation with the user
 					Alert.show("Are you sure?", "Discarding changes...", Alert.OK | Alert.CANCEL, null, function(evt:CloseEvent):void {
@@ -368,21 +357,49 @@
 			}
 			
 			private function importTranscript():void {
-				var thisPanel:MainPanel = this;
-				var popup:ImportWizard = new ImportWizard();
-				popup.addEventListener(ImportWizard.OK_CLICKED, function(event:Event):void {
-					var newSession:Session = sessionMgr.createSession(popup.sessionXML, function():void {
-						session = newSession;
-						Alert.show("Successfully created and saved session:\n\n" + session.id);
-						transcriptPane.transcript = session.transcript;
-					}, function(msg:String):void {
-						Alert.show(msg, "Failed to create session");
+				// always bring up the full import dialog if there is no session loaded or the session already has a transcript
+				if (session == null || session.transcript != null) {
+					importTranscriptComplex();
+				}
+				else {
+					var popup:Alert = Alert.show("Import into current session?", null, Alert.YES + Alert.NO + Alert.CANCEL, this, function(evt:CloseEvent):void {
+						if (evt.detail == Alert.YES) {
+							importTranscriptSimple();
+						}
+						else if (evt.detail == Alert.NO) {
+							importTranscriptComplex();
+						}
+						else {
+							// do nothing
+						}
 					});
+				}
+			}
+			
+			private function importTranscriptComplex():void {
+				var popup:ImportDialog = ImportDialog.display(this, databaseMgr, referenceMgr);
+				popup.addEventListener(ImportDialog.IMPORT_CLICKED, function(event:Event):void {
+					session = sessionMgr.openSession(popup.sessionXML);
+					session.unsavedChanges = true;
+					openSessionSuccess(session);
 				});
-				popup.databaseMgr = databaseMgr;
-				popup.referenceMgr = referenceMgr;
-				popup.importer = new MSWordImporter(databaseMgr);
-				PopUpManager.addPopUp(popup, thisPanel, true);
+			}
+			
+			/** imports the selected transcript files into the current session */
+			private function importTranscriptSimple():void {
+				if (session == null) {
+					throw new Error("Cannot do a simple import when no session is open");
+				}
+				var popup:ExternalTranscriptsSelectorDialog = ExternalTranscriptsSelectorDialog.display(this, databaseMgr);
+				popup.addEventListener(ExternalTranscriptsSelectorDialog.FILES_IMPORTED, function(evt:Event):void {
+					var importedSessionXML:XML = MSWordImporter.createSessionElement(popup.selectedAudioTranscripts);
+					var importedDeviceElements:XMLList = importedSessionXML.devices.device;
+					var importedTranscriptElement:XML = importedSessionXML.transcript[0];
+					session.appendTranscript(importedTranscriptElement, importedDeviceElements);
+					session.unsavedChanges = true;
+					openSessionSuccess(session);
+				});
+				
 			}
 			
 			private function showAboutBox():void {
@@ -442,11 +459,8 @@
 					var showTextProps:Boolean = evt.item.@toggled.toString() == "true";
 					this.transcriptPane.textPane.setPropertiesPaneVisibility(showTextProps);
 				}
-				else if ( actionName == "createEvent" ) {
-					createEventClicked();
-				}
-				else if ( actionName == "import" ) {
-					importClicked();
+				else if ( actionName == "eventSessionBuilder" ) {
+					eventSessionBuilderClicked();
 				}
 				else if ( actionName == "categoryManager" ) {
 					categoryManagerClicked();
@@ -518,8 +532,7 @@
 				<menuitem id="showTextPropertiesPane" label="Text properties" type="check" toggled="true"/>
 			</menuitem>
 			<menuitem label="Admin" enabled="{databaseMgr != null &amp;&amp; databaseMgr.isSuperUser}">
-				<menuitem id="createEvent" label="Create event..."/>
-				<menuitem id="import" label="Import..."/>
+				<menuitem id="eventSessionBuilder" label="Event/Session Builder..."/>
 				<menuitem type="separator"/>
 				<menuitem id="categoryManager" label="Categories..."/>
 				<menuitem id="conceptManager" label="Concepts..."/>
@@ -541,5 +554,5 @@
 		</mx:XMLList>
 	</mx:MenuBar>
 	<!--mx:TextInput id="textInput" enter="{TranscriptStudio.testId(textInput.text)}"/-->
-	<studioNS:TranscriptPane id="transcriptPane" width="100%" height="100%" referenceMgr="{this.referenceMgr}" visible="{this.transcriptPane.transcript != null}"/>
+	<studioNS:TranscriptPane id="transcriptPane" width="100%" height="100%" referenceMgr="{this.referenceMgr}" visible="{this.session != null}" enabled="{this.transcriptPane.transcript != null}"/>
 </mx:VBox>

@@ -77,13 +77,7 @@
 		}
 		
 		public function get selectedEventProps():EventProperties {
-			var eventProps:EventProperties = eventsList.selectedItem as EventProperties;
-			if (eventProps == null) {
-				return null;
-			}
-			else {
-				return eventProps;
-			}
+			return eventsList.selectedItem as EventProperties;
 		}
 	
 		public function selectEvent(eventId:String):void {
@@ -122,20 +116,7 @@
 		}
 		
 		private function resultLabelFunc(eventProps:EventProperties):String {
-			var result:String = "";
-			if (eventTypeComboBox.selectedItem == ANY) {
-				result += eventProps.type + ": ";
-			}
-			if (eventProps.startAt != null) {
-				result += dateFormatter.format(eventProps.startAt) + " ";
-			}
-			var placeArr:Array = [eventProps.subTitle, eventProps.venue, eventProps.location, eventProps.country];
-			placeArr = Utils.condenseWhitespaceForArray(placeArr);
-			var placeStr:String = placeArr.join(", ");
-			if (placeStr != "") {
-				result += placeStr + " ";
-			}
-			result += "[" + eventProps.id + "]";
+			var result:String = eventProps.generateFullName(eventTypeComboBox.selectedItem == ANY, dateFormatter);
 			return result;
 		}
 		
