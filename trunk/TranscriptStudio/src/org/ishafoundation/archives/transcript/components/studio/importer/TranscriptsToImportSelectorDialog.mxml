@@ -16,8 +16,8 @@
 	   	
 		private var importer:MSWordImporter;
 			   	
-		public static function display(parent:DisplayObject, xqueryExecutor:XQueryExecutor):ExternalTranscriptsSelectorDialog {
-			var result:ExternalTranscriptsSelectorDialog = new ExternalTranscriptsSelectorDialog();
+		public static function display(parent:DisplayObject, xqueryExecutor:XQueryExecutor):TranscriptsToImportSelectorDialog {
+			var result:TranscriptsToImportSelectorDialog = new TranscriptsToImportSelectorDialog();
 			result.importer = new MSWordImporter(xqueryExecutor);		
 			PopUpManager.addPopUp(result, parent, true);
 			result.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {

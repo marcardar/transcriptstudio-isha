@@ -23,7 +23,7 @@
 			var result:SessionCreatorDialog = new SessionCreatorDialog();
 			result.xmlStorer = xmlStorer;
 			PopUpManager.addPopUp(result, parent, true);
-			result.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
+			result.sessionPropertiesPane.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
 				result.sessionPropertiesPane.referenceMgr = referenceMgr;
 				result.sessionPropertiesPane.sessionProps = sessionProps;
 				result.sessionPropertiesPane.sessionProps.eventId = eventProps.id;
