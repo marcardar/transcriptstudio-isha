@@ -13,17 +13,26 @@ package org.ishafoundation.archives.transcript.model
 
 		public var transcript:Transcript;
 		
+		private var referenceMgr:ReferenceManager;
+		
 		[Bindable]
 		private var _unsavedChanges:Boolean;
 
-		public function Session(sessionXML:XML, username:String, referenceMgr:ReferenceManager)
+		public function Session(sessionXML:XML, referenceMgr:ReferenceManager)
 		{
 			if (sessionXML == null) {
 				throw new ArgumentError("Passed a null sessionXML");
 			}
 			this.sessionXML = sessionXML;
-			this.transcript = new Transcript(sessionXML.transcript[0], referenceMgr);
-			ChangeWatcher.watch(this.transcript.mdoc, "modified", function(evt:PropertyChangeEvent):void {
+			this.referenceMgr = referenceMgr;
+			var transcriptXML:XML = sessionXML.transcript[0];
+			if (transcriptXML != null) {
+				this.transcript = new Transcript(transcriptXML, referenceMgr);
+			}
+			else {
+				this.transcript = null;
+			}
+			ChangeWatcher.watch(this, "transcript.mdoc.modified", function(evt:PropertyChangeEvent):void {
 				// only care about positive changes (because negative changes are driven from outside)
 				if (new Boolean(evt.newValue)) {
 					unsavedChanges = true;					
@@ -40,26 +49,6 @@ package org.ishafoundation.archives.transcript.model
 			return result;
 		}
 		
-		/*private function generateFilename(eventProps:EventProperties):String {
-			var filename:String = id + "_" + eventProps.type;
-			if (eventProps.subTitle != null) {
-				filename += "_" + eventProps.subTitle;
-			}
-			if (subTitle != null) {
-				filename += "_" + subTitle;
-			}
-			if (eventProps.location != null) {
-				filename += "_" + eventProps.location;
-			}
-			if (eventProps.venue != null) {
-				filename += "_" + eventProps.venue;
-			}
-			filename += ".xml";
-			// remove any spaces and make lower case
-			filename = filename.replace(/ /g, "-").toLowerCase();
-			return filename;
-		}*/
-
 		public static function testSourceId(str:String):Boolean {
 			var match:Object = SOURCE_ID_REG_EXP.exec(str);
 			if (match == null) {
@@ -101,5 +90,21 @@ package org.ishafoundation.archives.transcript.model
 			transcript.populateCommittedMarkupPropsMap();
 		}
 		
+		public function appendTranscript(transcriptElement:XML, deviceElements:XMLList):void {
+			if (sessionXML.transcript.length() == 0) {
+				if (sessionXML.devices.length() == 0) {
+					sessionXML.insertChildAfter(null, <devices/>);
+				}
+				var devicesElement:XML = sessionXML.devices[0];
+				for each (var deviceElement:XML in deviceElements) {
+					devicesElement.appendChild(deviceElement);
+				}
+				sessionXML.appendChild(transcriptElement);
+				transcript = new Transcript(transcriptElement, this.referenceMgr); 
+			}
+			else {
+				throw new Error("Not yet supported");
+			}
+		}
 	}
 }

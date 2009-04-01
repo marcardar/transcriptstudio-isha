@@ -1,7 +1,10 @@
 package org.ishafoundation.archives.transcript.model
 {
+	import mx.formatters.DateFormatter;
 	import mx.utils.StringUtil;
 	
+	import name.carter.mark.flex.util.DateUtils;
+	import name.carter.mark.flex.util.Utils;
 	import name.carter.mark.flex.util.XMLUtils;
 	
 	public class EventProperties
@@ -141,5 +144,74 @@ package org.ishafoundation.archives.transcript.model
 		public function set comment(newValue:String):void {
 			XMLUtils.setAttributeValue(eventElement, COMMENT_ATTR_NAME, newValue);
 		}
+
+		/**
+		 * Returns the place in the form Spanda Hall, Isha Yoga Center, India
+		 */
+		public function get place():String {
+			var placeArr:Array = [venue, location, country];
+			placeArr = Utils.condenseWhitespaceForArray(placeArr);
+			var placeStr:String = placeArr.join(", ");
+			return placeStr;
+		}
+		
+		public function generateFullName(includeEventType:Boolean, dateFormatter:DateFormatter):String {
+			var result:String = "";
+			if (includeEventType) {
+				result += type + ":";
+			}
+			if (startAt != null) {
+				result += " " + dateFormatter.format(startAt);
+			}
+			if (subTitle != null) {
+				result += " " + subTitle;
+			}
+			var place:String = place;
+			if (place.length > 0) {
+				result += " @ " + place;
+			}
+			result += " [" + id + "]";
+			return result;
+		}
+		
+		private static const DATE_FORMATTER:DateFormatter = DateUtils.createDateFormatter("DD-MMM-YY");
+		
+		public function generateLongText(referenceMgr:ReferenceManager):String {
+			var result:String = referenceMgr.getEventTypeName(type) + " (" + type + ")";
+			if (subTitle != null) {
+				result += " - " + subTitle;
+			}
+			result += "\n";
+			result += "Start: ";
+			if (startAt == null) {
+				result += "<unknown>";
+			}
+			else {
+				result += DATE_FORMATTER.format(startAt);
+			}
+			result += ", End: ";
+			if (endAt == null) {
+				result += "<unknown>";
+			}
+			else {
+				result += DATE_FORMATTER.format(endAt);
+			}
+			result += "\n";
+			result += "Place: ";
+			var place:String = place;
+			if (place == null) {
+				result += "<unknown>";
+			}
+			else {
+				result += place;
+			}
+			result += "\nLanguage: " + language; 
+			if (comment != null) {
+				result += "\n";
+				result += "Notes: " + comment;
+			}
+			return result;
+		}
+		
 	}
 }

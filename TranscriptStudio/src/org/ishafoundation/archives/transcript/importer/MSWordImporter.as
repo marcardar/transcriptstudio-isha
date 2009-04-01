@@ -23,8 +23,7 @@ package org.ishafoundation.archives.transcript.importer
 	import com.ericfeminella.collections.HashMap;
 	import com.ericfeminella.collections.IMap;
 	
-	import mx.utils.StringUtil;
-	
+	import name.carter.mark.flex.util.Utils;
 	import name.carter.mark.flex.util.XMLUtils;
 	
 	import org.ishafoundation.archives.transcript.db.XQueryExecutor;
@@ -146,6 +145,7 @@ package org.ishafoundation.archives.transcript.importer
 				successFunc();
 				return;
 			}
+			names = Utils.copyArray(names);
 			var nextName:String = names.shift();
 			var encodedNextName:String = encodeURIComponent(nextName);
 			xqueryExecutor.query("import module namespace ts4isha='http://ishafoundation.org/ts4isha/xquery' at 'java:org.ishafoundation.ts4isha.xquery.modules.TranscriptStudioModule';ts4isha:import-file-read($arg0)", [encodedNextName], function(resultXML:XML):void {

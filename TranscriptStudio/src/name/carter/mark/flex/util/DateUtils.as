@@ -1,8 +1,7 @@
 package name.carter.mark.flex.util
 {
 	import mx.formatters.DateBase;
-	
-	import name.carter.mark.flex.util.Utils;
+	import mx.formatters.DateFormatter;
 	
 	public class DateUtils
 	{
@@ -88,6 +87,15 @@ package name.carter.mark.flex.util
 				return null;
 			}
 		}
+		
+		private static const START_OF_DAY_DATE_FORMATTER:DateFormatter = createDateFormatter("YYYY-MM-DD");
+		public static const MILLIS_IN_DAY:Number = 24 * 60 * 60 * 1000;
+				
+		public static function createDateFormatter(formatString:String):DateFormatter {
+			var result:DateFormatter = new DateFormatter();
+			result.formatString = formatString;
+			return result;
+		}
 
 		public static function parseStandardDateString(dateStr:String):Date {
 			if (dateStr == null) {
@@ -98,5 +106,13 @@ package name.carter.mark.flex.util
 			dateStr = dateStr.replace("Z", " GMT-0000");
 			return new Date(Date.parse(dateStr));
 		}
+
+		public static function getStartOfDay(date:Date):Date {
+			if (date == null) {
+				return null;
+			}
+			var result:Date = DateUtils.parseStandardDateString(START_OF_DAY_DATE_FORMATTER.format(date));
+			return result;
+		} 
 	}
 }

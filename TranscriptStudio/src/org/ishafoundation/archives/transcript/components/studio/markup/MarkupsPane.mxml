@@ -64,7 +64,12 @@
 		
 		public function set transcript(transcript:Transcript):void {
 			this._transcript = transcript;
-			this.markupsTree.setMDoc(this._transcript.mdoc);
+			if (transcript == null) {
+				this.markupsTree.setMDoc(null);
+			}
+			else {
+				this.markupsTree.setMDoc(this._transcript.mdoc);
+			}
 			this.markupPropertiesPane.clearPane();
 		}
 		
@@ -118,7 +123,7 @@
         }
         
         public function createMarkupTitleShowingChangesFromId(markup:MSuperNode):String {
-        	if (markup == null) {
+        	if (markup == null || _transcript == null) {
         		return null;
         	}
         	if (markup.parent == null) {
