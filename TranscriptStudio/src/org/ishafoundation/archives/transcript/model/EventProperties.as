@@ -199,7 +199,7 @@ package org.ishafoundation.archives.transcript.model
 			result += "\n";
 			result += "Place: ";
 			var place:String = place;
-			if (place == null) {
+			if (place == null || place.length == 0) {
 				result += "<unknown>";
 			}
 			else {

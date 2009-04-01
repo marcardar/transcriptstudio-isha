@@ -21,6 +21,10 @@ package org.ishafoundation.archives.transcript.model
 			this.sessionElement = sessionElement;
 		}
 
+		public function copy():SessionProperties {
+			return new SessionProperties(sessionElement.copy());
+		}
+
 		[Bindable]
 		public function get id():String {
 			return sessionElement.attribute(ID_ATTR_NAME);

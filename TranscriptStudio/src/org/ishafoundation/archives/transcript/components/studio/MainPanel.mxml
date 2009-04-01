@@ -22,7 +22,7 @@
 	<mx:Script>
 		<![CDATA[
 			import mx.events.PropertyChangeEvent;
-			import org.ishafoundation.archives.transcript.components.studio.importer.ExternalTranscriptsSelectorDialog;
+			import org.ishafoundation.archives.transcript.components.studio.importer.TranscriptsToImportSelectorDialog;
 			import org.ishafoundation.archives.transcript.components.studio.importer.ImportDialog;
 			import mx.utils.StringUtil;
 			import mx.managers.CursorManager;
@@ -390,8 +390,8 @@
 				if (session == null) {
 					throw new Error("Cannot do a simple import when no session is open");
 				}
-				var popup:ExternalTranscriptsSelectorDialog = ExternalTranscriptsSelectorDialog.display(this, databaseMgr);
-				popup.addEventListener(ExternalTranscriptsSelectorDialog.FILES_IMPORTED, function(evt:Event):void {
+				var popup:TranscriptsToImportSelectorDialog = TranscriptsToImportSelectorDialog.display(this, databaseMgr);
+				popup.addEventListener(TranscriptsToImportSelectorDialog.FILES_IMPORTED, function(evt:Event):void {
 					var importedSessionXML:XML = MSWordImporter.createSessionElement(popup.selectedAudioTranscripts);
 					var importedDeviceElements:XMLList = importedSessionXML.devices.device;
 					var importedTranscriptElement:XML = importedSessionXML.transcript[0];

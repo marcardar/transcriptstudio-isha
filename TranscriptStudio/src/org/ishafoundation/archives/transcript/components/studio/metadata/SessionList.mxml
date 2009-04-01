@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:List xmlns:mx="http://www.adobe.com/2006/mxml" labelFunction="{itemLabelFunc}">
+	<mx:Script>
+	<![CDATA[
+		import org.ishafoundation.archives.transcript.model.EventProperties;
+		import mx.rpc.http.HTTPService;
+		import org.ishafoundation.archives.transcript.model.SessionProperties;
+		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
+		
+		public var xqueryExecutor:XQueryExecutor;
+		public var errorHandler:Function;
+		
+		private var _eventProps:EventProperties;
+		
+		public function set eventProps(newValue:EventProperties):void {
+			_eventProps = newValue;
+			refresh(null);
+		}
+		
+		public function get eventProps():EventProperties {
+			return _eventProps;
+		}
+		
+		public function refresh(sessionId:String):void {
+			xqueryExecutor.executeStoredXQuery("retrieve-session-props.xql", {eventId:eventProps.id}, function(returnVal:XML):void {
+				var sessionPropsElements:XMLList = returnVal.*;
+				var arr:Array = [];
+				var propsToSelect:SessionProperties;
+				for each (var sessionPropsElement:XML in sessionPropsElements) {
+					var props:SessionProperties = new SessionProperties(sessionPropsElement);
+					arr.push(props);
+					if (props.id == sessionId) {
+						propsToSelect = props;
+					}
+				}
+				dataProvider = arr;
+				if (propsToSelect != null) {
+					callLater(function():void {
+						selectedItem = propsToSelect;
+					});
+				}
+			}, function(msg:String):void {
+				if (errorHandler != null) {
+					errorHandler(msg);
+				} 
+			}, HTTPService.RESULT_FORMAT_E4X);			
+		}
+		
+		private function itemLabelFunc(sessionProps:SessionProperties):String {
+			return sessionProps.getFullName(eventProps.startAt);
+		}		
+	]]>
+	</mx:Script>
+</mx:List>
