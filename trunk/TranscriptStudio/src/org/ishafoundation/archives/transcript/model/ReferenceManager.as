@@ -539,7 +539,7 @@ package org.ishafoundation.archives.transcript.model
 			}, failureFunc);			
 		}
 		
-		private function getAllConcepts(successFunc:Function, failureFunc:Function, reloadReferences:Boolean):void {
+		public function getAllConcepts(successFunc:Function, failureFunc:Function, reloadReferences:Boolean):void {
 			trace("Fetching all concepts");
 			xqueryExecutor.executeStoredXQuery("get-all-concepts.xql", {}, function(returnVal:String):void {
 				var arr:Array = returnVal.split(" ");
