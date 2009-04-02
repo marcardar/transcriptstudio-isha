@@ -48,7 +48,7 @@ package org.ishafoundation.archives.transcript.model
 		public function createSession(sessionXML:XML, successFunc:Function, failureFunc:Function):Session {
 			var result:Session = new Session(sessionXML, referenceMgr);
 			result.unsavedChanges = true; // need to save all this stuff			
-			storeTranscript(result, function():void {
+			storeSession(result, function():void {
 				successFunc();
 			}, failureFunc);
 			return result;
@@ -73,7 +73,7 @@ package org.ishafoundation.archives.transcript.model
 			return new Session(sessionXML, referenceMgr);
 		}
 			
-		public function storeTranscript(session:Session, externalSuccess:Function, externalFailure:Function):void {
+		public function storeSession(session:Session, externalSuccess:Function, externalFailure:Function):void {
 			if (session.id == null) {
 				throw new Error("Tried to store session but either the collection or transcript id was not set");
 			}
@@ -92,7 +92,9 @@ package org.ishafoundation.archives.transcript.model
 		private function setActionAttributes(session:Session):void {
 			var date:Date = new Date();
 			//setModifiedAttributesOnElement(session.sessionXML, date, username);
-			setActionAttributesOnNode(session.transcript.mdoc, date);
+			if (session.transcript != null) {
+				setActionAttributesOnNode(session.transcript.mdoc, date);
+			}
 		}
 		
 		private function setActionAttributesOnNode(node:MNode, date:Date, deep:Boolean = true):void {
