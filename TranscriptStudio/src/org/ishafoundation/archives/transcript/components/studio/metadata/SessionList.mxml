@@ -8,7 +8,18 @@
 		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
 		
 		public var xqueryExecutor:XQueryExecutor;
+		/**
+		 * must accept an array - which represents all the session props for the specified event
+		 */
+		public var successHandler:Function;
 		public var errorHandler:Function;
+		
+		/**
+		 * Setting this to true will do the following:
+		 * 
+		 * 1. If there are no sessions then 
+		 */
+		public var autoSelect:Boolean = false;
 		
 		private var _eventProps:EventProperties;
 		
@@ -19,6 +30,10 @@
 		
 		public function get eventProps():EventProperties {
 			return _eventProps;
+		}
+		
+		public function get selectedSessionProps():SessionProperties {
+			return selectedItem as SessionProperties;
 		}
 		
 		public function refresh(sessionId:String):void {
@@ -39,11 +54,14 @@
 						selectedItem = propsToSelect;
 					});
 				}
+				if (successHandler != null) {
+					successHandler(arr);
+				}
 			}, function(msg:String):void {
 				if (errorHandler != null) {
 					errorHandler(msg);
 				} 
-			}, HTTPService.RESULT_FORMAT_E4X);			
+			}, HTTPService.RESULT_FORMAT_E4X);
 		}
 		
 		private function itemLabelFunc(sessionProps:SessionProperties):String {

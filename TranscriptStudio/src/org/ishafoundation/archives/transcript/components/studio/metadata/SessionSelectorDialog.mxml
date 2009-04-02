@@ -2,6 +2,7 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" x="50" width="470" horizontalAlign="center" title="Select Session" creationComplete="init()" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*">
 	<mx:Script>
 	<![CDATA[
+		import mx.events.FlexEvent;
 		import mx.rpc.http.HTTPService;
 		import name.carter.mark.flex.util.DateUtils;
 		import org.ishafoundation.archives.transcript.model.SessionProperties;
@@ -12,41 +13,55 @@
 		
 		private var eventStartDate:Date;
 	   	
-		public static function display(sessionPropsElements:XMLList, eventProps:EventProperties, parent:DisplayObject):SessionSelectorDialog {
+		/*public static function display(xqueryExecutor:XQueryExecutor, eventProps:EventProperties, parent:DisplayObject):SessionSelectorDialog {
 			var result:SessionSelectorDialog = new SessionSelectorDialog();
-			result.eventStartDate = eventProps.startAt;
+			result.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
+				result.sessionList.xqueryExecutor = xqueryExecutor;
+				result.sessionList.errorHandler = result.sessionListErrorHandler;
+				result.sessionList.eventProps = eventProps;
+			});
 			PopUpManager.addPopUp(result, parent, true);
-			var arr:Array = [];
-			for each (var sessionPropsElement:XML in sessionPropsElements) {
-				arr.push(new SessionProperties(sessionPropsElement));
-			}
-			result.sessionList.dataProvider = arr;
 			return result;
-		}
+		}*/
 	
+		private function sessionListErrorHandler(msg:String):void {
+			Alert.show(msg, "Could not retrieve sessions for event: " + sessionList.eventProps.id); 
+		}
+		
 		public static function displayIfNecessary(eventProps:EventProperties, parent:DisplayObject, xqueryExecutor:XQueryExecutor, successFunc:Function):void {
-			xqueryExecutor.executeStoredXQuery("retrieve-session-props.xql", {eventId:eventProps.id}, function(returnVal:XML):void {
-				var sessionPropsElements:XMLList = returnVal.*;
-				switch (sessionPropsElements.length()) {
-					case 0:
-						Alert.show("No sessions defined for this event");
-						//successFunc(null);
-						break;
-					case 1:
-						var sessionId:String = (sessionPropsElements[0] as XML).@id;
-						successFunc(sessionId);
-						break;
-					default:
-						var dialog:SessionSelectorDialog = display(sessionPropsElements, eventProps, parent);
-						dialog.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
-							// the user has selected a session
-							var sessionId:String = dialog.selectedSessionProps.id;
-							successFunc(sessionId);
-						});						
-				}
-			}, function(msg:String):void {
-				Alert.show(msg, "Could not retrieve sessions for selected event: " + eventProps.id); 
-			}, HTTPService.RESULT_FORMAT_E4X);			
+			var result:SessionSelectorDialog = new SessionSelectorDialog();
+			result.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
+				result.sessionList.xqueryExecutor = xqueryExecutor;
+				result.sessionList.errorHandler = result.sessionListErrorHandler;
+				result.sessionList.successHandler = function(sessionPropsArr:Array):void {
+					switch (sessionPropsArr.length) {
+						case 0:
+							Alert.show("No sessions defined for event: " + eventProps.id);
+							result.closeMe();
+							break;
+						case 1:
+							successFunc(sessionPropsArr[0]);
+							result.closeMe();
+							break;
+						default:
+							// leave the dialog open and let the user select a session
+							result.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+								// the user has selected a session
+								successFunc(result.selectedSessionProps);
+							});						
+					}
+				};
+				result.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+					successFunc(result.sessionList.selectedSessionProps);
+					result.closeMe();
+				});
+				result.sessionList.addEventListener(MouseEvent.DOUBLE_CLICK, function(evt:MouseEvent):void {
+					successFunc(result.sessionList.selectedSessionProps);
+					result.closeMe();
+				});
+				result.sessionList.eventProps = eventProps;
+			});
+			PopUpManager.addPopUp(result, parent, true);
 		}
 	
 		private function init():void {
@@ -63,14 +78,10 @@
 		private function closeMe():void {
 			PopUpManager.removePopUp(this);
 		}
-
-		private function resultLabelFunc(sessionProps:SessionProperties):String {
-			return sessionProps.getFullName(eventStartDate);
-		}		
 	]]>
 	</mx:Script>
 
-	<mx:List id="sessionList" width="100%" labelFunction="{resultLabelFunc}"/>
+	<metadata:SessionList id="sessionList" width="100%" doubleClickEnabled="true"/>
 	<mx:HBox id="buttonBox">
 		<mx:Button id="okButton" label="OK" enabled="{sessionList.selectedItem != null}" click="okClicked(event)" />
 		<mx:Button label="Cancel" click="closeMe()"/>
