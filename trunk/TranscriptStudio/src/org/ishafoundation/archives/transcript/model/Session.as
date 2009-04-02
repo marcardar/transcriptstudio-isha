@@ -28,16 +28,16 @@ package org.ishafoundation.archives.transcript.model
 			var transcriptXML:XML = sessionXML.transcript[0];
 			if (transcriptXML != null) {
 				this.transcript = new Transcript(transcriptXML, referenceMgr);
+				ChangeWatcher.watch(this.transcript.mdoc, "modified", function(evt:PropertyChangeEvent):void {
+					// only care about positive changes (because negative changes are driven from outside)
+					if (new Boolean(evt.newValue)) {
+						unsavedChanges = true;					
+					}
+				});
 			}
 			else {
 				this.transcript = null;
 			}
-			ChangeWatcher.watch(this, "transcript.mdoc.modified", function(evt:PropertyChangeEvent):void {
-				// only care about positive changes (because negative changes are driven from outside)
-				if (new Boolean(evt.newValue)) {
-					unsavedChanges = true;					
-				}
-			});
 		}
 		
 		public function get props():SessionProperties {
@@ -80,7 +80,7 @@ package org.ishafoundation.archives.transcript.model
 		
 		public function set unsavedChanges(value:Boolean):void {
 			_unsavedChanges = value;
-			if (transcript.mdoc.modified != value) {
+			if (transcript != null && transcript.mdoc.modified != value) {
 				transcript.mdoc.modified = value;
 			}
 		}
