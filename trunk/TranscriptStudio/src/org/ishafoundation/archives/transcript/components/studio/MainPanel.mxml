@@ -174,8 +174,8 @@
 							}
 							else if (docXML.localName() == "event") {
 								var eventProps:EventProperties = new EventProperties(docXML);
-								SessionSelectorDialog.displayIfNecessary(eventProps, popup, databaseMgr, function(sessionId:String):void {
-									sessionMgr.retrieveSession(sessionId, openSessionSuccess, openSessionFailure);
+								SessionSelectorDialog.displayIfNecessary(eventProps, popup, databaseMgr, function(sessionProps:SessionProperties):void {
+									sessionMgr.retrieveSession(sessionProps.id, openSessionSuccess, openSessionFailure);
 									popup.closeMe();
 								});
 							}
