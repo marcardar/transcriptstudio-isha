@@ -39,14 +39,14 @@
 			import org.ishafoundation.archives.transcript.db.DatabaseManagerUtils;
 			import mx.controls.Alert;
 			import org.ishafoundation.archives.transcript.components.generic.AboutBox;
-			import org.ishafoundation.archives.transcript.components.studio.metadata.SessionPropertiesEditDialog;
+			import org.ishafoundation.archives.transcript.components.studio.metadata.SessionPropertiesEditorDialog;
 			import org.ishafoundation.archives.transcript.model.SessionProperties;
 			import org.ishafoundation.archives.transcript.model.SessionManager;
 			import org.ishafoundation.archives.transcript.model.ReferenceManager;
 			import mx.managers.PopUpManager;
 			import name.carter.mark.flex.project.mdoc.*;
 			import org.ishafoundation.archives.transcript.components.studio.media.MediaPlayerDialog;
-			import org.ishafoundation.archives.transcript.components.studio.metadata.EventPropertiesEditDialog;
+			import org.ishafoundation.archives.transcript.components.studio.metadata.EventPropertiesEditorDialog;
 			import org.ishafoundation.archives.transcript.model.EventProperties;
 			import org.ishafoundation.archives.transcript.components.generic.DebugPopUp;
 			import org.ishafoundation.archives.transcript.components.studio.concept.ConceptManagerDialog;
@@ -311,8 +311,8 @@
 				var thisPanel:MainPanel = this;
 				DatabaseManagerUtils.retrieveEventXML(session.props.eventId, databaseMgr, function(eventXML:XML):void {
 					var eventProps:EventProperties = new EventProperties(eventXML);
-					var popup:EventPropertiesEditDialog = EventPropertiesEditDialog.display(thisPanel, databaseMgr, referenceMgr, eventProps);
-					popup.addEventListener(EventPropertiesEditDialog.EVENT_EDITED, function(event:Event):void {
+					var popup:EventPropertiesEditorDialog = EventPropertiesEditorDialog.display(thisPanel, databaseMgr, referenceMgr, eventProps);
+					popup.addEventListener(EventPropertiesEditorDialog.EVENT_EDITED, function(event:Event):void {
 						status = "Successfully edited event";
 						Alert.show("Successfully edited event"); 
 					});
@@ -325,8 +325,8 @@
 				var sessionPropsXMLCopy:XML = session.sessionXML.copy();
 				delete sessionPropsXMLCopy.*;
 				var sessionPropsCopy:SessionProperties = new SessionProperties(sessionPropsXMLCopy);
-				var popup:SessionPropertiesEditDialog = SessionPropertiesEditDialog.display(this, databaseMgr, referenceMgr, sessionPropsCopy); 
-				popup.addEventListener(SessionPropertiesEditDialog.SESSION_PROPS_EDITED, function():void {
+				var popup:SessionPropertiesEditorDialog = SessionPropertiesEditorDialog.display(this, databaseMgr, referenceMgr, sessionPropsCopy); 
+				popup.addEventListener(SessionPropertiesEditorDialog.SESSION_PROPS_EDITED, function():void {
 					// copy the session props over the existing ones
 					// first delete the old ones
 					delete session.sessionXML.@*;

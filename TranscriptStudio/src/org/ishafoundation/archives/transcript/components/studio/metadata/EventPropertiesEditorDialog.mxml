@@ -37,8 +37,8 @@
 	   	[Bindable]
 	   	public var referenceMgr:ReferenceManager;
 	   	
-		public static function display(parent:DisplayObject, xmlRetrieverStorer:XMLRetrieverStorer, referenceMgr:ReferenceManager, eventProps:EventProperties):EventPropertiesEditDialog {
-			var result:EventPropertiesEditDialog = new EventPropertiesEditDialog();
+		public static function display(parent:DisplayObject, xmlRetrieverStorer:XMLRetrieverStorer, referenceMgr:ReferenceManager, eventProps:EventProperties):EventPropertiesEditorDialog {
+			var result:EventPropertiesEditorDialog = new EventPropertiesEditorDialog();
 			result.xmlRetrieverStorer = xmlRetrieverStorer;
 			result.referenceMgr = referenceMgr;
 			PopUpManager.addPopUp(result, parent, true);

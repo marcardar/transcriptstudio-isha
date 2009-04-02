@@ -16,11 +16,11 @@
 		
 		private var xmlStorer:XMLStorer;
 		
-		public static function display(parent:DisplayObject, xmlStorer:XMLStorer, referenceMgr:ReferenceManager, eventProps:EventProperties = null, sessionProps:SessionProperties = null):SessionCreatorDialog {
+		public static function display(parent:DisplayObject, xmlStorer:XMLStorer, referenceMgr:ReferenceManager, eventProps:EventProperties = null, sessionProps:SessionProperties = null):SessionPropertiesCreatorDialog {
 			if (sessionProps == null) {
 				sessionProps = new SessionProperties(<session eventId="{eventProps.id}"/>);
 			}
-			var result:SessionCreatorDialog = new SessionCreatorDialog();
+			var result:SessionPropertiesCreatorDialog = new SessionPropertiesCreatorDialog();
 			result.xmlStorer = xmlStorer;
 			PopUpManager.addPopUp(result, parent, true);
 			result.sessionPropertiesPane.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {

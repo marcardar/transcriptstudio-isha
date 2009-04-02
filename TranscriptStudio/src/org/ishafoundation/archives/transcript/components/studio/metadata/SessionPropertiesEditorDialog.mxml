@@ -10,8 +10,8 @@
 		
 	   	public static const SESSION_PROPS_EDITED:String = "SESSION_PROPS_EDITED";
 	   	
-		public static function display(parent:DisplayObject, xmlRetriever:XMLRetriever, referenceMgr:ReferenceManager, sessionProps:SessionProperties):SessionPropertiesEditDialog {
-			var result:SessionPropertiesEditDialog = new SessionPropertiesEditDialog();
+		public static function display(parent:DisplayObject, xmlRetriever:XMLRetriever, referenceMgr:ReferenceManager, sessionProps:SessionProperties):SessionPropertiesEditorDialog {
+			var result:SessionPropertiesEditorDialog = new SessionPropertiesEditorDialog();
 			PopUpManager.addPopUp(result, parent, true);
 			result.sessionPropsPane.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
 				result.sessionPropsPane.referenceMgr = referenceMgr;
