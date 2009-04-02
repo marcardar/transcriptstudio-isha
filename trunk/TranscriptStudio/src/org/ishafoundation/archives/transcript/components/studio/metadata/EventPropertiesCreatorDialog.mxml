@@ -15,8 +15,8 @@
 		
 		private var xmlStorer:XMLStorer;
 		
-		public static function display(parent:DisplayObject, xmlStorer:XMLStorer, referenceMgr:ReferenceManager, eventProps:EventProperties):EventCreatorDialog {
-			var result:EventCreatorDialog = new EventCreatorDialog();
+		public static function display(parent:DisplayObject, xmlStorer:XMLStorer, referenceMgr:ReferenceManager, eventProps:EventProperties):EventPropertiesCreatorDialog {
+			var result:EventPropertiesCreatorDialog = new EventPropertiesCreatorDialog();
 			result.xmlStorer = xmlStorer;
 			PopUpManager.addPopUp(result, parent, true);
 			result.eventPropertiesPane.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
