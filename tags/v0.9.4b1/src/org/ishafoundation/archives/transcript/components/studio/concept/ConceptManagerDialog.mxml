@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" alpha="2.0" layout="vertical" x="30" y="30" width="700" height="450" title="Concept Manager" horizontalAlign="center" creationComplete="init()" paddingLeft="0" paddingRight="0" paddingTop="0" roundedBottomCorners="false">
+<mx:Script>
+	<![CDATA[
+		import mx.events.CloseEvent;
+		import org.ishafoundation.archives.transcript.components.generic.MessagePopUp;
+		import org.ishafoundation.archives.transcript.util.Constants;
+		import mx.utils.StringUtil;
+		import org.ishafoundation.archives.transcript.components.generic.TextInputDialog;
+		import mx.events.MenuEvent;
+		import mx.collections.ArrayCollection;
+		import mx.managers.DragManager;
+		import mx.binding.utils.BindingUtils;
+		import mx.controls.Alert;
+		import mx.events.DragEvent;
+		import name.carter.mark.flex.util.Utils;
+		import mx.managers.PopUpManager;
+		import org.ishafoundation.archives.transcript.model.ReferenceManager;
+		
+		[Bindable]
+    	private var referenceMgr:ReferenceManager;
+    	[Bindable]
+    	public var selectedConceptId:String;
+    	
+		public static function createInstance(referenceMgr:ReferenceManager):ConceptManagerDialog {
+			var result:ConceptManagerDialog = new ConceptManagerDialog();
+			result.referenceMgr = referenceMgr; 
+			return result;
+		}
+		
+		private function init():void {
+			referenceMgr.getAllConcepts(function(conceptIds:Array):void {
+				conceptList.dataProvider = conceptIds;
+			}, function(msg:String):void {
+				Alert.show(msg, "Failed to get all concepts");
+			}, true);
+		}
+
+    	private function selectionChange(newConceptId:String):void {
+    		if (DragManager.isDragging) {
+    			return;
+    		}
+    		if (this.selectedConceptId != newConceptId) {
+	    		trace("Selection changed to: " + newConceptId);
+    			this.selectedConceptId = newConceptId;
+    		}
+    		conceptList.selectedItem = newConceptId;
+    	}
+
+    	/**
+    	 * Convenience method
+    	 */
+    	private static function sort(arr:Array):Array {
+    		var result:Array = arr;
+    		arr.sort();
+    		return result;
+    	}
+    	
+		private function closeMe():void {
+        	PopUpManager.removePopUp(this);
+		}
+
+		private function dragDropToSubTypeList(evt:DragEvent):void {
+			if (!evt.dragSource.hasFormat("items")) {
+				return;
+			}
+			evt.preventDefault();
+			evt.currentTarget.hideDropFeedback(evt);
+			var itemsArray:Array = evt.dragSource.dataForFormat("items") as Array;
+			var draggedConceptId:String = itemsArray[0].toString();
+			trace("Concept dropped: " + draggedConceptId);
+			if (this.selectedConceptId == draggedConceptId) {
+				Alert.show("Cannot assign concept as subtype of itself: " + draggedConceptId);
+			}
+			else {
+				referenceMgr.addSubtype(this.selectedConceptId, draggedConceptId, function(added:Boolean):void {
+					if (added) {
+						refresh();
+					}
+					else {
+						Alert.show("Already subtype: " + draggedConceptId);
+					}
+				}, function(msg:String):void {
+					Alert.show(msg, "Failed to add subtype: " + draggedConceptId);
+				});
+			}
+		}
+		
+		private function dragDropToSynonymList(evt:DragEvent):void {
+			if (!evt.dragSource.hasFormat("items")) {
+				return;
+			}
+			evt.preventDefault();
+			evt.currentTarget.hideDropFeedback(evt);
+			var itemsArray:Array = evt.dragSource.dataForFormat("items") as Array;
+			var draggedConceptId:String = itemsArray[0].toString();
+			trace("Concept dropped: " + draggedConceptId);
+			if (this.selectedConceptId == draggedConceptId) {
+				Alert.show("Cannot assign concept as synonym of itself: " + draggedConceptId);
+			}
+			else {
+				referenceMgr.addSynonyms([this.selectedConceptId, draggedConceptId], function(added:Boolean):void {
+					if (added) {
+						refresh();
+					}
+					else {
+						Alert.show("Already synonym: " + draggedConceptId);
+					}
+				}, function(msg:String):void {
+					Alert.show(msg, "Failed to add synonym: " + draggedConceptId);
+				});
+			}
+		}
+		
+		private function dragComplete(evt:DragEvent):void {
+			conceptList.selectedItem = this.selectedConceptId;			
+		}
+		
+		private function generateCollectedConcepts(conceptId:String):String {
+			if (conceptId == null) {
+				return "";
+			}
+			else {
+				return sort(referenceMgr.getCollectedConceptIds(conceptId).toArray()).toString().replace(/,/g, ", ")
+			}
+		}
+		
+		private function subTypeRemoveHandler():void {
+			var subtypeId:String = subTypeList.selectedItem as String;
+			referenceMgr.removeSubtype(this.selectedConceptId, subtypeId, function(removed:Boolean):void {
+				if (removed) {
+					refresh();
+				}
+				else {
+					Alert.show("Subtype not found: " + subtypeId);
+				}
+			}, function(msg:String):void {
+				Alert.show(msg, "Failed to remove subtype: " + subtypeId);
+			});
+		}
+		
+		private function synonymsLeaveHandler():void {
+			referenceMgr.removeSynonym(this.selectedConceptId, function(removed:Boolean):void {
+				if (removed) {
+					refresh();
+				}
+				else {
+					Alert.show("Synonym not found: " + this.selectedConceptId);
+				}
+			}, function(msg:String):void {
+				Alert.show(msg, "Failed to remove synonym: " + this.selectedConceptId);
+			});
+		}
+		
+		private function refresh():void {
+			subTypeList.executeBindings();
+			synonymList.executeBindings();
+			collectedConceptTextArea.executeBindings();
+		}
+		
+		private function addConcept():void {
+			var newConceptDialog:TextInputDialog = TextInputDialog.display(this, "Enter new concept", null, Constants.CONCEPT_ID_RESTRICTION);
+			newConceptDialog.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+				var conceptId:String = Utils.normalizeSpace(newConceptDialog.textInput.text);
+				if (conceptId != "") {
+					var messagePopUp:MessagePopUp = createMessagePopup("Adding concept: " + conceptId);
+					referenceMgr.addConcept(conceptId, function(returnVal:int):void {
+						init();
+						selectionChange(conceptId);
+						if (returnVal == 0) {
+							messagePopUp.enableOkButton("Concept already exists!");
+						}
+						else {
+							messagePopUp.enableOkButton("Added");
+						}
+					},
+					function(msg:String):void {
+						messagePopUp.enableOkButton("Failed", msg);
+					});
+				}
+			});			
+		}
+		
+		private function renameConcept():void {
+			var oldConceptId:String = conceptList.selectedItem.toString();
+			var thisObj:ConceptManagerDialog = this;
+			referenceMgr.countConceptInstances(oldConceptId, function(count:int):void {
+				if (count == 0) {
+					renameConceptWithoutConfirmation(oldConceptId);
+				}
+				else {
+					Alert.show("Are you sure you want to rename " + count + " instance(s)?", "Renaming concept: " + oldConceptId, Alert.OK | Alert.CANCEL, thisObj, function(evt:CloseEvent):void {
+						if (evt.detail == Alert.OK) {
+							renameConceptWithoutConfirmation(oldConceptId);
+						}
+					});
+				}
+			}, function(msg:String):void {
+				Alert.show(msg, "Error");				
+			});
+		}
+		
+		private function renameConceptWithoutConfirmation(oldConceptId:String):void {
+			var renameConceptDialog:TextInputDialog = TextInputDialog.display(this, "Rename concept", oldConceptId, Constants.CONCEPT_ID_RESTRICTION);
+			renameConceptDialog.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+				var newConceptId:String = Utils.normalizeSpace(renameConceptDialog.textInput.text);
+				if (newConceptId != "") {
+					if (oldConceptId == newConceptId) {
+						Alert.show("Concept name unchanged: " + oldConceptId);
+						return;
+					}
+					var messagePopUp:MessagePopUp = createMessagePopup("Renaming concept: " + oldConceptId + " to: " + newConceptId);
+					referenceMgr.renameConcept(oldConceptId, newConceptId, function(returnVal:int):void {
+						init();
+						if (returnVal == 0) {
+							selectionChange(null);
+							messagePopUp.enableOkButton("Could not find concept!");
+						}
+						else {
+							selectionChange(newConceptId);
+							messagePopUp.enableOkButton("Renamed");
+						}
+					},
+					function(msg:String):void {
+						messagePopUp.enableOkButton("Failed", msg);
+					});
+				}
+			});
+		}
+		
+		private function removeConcept():void {
+			var conceptId:String = conceptList.selectedItem.toString();
+			referenceMgr.countConceptInstances(conceptId, function(count:int):void {
+				if (count == 0) {
+					var messagePopUp:MessagePopUp = createMessagePopup("Removing concept: " + conceptId);
+					referenceMgr.removeConcept(conceptId, function(returnVal:int):void {
+						init();
+						selectionChange(null);
+						messagePopUp.enableOkButton(returnVal == 0 ? "Could not find concept!" : "Removed");
+					},
+					function(msg:String):void {
+						messagePopUp.enableOkButton("Failed", msg);
+					});
+				}
+				else {
+					Alert.show("Cannot remove concept because it appears at least once (" + count + " instance(s)) in all transcripts");
+				}
+			}, function(msg:String):void {
+				Alert.show(msg, "Error");
+			});
+		}
+		
+		private function onMenuClick(evt:MenuEvent):void {
+			var actionName:String = evt.item.@id;
+			if ( actionName == "add" ) {
+				addConcept();
+			}
+			else if ( actionName == "rename" ) {
+				renameConcept();
+			}
+			else if ( actionName == "remove" ) {
+				removeConcept();
+			}
+		}
+		
+		private function createMessagePopup(title:String):MessagePopUp {
+			var result:MessagePopUp = MessagePopUp.display(this, title, "Please wait...", 250);
+			result.okButton.enabled = false;
+			return result;
+		}
+	]]>
+	</mx:Script>
+	<mx:MenuBar id="myMenuBar" width="100%" labelField="@label" itemClick="onMenuClick(event)">
+		<mx:XMLList id="menuData">
+			<menuitem label="Concept">
+				<menuitem id="add" label="Add..."/>
+				<menuitem id="rename" label="Rename..." enabled="{conceptList.selectedItem != null}"/>
+				<menuitem id="remove" label="Remove" enabled="{conceptList.selectedItem != null}"/>
+			</menuitem>
+		</mx:XMLList>
+	</mx:MenuBar>
+	<mx:HDividedBox width="100%" height="100%" horizontalGap="{Utils.DIVIDER_SIZE}">
+		<mx:VBox width="33%" height="100%" minWidth="100">
+			<mx:Label text="All Concepts"/>
+			<mx:List id="conceptList" width="100%" height="100%" change="selectionChange(conceptList.selectedItem as String)" dragEnabled="true" dragDrop="dragDropToSubTypeList(event)" dragComplete="dragComplete(event)"/>
+		</mx:VBox>
+		<mx:VDividedBox width="67%" height="100%" minWidth="250" verticalGap="{Utils.DIVIDER_SIZE}">
+			<mx:HDividedBox width="100%" height="60%" minHeight="100" horizontalGap="{Utils.DIVIDER_SIZE}" paddingBottom="10">
+				<mx:VBox width="100%" height="100%" minWidth="130" horizontalAlign="center">
+					<mx:Label text="Immediate subtypes" width="100%"/>
+					<mx:List id="subTypeList" height="100%" width="100%" enabled="{this.selectedConceptId != null}" dropEnabled="true" dragDrop="dragDropToSubTypeList(event)" dataProvider="{this.selectedConceptId == null ? null : sort(this.referenceMgr.getConceptSubTypes(this.selectedConceptId).toArray())}"/>
+					<mx:Button label="Remove" click="subTypeRemoveHandler()" enabled="{subTypeList.selectedItem != null}"/>
+				</mx:VBox>
+				<mx:VBox width="100%" height="100%" minWidth="100" horizontalAlign="center">
+					<mx:Label text="Synonym group" width="100%"/>
+					<mx:List id="synonymList" height="100%" width="100%" enabled="{this.selectedConceptId != null}" selectable="false" dropEnabled="true" dragDrop="dragDropToSynonymList(event)" dataProvider="{this.selectedConceptId == null ? null : sort(referenceMgr.getConceptSynonymsIncludingSelf(this.selectedConceptId).toArray())}"/>
+					<mx:Button label="Leave Group" enabled="{(synonymList.dataProvider as ArrayCollection).length > 1}" click="synonymsLeaveHandler()"/>
+				</mx:VBox>
+			</mx:HDividedBox>
+			<mx:VBox width="100%" height="40%" minHeight="100" paddingTop="10">
+				<mx:Label text="Collected synonyms and subtypes"/>
+				<mx:TextArea id="collectedConceptTextArea" width="100%" height="100%" editable="false" selectable="false" wordWrap="true" enabled="{this.selectedConceptId != null}" text="{generateCollectedConcepts(this.selectedConceptId)}"/>
+			</mx:VBox>
+		</mx:VDividedBox>
+	</mx:HDividedBox>
+	<mx:HBox>
+		<mx:Button label="OK" click="{closeMe();referenceMgr.refreshAllConceptsArray()}"/>
+	</mx:HBox>	
+</mx:TitleWindow>

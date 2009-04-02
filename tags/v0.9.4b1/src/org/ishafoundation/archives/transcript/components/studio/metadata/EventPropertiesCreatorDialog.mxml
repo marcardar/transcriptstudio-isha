@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Create Event" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*">
+	<mx:Script>
+	<![CDATA[
+		import org.ishafoundation.archives.transcript.db.XMLStorer;
+		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
+		import mx.events.FlexEvent;
+		import org.ishafoundation.archives.transcript.model.ReferenceManager;
+		import org.ishafoundation.archives.transcript.model.EventProperties;
+		import org.ishafoundation.archives.transcript.db.DatabaseManager;
+		import mx.controls.Alert;
+		import mx.managers.PopUpManager;
+		
+		public static const EVENT_EDITED:String = "EVENT_EDITED";
+		
+		private var xmlStorer:XMLStorer;
+		
+		public static function display(parent:DisplayObject, xmlStorer:XMLStorer, referenceMgr:ReferenceManager, eventProps:EventProperties):EventPropertiesCreatorDialog {
+			var result:EventPropertiesCreatorDialog = new EventPropertiesCreatorDialog();
+			result.xmlStorer = xmlStorer;
+			PopUpManager.addPopUp(result, parent, true);
+			result.eventPropertiesPane.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
+				result.eventPropertiesPane.referenceMgr = referenceMgr;
+				result.eventPropertiesPane.callLater(function():void {
+					result.eventPropertiesPane.eventProps = eventProps == null ? new EventProperties(<event type="a"/>) : eventProps;
+				});
+			}, true);
+			return result;
+		}
+	
+		public function get eventProps():EventProperties {
+			return eventPropertiesPane.eventProps;
+		}
+		
+		private function okClicked():void {
+			xmlStorer.storeXML(eventProps.eventElement, function(eventId:String):void {
+				eventProps.id = eventId;
+				closeMe();
+				dispatchEvent(new Event(EVENT_EDITED));
+			}, function (msg:String):void {
+				throw new Error("Could not store event file '" + eventProps.path + "': " + msg);
+			});
+		}
+		
+		public function closeMe():void {
+			PopUpManager.removePopUp(this);
+		}
+	]]>
+	</mx:Script>
+	
+	<metadata:EventPropertiesPane id="eventPropertiesPane" width="100%" height="100%"/>
+	<mx:HBox id="buttonBox">
+		<mx:Button id="okButton" label="OK" enabled="{eventPropertiesPane.ready}" click="okClicked()"/>
+		<mx:Button label="Cancel" click="closeMe()"/>
+	</mx:HBox>
+	
+</mx:TitleWindow>
