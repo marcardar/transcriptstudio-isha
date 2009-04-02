@@ -142,7 +142,7 @@
 			}
 			
 			private function showUnsavedChangesPopupIfNecessary(successFunction:Function):void {
-				UnhandledChangesPopUpManager.displayIfNecessaryUsingAsyncFunc(this.session != null && this.session.unsavedChanges, storeTranscript, storeTranscriptFailure, successFunction); 
+				UnhandledChangesPopUpManager.displayIfNecessaryUsingAsyncFunc(this.session != null && this.session.unsavedChanges, storeSession, storeTranscriptFailure, successFunction); 
 			}
 			
 			private function showOpenDialog():void {
@@ -243,11 +243,11 @@
 				}
 			}
 			
-			private function storeTranscript(successFunction:Function, failureFunction:Function):void {
+			private function storeSession(successFunction:Function, failureFunction:Function):void {
 	  			if (!this.session.unsavedChanges) {
 	  				return;
 	  			}
-				this.sessionMgr.storeTranscript(session, successFunction, failureFunction);
+				this.sessionMgr.storeSession(session, successFunction, failureFunction);
 			}
 			
 			private function storeTranscriptSuccess():void
@@ -415,7 +415,7 @@
 					retrieveByIdClicked();
 				}
 				else if ( actionName == "store" ) {
-					storeTranscript(storeTranscriptSuccess, storeTranscriptFailure);
+					storeSession(storeTranscriptSuccess, storeTranscriptFailure);
 				}
 				else if ( actionName == "reloadTranscript" ) {
 					reloadClicked();
