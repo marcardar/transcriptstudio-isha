@@ -2,6 +2,9 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="600" horizontalAlign="center" title="Event / Session Builder" creationComplete="init()" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*" xmlns:importer="org.ishafoundation.archives.transcript.components.studio.importer.*">
 	<mx:Script>
 	<![CDATA[
+		import org.ishafoundation.archives.transcript.components.studio.metadata.EventSelectorDialog;
+		import org.ishafoundation.archives.transcript.components.studio.metadata.SessionCreatorDialog;
+		import org.ishafoundation.archives.transcript.components.studio.metadata.EventCreatorDialog;
 		import org.ishafoundation.archives.transcript.model.Session;
 		import mx.rpc.http.HTTPService;
 		import org.ishafoundation.archives.transcript.db.DatabaseConstants;
