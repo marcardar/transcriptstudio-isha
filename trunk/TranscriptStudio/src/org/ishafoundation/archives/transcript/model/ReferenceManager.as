@@ -36,6 +36,9 @@ package org.ishafoundation.archives.transcript.model
 	 * Also, a map from search term to synonyms (and self)
 	 */
 	public class ReferenceManager {
+		
+		[Bindable]
+		public static var ALL_CONCEPTS:Array = null;
 
 		private var xmlRetrieverStorer:XMLRetrieverStorer;
 		private var xqueryExecutor:XQueryExecutor;
@@ -49,10 +52,21 @@ package org.ishafoundation.archives.transcript.model
 			this.xmlRetrieverStorer = databaseMgr;
 			this.xqueryExecutor = databaseMgr;
 			BindingUtils.bindProperty(this, "isSuperUser", databaseMgr, "isSuperUser");
-		}	
+			refreshAllConceptsArray();
+		}
+		
+		public function refreshAllConceptsArray():void {
+			getAllConcepts(function(arr:Array):void {
+				ALL_CONCEPTS = arr;
+			}, function(msg:String):void {
+				// this is non-critical so ignore
+				trace("ERROR refreshing all concepts array: " + msg);
+			}, false);			
+		}
 		
 		public function loadReferences(successFunc:Function, failureFunc:Function):void {
 			// recreate the xmlRetriever because the old one might be still in progress (not timedout)
+			trace("loadReferences");
 			DatabaseManagerUtils.retrieveReferenceXML(this.xmlRetrieverStorer, function(xml:XML):void {
 				referenceXML = xml;
 				successFunc();
@@ -525,12 +539,18 @@ package org.ishafoundation.archives.transcript.model
 			}, failureFunc);			
 		}
 		
-		public function getAllConcepts(successFunc:Function, failureFunc:Function):void {
+		public function getAllConcepts(successFunc:Function, failureFunc:Function, reloadReferences:Boolean):void {
 			trace("Fetching all concepts");
 			xqueryExecutor.executeStoredXQuery("get-all-concepts.xql", {}, function(returnVal:String):void {
-				loadReferences(function():void {
-					successFunc(returnVal.split(" "));
-				}, failureFunc);
+				var arr:Array = returnVal.split(" ");
+				if (reloadReferences) {
+					loadReferences(function():void {
+						successFunc(arr);
+					}, failureFunc);
+				}
+				else {
+					successFunc(arr);
+				}
 			}, failureFunc);			
 		}
 		

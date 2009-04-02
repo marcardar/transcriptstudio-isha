@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()">
+<mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()" xmlns:generic="org.ishafoundation.archives.transcript.components.generic.*">
 	<mx:Script>
 	<![CDATA[
 		import name.carter.mark.flex.util.Utils;
@@ -167,7 +167,7 @@
 	<mx:VBox width="100%" height="100%">
 		<mx:HBox width="100%">
 			<mx:ComboBox id="typeComboBox" labelFunction="comboBoxLabelFunc" dataProvider="{getCategoryTypeIdsForComboBox(this.referenceMgr)}"/>
-			<mx:TextInput width="100%" id="searchTextInput" restrict="a-z0-9\- " enter="searchClicked()"/>
+			<generic:ConceptTextInput width="100%" id="searchTextInput" restrict="a-z0-9\- " enter="searchClicked()"/>
 			<mx:Button label="Search" id="searchButton" click="searchClicked()" width="80"/>			
 		</mx:HBox>
 		<mx:HBox width="100%" height="100%">

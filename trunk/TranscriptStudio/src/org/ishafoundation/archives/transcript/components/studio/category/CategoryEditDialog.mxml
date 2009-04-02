@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" alpha="2.0" layout="vertical" x="80" y="30" width="400" horizontalAlign="center" paddingBottom="10" creationComplete="nameTextInput.setFocus()">
-	<mx:Script>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" alpha="2.0" layout="vertical" x="80" y="30" width="400" horizontalAlign="center" paddingBottom="10" xmlns:generic="org.ishafoundation.archives.transcript.components.generic.*" creationComplete="init()">
+   	<mx:Script>
     <![CDATA[
     	import mx.collections.ICollectionView;
     	import mx.utils.StringUtil;
@@ -21,7 +21,11 @@
 			result.referenceMgr = referenceMgr; 
 			return result;
 		}
-
+		
+		public function init():void {
+			nameTextInput.setFocus();
+		}
+		
 		public function closeMe():void {
         	PopUpManager.removePopUp(this);
 		}
@@ -77,7 +81,7 @@
 			var ac:ArrayCollection = list.dataProvider as ArrayCollection;
 			ac.removeItemAt(list.selectedIndex);
 		}
-    ]]>
+	]]>
 	</mx:Script>
 	<mx:Label text="Category Name" width="95%"/>
 	<mx:TextArea id="nameTextInput" width="95%" wordWrap="true"/>
@@ -97,7 +101,7 @@
 		</mx:HBox>
 		<mx:Label text="Match on these concepts:" width="100%" paddingTop="5"/>
 		<mx:HBox width="100%">
-			<mx:TextInput id="conceptTextInput" width="100%" restrict="a-z0-9\-" enter="addConceptClicked()"/>
+			<generic:ConceptTextInput id="conceptTextInput" width="100%" restrict="a-z0-9\-" enter="{callLater(addConceptClicked)}"/>
 			<mx:Button label="Add" width="100" enabled="{StringUtil.trim(conceptTextInput.text).length &gt; 0}" click="addConceptClicked()"/>
 		</mx:HBox>
 		<mx:HBox width="100%">
