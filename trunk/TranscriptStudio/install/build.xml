@@ -21,8 +21,18 @@
 	<target name="init-exist">
 		<echo message="Copying TranscriptStudio-specific files to eXist installation..."/>
 		<copy todir="${exist.home}" includeEmptyDirs="true">
-			<fileset dir="${dist.exist.app.dir}"/>
-		</copy>
+			<fileset dir="${dist.exist.app.dir}">
+				<exclude name="tools/wrapper/conf/wrapper.conf"/>
+			</fileset>
+ 		</copy>
+		<copy todir="${exist.home}">
+			<fileset dir="${dist.exist.app.dir}">
+				<include name="tools/wrapper/conf/wrapper.conf"/>
+			</fileset>
+			<filterset>
+				<filter token="JAVA_HOME" value="${java.home}"/>
+			</filterset>
+ 		</copy>
 		<chmod file="${exist.home}/bin/startup.sh" perm="ugo+x"/>
 		<echo message="Initialising database..."/>
 		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
