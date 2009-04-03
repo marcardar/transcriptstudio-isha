@@ -7,15 +7,15 @@
 
 # will be set by the installer
 if [ -z "$EXIST_HOME" ]; then
-	EXIST_HOME="C:\Program Files\eXist"
+	EXIST_HOME="/usr/lib/exist"
 fi
 
 if [ -z "$JAVA_HOME" ]; then
-    JAVA_HOME="C:\Program Files\Java\jdk1.6.0_11"
+    JAVA_HOME="/usr/lib/jvm/java-6-sun-1.6.0.11"
 fi
 
 if [ ! -d "$JAVA_HOME" ]; then
-    JAVA_HOME="C:\Program Files\Java\jre6"
+    JAVA_HOME="/usr/lib/jvm/java-6-sun-1.6.0.11/jre"
 fi
 
 #
