@@ -7,14 +7,18 @@ declare function concept-fns:count-concept-instances($conceptId as xs:string) as
 	count(collection('/db/ts4isha/data')/session/transcript//tag[@type eq 'concept' and @value=$conceptId])
 };
 
-declare function concept-fns:get-all-concepts() as xs:string*
+declare function concept-fns:get-all-concepts($referenceConceptsOnly as xs:boolean?) as xs:string*
 {
 	let $reference := collection('/db/ts4isha/reference')/reference
 	let $categoryConcepts := $reference/markupCategories/markupCategory/tag[@type eq 'concept']/string(@value)
 	let $coreConcepts := $reference/coreConcepts/concept/string(@id)
 	let $subtypeConcepts := $reference/coreConcepts/concept/subtype/string(@idRef)
 	let $synonymConcepts := $reference/synonymGroups/synonymGroup/synonym/string(@idRef)
-	let $additionalConcepts := collection('/db/ts4isha/data')/session/transcript/(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
+	let $additionalConcepts :=
+		if ($referenceConceptsOnly) then
+			()
+		else
+			collection('/db/ts4isha/data')/session/transcript/(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
 	return
 		for $concept in distinct-values(($categoryConcepts, $coreConcepts, $subtypeConcepts, $synonymConcepts, $additionalConcepts))
 		order by $concept 
