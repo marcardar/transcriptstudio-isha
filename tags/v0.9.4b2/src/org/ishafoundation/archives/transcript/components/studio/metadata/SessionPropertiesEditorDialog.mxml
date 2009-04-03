@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Edit Session Properties" creationComplete="init()" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*">
+	<mx:Script>
+	<![CDATA[
+		import mx.events.FlexEvent;
+		import mx.managers.PopUpManager;
+		import org.ishafoundation.archives.transcript.model.SessionProperties;
+		import org.ishafoundation.archives.transcript.model.ReferenceManager;
+		import org.ishafoundation.archives.transcript.db.XMLRetriever;
+		
+	   	public static const SESSION_PROPS_EDITED:String = "SESSION_PROPS_EDITED";
+	   	
+		public static function display(parent:DisplayObject, xmlRetriever:XMLRetriever, referenceMgr:ReferenceManager, sessionProps:SessionProperties):SessionPropertiesEditorDialog {
+			var result:SessionPropertiesEditorDialog = new SessionPropertiesEditorDialog();
+			PopUpManager.addPopUp(result, parent, true);
+			result.sessionPropsPane.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
+				result.sessionPropsPane.referenceMgr = referenceMgr;
+				result.sessionPropsPane.sessionProps = sessionProps;
+			}, true);
+			return result;
+		}
+	
+		private function init():void {
+		}
+		
+		private function okClicked():void {
+			closeMe();
+			dispatchEvent(new Event(SESSION_PROPS_EDITED));
+		}
+		
+		private function closeMe():void {
+			PopUpManager.removePopUp(this);
+		}
+	]]>
+	</mx:Script>
+	
+	<metadata:SessionPropertiesPane id="sessionPropsPane" label="Session Properties" width="100%" height="100%"/>
+	<mx:HBox id="buttonBox">
+		<mx:Button label="OK" click="okClicked()" />
+		<mx:Button label="Cancel" click="closeMe()"/>
+	</mx:HBox>
+	
+</mx:TitleWindow>

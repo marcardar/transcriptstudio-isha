@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="{0.9 * parentDocument.width}" height="{0.9 * parentDocument.height}" title="Execute XQuery" horizontalAlign="center" creationComplete="init()">
+	<mx:Script>
+	<![CDATA[
+		import mx.managers.PopUpManager;
+		import mx.controls.TextInput;
+		import mx.controls.Label;
+		import mx.containers.GridItem;
+		import mx.containers.GridRow;
+		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
+		import mx.controls.Alert;
+		import org.ishafoundation.archives.transcript.db.XQueries;
+		
+		public var xQueryExecutor:XQueryExecutor;
+		
+		[Bindable]
+		private var args:Array = new Array(5);
+		
+		private function init():void {
+			//queryTextArea.text = XQueries.ALL_EVENT_IDS;
+			for (var i:int = 0; i < args.length; i++) {
+				var gr:GridRow = new GridRow();
+				gr.percentWidth = 100;
+				gr.percentHeight = 100;
+				var gi1:GridItem = new GridItem();
+				gi1.percentWidth = 100;
+				gi1.percentHeight = 100;
+				var label:Label = new Label();
+				label.text = "arg" + i;
+				gi1.addChild(label);
+				var gi2:GridItem = new GridItem();
+				gi2.percentWidth = 100;
+				gi2.percentHeight = 100;
+				var textInput:TextInput = createArgTextInput(i);
+				gi2.addChild(textInput);
+				gr.addChild(gi1);
+				gr.addChild(gi2);
+				argsGrid.addChild(gr);
+			}
+		}
+		
+		private function createArgTextInput(i:int):TextInput {
+			var textInput:TextInput = new TextInput();
+			textInput.width = 80;
+			textInput.addEventListener(Event.CHANGE, function(evt:Event):void {
+				args[i] = textInput.text;
+			});
+			return textInput
+		}
+		
+		private function labelFunc(queryStr:String):String {
+			var lines:Array = queryStr.split("\n");
+			return lines[0];
+		}
+		
+		private function executeClicked():void {
+			resultTextArea.text = "Executing...";
+			xQueryExecutor.query(queryTextArea.text, args, function(xml:XML):void {
+				resultTextArea.text = xml.toXMLString();
+			}, function(msg:String):void {
+				Alert.show(msg);
+			});
+		}
+
+		private function closeMe():void {
+        	PopUpManager.removePopUp(this);
+		}
+	]]>
+	</mx:Script>
+	<mx:ComboBox id="templateComboBox" width="100%" prompt="Select a template xquery..." labelFunction="labelFunc" dataProvider="{XQueries.ALL_XQUERIES}" change="{queryTextArea.text = templateComboBox.selectedItem as String}"/>
+	<mx:VDividedBox width="100%" height="100%">
+		<mx:VBox width="100%" height="100%" horizontalAlign="center" paddingBottom="5">
+			<mx:HBox width="100%" height="100%">
+				<mx:TextArea id="queryTextArea" height="100%" width="100%"/>
+				<mx:Grid id="argsGrid"/>
+			</mx:HBox>			
+			<mx:Button label="Execute" click="executeClicked()"/>
+		</mx:VBox>
+		<mx:TextArea id="resultTextArea" width="100%" height="100%" editable="false"/>
+	</mx:VDividedBox>
+	<mx:Button label="Done" click="closeMe()"/>
+</mx:TitleWindow>
