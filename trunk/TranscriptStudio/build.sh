@@ -14,7 +14,7 @@ if [ ! -d "$JAVA_HOME" ]; then
 fi
 
 if [ -z "$FLEX_HOME" ]; then
-    JAVA_HOME="/usr/lib/Adobe_Flex_Builder/sdks/3.3.0"
+    FLEX_HOME="/usr/lib/Adobe_Flex_Builder/sdks/3.3.0"
 fi
 
 JAVA_CMD="$JAVA_HOME/bin/java"
