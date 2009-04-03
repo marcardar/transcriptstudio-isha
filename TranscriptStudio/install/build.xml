@@ -23,6 +23,7 @@
 		<copy todir="${exist.home}" includeEmptyDirs="true">
 			<fileset dir="${dist.exist.app.dir}"/>
 		</copy>
+		<chmod file="${exist.home}/bin/startup.sh" perm="ugo+x"/>
 		<echo message="Initialising database..."/>
 		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
 			<fileset dir="${dist.exist.db.dir}">

@@ -138,6 +138,7 @@
 		</copy>
 		<copy file="build.bat" tofile="${dist.server.dir}/install.bat"/>
 		<copy file="build.sh" tofile="${dist.server.dir}/install.sh"/>
+		<chmod dir="${dist.server.dir}" includes="**/*.sh" perm="ugo+x"/>
 	</target>
 		
 	<target name="dist-client" depends="dist-init">
@@ -175,5 +176,5 @@
 		<ant dir="${dist.server.dir}"/>
 	</target>
 
-	<target name="all" depends="build,dist,configure-exist" description="Build, Distribute and Deploy"/>
+	<target name="all" depends="build,dist,configure-exist" description="Build, Distribute and Configure eXist"/>
 </project>
