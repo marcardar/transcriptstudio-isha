@@ -1,3 +1,5 @@
+xquery version "1.0";
+
 module namespace functx = "http://www.functx.com"; 
 declare function functx:add-attributes 
   ( $elements as element()* ,

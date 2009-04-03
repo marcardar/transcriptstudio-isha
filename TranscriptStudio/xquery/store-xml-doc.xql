@@ -1,3 +1,5 @@
+xquery version "1.0";
+
 declare namespace store-xml-doc = "http://www.ishafoundation.org/ts4isha/xquery/store-xml-doc";
 
 import module namespace functx = "http://www.functx.com" at "functx.xqm";

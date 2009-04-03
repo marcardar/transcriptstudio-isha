@@ -1,8 +1,4 @@
 xquery version "1.0";
-(: $Id: admin.xql 6739 2007-10-19 14:24:20Z deliriumsky $ :)
-(:
-	Main module of the database administration interface.
-:)
 
 declare namespace main = "http://www.ishafoundation.org/ts4isha/xquery/main";
 

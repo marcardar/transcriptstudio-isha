@@ -1,3 +1,5 @@
+xquery version "1.0";
+
 module namespace id-utils = "http://www.ishafoundation.org/ts4isha/xquery/id-utils";
 import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
 
