@@ -33,7 +33,7 @@
 				conceptList.dataProvider = conceptIds;
 			}, function(msg:String):void {
 				Alert.show(msg, "Failed to get all concepts");
-			}, true);
+			});
 		}
 
     	private function selectionChange(newConceptId:String):void {
@@ -304,6 +304,6 @@
 		</mx:VDividedBox>
 	</mx:HDividedBox>
 	<mx:HBox>
-		<mx:Button label="OK" click="{closeMe();referenceMgr.refreshAllConceptsArray()}"/>
+		<mx:Button label="OK" click="{closeMe();referenceMgr.refreshAutoCompleteConcepts()}"/>
 	</mx:HBox>	
 </mx:TitleWindow>

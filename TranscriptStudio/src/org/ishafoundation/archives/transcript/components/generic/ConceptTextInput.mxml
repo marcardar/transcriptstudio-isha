@@ -70,7 +70,7 @@
 	<generic:AutoCompleteManager
 		id="autoCompleteMgr"
 		target="{this}"
-		dataProvider="{ReferenceManager.ALL_CONCEPTS}"
+		dataProvider="{ReferenceManager.AUTO_COMPLETE_CONCEPTS}"
 		maxRowCount="10"
 		itemSelectedFunction="{itemSelectedFunction}"
 		filterFunction="{conceptFilterFunc}"

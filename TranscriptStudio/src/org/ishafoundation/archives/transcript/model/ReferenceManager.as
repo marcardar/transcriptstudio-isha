@@ -38,7 +38,7 @@ package org.ishafoundation.archives.transcript.model
 	public class ReferenceManager {
 		
 		[Bindable]
-		public static var ALL_CONCEPTS:Array = null;
+		public static var AUTO_COMPLETE_CONCEPTS:Array = null;
 
 		private var xmlRetrieverStorer:XMLRetrieverStorer;
 		private var xqueryExecutor:XQueryExecutor;
@@ -52,16 +52,17 @@ package org.ishafoundation.archives.transcript.model
 			this.xmlRetrieverStorer = databaseMgr;
 			this.xqueryExecutor = databaseMgr;
 			BindingUtils.bindProperty(this, "isSuperUser", databaseMgr, "isSuperUser");
-			refreshAllConceptsArray();
+			refreshAutoCompleteConcepts();
 		}
 		
-		public function refreshAllConceptsArray():void {
-			getAllConcepts(function(arr:Array):void {
-				ALL_CONCEPTS = arr;
+		public function refreshAutoCompleteConcepts():void {
+			trace("Refreshing auto-complete concepts");
+			xqueryExecutor.executeStoredXQuery("get-auto-complete-concepts.xql", {}, function(returnVal:String):void {
+				AUTO_COMPLETE_CONCEPTS = returnVal.split(" ");
 			}, function(msg:String):void {
 				// this is non-critical so ignore
 				trace("ERROR refreshing all concepts array: " + msg);
-			}, false);			
+			});
 		}
 		
 		public function loadReferences(successFunc:Function, failureFunc:Function):void {
@@ -539,18 +540,13 @@ package org.ishafoundation.archives.transcript.model
 			}, failureFunc);			
 		}
 		
-		public function getAllConcepts(successFunc:Function, failureFunc:Function, reloadReferences:Boolean):void {
+		public function getAllConcepts(successFunc:Function, failureFunc:Function):void {
 			trace("Fetching all concepts");
 			xqueryExecutor.executeStoredXQuery("get-all-concepts.xql", {}, function(returnVal:String):void {
 				var arr:Array = returnVal.split(" ");
-				if (reloadReferences) {
-					loadReferences(function():void {
-						successFunc(arr);
-					}, failureFunc);
-				}
-				else {
+				loadReferences(function():void {
 					successFunc(arr);
-				}
+				}, failureFunc);
 			}, failureFunc);			
 		}
 		
