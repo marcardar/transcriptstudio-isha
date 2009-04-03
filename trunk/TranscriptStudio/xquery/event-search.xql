@@ -5,13 +5,13 @@ declare namespace event-search = "http://www.ishafoundation.org/ts4isha/xquery/e
 (: declare function create-session-id:create-id($idPrefix as xs:string, $startId as xs:integer) as xs:string :)
 
 (: type: e.g. "n", "other" (special code), "any" :)
-let $eventType := request:get-parameter('eventType', '')
+let $eventType := request:get-parameter('eventType', ())
 let $year := request:get-parameter('year', ())
 let $yearType := request:get-parameter('yearType', 'on')
-let $country := request:get-parameter('country', '')
+let $country := request:get-parameter('country', ())
 
 let $result :=
-	if ($eventType = '[any]') then
+	if (not(exists($eventType)) or $eventType = '[any]') then
 		collection('/db/ts4isha/data')/event
 	else
 		collection('/db/ts4isha/data')/event[@type = $eventType]
