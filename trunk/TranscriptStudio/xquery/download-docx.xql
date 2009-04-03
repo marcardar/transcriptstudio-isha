@@ -1,4 +1,4 @@
-(:declare option exist:serialize "media-type=application/zip"; :)
+xquery version "1.0";
 
 import module namespace ts4isha='http://ishafoundation.org/ts4isha/xquery' at 'java:org.ishafoundation.ts4isha.xquery.modules.TranscriptStudioModule';
 import module namespace search-fns = "http://www.ishafoundation.org/ts4isha/xquery/search-fns" at "search-fns.xqm";

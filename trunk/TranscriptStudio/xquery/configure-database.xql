@@ -1,3 +1,5 @@
+xquery version "1.0";
+
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>Isha Foundation - Configure Database</title>

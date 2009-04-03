@@ -1,3 +1,5 @@
+xquery version "1.0";
+
 import module namespace functx = "http://www.functx.com" at "functx.xqm";
 
 let $eventId := request:get-parameter('eventId', ())

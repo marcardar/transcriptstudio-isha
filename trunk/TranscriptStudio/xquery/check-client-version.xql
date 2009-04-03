@@ -1,3 +1,5 @@
+xquery version "1.0";
+
 (: Tests whether the specified client version (e.g. "0.9.0b1") is allowed (otherwise out-of-date) :)
 (: Returns empty string if allowed, otherwise returns min version required string :)
 

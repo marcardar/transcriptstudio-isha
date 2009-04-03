@@ -1,8 +1,6 @@
+xquery version "1.0";
+
 (: returns a new session id (not currently in use). e.g. 20090320-n1-1-1830 :)
-
-declare namespace event-search = "http://www.ishafoundation.org/ts4isha/xquery/event-search";
-
-(: declare function create-session-id:create-id($idPrefix as xs:string, $startId as xs:integer) as xs:string :)
 
 (: type: e.g. "n", "other" (special code), "any" :)
 let $eventType := request:get-parameter('eventType', ())
