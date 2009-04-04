@@ -3,6 +3,7 @@ xquery version "1.0";
 module namespace search-panel = "http://www.ishafoundation.org/ts4isha/xquery/search-panel";
 
 import module namespace search-fns = "http://www.ishafoundation.org/ts4isha/xquery/search-fns" at "search-fns.xqm";
+import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
 
 declare namespace request = "http://exist-db.org/xquery/request";
 declare namespace session = "http://exist-db.org/xquery/session";
@@ -28,7 +29,7 @@ declare function search-panel:main() as element()*
 			<center>
 			<table id="header">
 				<tr><td valign="bottom">
-				<form id="search-form" action="{session:encode-url(request:get-uri())}">
+				<form id="search-form">
 					<input type="hidden" name="panel" value="search"/>
 					<table id="search-form-table" cellpadding="2"><tr>
 						<td>Search</td>
@@ -69,6 +70,14 @@ declare function search-panel:main() as element()*
 			<div class="additional-info">
 				Additional info: <a href="main.xql?panel=all-concepts">concepts</a>, <a href="main.xql?panel=categories">categories</a>
 			</div>
+			{
+				if (utils:is-current-user-admin()) then
+					<div class="additional-info">
+						Admin: <a href="main.xql?panel=admin">ts4isha</a>, <a href="../../../../admin/admin.xql">eXist db</a>
+					</div>
+				else
+					()
+			}
 			<br/>
 		</div>
 	)
