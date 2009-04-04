@@ -44,7 +44,7 @@ declare function upload-media-metadata-panel:main() as element()*
 					let $tempPath := xdb:store($tempColl, $tempFile, $uploadedFile)
 					let $doc := doc($tempPath)
 					let $rootElementName := local-name($doc/*[1])
-					return
+					let $result :=
 						if ($rootElementName != 'mediaMetadata') then
 							concat('Incorrect root element name: ', $rootElementName)
 						else
@@ -64,6 +64,9 @@ declare function upload-media-metadata-panel:main() as element()*
 								)
 							return
 								$newMediaDetails
+					let $null := xdb:remove($tempColl, $tempFile)
+					return
+						$result
 			}
 		</div>
 	)
