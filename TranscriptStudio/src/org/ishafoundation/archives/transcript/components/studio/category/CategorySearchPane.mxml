@@ -2,6 +2,7 @@
 <mx:HBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()" xmlns:generic="org.ishafoundation.archives.transcript.components.generic.*">
 	<mx:Script>
 	<![CDATA[
+		import org.ishafoundation.archives.transcript.components.generic.MessagePopUp;
 		import name.carter.mark.flex.util.Utils;
 		import mx.controls.Alert;
 		import org.ishafoundation.archives.transcript.model.MTagImpl;
@@ -162,6 +163,33 @@
 			}, 16, 16, Utils.DEFAULT_ICON_CLASS);
 		}
 
+		private function removeClicked():void {
+			var categoryId:String = resultsList.selectedItem as String;
+			referenceMgr.countCategoryInstances(categoryId, function(count:int):void {
+				if (count == 0) {
+					var messagePopUp:MessagePopUp = createMessagePopup("Removing category: " + categoryId);
+					referenceMgr.removeCategory(categoryId, function(returnVal:int):void {
+						init();
+						searchClicked();
+						messagePopUp.enableOkButton(returnVal == 0 ? "Could not find category: " + categoryId : "Removed");
+					},
+					function(msg:String):void {
+						messagePopUp.enableOkButton("Failed to remove category", msg);
+					});
+				}
+				else {
+					Alert.show("Cannot remove concept because it appears at least once (" + count + " instance(s)) in all transcripts");
+				}
+			}, function(msg:String):void {
+				Alert.show(msg, "Error");
+			});
+		}
+		
+		private function createMessagePopup(title:String):MessagePopUp {
+			var result:MessagePopUp = MessagePopUp.display(this, title, "Please wait...", 250);
+			result.okButton.enabled = false;
+			return result;
+		}
 	]]>
 	</mx:Script>
 	<mx:VBox width="100%" height="100%">
@@ -177,6 +205,6 @@
 	<mx:VBox id="adminVBox" height="100%" horizontalAlign="center" verticalAlign="middle" visible="{referenceMgr.isSuperUser}" includeInLayout="{referenceMgr.isSuperUser}">
 		<mx:Button label="New..." width="80" click="editClicked(true)"/>
 		<mx:Button label="Edit..." width="80" enabled="{resultsList.selectedIndex &gt;= 0}" click="editClicked(false)"/>
-		<mx:Button label="Remove" width="80" enabled="{false &amp;&amp; resultsList.selectedIndex &gt;= 0}"/>
+		<mx:Button label="Remove" width="80" enabled="{resultsList.selectedIndex &gt;= 0}" click="removeClicked()"/>
 	</mx:VBox>
 </mx:HBox>
