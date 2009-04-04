@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="600" horizontalAlign="center" title="Event / Session Builder" creationComplete="init()" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*" xmlns:importer="org.ishafoundation.archives.transcript.components.studio.importer.*">
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="600" horizontalAlign="center" title="Event / Session Builder" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*" xmlns:importer="org.ishafoundation.archives.transcript.components.studio.importer.*" creationComplete="init()">
 	<mx:Script>
 	<![CDATA[
+		import mx.binding.utils.BindingUtils;
 		import org.ishafoundation.archives.transcript.components.studio.metadata.EventSelectorDialog;
 		import org.ishafoundation.archives.transcript.components.studio.metadata.SessionPropertiesCreatorDialog;
 		import org.ishafoundation.archives.transcript.components.studio.metadata.EventPropertiesCreatorDialog;
@@ -51,6 +52,9 @@
 		}
 		
 		private function init():void {
+			ChangeWatcher.watch(transcriptsToImportList, "dataProvider", function():void {
+				callLater(buttonBox.invalidateProperties);
+			});
 		}
 		
 		[Bindable]
@@ -89,7 +93,6 @@
 					}
 				}
 				transcriptsToImportList.dataProvider = transcriptsToImportSelectorDialog.selectedPaths;
-				buttonBox.invalidateProperties();
 			});
 		}
 			
