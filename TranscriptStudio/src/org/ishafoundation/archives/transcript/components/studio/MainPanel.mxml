@@ -91,17 +91,18 @@
 			private static const KEYBOARD_SHORTCUT_MAP:IMap = createKeyboardShortcutMap();		
 			private static function createKeyboardShortcutMap():IMap {
 				var result:IMap = new HashMap();
-				result.put("m".charCodeAt(), "markupText")
+				result.put("m", "markupText")
 				return result;
 			}
 		
 			protected override function keyDownHandler(evt:KeyboardEvent):void {
 				if (evt[KEYBOARD_SHORTCUT_MODIFIER]) {
-					var actionName:String = KEYBOARD_SHORTCUT_MAP.getValue(evt.charCode);
+					var keyStr:String = String.fromCharCode(evt.charCode);
+					var actionName:String = KEYBOARD_SHORTCUT_MAP.getValue(keyStr);
 					if (actionName != null) {
 						var menuItemElement:XML = menuData..*.(hasOwnProperty("@id") && @id == actionName)[0]
 						if (menuItemElement.@enabled == "true") {
-							trace("Keyboard shortcut: " + KEYBOARD_SHORTCUT_MODIFIER + "-" + String.fromCharCode(evt.charCode));
+							trace("Keyboard shortcut: " + KEYBOARD_SHORTCUT_MODIFIER + "-" + keyStr);
 							onMenuClick(menuItemElement);
 							evt.preventDefault();
 							return;
