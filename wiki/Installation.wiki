@@ -4,6 +4,8 @@
   * eXist 1.2.5 (jar file) [http://exist.sourceforge.net/download.html#N10170]
   * java (jdk 6) [http://java.sun.com/javase/downloads/index.jsp]
   * flex sdk 3.3 [http://www.adobe.com/products/flex/flexdownloads/]
+  * mozilla firefox 3.0 [http://www.mozilla.com/en-US/firefox/firefox.html]
+  * adobe flash player 10 (debian package - firefox plugin) [http://get.adobe.com/flashplayer/]
 
 ===System Setup===
 Install java (the default installation location is /usr/lib/jvm/java-6-sun).
@@ -32,3 +34,7 @@ svn checkout http://transcriptstudio4isha.googlecode.com/svn/trunk/ ts4isha-trun
 
 ===Build the application===
 Open the ts4isha-trunk folder and run the build.sh script as root ("sudo ./build.sh"). (Note that you may have to make it executable by running the following command: "sudo chmod +x build.sh").
+
+After the build completes successfully, restart the database by executing the shutdown.sh script in the $EXIST_HOME/bin directory, and then the start.sh script.
+
+==Run the application== 
