@@ -1,3 +1,5 @@
+#summary Installation procedure for Ubuntu Linux
+
 ==Steps for installing ts4isha on Linux (Ubuntu)==
 ===Prerequisites===
   * eXist 1.2.5 (jar file) [http://exist.sourceforge.net/download.html#N10170]
