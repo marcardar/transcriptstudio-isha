@@ -15,9 +15,9 @@ Unpack the flex sdk to a suitable location. (We recommend /usr/lib/flex).
 ===Define system environment variables===
 Edit the /etc/environment file to include the following lines:
 
-EXIST_HOME="/usr/lib/exist"
-JAVA_HOME="/usr/lib/jvm/java-6-sun"
-FLEX_HOME="/usr/lib/flex"
+  * EXIST_HOME="/usr/lib/exist"
+  * JAVA_HOME="/usr/lib/jvm/java-6-sun"
+  * FLEX_HOME="/usr/lib/flex"
 
 (Paths may be different for different installations)
 
