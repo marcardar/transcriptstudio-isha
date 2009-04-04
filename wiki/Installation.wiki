@@ -1,11 +1,16 @@
 =Installation=
 ==Steps for installing ts4isha on Linux (Ubuntu)==
 ===Prerequisites===
-  * eXist 1.2.5 (native xml database) [http://exist.sourceforge.net/download.html#N10170]
+  * eXist 1.2.5 (jar file) [http://exist.sourceforge.net/download.html#N10170]
   * java (jdk 6) [http://java.sun.com/javase/downloads/index.jsp]
   * flex sdk 3.3 [http://www.adobe.com/products/flex/flexdownloads/]
 
+===System Setup===
+Install java (the default installation location is /usr/lib/jvm/java-6-sun).
 
+Install eXist by executing the command "sudo java -jar eXist-setup-1.2.5-rev8668.jar" (We recommend you install to /usr/lib/exist).
+
+Unpack the flex sdk to a suitable location. (We recommend /usr/lib/flex)
 
 
 
