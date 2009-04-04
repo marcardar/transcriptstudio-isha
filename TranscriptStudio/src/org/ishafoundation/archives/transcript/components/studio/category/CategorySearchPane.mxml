@@ -67,7 +67,14 @@
             PopUpManager.addPopUp(categoryEditDialog, this, true);
            	var categoryId:String = newCategory ? null : resultsList.selectedItem as String;
             categoryEditDialog.title = newCategory ? "Create new category" : "Edit category";
-            if (!newCategory) {
+            if (newCategory) {
+            	var initialTypes:Array = [];
+            	if (typeComboBox.selectedIndex > 0) {
+            		initialTypes.push(typeComboBox.selectedItem as String);
+            	}
+            	categoryEditDialog.typeIds = new ArrayCollection(initialTypes);
+            }
+            else {
             	categoryEditDialog.nameTextInput.text = this.referenceMgr.getCategoryName(categoryId);
             	categoryEditDialog.typeIds = new ArrayCollection(this.referenceMgr.getCategoryTypeIdsForCategoryId(categoryId));
             	categoryEditDialog.concepts = new ArrayCollection(this.referenceMgr.getConceptsForCategoryId(categoryId));
