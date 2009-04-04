@@ -139,7 +139,7 @@
 			if (!event.shiftKey && !event.ctrlKey) {
 				return;
 			}
-			trace("key up: code=" + event.charCode + ", ctrl=" + event.ctrlKey + ", shift=" + event.shiftKey);
+			//trace("key up: code=" + event.charCode + ", ctrl=" + event.ctrlKey + ", shift=" + event.shiftKey);
 			selectionChangeHandler();			
 		}
 		
