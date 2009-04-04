@@ -41,7 +41,7 @@
 				closeMe();
 				dispatchEvent(new Event(SESSION_EDITED));
 			}, function (msg:String):void {
-				throw new Error("Could not store session file '" + sessionProps.path + "': " + msg);
+				Alert.show(msg, "Could not store session");
 			});
 		}
 		
