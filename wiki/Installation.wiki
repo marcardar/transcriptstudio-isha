@@ -1,6 +1,9 @@
 Installation
-Steps for installing ts4isha
-Introduction
+Steps for installing ts4isha on Linux (Ubuntu)
+Prerequisites
+eXist 1.2.5 (native xml database) [http://exist.sourceforge.net/download.html#N10170]
+java (jdk 6) [http://java.sun.com/javase/downloads/index.jsp]
+flex sdk 3.3 [http://www.adobe.com/products/flex/flexdownloads/]
 
 
 
