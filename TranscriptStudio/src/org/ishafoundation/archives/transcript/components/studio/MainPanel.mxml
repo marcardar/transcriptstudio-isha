@@ -18,9 +18,11 @@
    Transcript Studio for Isha Foundation. If not, see http://www.gnu.org/licenses/.
 -->
 
-<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" xmlns:metadataNS="org.ishafoundation.archives.transcript.components.metadata.*" width="100%" height="100%" verticalGap="0">
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" xmlns:metadataNS="org.ishafoundation.archives.transcript.components.metadata.*" width="100%" height="100%" verticalGap="0" keyDown="keyDownHandler(event)">
 	<mx:Script>
 		<![CDATA[
+			import com.ericfeminella.collections.HashMap;
+			import com.ericfeminella.collections.IMap;
 			import mx.events.PropertyChangeEvent;
 			import org.ishafoundation.archives.transcript.components.studio.importer.TranscriptsToImportSelectorDialog;
 			import org.ishafoundation.archives.transcript.components.studio.importer.ImportDialog;
@@ -83,7 +85,32 @@
 				this.sessionMgr = new SessionManager(username, referenceMgr, databaseMgr);
 				this.referenceMgr.loadReferences(referenceXMLRetrieveSuccess, referenceXMLRetrieveFailure);
 			}
+			
+			private static const KEYBOARD_SHORTCUT_MODIFIER:String = "ctrlKey";
+			/** key is charCode, value is actionName */
+			private static const KEYBOARD_SHORTCUT_MAP:IMap = createKeyboardShortcutMap();		
+			private static function createKeyboardShortcutMap():IMap {
+				var result:IMap = new HashMap();
+				result.put("m".charCodeAt(), "markupText")
+				return result;
+			}
 		
+			protected override function keyDownHandler(evt:KeyboardEvent):void {
+				if (evt[KEYBOARD_SHORTCUT_MODIFIER]) {
+					var actionName:String = KEYBOARD_SHORTCUT_MAP.getValue(evt.charCode);
+					if (actionName != null) {
+						var menuItemElement:XML = menuData..*.(hasOwnProperty("@id") && @id == actionName)[0]
+						if (menuItemElement.@enabled == "true") {
+							trace("Keyboard shortcut: " + KEYBOARD_SHORTCUT_MODIFIER + "-" + String.fromCharCode(evt.charCode));
+							onMenuClick(menuItemElement);
+							evt.preventDefault();
+							return;
+						}
+					}
+				}
+				super.keyDownHandler(evt);				
+			}
+			
 			private function updateTitle():void {
 				var transcriptId:String = this.session.id;
 	  			if (transcriptId == null) {
@@ -406,8 +433,8 @@
 				PopUpManager.createPopUp(this, AboutBox, true);
 			}
 			
-			private function onMenuClick(evt:MenuEvent):void {
-				var actionName:String = evt.item.@id;
+			private function onMenuClick(menuItemElement:XML):void {
+				var actionName:String = menuItemElement.@id;
 				if ( actionName == "retrieve" ) {
 					retrieveClicked();
 				}
@@ -452,11 +479,11 @@
 					mediaPlayerDialog.devicesElement = session.sessionXML.devices[0];
 				}
 				else if ( actionName == "showMarkupPropertiesPane" ) {
-					var showMarkupProps:Boolean = evt.item.@toggled.toString() == "true";
+					var showMarkupProps:Boolean = menuItemElement.@toggled.toString() == "true";
 					this.transcriptPane.markupsPane.setNodePropertiesPaneVisibility(showMarkupProps);
 				}
 				else if ( actionName == "showTextPropertiesPane" ) {
-					var showTextProps:Boolean = evt.item.@toggled.toString() == "true";
+					var showTextProps:Boolean = menuItemElement.@toggled.toString() == "true";
 					this.transcriptPane.textPane.setPropertiesPaneVisibility(showTextProps);
 				}
 				else if ( actionName == "eventSessionBuilder" ) {
@@ -496,7 +523,7 @@
 			}			
 		]]>
 	</mx:Script>
-	<mx:MenuBar id="myMenuBar" width="100%" labelField="@label" itemClick="onMenuClick(event)">
+	<mx:MenuBar id="myMenuBar" width="100%" labelField="@label" itemClick="onMenuClick(event.item as XML)">
 		<mx:XMLList id="menuData">
 			<menuitem label="File" enabled="{referenceMgr != null}">
 				<menuitem id="retrieve" label="Open..."/>
