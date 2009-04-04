@@ -63,7 +63,7 @@
 				var evt:Event = new Event(EVENT_EDITED);
 				dispatchEvent(evt);
 			}, function (msg:String):void {
-				throw new Error("Could not store event file '" + eventProps.path + "': " + msg);
+				Alert.show(msg, "Could not store event file '" + eventProps.path + "'");
 			});
 		}
 			
