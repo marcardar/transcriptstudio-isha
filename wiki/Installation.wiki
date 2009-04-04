@@ -21,6 +21,9 @@ Edit the /etc/environment file to include the following lines:
 
 (Paths may be different for different installations)
 
+==Check out source code from svn==
+
+
 
 Here we define the format of UUIDs for the various entities. These UUIDs provide more than just uniqueness. They also provide a certain level of readability as well as ordering.
 Details
