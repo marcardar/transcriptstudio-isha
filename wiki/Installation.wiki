@@ -39,5 +39,5 @@ Open the ts4isha-trunk folder and run the build.sh script as root ("sudo ./build
 
 After the build completes successfully, restart the database by executing the shutdown.sh script in the $EXIST_HOME/bin directory, and then the start.sh script.
 
-==Run the application== 
+===Run the application=== 
 Open Firefox and enter "http://localhost:8080/exist/ts4isha/TranscriptStudio.swf" to run the Transcript Studio Flex Application, and enter your eXist admin username and password at the prompt.
