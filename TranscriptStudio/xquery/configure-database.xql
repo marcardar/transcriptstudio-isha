@@ -1,14 +1,14 @@
 xquery version "1.0";
 
+import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
+
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>Isha Foundation - Configure Database</title>
 	</head>
 	<body>
 	{
-let $currentUser := xmldb:get-current-user()
-return
-	if (xmldb:is-admin-user($currentUser)) then
+	if (utils:is-current-user-admin()) then
 		let $dataCollectionPath := '/db/ts4isha/data'
 		let $newCollectionPaths :=
 			(: looks like there is a bug in eXist because this line does not work:
@@ -36,6 +36,6 @@ return
 			)
 	else
 		error('Only admin user allowed to create data collections')
-}
+	}
 	</body>
 </html>

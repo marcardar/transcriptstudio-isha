@@ -1,35 +1,38 @@
 xquery version "1.0";
 
-module namespace upload-media-metadata-panel = "http://www.ishafoundation.org/ts4isha/xquery/upload-media-metadata-panel";
+module namespace admin-panel = "http://www.ishafoundation.org/ts4isha/xquery/admin-panel";
 
 import module namespace media-fns = "http://www.ishafoundation.org/ts4isha/xquery/media-fns" at "media-fns.xqm";
+import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
 
 declare namespace request = "http://exist-db.org/xquery/request";
 declare namespace session = "http://exist-db.org/xquery/session";
 declare namespace xdb = "http://exist-db.org/xquery/xmldb";
 declare namespace util = "http://exist-db.org/xquery/util";
 
-declare function upload-media-metadata-panel:main() as element()*
+declare function admin-panel:main() as element()*
 {
+if (utils:is-current-user-admin()) then	
 	(
-		<center><h2>Isha Foundation Transcript &amp; Media Metadata Upload</h2></center>
+		<center><h2>Isha Foundation Transcript Administration</h2></center>
 	,
 		<div class="panel">
-			<center>
+			<h3>Configure Database</h3>
+			Click <a href="configure-database.xql">here</a> to add the event collections
+			<h3>Upload Media Metadata</h3>
 			<table id="header">
 				<tr><td valign="bottom">
 				<form id="upload-media-metadata-form" method="POST"  enctype="multipart/form-data">
-					<input type="hidden" name="panel" value="upload-media-metadata"/>
+					<input type="hidden" name="panel" value="admin"/>
 					<table id="upload-media-metadata-form-table" cellpadding="2"><tr>
+						<td><input type="submit" value="Upload"/></td> 
                         <td>
                             <input type="file" size="30" name="upload-media-metadata"/>
                         </td>
-						<td><input type="submit" value="Upload"/></td> 
 					</tr></table>
 				</form>
 				</td></tr>
 			</table>
-			</center>
 			{
 			let $uploadedFilename := request:get-uploaded-file-name("upload-media-metadata")
 			return
@@ -70,4 +73,6 @@ declare function upload-media-metadata-panel:main() as element()*
 			}
 		</div>
 	)
+else
+	error('Only admin user allowed to use admin panel')
 };

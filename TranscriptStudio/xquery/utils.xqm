@@ -5,6 +5,13 @@ module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils";
 import module namespace functx = "http://www.functx.com" at "functx.xqm";
 declare namespace xmldb = "http://exist-db.org/xquery/xmldb";
 
+declare function utils:is-current-user-admin() as xs:boolean?
+{
+	let $currentUser := xmldb:get-current-user()
+	return
+		xmldb:is-admin-user($currentUser)
+};
+
 declare function utils:get-event($eventId as xs:string) as element()
 {
 	collection('/db/ts4isha/data')/event[@id = $eventId]
