@@ -21,7 +21,7 @@ Edit the /etc/environment file to include the following lines:
 
 (Paths may be different for different installations)
 
-==Check out source code from svn==
+===Check out source code from svn===
 Execute the following command in the terminal to get the latest version of the code:
 
 svn checkout http://transcriptstudio4isha.googlecode.com/svn/trunk/ ts4isha-trunk
@@ -30,3 +30,5 @@ svn checkout http://transcriptstudio4isha.googlecode.com/svn/trunk/ ts4isha-trun
 
 (If you don't have subversion installed, you can get it by typing "sudo apt-get install svn" in the terminal).
 
+===Build the application===
+Open the ts4isha-trunk folder and run the build.sh script as root ("sudo ./build.sh"). (Note that you may have to make it executable by running the following command: "sudo chmod +x build.sh").
