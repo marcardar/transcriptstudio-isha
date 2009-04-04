@@ -540,6 +540,15 @@ package org.ishafoundation.archives.transcript.model
 			}, failureFunc);			
 		}
 		
+		public function removeCategory(categoryId:String, successFunc:Function, failureFunc:Function):void {
+			trace("Removing category: " + categoryId);
+			xqueryExecutor.executeStoredXQuery("update-category.xql", {categoryId:categoryId}, function(returnVal:int):void {
+				loadReferences(function():void {
+					successFunc(returnVal);
+				}, failureFunc);
+			}, failureFunc);
+		}
+		
 		public function getAllConcepts(successFunc:Function, failureFunc:Function):void {
 			trace("Fetching all concepts");
 			xqueryExecutor.executeStoredXQuery("get-all-concepts.xql", {}, function(returnVal:String):void {
@@ -553,6 +562,15 @@ package org.ishafoundation.archives.transcript.model
 		public function countConceptInstances(conceptId:String, successFunc:Function, failureFunc:Function):void {
 			trace("Counting instances of concept: " + conceptId);
 			xqueryExecutor.executeStoredXQuery("count-concept-instances.xql", {conceptId:conceptId}, function(returnVal:int):void {
+				loadReferences(function():void {
+					successFunc(returnVal);
+				}, failureFunc);
+			}, failureFunc);			
+		}
+		
+		public function countCategoryInstances(categoryId:String, successFunc:Function, failureFunc:Function):void {
+			trace("Counting instances of category: " + categoryId);
+			xqueryExecutor.executeStoredXQuery("count-category-instances.xql", {categoryId:categoryId}, function(returnVal:int):void {
 				loadReferences(function():void {
 					successFunc(returnVal);
 				}, failureFunc);

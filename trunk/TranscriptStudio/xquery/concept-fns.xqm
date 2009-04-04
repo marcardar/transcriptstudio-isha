@@ -7,6 +7,11 @@ declare function concept-fns:count-concept-instances($conceptId as xs:string) as
 	count(collection('/db/ts4isha/data')/session/transcript//tag[@type eq 'concept' and @value=$conceptId])
 };
 
+declare function concept-fns:count-category-instances($categoryId as xs:string) as xs:integer
+{
+	count(collection('/db/ts4isha/data')/session/transcript//tag[@type eq 'markupCategory' and @value=$categoryId])
+};
+
 declare function concept-fns:get-all-concepts($referenceConceptsOnly as xs:boolean?) as xs:string*
 {
 	let $reference := collection('/db/ts4isha/reference')/reference
@@ -265,6 +270,13 @@ declare function concept-fns:rename-additional-concept($oldConceptId as xs:strin
 			else
 				update value $additionalTag/@value with $newConceptId
 	return count($additionalTags)
+};
+
+declare function concept-fns:remove-category($categoryId as xs:string) as xs:integer
+{
+	let $reference := collection('/db/ts4isha/reference')/reference
+	let $deleteValues := concept-fns:delete-internal($reference/markupCategories/markupCategory[@id eq $categoryId])
+	return sum($deleteValues)
 };
 
 declare function concept-fns:remove($conceptId as xs:string) as xs:integer
