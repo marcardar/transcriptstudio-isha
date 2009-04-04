@@ -22,22 +22,11 @@ Edit the /etc/environment file to include the following lines:
 (Paths may be different for different installations)
 
 ==Check out source code from svn==
+Execute the following command in the terminal to get the latest version of the code:
 
+svn checkout http://transcriptstudio4isha.googlecode.com/svn/trunk/ ts4isha-trunk
 
+(or get the most recent stable tag)
 
-Here we define the format of UUIDs for the various entities. These UUIDs provide more than just uniqueness. They also provide a certain level of readability as well as ordering.
-Details
-Event UUID (e.g. 20090319-y1)
+(If you don't have subversion installed, you can get it by typing "sudo apt-get install svn" in the terminal).
 
-    * aim: provide ordering and some level of readability to event UUID
-    * format: <8-digit date when event started>-<event id unique within date>
-    * fixed width: no
-    * order: by date
-    * grouping: by event type within date
-    * examples:
-          o 20090319-d1
-          o 00000000-n124 (this means there are probably at least 124 intro talks on an unknown date) 
-
-<8-digit date when event started> (e.g. 20090319)
-
-    * aim: provide chronological ordering and
