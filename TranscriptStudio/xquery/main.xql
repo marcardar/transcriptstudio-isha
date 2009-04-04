@@ -17,6 +17,7 @@ import module namespace event-panel = "http://www.ishafoundation.org/ts4isha/xqu
 import module namespace session-panel = "http://www.ishafoundation.org/ts4isha/xquery/session-panel" at "session-panel.xqm";
 import module namespace all-concepts-panel = "http://www.ishafoundation.org/ts4isha/xquery/all-concepts-panel" at "all-concepts-panel.xqm";
 import module namespace categories-panel = "http://www.ishafoundation.org/ts4isha/xquery/categories-panel" at "categories-panel.xqm";
+import module namespace upload-media-metadata-panel = "http://www.ishafoundation.org/ts4isha/xquery/upload-media-metadata-panel" at "upload-media-metadata-panel.xqm";
 
 (:
 	Select the page to show. Every page is defined in its own module 
@@ -46,6 +47,10 @@ declare function main:display-panel($panel) as element()*
 	else if ($panel eq "categories") then
 	(
 		categories-panel:main()
+	)
+	else if ($panel eq "upload-media-metadata") then
+	(
+		upload-media-metadata-panel:main()
 	)
 	else
 	(

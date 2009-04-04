@@ -15,18 +15,29 @@ declare function functx:add-attributes
                                           {$attrValues[$seq]},
                     $element/@*,
                     $element/node() }
- };
+};
 
+declare function functx:remove-attributes($elements as element()*, $attrNames as xs:QName*) as element() {       
+	for $element in $elements
+	return element
+		{node-name($element)}
+		{
+			$element/@*[not(node-name(.) = $attrNames)],
+			$element/node()
+		}
+};
+ 
 declare function functx:add-or-update-attributes($elements as element()*, $attrNames as xs:QName*, $attrValues as xs:anyAtomicType*) as element()? {
 	for $element in $elements
-	return element {node-name($element)}
-	{
+	return element
+		{node-name($element)}
+		{
 		for $attrName at $seq in $attrNames
 		return attribute {$attrName}
 		                 {$attrValues[$seq]},
 			$element/@*[not(node-name(.) = $attrNames)],
 			$element/node()
-	}
+		}
 };
 
 declare function functx:remove-elements($elements as element()*, $names as xs:string*) as element()* {			 
