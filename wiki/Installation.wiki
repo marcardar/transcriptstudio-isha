@@ -8,10 +8,18 @@
 ===System Setup===
 Install java (the default installation location is /usr/lib/jvm/java-6-sun).
 
-Install eXist by executing the command "sudo java -jar eXist-setup-1.2.5-rev8668.jar" (We recommend you install to /usr/lib/exist).
+Install eXist by executing the command "sudo java -jar eXist-setup-1.2.5-rev8668.jar" from within the directory containing the eXist jar file. (We recommend you install to /usr/lib/exist).
 
-Unpack the flex sdk to a suitable location. (We recommend /usr/lib/flex)
+Unpack the flex sdk to a suitable location. (We recommend /usr/lib/flex).
 
+===Define system environment variables===
+Edit the /etc/environment file to include the following lines:
+
+EXIST_HOME="/usr/lib/exist"
+JAVA_HOME="/usr/lib/jvm/java-6-sun"
+FLEX_HOME="/usr/lib/flex"
+
+(Paths may be different for different installations)
 
 
 Here we define the format of UUIDs for the various entities. These UUIDs provide more than just uniqueness. They also provide a certain level of readability as well as ordering.
