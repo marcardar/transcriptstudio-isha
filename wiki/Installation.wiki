@@ -28,9 +28,9 @@ Edit the /etc/environment file to include the following lines:
 
 Secondly, run "sudo visudo" to edit your /etc/sudoers file. Add the following lines:
 
-Defaults        env_keep+=JAVA_HOME
-Defaults        env_keep+=EXIST_HOME
-Defaults        env_keep+=FLEX_HOME
+  * Defaults        env_keep+=JAVA_HOME
+  * Defaults        env_keep+=EXIST_HOME
+  * Defaults        env_keep+=FLEX_HOME
 
 (We have it right under the "Defaults env_reset" line).
 
