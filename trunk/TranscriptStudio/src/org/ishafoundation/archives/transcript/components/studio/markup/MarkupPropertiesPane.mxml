@@ -45,6 +45,9 @@
 		public var referenceMgr:ReferenceManager;
 		
 		[Bindable]
+		public var allowMarkupEdit:Boolean = true;
+		
+		[Bindable]
 		public var markupAttrs:MSuperNodeProperties;
 		[Bindable]
 		public var committedMarkupAttrs:MSuperNodeProperties;
@@ -231,12 +234,12 @@
   	<mx:HBox width="100%" verticalAlign="top" horizontalGap="0">
 		<mx:Image id="typeImage" height="24" width="24" horizontalAlign="right" verticalAlign="top" source="{this.markupAttrs == null ? Utils.DEFAULT_ICON_CLASS : getTypeIcon(this.markupAttrs.markupTypeId)}"/>
 		<mx:Text id="titleText" width="100%" fontSize="14" fontWeight="bold" textDecoration="none" textAlign="left" fontFamily="arial"/>
-		<mx:Button id="starButton" width="24" height="24" toggle="true" skin="{starButton.selected ? STAR_YELLOW_ICON_CLASS : STAR_GREY_ICON_CLASS}" selected="{this.markupAttrs.rating >= 0}" change="starredChanged()"/>			
+		<mx:Button id="starButton" width="24" height="24" enabled="{allowMarkupEdit}" toggle="true" skin="{starButton.selected ? STAR_YELLOW_ICON_CLASS : STAR_GREY_ICON_CLASS}" selected="{this.markupAttrs.rating >= 0}" change="starredChanged()"/>			
 	</mx:HBox>
 	<mx:VBox width="100%" height="100%" verticalGap="0">
 		<mx:HBox width="100%" paddingBottom="5" paddingTop="15" paddingRight="5">
 			<mx:HBox width="50%" horizontalAlign="left">
-				<mx:PopUpButton id="changeTypePopUpButton" label="Change type" openAlways="true" minWidth="130" close="markupTypeChanged();">
+				<mx:PopUpButton id="changeTypePopUpButton" label="Change type" enabled="{allowMarkupEdit}" openAlways="true" minWidth="130" close="markupTypeChanged();">
 					<mx:popUp>
 						<mx:List id="changeTypeList" textAlign="center" minWidth="120" labelFunction="labelFunc" iconFunction="getIconFunc()"/>
 					</mx:popUp>
@@ -244,7 +247,7 @@
 			</mx:HBox>
 		</mx:HBox>
 		<mx:Label text="Category"/>
-		<mx:ToggleButtonBar id="categoryStyleToggleButtonBar" itemClick="categoryStyleClicked();" width="330" horizontalAlign="left" selectedIndex="{this.markupAttrs.markupCategoryId != null ? 0 : this.markupAttrs.markupCategorySuggestion.length > 0 ? 1 : 2}">
+		<mx:ToggleButtonBar id="categoryStyleToggleButtonBar" enabled="{allowMarkupEdit}" itemClick="categoryStyleClicked();" width="330" horizontalAlign="left" selectedIndex="{this.markupAttrs.markupCategoryId != null ? 0 : this.markupAttrs.markupCategorySuggestion.length > 0 ? 1 : 2}">
 			<mx:dataProvider>
 				<mx:Object label="Search..." icon="{Utils.SEARCH_ICON_CLASS}"/>
 				<mx:Object label="Suggest..." icon="{Utils.PENCIL_ICON_CLASS}"/>
@@ -255,15 +258,15 @@
 			<mx:Spacer width="50%" height="100%"/>
 		</mx:HBox>
 		<mx:Label text="Additional concepts (space-separated)" width="300" paddingTop="5"/>
-		<generic:ConceptTextInput id="additionalConceptsTextInput" width="100%" editable="true" text="{this.markupAttrs.additionalConcepts.join(' ')}" restrict="{Constants.CONCEPT_ID_RESTRICTION + ' '}" enter="{updateAdditionalTags()}" focusOut="{updateAdditionalTags()}"/>
+		<generic:ConceptTextInput id="additionalConceptsTextInput" width="100%" editable="{allowMarkupEdit}" text="{this.markupAttrs.additionalConcepts.join(' ')}" restrict="{Constants.CONCEPT_ID_RESTRICTION + ' '}" enter="{updateAdditionalTags()}" focusOut="{updateAdditionalTags()}"/>
 		<mx:VBox width="100%" height="100%" verticalGap="0" horizontalAlign="center">
 			<mx:Label text="Content summary" width="100%"/>
-			<mx:TextArea id="summaryTextArea" width="100%" height="50%" minHeight="32" text="{this.markupAttrs.summary}" focusOut="summaryChanged()"/>
+			<mx:TextArea id="summaryTextArea" width="100%" height="50%" minHeight="32" editable="{allowMarkupEdit}" text="{this.markupAttrs.summary}" focusOut="summaryChanged()"/>
 			<mx:Label width="100%" textAlign="left" text="Comments"/>
-			<mx:TextArea id="commentTextArea" width="100%" height="50%" minHeight="32" text="{this.markupAttrs.comment}" focusOut="commentChanged()"/>
+			<mx:TextArea id="commentTextArea" width="100%" height="50%" minHeight="32" editable="{allowMarkupEdit}" text="{this.markupAttrs.comment}" focusOut="commentChanged()"/>
 			<mx:HBox horizontalGap="20" paddingTop="5">
-				<mx:Button id="revertButton" label="Revert Properties" enabled="{committedMarkupAttrs != null &amp;&amp; !markupAttrs.equals(committedMarkupAttrs)}" click="revertClicked()"/>
-				<mx:Button id="removeButton" label="Remove Markup" click="removeClicked()"/>
+				<mx:Button id="revertButton" label="Revert Properties" enabled="{allowMarkupEdit &amp;&amp; committedMarkupAttrs != null &amp;&amp; !markupAttrs.equals(committedMarkupAttrs)}" click="revertClicked()"/>
+				<mx:Button id="removeButton" label="Remove Markup" enabled="{allowMarkupEdit}" click="removeClicked()"/>
 			</mx:HBox>
 		</mx:VBox>
 	</mx:VBox>

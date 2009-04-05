@@ -23,6 +23,7 @@
 <mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" x="40" y="40" title="About..." width="410" borderThickness="1" alpha="2.0" layout="absolute">
 	<mx:Script>
 		<![CDATA[
+			import org.ishafoundation.archives.transcript.db.User;
 			import org.ishafoundation.archives.transcript.db.DatabaseConstants;
 			import org.ishafoundation.archives.transcript.util.ApplicationUtils;
 			import name.carter.mark.flex.util.Utils;
@@ -39,7 +40,7 @@
 			[Bindable]
 			private var databaseUrlHTML:String = "<u><a href='" + databaseURL + "' target='_blank'>" + databaseURL + "</a></u>";
 			[Bindable]
-			private var databaseUsername:String = DatabaseConstants.EXIST_USERNAME;
+			public var user:User;
 		]]>
 	</mx:Script>
 	<mx:VBox width="100%" height="100%" horizontalAlign="center" verticalAlign="top" borderThickness="10" fontSize="12">
@@ -51,7 +52,7 @@
 			<mx:Text width="100%" text="Flash Player: {flashPlayerVersion}"/>
 			<mx:Text width="100%" text="Flex SDK: {flexSdkVersion}"/>
 			<mx:Text width="100%" htmlText="Database URL: {databaseUrlHTML}"/>
-			<mx:Text width="100%" text="Username: {databaseUsername}"/>
+			<mx:Text width="100%" text="Username: {user.username} (groups: {user.groupNames})"/>
 		</mx:VBox>
 		<mx:Button label="Ok" textAlign="center" click="{PopUpManager.removePopUp(this)}"/>		
 	</mx:VBox>

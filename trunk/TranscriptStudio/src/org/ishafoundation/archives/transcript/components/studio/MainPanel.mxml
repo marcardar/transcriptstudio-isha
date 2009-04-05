@@ -430,7 +430,8 @@
 			}
 			
 			private function showAboutBox():void {
-				PopUpManager.createPopUp(this, AboutBox, true);
+				var popup:AboutBox = PopUpManager.createPopUp(this, AboutBox, true) as AboutBox;
+				popup.user = databaseMgr.user;
 			}
 			
 			private function updateTitle():void {
@@ -558,14 +559,14 @@
 				<!--menuitem id="mediaProps" label="Media properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/-->
 			</menuitem>
 			<menuitem label="Selection" enabled="{transcriptPane.textPane.ttSelection != null}">
-				<menuitem id="markupText" label="Markup text" enabled="{transcriptPane.textPane.ttSelection.allowMarkup()}"/>
-				<menuitem id="removeMarkup" label="Remove markup" enabled="{transcriptPane.textPane.ttSelection.allowRemoveMarkup()}"/>
+				<menuitem id="markupText" label="Markup text" enabled="{databaseMgr.user.isMarkupUser() &amp;&amp; transcriptPane.textPane.ttSelection.allowMarkup()}"/>
+				<menuitem id="removeMarkup" label="Remove markup" enabled="{databaseMgr.user.isMarkupUser() &amp;&amp; transcriptPane.textPane.ttSelection.allowRemoveMarkup()}"/>
 				<menuitem type="separator"/>
-				<menuitem id="mergeSegmentRange" label="Merge paragraphs" enabled="{transcriptPane.textPane.ttSelection.allowMerge()}"/>
-				<menuitem id="deleteText" label="Delete text" enabled="{transcriptPane.textPane.ttSelection.allowDeleteText()}"/>
+				<menuitem id="mergeSegmentRange" label="Merge paragraphs" enabled="{databaseMgr.user.isTextUser() &amp;&amp; transcriptPane.textPane.ttSelection.allowMerge()}"/>
+				<menuitem id="deleteText" label="Delete text" enabled="{databaseMgr.user.isTextUser() &amp;&amp; transcriptPane.textPane.ttSelection.allowDeleteText()}"/>
 				<menuitem type="separator"/>
-				<menuitem id="nudgeUp" label="Nudge up" enabled="{transcriptPane.textPane.ttSelection.allowNudgeUp()}"/>
-				<menuitem id="nudgeDown" label="Nudge down" enabled="{transcriptPane.textPane.ttSelection.allowNudgeDown()}"/>
+				<menuitem id="nudgeUp" label="Nudge up" enabled="{databaseMgr.user.isMarkupUser() &amp;&amp; transcriptPane.textPane.ttSelection.allowNudgeUp()}"/>
+				<menuitem id="nudgeDown" label="Nudge down" enabled="{databaseMgr.user.isMarkupUser() &amp;&amp; transcriptPane.textPane.ttSelection.allowNudgeDown()}"/>
 			</menuitem>				
 			<menuitem label="Window" enabled="{myMenuBar != null &amp;&amp; session != null}">
 				<menuitem id="showMediaPlayer" label="Media player"/>
@@ -573,7 +574,7 @@
 				<menuitem id="showMarkupPropertiesPane" label="Markup properties" type="check" toggled="true"/>
 				<menuitem id="showTextPropertiesPane" label="Text properties" type="check" toggled="true"/>
 			</menuitem>
-			<menuitem label="Admin" enabled="{databaseMgr != null &amp;&amp; databaseMgr.isSuperUser}">
+			<menuitem label="Admin" enabled="{databaseMgr != null &amp;&amp; databaseMgr.user.isDbaUser()}">
 				<menuitem id="eventSessionBuilder" label="Event/Session Builder..."/>
 				<menuitem type="separator"/>
 				<menuitem id="categoryManager" label="Categories..."/>
@@ -596,6 +597,6 @@
 		</mx:XMLList>
 	</mx:MenuBar>
 	<mx:TabNavigator borderStyle="none" tabWidth="{transcriptPane.width}" horizontalAlign="center" width="100%" height="100%" paddingTop="0" visible="{this.session != null}">
-		<studioNS:TranscriptPane id="transcriptPane" width="100%" height="100%" backgroundColor="0x869CA7" referenceMgr="{this.referenceMgr}" visible="{this.session != null}" enabled="{this.transcriptPane.transcript != null}"/>
+		<studioNS:TranscriptPane id="transcriptPane" width="100%" height="100%" backgroundColor="0x869CA7" referenceMgr="{this.referenceMgr}" visible="{this.session != null}" enabled="{this.transcriptPane.transcript != null}" user="{databaseMgr.user}"/>
 	</mx:TabNavigator>
 </mx:VBox>

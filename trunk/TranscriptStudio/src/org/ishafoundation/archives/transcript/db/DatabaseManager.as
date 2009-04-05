@@ -22,7 +22,7 @@ package org.ishafoundation.archives.transcript.db
 {
 	public interface DatabaseManager extends XMLRetrieverStorer, XQueryExecutor
 	{
-		function login(successFunction:Function, failureFunction:Function):void;
-		function get isSuperUser():Boolean; 
+		function login(successFunc:Function, failureFunc:Function):void;
+		function get user():User;
 	}
 }
