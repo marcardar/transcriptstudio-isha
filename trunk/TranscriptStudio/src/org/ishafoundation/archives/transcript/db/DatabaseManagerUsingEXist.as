@@ -38,17 +38,11 @@ package org.ishafoundation.archives.transcript.db
 		public var user:User;
 		
 		private var remoteMgr:ClientManager;
-		private var username:String;
 		private var loggedIn:Boolean = false;
 		
-		public function DatabaseManagerUsingEXist(username:String, password:String) {
+		public function DatabaseManagerUsingEXist(username:String, password:String, successFunc:Function, failureFunc:Function) {
 			trace("Using eXist URL: " + DatabaseConstants.EXIST_URL);
 			this.remoteMgr = new ClientManager(DatabaseConstants.EXIST_URL, username, password);
-			this.username = username;
-		}
-
-		public function login(successFunction:Function, failureFunction:Function):void {
-			// we test the connection by reading the top level collection
 			remoteMgr.testConnection(function(response:Object):void {
 				loggedIn = true;
 				// write db config to the shared object
@@ -58,9 +52,20 @@ package org.ishafoundation.archives.transcript.db
 				checkClientVersionAllowed(function():void {
 					getUserGroupNames(function(groupNames:Array):void {
 						user = new User(username, groupNames);
-						successFunction();
+						successFunc();
 					});
-				}, failureFunction);
+				}, failureFunc);
+			},
+			function(msg:String):void {
+				loggedIn = false;
+				failureFunc("Login failed because: " + msg);
+			});
+		}
+
+		public function testConnection(successFunction:Function, failureFunction:Function):void {
+			remoteMgr.testConnection(function(response:Object):void {
+				loggedIn = true;
+				successFunction();
 			},
 			function(msg:String):void {
 				loggedIn = false;
@@ -70,7 +75,7 @@ package org.ishafoundation.archives.transcript.db
 		
 		public function retrieveXML(successFunc:Function, failureFunc:Function, tagName:String = null, id:String = null, collectionPath:String = null):void {
 			if (!this.loggedIn) {
-				login(function():void {
+				testConnection(function():void {
 					retrieveXML(successFunc, failureFunc, tagName, id, collectionPath);
 				}, function(msg:String):void {
 					failureFunc("Tried to retrieve XML but not connected to database");					
@@ -121,7 +126,7 @@ package org.ishafoundation.archives.transcript.db
 		
 		public function storeXML(xml:XML, successFunc:Function, failureFunc:Function):void {
 			if (!this.loggedIn) {
-				login(function():void {
+				testConnection(function():void {
 					storeXML(xml, successFunc, failureFunc);
 				}, function(msg:String):void {
 					failureFunc("Tried to store XML but not connected to database");					
@@ -138,7 +143,7 @@ package org.ishafoundation.archives.transcript.db
 		
 		public function query(xQuery:String, args:Array, successFunc:Function, failureFunc:Function):void {
 			if (!this.loggedIn) {
-				login(function():void {
+				testConnection(function():void {
 					query(xQuery, args, successFunc, failureFunc);
 				}, function(msg:String):void {
 					failureFunc("Tried to execute query but not connected to database");					
@@ -150,7 +155,7 @@ package org.ishafoundation.archives.transcript.db
 		
 		public function executeStoredXQuery(xQueryFilename:String, params:Object, successFunc:Function, failureFunc:Function, resultFormat:String = null):void {
 			if (!this.loggedIn) {
-				login(function():void {
+				testConnection(function():void {
 					executeStoredXQuery(xQueryFilename, params, successFunc, failureFunc);
 				}, function(msg:String):void {
 					failureFunc("Tried to execute stored query but not connected to database");					

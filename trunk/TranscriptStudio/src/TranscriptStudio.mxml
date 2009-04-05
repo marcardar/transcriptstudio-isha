@@ -149,8 +149,7 @@
 				}
 				var username:String = loginPopUp.usernameTextInput.text;
 				var password:String = loginPopUp.passwordTextInput.text;
-				databaseMgr = new DatabaseManagerUsingEXist(username, password);
-				databaseMgr.login(function():void {
+				databaseMgr = new DatabaseManagerUsingEXist(username, password, function():void {
 					PopUpManager.removePopUp(loginPopUp);
 					//status = "Login succeeded";
 					// make sure the data collection has been created
