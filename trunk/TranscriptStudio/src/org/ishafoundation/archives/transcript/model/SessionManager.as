@@ -45,8 +45,8 @@ package org.ishafoundation.archives.transcript.model
 			this.xmlRetrieverStorer = xmlRetrieverStorer;
 		}
 		
-		public function createSession(sessionXML:XML, successFunc:Function, failureFunc:Function):Session {
-			var result:Session = new Session(sessionXML, referenceMgr);
+		public function createSession(sessionXML:XML, eventProps:EventProperties, successFunc:Function, failureFunc:Function):Session {
+			var result:Session = new Session(sessionXML, eventProps, referenceMgr);
 			result.unsavedChanges = true; // need to save all this stuff			
 			storeSession(result, function():void {
 				successFunc();
@@ -54,23 +54,25 @@ package org.ishafoundation.archives.transcript.model
 			return result;
 		} 
 		
-		public function retrieveSession(sessionId:String, externalSuccess:Function, externalFailure:Function):void {
+		public function retrieveSession(sessionId:String, eventProps:EventProperties, externalSuccess:Function, externalFailure:Function):void {
 			if (sessionId == null || StringUtil.trim(sessionId).length == 0) {
 				throw new Error("Passed a blank sessionId");
 			}
 			DatabaseManagerUtils.retrieveSessionXML(sessionId, xmlRetrieverStorer, function(sessionXML:XML):void {
 				trace("Successfully retrieved session");
-				var session:Session = new Session(sessionXML, referenceMgr);
-				externalSuccess(session);
+				var session:Session = openSessionForEvent(sessionXML, eventProps);
+				externalSuccess(session);		
 			}, function (msg:String):void {
 				trace("Could not load session xml because: " + msg);
 				externalFailure(msg);			
 			});
 		}
 		
-		public function openSession(sessionXML:XML):Session {
-			trace("Opening session based on session XML already in memory");
-			return new Session(sessionXML, referenceMgr);
+		/**
+		 * For when we already have the event props
+		 */
+		public function openSessionForEvent(sessionXML:XML, eventProps:EventProperties):Session {
+			return new Session(sessionXML, eventProps, referenceMgr);
 		}
 			
 		public function storeSession(session:Session, externalSuccess:Function, externalFailure:Function):void {

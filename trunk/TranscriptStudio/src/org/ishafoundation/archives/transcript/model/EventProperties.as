@@ -22,6 +22,7 @@ package org.ishafoundation.archives.transcript.model
 		public static const COMMENT_ATTR_NAME:String = "comment";
 		
 		public static const TYPES:Array = createTypesArray();
+		private static const DATE_FORMATTER:DateFormatter = DateUtils.createDateFormatter("DD-MMM-YY");
 		
 		public var eventElement:XML;
 		
@@ -155,13 +156,13 @@ package org.ishafoundation.archives.transcript.model
 			return placeStr;
 		}
 		
-		public function generateFullName(includeEventType:Boolean, dateFormatter:DateFormatter):String {
+		public function generateFullName(includeEventType:Boolean):String {
 			var result:String = "";
 			if (includeEventType) {
 				result += type + ":";
 			}
 			if (startAt != null) {
-				result += " " + dateFormatter.format(startAt);
+				result += " " + DATE_FORMATTER.format(startAt);
 			}
 			if (subTitle != null) {
 				result += " " + subTitle;
@@ -173,8 +174,6 @@ package org.ishafoundation.archives.transcript.model
 			result += " [" + id + "]";
 			return result;
 		}
-		
-		private static const DATE_FORMATTER:DateFormatter = DateUtils.createDateFormatter("DD-MMM-YY");
 		
 		public function generateLongText(referenceMgr:ReferenceManager):String {
 			var result:String = referenceMgr.getEventTypeName(type) + " (" + type + ")";

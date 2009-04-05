@@ -112,16 +112,6 @@
 				super.keyDownHandler(evt);				
 			}
 			
-			private function updateTitle():void {
-				var transcriptId:String = this.session.id;
-	  			if (transcriptId == null) {
-	  				this.title = DEFAULT_TITLE;
-	  			}
-	  			else {
-	  				this.title = "Transcript Id: " + transcriptId;
-	  			}
- 			}
- 			
 			private function referenceXMLRetrieveSuccess():void {
 				this.status = "References loaded";
 			}
@@ -180,7 +170,7 @@
 					CursorManager.setBusyCursor();
 					// first update the reference file - continue even if it fails
 					reloadReferencesBeforeContinuing(function():void {
-						sessionMgr.retrieveSession(sessionId, openSessionSuccess, openSessionFailure);
+						sessionMgr.retrieveSession(sessionId, popup.eventSelectorPane.selectedEventProps, openSessionSuccess, openSessionFailure);
 					});					
 				});
 			}
@@ -203,28 +193,39 @@
 							else if (docXML.localName() == "event") {
 								var eventProps:EventProperties = new EventProperties(docXML);
 								SessionSelectorDialog.displayIfNecessary(eventProps, popup, databaseMgr, function(sessionProps:SessionProperties):void {
-									sessionMgr.retrieveSession(sessionProps.id, openSessionSuccess, openSessionFailure);
+									sessionMgr.retrieveSession(sessionProps.id, eventProps, openSessionSuccess, openSessionFailure);
 									popup.closeMe();
 								});
 							}
 							else if (docXML.localName() == "session") {
-								var session:Session = sessionMgr.openSession(docXML);
-								openSessionSuccess(session);
-								popup.closeMe();
-								// the nodeId might refer to a markup or something
-								if (nodeId != null && nodeId.length > 0) {
-									callLater(function():void {
-										var node:MNode = session.transcript.mdoc.resolveId(nodeId);
-										if (node == null) {
-											Alert.show("Could not find markup with id: " + nodeId);
-											return;
-										}
-										if (node is MSuperNode) {
-											transcriptPane.markupsPane.selectedMarkup = node as MSuperNode;
-											transcriptPane.textPane.selectMarkup(node as MSuperNode);
-										}
-									});
+								// first we need to get the event props
+								var eventId:String = new SessionProperties(docXML).eventId;
+								if (eventId == null) {
+									throw new Error("session XML does not have an eventId");
 								}
+								trace("Opening session based on session XML already in memory");
+								DatabaseManagerUtils.retrieveEventXML(eventId, databaseMgr, function(eventXML:XML):void {
+									var eventProps:EventProperties = new EventProperties(eventXML);
+									var session:Session = new Session(docXML, eventProps, referenceMgr);
+									openSessionSuccess(session);
+									popup.closeMe();
+									// the nodeId might refer to a markup or something
+									if (nodeId != null && nodeId.length > 0) {
+										callLater(function():void {
+											var node:MNode = session.transcript.mdoc.resolveId(nodeId);
+											if (node == null) {
+												Alert.show("Could not find markup with id: " + nodeId);
+												return;
+											}
+											if (node is MSuperNode) {
+												transcriptPane.markupsPane.selectedMarkup = node as MSuperNode;
+												transcriptPane.textPane.selectMarkup(node as MSuperNode);
+											}
+										});
+									}								
+								}, function(msg:String):void {
+									Alert.show(msg, "Could not open session");
+								});
 							}
 							else {
 								Alert.show("Unknown xml doc type: " + docXML.localName());
@@ -326,7 +327,7 @@
 			
 			private function reloadTranscript():void {
 				var reloadTranscriptFunction:Function = function():void {
-					sessionMgr.retrieveSession(session.id, openSessionSuccess, openSessionFailure);
+					sessionMgr.retrieveSession(session.id, session.eventProps, openSessionSuccess, openSessionFailure);
 				}
 				// first update the reference file - continue even if it fails
 				referenceMgr.loadReferences(reloadTranscriptFunction, function(msg:String):void {
@@ -338,11 +339,12 @@
 			private function editEventProps():void {
 				var thisPanel:MainPanel = this;
 				DatabaseManagerUtils.retrieveEventXML(session.props.eventId, databaseMgr, function(eventXML:XML):void {
-					var eventProps:EventProperties = new EventProperties(eventXML);
-					var popup:EventPropertiesEditorDialog = EventPropertiesEditorDialog.display(thisPanel, databaseMgr, referenceMgr, eventProps);
+					session.eventProps = new EventProperties(eventXML);
+					var popup:EventPropertiesEditorDialog = EventPropertiesEditorDialog.display(thisPanel, databaseMgr, referenceMgr, session.eventProps);
 					popup.addEventListener(EventPropertiesEditorDialog.EVENT_EDITED, function(event:Event):void {
 						status = "Successfully edited event";
 						Alert.show("Successfully edited event"); 
+						updateTitle();
 					});
 				}, function(msg:String):void {;				
 					Alert.show(msg, "Could not retrieve event XML");
@@ -363,11 +365,8 @@
 					}
 					session.unsavedChanges = true;
 					Alert.show("Session properties edited but not yet saved");				
+					updateTitle();
 				});
-			}
-			
-			private function editMediaProps():void {
-				
 			}
 			
 			private function eventSessionBuilderClicked():void {
@@ -407,7 +406,7 @@
 			private function importTranscriptComplex():void {
 				var popup:ImportDialog = ImportDialog.display(this, databaseMgr, referenceMgr);
 				popup.addEventListener(ImportDialog.IMPORT_CLICKED, function(event:Event):void {
-					session = sessionMgr.openSession(popup.sessionXML);
+					session = sessionMgr.openSessionForEvent(popup.sessionXML, popup.eventProps);
 					session.unsavedChanges = true;
 					openSessionSuccess(session);
 				});
@@ -434,6 +433,24 @@
 				PopUpManager.createPopUp(this, AboutBox, true);
 			}
 			
+			private function updateTitle():void {
+				var title:String = "";
+				if (session == null) {
+					title += "No session open";
+				}
+				else {
+					if (session.eventProps != null) {
+						title += referenceMgr.getEventTypeName(session.eventProps.type) + ": ";
+						title += session.eventProps.generateFullName(false) + " ";
+					}
+					title += session.props.getFullName(session.eventProps.startAt) + " ";
+					if (session.transcript == null) {
+						title += "- NO TRANSCRIPT";
+					}
+				}
+				transcriptPane.label = title;
+			}
+			
 			private function onMenuClick(menuItemElement:XML):void {
 				var actionName:String = menuItemElement.@id;
 				if ( actionName == "retrieve" ) {
@@ -453,9 +470,6 @@
 				}
 				else if ( actionName == "sessionProps" ) {
 					editSessionProps();
-				}
-				else if ( actionName == "mediaProps" ) {
-					editMediaProps();
 				}
 				else if ( actionName == "markupText" ) {
 					this.transcriptPane.markupText();
@@ -581,6 +595,7 @@
 			</menuitem>
 		</mx:XMLList>
 	</mx:MenuBar>
-	<!--mx:TextInput id="textInput" enter="{TranscriptStudio.testId(textInput.text)}"/-->
-	<studioNS:TranscriptPane id="transcriptPane" width="100%" height="100%" referenceMgr="{this.referenceMgr}" visible="{this.session != null}" enabled="{this.transcriptPane.transcript != null}"/>
+	<mx:TabNavigator borderStyle="none" tabWidth="{transcriptPane.width}" horizontalAlign="center" width="100%" height="100%" paddingTop="0" visible="{this.session != null}">
+		<studioNS:TranscriptPane id="transcriptPane" width="100%" height="100%" backgroundColor="0x869CA7" referenceMgr="{this.referenceMgr}" visible="{this.session != null}" enabled="{this.transcriptPane.transcript != null}"/>
+	</mx:TabNavigator>
 </mx:VBox>
