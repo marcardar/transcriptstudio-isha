@@ -10,6 +10,7 @@ package org.ishafoundation.archives.transcript.model
 		private static const SOURCE_ID_REG_EXP:RegExp = /^[a-z]+\d+/i;
 		
 		public var sessionXML:XML;
+		public var eventProps:EventProperties;
 
 		public var transcript:Transcript;
 		
@@ -18,12 +19,13 @@ package org.ishafoundation.archives.transcript.model
 		[Bindable]
 		private var _unsavedChanges:Boolean;
 
-		public function Session(sessionXML:XML, referenceMgr:ReferenceManager)
+		public function Session(sessionXML:XML, eventProps:EventProperties, referenceMgr:ReferenceManager)
 		{
 			if (sessionXML == null) {
 				throw new ArgumentError("Passed a null sessionXML");
 			}
 			this.sessionXML = sessionXML;
+			this.eventProps = eventProps;
 			this.referenceMgr = referenceMgr;
 			var transcriptXML:XML = sessionXML.transcript[0];
 			if (transcriptXML != null) {

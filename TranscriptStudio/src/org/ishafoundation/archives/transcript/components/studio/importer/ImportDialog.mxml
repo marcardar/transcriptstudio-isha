@@ -170,7 +170,7 @@
 					Alert.show("Session already has transcript - choose another");
 					return;
 				}
-				var session:Session = new Session(existingSessionXML, referenceMgr);
+				var session:Session = new Session(existingSessionXML, eventProps, referenceMgr);
 				session.appendTranscript(importedTranscriptElement, importedDeviceElements);
 				sessionXML = session.sessionXML;
 				dispatchEvent(new Event(IMPORT_CLICKED));
