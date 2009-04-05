@@ -26,6 +26,14 @@ Edit the /etc/environment file to include the following lines:
 
 (Paths may be different for different installations)
 
+Secondly, run "sudo visudo" to edit your /etc/sudoers file. Add the following lines:
+
+Defaults        env_keep+=JAVA_HOME
+Defaults        env_keep+=EXIST_HOME
+Defaults        env_keep+=FLEX_HOME
+
+(We have it right under the "Defaults env_reset" line).
+
 ===Check out source code from svn===
 Execute the following command in the terminal to get the latest version of the code:
 
