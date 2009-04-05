@@ -211,7 +211,7 @@
 					<mx:Label width="100%" textAlign="right" text="Speaker" paddingBottom="2" paddingTop="2"/>
 				</mx:GridItem>
 				<mx:GridItem width="100%" height="100%">
-					<mx:ComboBox id="speakerComboBox" width="100%" dataProvider="{speakers}" editable="true" selectedIndex="{generalProps.speaker == null ? -1 : speakers.indexOf(generalProps.speaker)}" prompt="Select..." change="speakerChanged()" enter="speakerHandler()" focusOut="speakerHandler()"/>
+					<mx:ComboBox id="speakerComboBox" width="100%" enabled="{allowTextEdit}" dataProvider="{speakers}" editable="true" selectedIndex="{generalProps.speaker == null ? -1 : speakers.indexOf(generalProps.speaker)}" prompt="Select..." change="speakerChanged()" enter="speakerHandler()" focusOut="speakerHandler()"/>
 				</mx:GridItem>
 				<mx:GridItem height="100%">
 					<mx:RadioButton label="mixed" enabled="false" id="speakerMixedRadioButton" selected="{generalProps.speaker == null}"/>
@@ -222,7 +222,7 @@
 					<mx:Label width="100%" textAlign="right" text="Spoken Language" paddingBottom="2" paddingTop="2"/>
 				</mx:GridItem>
 				<mx:GridItem width="100%" height="100%">
-					<mx:ComboBox id="languageComboBox" width="100%" dataProvider="{spokenLanguages}" prompt="Select..." editable="false" selectedIndex="{generalProps.spokenLanguage == null ? -1 : spokenLanguages.indexOf(generalProps.spokenLanguage)}" change="spokenLanguageChanged()"/>
+					<mx:ComboBox id="languageComboBox" width="100%" enabled="{allowTextEdit}" dataProvider="{spokenLanguages}" prompt="Select..." editable="false" selectedIndex="{generalProps.spokenLanguage == null ? -1 : spokenLanguages.indexOf(generalProps.spokenLanguage)}" change="spokenLanguageChanged()"/>
 				</mx:GridItem>
 				<mx:GridItem height="100%">
 					<mx:RadioButton label="mixed" id="spokenLanguageMixedRadioButton" enabled="false" selected="{generalProps.spokenLanguage == null}"/>
@@ -233,7 +233,7 @@
 					<mx:Label width="100%" textAlign="right" text="Emphasized" paddingBottom="2" paddingTop="2"/>
 				</mx:GridItem>
 				<mx:GridItem width="100%" height="100%">
-					<mx:RadioButtonGroup id="emphasisRadioButtonGroup" selectedValue="{generalProps.emphasis == null ? 'mixed' : generalProps.emphasis.toString()}" change="emphasisChanged()"/>
+					<mx:RadioButtonGroup id="emphasisRadioButtonGroup" enabled="{allowTextEdit}" selectedValue="{generalProps.emphasis == null ? 'mixed' : generalProps.emphasis.toString()}" change="emphasisChanged()"/>
 					<mx:RadioButton label="true" groupName="emphasisRadioButtonGroup" id="emphasisTrueRadioButton" value="{true}"/>
 					<mx:RadioButton label="false" groupName="emphasisRadioButtonGroup" id="emphasisFalseRadioButton" value="{false}"/>
 				</mx:GridItem>
@@ -246,7 +246,7 @@
 					<mx:Label width="100%" textAlign="right" text="Confidential"/>
 				</mx:GridItem>
 				<mx:GridItem width="100%" height="100%">
-					<mx:RadioButtonGroup id="confidentialRadioButtonGroup" selectedValue="{generalProps.confidential == null ? 'mixed' : generalProps.confidential.toString()}" change="confidentialChanged()"/>
+					<mx:RadioButtonGroup id="confidentialRadioButtonGroup" enabled="{allowTextEdit}" selectedValue="{generalProps.confidential == null ? 'mixed' : generalProps.confidential.toString()}" change="confidentialChanged()"/>
 					<mx:RadioButton label="true" groupName="confidentialRadioButtonGroup" id="confidentialTrueRadioButton" value="{true}"/>
 					<mx:RadioButton label="false" groupName="confidentialRadioButtonGroup" id="confidentialFalseRadioButton" value="{false}"/>
 				</mx:GridItem>
