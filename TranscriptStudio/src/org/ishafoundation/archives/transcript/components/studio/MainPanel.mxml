@@ -300,7 +300,7 @@
 				}
 				else if (StringUtil.trim(msg).length == 0) {
 					// nothing in the message
-					databaseMgr.login(function():void {
+					databaseMgr.testConnection(function():void {
 						Alert.show("Unknown reason", "Error saving transcript");
 					}, function(msg2:String):void {
 						Alert.show("Could not connect to database", "Error saving transcript");						
