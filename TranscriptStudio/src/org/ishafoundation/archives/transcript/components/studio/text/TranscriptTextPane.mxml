@@ -41,6 +41,9 @@
     	
     	[Bindable]
 		public var referenceMgr:ReferenceManager;
+		
+		[Bindable]
+		public var allowTextEdit:Boolean = true;
 
 		private var _transcript:Transcript;
 		
@@ -115,8 +118,6 @@
 	</mx:Script>
 	<textNS:TranscriptTextArea id="transcriptTextArea" width="100%" height="75%" referenceMgr="{this.referenceMgr}"/>
 	<mx:TabNavigator id="nodePropertiesPane" width="100%" height="25%" minWidth="350" minHeight="200">
-		<textNS:GeneralNodePropertiesPane id="generalNodePropertiesPane" label="Selected Text" width="100%"/>
-		<!--textNS:MediaPane id="mediaPane" label="Media" width="100%" height="100%" enabled="false"/-->
-		<!--textNS:TimingsPane id="timingsPane" label="Timings" width="100%" height="100%" enabled="false"/-->
+		<textNS:GeneralNodePropertiesPane id="generalNodePropertiesPane" allowTextEdit="{allowTextEdit}" label="Selected Text" width="100%"/>
 	</mx:TabNavigator>		
 </mx:VDividedBox>

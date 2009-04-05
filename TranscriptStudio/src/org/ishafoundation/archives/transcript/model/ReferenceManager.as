@@ -20,7 +20,8 @@
 
 package org.ishafoundation.archives.transcript.model
 {
-	import mx.binding.utils.BindingUtils;
+	import mx.binding.utils.ChangeWatcher;
+	import mx.events.PropertyChangeEvent;
 	
 	import name.carter.mark.flex.project.mdoc.MTag;
 	import name.carter.mark.flex.util.XMLUtils;
@@ -43,7 +44,7 @@ package org.ishafoundation.archives.transcript.model
 		private var xmlRetrieverStorer:XMLRetrieverStorer;
 		private var xqueryExecutor:XQueryExecutor;
 		[Bindable]
-		public var isSuperUser:Boolean;
+		public var isDbaUser:Boolean;
 		
 		[Bindable]
 		public var referenceXML:XML;
@@ -51,7 +52,14 @@ package org.ishafoundation.archives.transcript.model
 		public function ReferenceManager(databaseMgr:DatabaseManager) {
 			this.xmlRetrieverStorer = databaseMgr;
 			this.xqueryExecutor = databaseMgr;
-			BindingUtils.bindProperty(this, "isSuperUser", databaseMgr, "isSuperUser");
+			ChangeWatcher.watch(databaseMgr, "user", function(evt:PropertyChangeEvent):void {
+				if (evt.newValue == null) {
+					isDbaUser = false;
+				}
+				else {
+					isDbaUser = (evt.newValue as User).isDbaUser();
+				}
+			});
 			refreshAutoCompleteConcepts();
 		}
 		

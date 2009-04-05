@@ -20,6 +20,6 @@ package org.ishafoundation.archives.transcript.db
 
 		public static function storeSessionXML(sessionXML:XML, xmlStorer:XMLStorer, successFunc:Function, failureFunc:Function):void {
 			xmlStorer.storeXML(sessionXML, successFunc, failureFunc);
-		}
+		}		
 	}
 }

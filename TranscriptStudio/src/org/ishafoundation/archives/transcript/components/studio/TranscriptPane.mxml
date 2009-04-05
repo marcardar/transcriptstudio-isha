@@ -57,6 +57,8 @@
 		
 		[Bindable]
 		public var referenceMgr:ReferenceManager;
+		[Bindable]
+		public var user:User;
 	    private var _transcript:Transcript;
 	    
 		private function init():void {
@@ -152,6 +154,6 @@
 		}
 	]]>
 	</mx:Script>
-	<markupNS:MarkupsPane id="markupsPane" width="25%" minWidth="355" height="100%" verticalGap="{Utils.DIVIDER_SIZE}" transcript="{this.transcript}"/>
-	<textNS:TranscriptTextPane id="textPane" width="75%" minWidth="600" height="100%" verticalGap="{Utils.DIVIDER_SIZE}" referenceMgr="{this.referenceMgr}" transcript="{this.transcript}"/>
+	<markupNS:MarkupsPane id="markupsPane" width="25%" minWidth="355" height="100%" verticalGap="{Utils.DIVIDER_SIZE}" transcript="{this.transcript}" allowMarkupEdit="{user.isMarkupUser()}"/>
+	<textNS:TranscriptTextPane id="textPane" width="75%" minWidth="600" height="100%" verticalGap="{Utils.DIVIDER_SIZE}" referenceMgr="{this.referenceMgr}" transcript="{this.transcript}" allowTextEdit="{user.isTextUser()}"/>
 </mx:HDividedBox>

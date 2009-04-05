@@ -25,6 +25,7 @@ package org.ishafoundation.archives.transcript.db
 	
 	import name.carter.mark.flex.exist.EXistRESTClient;
 	import name.carter.mark.flex.exist.EXistXMLRPCClient;
+	import name.carter.mark.flex.util.Utils;
 	import name.carter.mark.flex.util.XMLUtils;
 	import name.carter.mark.flex.util.remote.ClientManager;
 	
@@ -33,10 +34,12 @@ package org.ishafoundation.archives.transcript.db
 	
 	public class DatabaseManagerUsingEXist implements DatabaseManager
 	{
+		[Bindable]
+		public var user:User;
+		
 		private var remoteMgr:ClientManager;
 		private var username:String;
 		private var loggedIn:Boolean = false;
-		private var _isSuperUser:Boolean = false;
 		
 		public function DatabaseManagerUsingEXist(username:String, password:String) {
 			trace("Using eXist URL: " + DatabaseConstants.EXIST_URL);
@@ -53,7 +56,10 @@ package org.ishafoundation.archives.transcript.db
 				PreferencesSharedObject.writeDbUsername(username);
 				
 				checkClientVersionAllowed(function():void {
-					checkForSuperUser(successFunction);
+					getUserGroupNames(function(groupNames:Array):void {
+						user = new User(username, groupNames);
+						successFunction();
+					});
 				}, failureFunction);
 			},
 			function(msg:String):void {
@@ -154,15 +160,6 @@ package org.ishafoundation.archives.transcript.db
 			new EXistRESTClient(remoteMgr.getRESTClient()).executeStoredXQuery(DatabaseConstants.XQUERY_COLLECTION_PATH + "/" + xQueryFilename, params, successFunc, failureFunc, resultFormat);
 		}
 
-		[Bindable]
-		public function get isSuperUser():Boolean {
-			return _isSuperUser;
-		}
-		
-		public function set isSuperUser(value:Boolean):void {
-			_isSuperUser = value;
-		}
-
 		private function checkClientVersionAllowed(successFunc:Function, failureFunc:Function):void {
 			var clientVersion:String = ApplicationUtils.getApplicationVersion();
 			executeStoredXQuery("check-client-version.xql", {clientVersion:clientVersion}, function(minClientVersion:String):void {
@@ -176,14 +173,18 @@ package org.ishafoundation.archives.transcript.db
 			}, failureFunc);
 		}
 		
-		private function checkForSuperUser(successFunc:Function):void {
+		private function getUserGroupNames(successFunc:Function):void {
 			var thisObj:DatabaseManagerUsingEXist = this;
-			query("xmldb:is-admin-user(xmldb:get-current-user())", [], function(xml:XML):void {
-				var boolString:String = xml.*.text();
-				thisObj.isSuperUser = boolString == "true";
-				successFunc();
+			query("xmldb:get-user-groups(xmldb:get-current-user())", [], function(xml:XML):void {
+				var arr:Array = []
+				for each (var groupName:String in xml.*) {
+					arr.push(groupName);
+				}
+				arr = Utils.condenseWhitespaceForArray(arr);
+				successFunc(arr);
 			}, function(msg:String):void {
-				Alert.show(msg, "Failed checking for super user");
+				Alert.show(msg, "Failed getting user's group names");
+				successFunc([]);
 			});
 		}
 	}

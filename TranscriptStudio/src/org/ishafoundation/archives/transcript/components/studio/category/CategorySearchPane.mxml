@@ -209,7 +209,7 @@
 			<mx:List width="100%" height="100%" id="resultsList" horizontalScrollPolicy="auto" allowMultipleSelection="false" labelFunction="resultLabelFunc" iconFunction="{getIconFunc()}" change="selectionChanged()"/>		
 		</mx:HBox>
 	</mx:VBox>
-	<mx:VBox id="adminVBox" height="100%" horizontalAlign="center" verticalAlign="middle" visible="{referenceMgr.isSuperUser}" includeInLayout="{referenceMgr.isSuperUser}">
+	<mx:VBox id="adminVBox" height="100%" horizontalAlign="center" verticalAlign="middle" visible="{referenceMgr.isDbaUser}" includeInLayout="{referenceMgr.isDbaUser}">
 		<mx:Button label="New..." width="80" click="editClicked(true)"/>
 		<mx:Button label="Edit..." width="80" enabled="{resultsList.selectedIndex &gt;= 0}" click="editClicked(false)"/>
 		<mx:Button label="Remove" width="80" enabled="{resultsList.selectedIndex &gt;= 0}" click="removeClicked()"/>
