@@ -2,6 +2,7 @@ xquery version "1.0";
 
 module namespace search-fns = "http://www.ishafoundation.org/ts4isha/xquery/search-fns";
 
+declare variable $search-fns:maxResults := 500;
 declare variable $search-fns:maxTextChars := 550;
 
 (: $defaultType is either "markup", "text" or "event" :)
@@ -57,9 +58,11 @@ declare function search-fns:main($searchString as xs:string, $defaultType as xs:
 					else
 						(: normal results :)
 						(
-							<p>Found {$numRows} result(s) {$afterSearching}</p>
+							<p>Found {$numRows} result(s) {$afterSearching}{
+							if ($numRows > $search-fns:maxResults) then concat(' [Displaying first ', $search-fns:maxResults, ' results only]') else ''}
+							</p>
 							,
-							$tableRows
+							$tableRows[position() <= $search-fns:maxResults]
 						)
 };
 
@@ -405,4 +408,3 @@ declare function search-fns:extract-sub-search-terms($searchString as xs:string,
 declare function search-fns:substring-before-match($arg as xs:string?, $regex as xs:string ) as xs:string {
 	tokenize($arg, $regex)[1]
 };
-
