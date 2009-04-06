@@ -52,6 +52,7 @@ package org.ishafoundation.archives.transcript.model
 		public function ReferenceManager(databaseMgr:DatabaseManager) {
 			this.xmlRetrieverStorer = databaseMgr;
 			this.xqueryExecutor = databaseMgr;
+			isDbaUser = databaseMgr.user.isDbaUser();
 			ChangeWatcher.watch(databaseMgr, "user", function(evt:PropertyChangeEvent):void {
 				if (evt.newValue == null) {
 					isDbaUser = false;
