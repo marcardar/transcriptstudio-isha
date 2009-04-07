@@ -6,7 +6,7 @@ xquery version "1.0";
 let $eventType := request:get-parameter('eventType', ())
 let $year := request:get-parameter('year', ())
 let $yearType := request:get-parameter('yearType', 'on')
-let $country := request:get-parameter('country', ())
+let $country := lower-case(request:get-parameter('country', ()))
 
 let $result :=
 	if (not(exists($eventType)) or $eventType = '[any]') then
@@ -26,7 +26,7 @@ let $result :=
 	if (not(exists($country)) or $country = '[any]') then
 		$result
 	else
-		$result[@country = $country]
+		$result[lower-case(@country) = $country]
 return
 	<result> 
 		{for $event in $result
