@@ -15,7 +15,7 @@ declare function store-xml-doc:build-event-path($event as element()) as xs:strin
 
 declare function store-xml-doc:build-event-full-name($event as element()) as xs:string?
 {
-	let $fullName := lower-case(string-join(($event/@subTitle, $event/@location, $event/@venue), '_'))
+	let $fullName := lower-case(string-join(($event/@startAt, $event/@subTitle, $event/@location, $event/@venue), '_'))
 	let $fullName := utils:make-filename-friendly($fullName)
 	return
 		if (string-length($fullName) > 0) then
