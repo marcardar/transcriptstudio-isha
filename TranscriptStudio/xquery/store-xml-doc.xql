@@ -83,9 +83,9 @@ return
 				if (not(exists($xml/@id))) then
 					let $newId :=
 						if ($isEventXML) then
-							id-utils:create-event-id($xml)
+							id-utils:generate-event-id($xml/@type)
 						else
-							id-utils:create-session-id($xml)
+							id-utils:generate-session-id($xml/@eventId)
 					return functx:add-attributes($xml, xs:QName('id'), $newId)
 				else
 					$xml

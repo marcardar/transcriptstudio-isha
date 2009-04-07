@@ -31,7 +31,8 @@ package org.ishafoundation.archives.transcript.importer
 		private static const TRACK_TIME_PATTERN:RegExp = /^track[^a-z]+/i;
 		private static const SPEAKER_PATTERN:RegExp = /^(?:sadhguru\s*:|(.{1,30})\s*(?:\s*:))/i;
 		
-		private static const SOURCE_ID_PATTERN:RegExp = /^([a-z]+)\d+$/;
+		private static const IMPORT_FILENAME_PATTERN:RegExp = /^([a-zA-Z0-9\-]+).*$/
+		private static const SOURCE_ID_PATTERN:RegExp = /^([a-z]+).+$/;
 		
 		private static const ACTION_PATTERN:RegExp = /^(.+)\s*\((.+)\)/;
 		
@@ -109,16 +110,13 @@ package org.ishafoundation.archives.transcript.importer
 		}
 		
 		private static function extractSourceIdFromName(importName:String):String {
-			var index:int = importName.indexOf(" ");
-			return importName.substring(0, index).toLowerCase();
+			var arr:Array = IMPORT_FILENAME_PATTERN.exec(importName);
+			if (arr == null) {
+				throw new Error("Passed an invalid importName: " + importName);
+			}
+			return arr[1].toString().toLowerCase();
 		}
 
-		private static function extractFilenameLessExtensionFromPath(path:String):String {
-			var index:int = path.lastIndexOf("/");
-			var extensionIndex:int = path.lastIndexOf(".");
-			return path.substring(index + 1, extensionIndex);
-		}
-		
 		/**
 		 * idFunc(prefix:String):String
 		 */

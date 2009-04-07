@@ -162,7 +162,8 @@
 				throw new Error("No transcript to import");
 			}
 			// now we might have the session date so use that to prefix the media UUIDs
-			fixMediaUUIDs();
+			// no need to fix media UUIDS - just use the ID given at the start of the imported filename
+			//fixMediaUUIDs();
 			// there is a transcript to import into the session
 			// load the session from the database
 			databaseMgr.retrieveXML(function(existingSessionXML:XML):void {
@@ -180,15 +181,15 @@
 			}, "session", sessionProps.id, DatabaseConstants.DATA_COLLECTION_PATH);
 		}
 		
-		private function fixMediaUUIDs():void {
+		/*private function fixMediaUUIDs():void {
 			// now we might have the session date so use that to prefix the media UUIDs
-			var mediaIdPrefix:String;
+			var mediaIdPrefix:String = eventProps.type + "-";
 			if (sessionProps.startAt == null) {
-				mediaIdPrefix = "00000000";
+				mediaIdPrefix += "00000000";
 			}
 			else {
 				var startAtDate:Date = sessionProps.startAt;
-				mediaIdPrefix = startAtDate.fullYear + EventPropertiesPane.fixWidth(startAtDate.month + 1, 2) + EventPropertiesPane.fixWidth(startAtDate.date, 2);
+				mediaIdPrefix += startAtDate.fullYear + EventPropertiesPane.fixWidth(startAtDate.month + 1, 2) + EventPropertiesPane.fixWidth(startAtDate.date, 2);
 			}
 			// use the digits from the sourceId in the new mediaId
 			mediaIdPrefix += "-" + eventProps.type;
@@ -202,7 +203,7 @@
 				}
 				mediaElement.@id = mediaIdPrefix + "-" + mediaIdSuffix;
 			}			
-		}
+		}*/
 		
 		private function getEventText(eventProps:EventProperties):String {
 			if (eventProps == null) {

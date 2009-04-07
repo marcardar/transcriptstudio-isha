@@ -408,3 +408,4 @@ declare function search-fns:extract-sub-search-terms($searchString as xs:string,
 declare function search-fns:substring-before-match($arg as xs:string?, $regex as xs:string ) as xs:string {
 	tokenize($arg, $regex)[1]
 };
+

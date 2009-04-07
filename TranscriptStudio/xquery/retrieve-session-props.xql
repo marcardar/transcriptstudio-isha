@@ -10,7 +10,7 @@ let $sessionElements :=
 		collection('/db/ts4isha/data')/session[@eventId = $eventId]
 return
 	<result>{
-		for $resultItem  in functx:remove-elements($sessionElements, 'transcript')
+		for $resultItem  in functx:remove-elements($sessionElements, ('devices', 'transcript'))
 		order by exists($resultItem/@startAt), $resultItem/@startAt, $resultItem/@id
 		return
 			$resultItem
