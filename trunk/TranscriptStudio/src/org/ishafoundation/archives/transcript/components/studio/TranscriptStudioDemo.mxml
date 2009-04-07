@@ -34,7 +34,7 @@
 				//MainPanel.IMPORT_EXPORT_ENABLED = false;
 				var databaseMgr:DatabaseManager = new DatabaseManagerDemo();
 				this.mainPanel.init("demo_user", databaseMgr);
-				this.mainPanel.retrieveClicked();
+				this.mainPanel.openClicked();
 			}
 
 			[Embed(source="/../assets/chant.png")]
