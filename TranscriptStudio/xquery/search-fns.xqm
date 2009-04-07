@@ -363,9 +363,14 @@ declare function search-fns:get-html-word-links($sessionId as xs:string) as elem
 	</span>
 };
 
-declare function search-fns:get-event-id($sessionId as xs:string) as xs:string
+declare function search-fns:get-event-id($sessionId as xs:string) as xs:string?
 {
-	collection('/db/ts4isha/data')/session[@id = $sessionId]/@eventId
+	let $result := collection('/db/ts4isha/data')/session[@id = $sessionId]/xs:string(@eventId)
+	return
+		if (normalize-space($result) = '') then
+			()
+		else
+			$result
 };
 
 declare function search-fns:get-events-for-session-ids($sessionIds as xs:string*) as element()*
