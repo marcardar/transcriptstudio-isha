@@ -304,6 +304,6 @@
 		</mx:VDividedBox>
 	</mx:HDividedBox>
 	<mx:HBox>
-		<mx:Button label="OK" click="{closeMe();referenceMgr.refreshAutoCompleteConcepts()}"/>
+		<mx:Button id="okButton" label="OK" click="{closeMe();referenceMgr.refreshAutoCompleteConcepts()}"/>
 	</mx:HBox>	
 </mx:TitleWindow>
