@@ -30,7 +30,7 @@ let $result :=
 return
 	<result> 
 		{for $event in $result
-		 order by xs:string($event/@id)
+		 order by exists($event/@startAt), $event/@startAt, $event/@id
 		 return
 		 	$event
 		}
