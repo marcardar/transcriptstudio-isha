@@ -1,0 +1,159 @@
+<!--
+   Transcript Studio for Isha Foundation: An XML based application that allows users to define 
+   and store contextual metadata for contiguous sections within a text document. 
+
+   Copyright 2008 Mark Carter, Swami Kevala
+
+   This file is part of Transcript Studio for Isha Foundation.
+
+   Transcript Studio for Isha Foundation is free software: you can redistribute it and/or modify it 
+   under the terms of the GNU General Public License as  published by the Free Software 
+   Foundation, either version 3 of the License, or (at your option) any later version.
+
+   Transcript Studio for Isha Foundation is distributed in the hope that it will be useful, but 
+   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along with 
+   Transcript Studio for Isha Foundation. If not, see http://www.gnu.org/licenses/.
+-->
+<mx:HDividedBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:markupNS="org.ishafoundation.archives.transcript.components.studio.markup.*" xmlns:textNS="org.ishafoundation.archives.transcript.components.studio.text.*" horizontalGap="{Utils.DIVIDER_SIZE}" resizeToContent="true" creationComplete="init()">
+	<mx:Script>
+    <![CDATA[
+    	import org.ishafoundation.archives.transcript.components.studio.markup.MarkupEvent;
+    	import org.ishafoundation.archives.transcript.components.studio.text.TranscriptTextEvent;
+    	import org.ishafoundation.archives.transcript.components.studio.text.GeneralNodePropertiesPane;
+    	import mx.events.PropertyChangeEvent;
+    	import mx.binding.utils.ChangeWatcher;
+    	import org.ishafoundation.archives.transcript.components.studio.text.AbstractEditDialog;
+    	import name.carter.mark.flex.project.mdoc.MNode;
+    	import name.carter.mark.flex.project.mdoc.MSuperNodeProperties;
+    	import org.ishafoundation.archives.transcript.components.studio.markup.MarkupPropertiesPane;
+    	import name.carter.mark.flex.project.mdoc.MSegmentSubset;
+    	import name.carter.mark.flex.project.mdoc.MSegmentRange;
+    	import name.carter.mark.flex.project.mdoc.MContentRange;
+    	import name.carter.mark.flex.project.mdoc.MSuperNode;
+    	import name.carter.mark.flex.project.mdoc.MSuperContent;
+    	import name.carter.mark.flex.project.mdoc.MSuperSegment;
+    	import name.carter.mark.flex.project.mdoc.MContent;
+    	import name.carter.mark.flex.project.mdoc.MSegment;
+    	import name.carter.mark.flex.project.mdoc.TaggableMNode;
+    	import name.carter.mark.flex.util.Utils;
+    	import mx.utils.StringUtil;
+    	import mx.managers.PopUpManager;
+    	import org.ishafoundation.archives.transcript.components.studio.text.TranscriptTextArea;
+    	import org.ishafoundation.archives.transcript.components.studio.markup.MarkupsTree;
+		import flash.events.Event;
+		
+		import mx.containers.HDividedBox;
+		import mx.controls.Alert;
+		
+		import org.ishafoundation.archives.transcript.db.*;
+		import org.ishafoundation.archives.transcript.model.*;
+		import org.ishafoundation.archives.transcript.util.*;
+		
+		public static const MAX_START_TEXT_LENGTH:int = 140;
+		public static const MAX_COMMENT_LENGTH:int = 140;
+		
+		[Bindable]
+		public var referenceMgr:ReferenceManager;
+		[Bindable]
+		public var user:User;
+	    private var _transcript:Transcript;
+	    
+		private function init():void {
+			this.textPane.addEventListener(TranscriptTextEvent.SELECTION_CHANGE, function (evt:TranscriptTextEvent):void {
+				var ttSelection:TranscriptTextSelection = evt.affectedTtSelection;
+				if (ttSelection != null) {
+					var selectedObject:Object = ttSelection.selectedObj;
+					if (selectedObject is MSuperNode) {
+						markupsPane.selectedMarkup = selectedObject as MSuperNode;
+					}
+				}
+				//textPane.select(ttSelection);
+			});
+			// nothing to do when text data changes
+			/*this.textPane.addEventListener(TranscriptTextEvent.DATA_CHANGE, function(evt:TranscriptTextEvent):void {
+			});*/
+			this.markupsPane.addEventListener(MarkupEvent.SELECTION_CHANGE, function(evt:MarkupEvent):void {
+				if (evt.affectedMarkup != null) {
+					if (evt.isStrongChange) {
+						textPane.selectMarkup(markupsPane.selectedMarkup);
+					}
+					else {
+						// don't allow different tree selection to text markup selection
+						if (ttSelection != null && ttSelection.toSuperNode() != null && ttSelection.toSuperNode() != evt.affectedMarkup) {
+							textPane.select(null);
+						}						
+					}
+				}
+			});
+			this.markupsPane.addEventListener(MarkupEvent.DATA_CHANGE, function(evt:MarkupEvent):void {
+				if (evt.isStrongChange) {
+					textPane.redrawAndSelectMarkup(evt.affectedMarkup);
+				}
+				else {
+					// TODO - is the ttSelection still valid?
+					textPane.redrawAndSelect(textPane.ttSelection);
+				}
+			});
+		}
+		
+		public function set transcript(transcript:Transcript):void {
+			this._transcript = transcript;
+		}
+		
+		[Bindable]
+		public function get transcript():Transcript {
+			return this._transcript;
+		}
+		
+		private function loadReferenceBeforeContinuing(nextFunction:Function):void {
+			referenceMgr.loadReferences(nextFunction, function(msg:String):void {
+				trace("Could not load references file but continuing anyway: " + msg);
+				nextFunction();
+			});
+		}
+		
+		private function get ttSelection():TranscriptTextSelection {
+			return this.textPane.ttSelection;
+		}
+		
+		internal function nudgeUp():void {
+			ttSelection.nudgeUp();
+			this.textPane.dispatchEvent(new TranscriptTextEvent(TranscriptTextEvent.DATA_CHANGE, ttSelection));
+		}
+
+		internal function nudgeDown():void {
+			ttSelection.nudgeDown();
+			this.textPane.dispatchEvent(new TranscriptTextEvent(TranscriptTextEvent.DATA_CHANGE, ttSelection));
+		}
+
+		internal function markupText():void {
+			var ttSelection:TranscriptTextSelection = textPane.ttSelection;
+			var markup:MSuperNode = ttSelection.markup();
+			this.markupsPane.dispatchEvent(new MarkupEvent(MarkupEvent.DATA_CHANGE, true, markup));
+		}
+
+		/**
+		 * Returns the parent.
+		 */
+		public function removeMarkup():void {
+			this.markupsPane.removeSelectedMarkup();
+		}
+
+		internal function mergeSegmentRange():void {
+			var segment:MSegment = this.ttSelection.merge();
+			var ttSelection:TranscriptTextSelection = new TranscriptTextSelection(segment);
+			this.textPane.dispatchEvent(new TranscriptTextEvent(TranscriptTextEvent.DATA_CHANGE, ttSelection));
+		}
+		
+		internal function deleteText():void {
+			textPane.ttSelection.deleteText();
+			this.textPane.dispatchEvent(new TranscriptTextEvent(TranscriptTextEvent.DATA_CHANGE));
+		}
+	]]>
+	</mx:Script>
+	<markupNS:MarkupsPane id="markupsPane" width="25%" minWidth="355" height="100%" verticalGap="{Utils.DIVIDER_SIZE}" transcript="{this.transcript}" allowMarkupEdit="{user.isMarkupUser()}"/>
+	<textNS:TranscriptTextPane id="textPane" width="75%" minWidth="600" height="100%" verticalGap="{Utils.DIVIDER_SIZE}" referenceMgr="{this.referenceMgr}" transcript="{this.transcript}" allowTextEdit="{user.isTextUser()}"/>
+</mx:HDividedBox>
