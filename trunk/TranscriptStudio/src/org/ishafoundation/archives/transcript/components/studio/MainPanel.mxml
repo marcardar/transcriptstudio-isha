@@ -128,15 +128,35 @@
 				showUnsavedChangesPopupIfNecessary(showOpenByIdDialog);
 			}
 			
-			private function categoryManagerClicked():void {
+			private function managerClicked(openManagerFunc:Function):void {
+				if (this.session != null && this.session.unsavedChanges) {
+					// confirm this operation with the user
+					Alert.show("Save session?", "Unsaved changes...", Alert.YES | Alert.NO | Alert.CANCEL, null, function(evt:CloseEvent):void {
+						if (evt.detail == Alert.YES) {
+							storeSession(openManagerFunc, function(msg:String):void {
+								Alert.show(msg, "Could not save session");
+							});
+						}
+						else if (evt.detail == Alert.NO) {
+							// dont save (but dont have to really lose the changes just yet
+							openManagerFunc();
+						}
+					});
+				}
+				else {
+					openManagerFunc();
+				}
+			}
+			
+			private function openCategoryManager():void {				
 				var thisRef:DisplayObject = this;
 				reloadReferencesBeforeContinuing(function():void {
 					var categoryManagerDialog:CategoryManagerDialog = new CategoryManagerDialog();
 					categoryManagerDialog.referenceMgr = referenceMgr;
 					PopUpManager.addPopUp(categoryManagerDialog, thisRef, true);
 					categoryManagerDialog.doneButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
-						// finished with the dialog box so update screen (to reflect changes)
-						transcriptPane.markupsPane.redraw(transcriptPane.markupsPane.selectedMarkup, true);
+						// finished with the dialog box so reload transcript (because changes may have been made during the dialog
+						reloadSession();
 					});
 					var selectedMarkupProps:MSuperNodeProperties = transcriptPane.markupsPane.selectedMarkupProps;
 					if (selectedMarkupProps != null) {
@@ -145,11 +165,15 @@
 				});
 			}
 			
-			private function conceptManagerClicked():void {
+			private function openConceptManager():void {
 				var thisRef:DisplayObject = this;
 				reloadReferencesBeforeContinuing(function():void {
 					var conceptManagerDialog:ConceptManagerDialog = ConceptManagerDialog.createInstance(referenceMgr);
 					PopUpManager.addPopUp(conceptManagerDialog, thisRef, true);
+					conceptManagerDialog.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+						// finished with the dialog box so reload transcript (because changes may have been made during the dialog
+						reloadSession();
+					});
 				});
 			}
 			
@@ -326,6 +350,9 @@
 			}
 			
 			private function reloadSession():void {
+				if (session == null) {
+					return;
+				}
 				var reloadSessionFunction:Function = function():void {
 					sessionMgr.retrieveSession(session.id, session.eventProps, openSessionSuccess, openSessionFailure);
 				}
@@ -506,10 +533,10 @@
 					eventSessionBuilderClicked();
 				}
 				else if ( actionName == "categoryManager" ) {
-					categoryManagerClicked();
+					managerClicked(openCategoryManager);
 				}
 				else if ( actionName == "conceptManager" ) {
-					conceptManagerClicked();
+					managerClicked(openConceptManager);
 				}
 				else if ( actionName == "query" ) {
 					queryClicked();

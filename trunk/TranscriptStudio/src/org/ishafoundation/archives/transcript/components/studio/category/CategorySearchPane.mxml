@@ -19,6 +19,8 @@
 		[Bindable]
 		public var referenceMgr:ReferenceManager;
 		public var selectedCategoryId:String;
+		
+		public var allowRemove:Boolean = true;
 				
 		private var alreadySearched:Boolean = false;		
 		public var initialCategoryId:String = null;
@@ -212,6 +214,6 @@
 	<mx:VBox id="adminVBox" height="100%" horizontalAlign="center" verticalAlign="middle" visible="{referenceMgr.isDbaUser}" includeInLayout="{referenceMgr.isDbaUser}">
 		<mx:Button label="New..." width="80" click="editClicked(true)"/>
 		<mx:Button label="Edit..." width="80" enabled="{resultsList.selectedIndex &gt;= 0}" click="editClicked(false)"/>
-		<mx:Button label="Remove" width="80" enabled="{resultsList.selectedIndex &gt;= 0}" click="removeClicked()"/>
+		<mx:Button label="Remove" width="80" enabled="{allowRemove &amp;&amp; resultsList.selectedIndex &gt;= 0}" click="removeClicked()"/>
 	</mx:VBox>
 </mx:HBox>
