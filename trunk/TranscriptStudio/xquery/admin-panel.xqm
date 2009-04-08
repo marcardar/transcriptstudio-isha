@@ -63,7 +63,11 @@ if (utils:is-current-user-admin()) then
 									if (not(exists($appendedMediaIds))) then
 										<p>Nothing imported</p>
 									else
-										<p>{string-join($appendedMediaIds, ', ')}</p>
+										<p>{
+										for $appendedMediaId in $appendedMediaIds
+										return
+											($appendedMediaId, <br/>)
+										}</p>
 								)
 							return
 								$newMediaDetails
