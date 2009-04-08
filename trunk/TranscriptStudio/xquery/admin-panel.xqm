@@ -33,6 +33,7 @@ if (utils:is-current-user-admin()) then
 				</form>
 				</td></tr>
 			</table>
+			<hr/>
 			{
 			let $uploadedFilename := request:get-uploaded-file-name("upload-media-metadata")
 			return
