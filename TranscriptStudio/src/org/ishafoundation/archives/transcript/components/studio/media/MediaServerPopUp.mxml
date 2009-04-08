@@ -31,5 +31,8 @@
 		]]>
 	</mx:Script>
 	<mx:TextInput id="urlTextInput" width="100%"/>
-	<mx:Button id="okButton" label="OK" enabled="{StringUtil.trim(urlTextInput.text).length &gt; 0}"/>
+	<mx:HBox>
+		<mx:Button id="okButton" label="OK" enabled="{StringUtil.trim(urlTextInput.text).length &gt; 0}"/>		
+		<mx:Button id="cancelButton" label="Cancel"/>		
+	</mx:HBox>
 </mx:TitleWindow>

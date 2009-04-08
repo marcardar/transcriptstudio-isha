@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" minWidth="320" layout="vertical" horizontalAlign="center" title="Media Player" creationComplete="init()" xmlns:generic="org.ishafoundation.archives.transcript.components.generic.*" xmlns:display="flash.display.*">
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" minWidth="320" layout="vertical" horizontalAlign="center" title="Media Player" creationComplete="init()" xmlns:display="flash.display.*">
 	<mx:Script>
     <![CDATA[
     	import flash.sampler.getMemberNames;
@@ -11,7 +11,6 @@
     	import mx.events.SliderEvent;
     	import mx.binding.utils.BindingUtils;
     	import org.ishafoundation.archives.transcript.components.generic.PleaseWaitPopUp;
-    	import org.ishafoundation.archives.transcript.components.generic.MediaServerPopUp;
     	import flash.sampler.getSetterInvocationCount;
     	import org.ishafoundation.archives.transcript.model.Session;
     	import name.carter.mark.flex.util.XMLUtils;
@@ -118,12 +117,16 @@
 				waitPopUp.closePopUp();
 				if (msg == "NetConnection.Connect.Failed") {
 					var popUp:MediaServerPopUp = PopUpManager.createPopUp(thisHandle, MediaServerPopUp, true) as MediaServerPopUp;
-						PopUpManager.centerPopUp(popUp);
-						popUp.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
-							MediaConstants.MEDIA_SERVER_URL = popUp.urlTextInput.text;
-							PopUpManager.removePopUp(popUp);
-							connectToMediaServer();
-						});
+					PopUpManager.centerPopUp(popUp);
+					popUp.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+						MediaConstants.MEDIA_SERVER_URL = popUp.urlTextInput.text;
+						PopUpManager.removePopUp(popUp);
+						connectToMediaServer();
+					});
+					popUp.cancelButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+						PopUpManager.removePopUp(popUp);
+						closeMe();
+					});
 				}
 				else {
 					Alert.show(msg, "Connect failed");
