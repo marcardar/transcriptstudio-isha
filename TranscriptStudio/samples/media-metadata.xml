@@ -1,10 +1,10 @@
 <mediaMetadata>
-	<device id="a1" sessionId="20090107-p1-0-0001">
-		<media id="20090107-p1-a1-000147" audioQuality="imported"/>
-		<media id="20090107-p1-a1-000148" audioQuality="imported"/>
+	<device id="a1" sessionId="p1-1">
+		<media id="p-20090107-183000-a1" audioQuality="excellent"/>
+		<media id="p-20090107-183030-a1" audioQuality="good"/>
 	</device>
-	<device id="v1" sessionId="20090107-p1-0-0001">
-		<media id="20090107-p1-v1-000001" audioQuality="imported"/>
-		<media id="20090107-p1-v1-000002" audioQuality="imported"/>
+	<device id="v1" sessionId="p1-2">
+		<media id="p-20090107-203110-v1" audioQuality="fair"/>
+		<media id="p-20090107-213100-v1" audioQuality="poor"/>
 	</device>
 </mediaMetadata>
