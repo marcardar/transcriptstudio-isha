@@ -188,7 +188,7 @@
 					});
 				}
 				else {
-					Alert.show("Cannot remove concept because it appears at least once (" + count + " instance(s)) in all transcripts");
+					Alert.show("Cannot remove category because it appears at least once (" + count + " instance(s)) in all transcripts");
 				}
 			}, function(msg:String):void {
 				Alert.show(msg, "Error");
