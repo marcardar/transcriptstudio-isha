@@ -26,9 +26,11 @@ import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/ut
 			(
 				concat('Created ', count($newCollectionPaths), ' collection(s)', ':')
 			,
+				<p/>
+			,
 				for $newCollectionPath in $newCollectionPaths
 				return
-					concat($newCollectionPath, '')
+					($newCollectionPath, <br/>)
 			)
 			else
 			(
