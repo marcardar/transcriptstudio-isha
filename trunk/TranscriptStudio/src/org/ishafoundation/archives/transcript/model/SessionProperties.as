@@ -105,11 +105,17 @@ package org.ishafoundation.archives.transcript.model
 		public function getFullName(eventStartDate:Date):String {
 			var result:String = id + ": ";
 			var eventDay:int = getEventDay(eventStartDate);
-			result += "Day " + (eventDay == 0 ? "?" : eventDay) + " - ";
+			result += "Day " + (eventDay == 0 ? "?" : eventDay);
+			var addedHyphen:Boolean = false;
 			if (startAtIncludesTime()) {
-				result += TIME_FORMATTER.format(startAt) + " ";
+				result += " - " + TIME_FORMATTER.format(startAt) + " ";
+				addedHyphen = true;
 			}
 			if (subTitle != null) {
+				if (!addedHyphen) {
+					result += " - ";
+					addedHyphen = true;
+				}
 				result += subTitle + " ";
 			}
 			return result;
