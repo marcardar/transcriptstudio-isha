@@ -6,40 +6,41 @@ declare namespace util = "http://exist-db.org/xquery/util";
 
 declare function id-utils:generate-event-id($eventType as xs:string) as xs:string
 {
-	let $maxValue := (max(collection('/db/ts4isha/data')/event/id-utils:get-event-integer-component(@id, $eventType)), 0)[1]
-	return
-		concat($eventType, $maxValue + 1)
-};
-
-(: If the id does not correspond to the specified eventType then return 0
-   otherwise return the integer component of the id (i.e. the number after the type :)
-declare function id-utils:get-event-integer-component($id as xs:string?, $eventType as xs:string) as xs:integer
-{
-	if (not(exists($id))) then
-		0
-	else
-		let $extractedType := replace($id, '[^a-zA-Z]', '')
-		return
-			if ($extractedType != $eventType) then
-				0
-			else
-				xs:integer(replace($id, '\D', ''))
+	id-utils:generate-id('event', $eventType)
 };
 
 declare function id-utils:generate-session-id($eventId as xs:string) as xs:string?
 {
-	let $sessionIdPrefix := concat($eventId, '-')
-	let $maxValue := (max(collection('/db/ts4isha/data')/session[starts-with(@id, $sessionIdPrefix)]/id-utils:get-session-integer-component(@id)), 0)[1]
-	return
-		concat($sessionIdPrefix, $maxValue + 1)
+	id-utils:generate-id('session', concat($eventId, '-'))
 };
 
-declare function id-utils:get-session-integer-component($id as xs:string?) as xs:integer
+declare function id-utils:generate-id($tagName as xs:string, $prefix as xs:string) as xs:string
+{
+	id-utils:get-max-id($tagName, $prefix, 1)
+};
+
+declare function id-utils:get-max-id($tagName as xs:string, $prefix as xs:string, $valueToAdd as xs:integer?) as xs:string
+{
+	let $valueToAdd := ($valueToAdd, 0)[1]
+	let $maxValue := (max(collection('/db/ts4isha/data')//*[local-name(.) eq $tagName]/id-utils:get-id-integer-component(@id, $prefix)), 0)[1]
+	return
+		concat($prefix, $maxValue + $valueToAdd)
+};
+
+(:
+   If the id does not start with the specified prefix then return 0
+   otherwise return the integer component of the id (i.e. the number after the prefix
+:)
+declare function id-utils:get-id-integer-component($id as xs:string?, $prefix as xs:string) as xs:integer
 {
 	if (not(exists($id))) then
 		0
+	else if (not(starts-with($id, $prefix))) then
+		0
 	else
-		let $localId := substring-after(@id, '-')
+		let $afterPrefix := substring($id, string-length($prefix) + 1)
+		let $afterNumber := replace($afterPrefix, '\d+', '')
+		let $number := substring($afterPrefix, 1, string-length($afterPrefix) - string-length($afterNumber))
 		return
-			util:catch('java.lang.Exception', xs:integer($localId), 0) 
+			util:catch('java.lang.Exception', xs:integer($number), 0) 
 };
