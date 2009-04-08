@@ -156,22 +156,19 @@ package org.ishafoundation.archives.transcript.model
 			return placeStr;
 		}
 		
-		public function generateFullName(includeEventType:Boolean):String {
-			var result:String = "";
-			if (includeEventType) {
-				result += type + ":";
-			}
+		public function generateFullName(referenceMgr:ReferenceManager):String {
+			var result:String = id + ":";
 			if (startAt != null) {
 				result += " " + DATE_FORMATTER.format(startAt);
 			}
+			result += " " + referenceMgr.getEventTypeName(type);
 			if (subTitle != null) {
-				result += " " + subTitle;
+				result += " - " + subTitle;
 			}
 			var place:String = place;
 			if (place.length > 0) {
 				result += " @ " + place;
 			}
-			result += " [" + id + "]";
 			return result;
 		}
 		
