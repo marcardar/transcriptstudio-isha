@@ -103,15 +103,15 @@ package org.ishafoundation.archives.transcript.model
 		private static const TIME_FORMATTER:DateFormatter = DateUtils.createDateFormatter("JJ:NN");
 
 		public function getFullName(eventStartDate:Date):String {
+			var result:String = id + ": ";
 			var eventDay:int = getEventDay(eventStartDate);
-			var result:String = "Day " + (eventDay == 0 ? "?" : eventDay) + ": ";
+			result += "Day " + (eventDay == 0 ? "?" : eventDay) + " - ";
 			if (startAtIncludesTime()) {
 				result += TIME_FORMATTER.format(startAt) + " ";
 			}
 			if (subTitle != null) {
 				result += subTitle + " ";
 			}
-			result += "[" + id + "]";
 			return result;
 		}
 		

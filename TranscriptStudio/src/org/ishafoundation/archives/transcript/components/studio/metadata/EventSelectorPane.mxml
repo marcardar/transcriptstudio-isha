@@ -116,7 +116,7 @@
 		}
 		
 		private function resultLabelFunc(eventProps:EventProperties):String {
-			var result:String = eventProps.generateFullName(eventTypeComboBox.selectedItem == ANY);
+			var result:String = eventProps.generateFullName(referenceMgr);
 			return result;
 		}
 		

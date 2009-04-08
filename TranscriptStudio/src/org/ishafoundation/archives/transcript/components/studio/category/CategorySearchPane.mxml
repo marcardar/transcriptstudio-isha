@@ -20,6 +20,7 @@
 		public var referenceMgr:ReferenceManager;
 		public var selectedCategoryId:String;
 		
+		[Bindable]
 		public var allowRemove:Boolean = true;
 				
 		private var alreadySearched:Boolean = false;		

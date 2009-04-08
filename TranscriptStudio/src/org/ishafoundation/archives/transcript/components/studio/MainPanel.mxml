@@ -468,8 +468,7 @@
 				}
 				else {
 					if (session.eventProps != null) {
-						title += referenceMgr.getEventTypeName(session.eventProps.type) + ": ";
-						title += session.eventProps.generateFullName(false) + " ";
+						title += session.eventProps.generateFullName(referenceMgr) + "; ";
 					}
 					title += session.props.getFullName(session.eventProps.startAt) + " ";
 					if (session.transcript == null) {
