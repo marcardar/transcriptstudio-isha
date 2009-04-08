@@ -15,8 +15,10 @@
 			PopUpManager.addPopUp(result, parent, true);
 			result.sessionPropsPane.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
 				result.sessionPropsPane.referenceMgr = referenceMgr;
-				result.sessionPropsPane.sessionProps = sessionProps;
 			}, true);
+			result.sessionPropsPane.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
+				result.sessionPropsPane.sessionProps = sessionProps;
+			});
 			return result;
 		}
 	
