@@ -73,9 +73,9 @@
 				return [];
 			}
 			var result:Array = [];
-			var mediaElements:XMLList = this.devicesElement.device.(@id == deviceId).media;
+			var mediaElements:XMLList = this.devicesElement.device.(@id == deviceId).*;
 			for each (var mediaElement:XML in mediaElements) {
-				result.push(mediaElement.@id.toString())
+				result.push(mediaElement.localName() + "-" + mediaElement.@id.toString())
 			}
 			return result;
 		}
@@ -89,21 +89,15 @@
 			return deviceElement.@id;
 		} 
 		
-		private function mediaLabelFunc(mediaId:String):String {
-			if (mediaId == null || mediaId.length == 0) {
+		private function mediaLabelFunc(mediaUUID:String):String {
+			if (mediaUUID == null || mediaUUID.length == 0) {
 				return "<Select Device>";
 			}
-			var mediaElement:XML = getMediaElement(mediaId);
-			var deviceId:String = (mediaElement.parent() as XML).@id;
-			var deviceIdIndex:int = mediaId.indexOf("-" + deviceId + "-");
-			if (deviceIdIndex < 0) {
-				// cannot find the device id in the media id - so just show the whole media id
-				return mediaId;
+			var firstHyphenIndex:int = mediaUUID.indexOf('-');
+			if (firstHyphenIndex < 0) {
+				throw new Error("Passed an invalid mediaUUID: " + mediaUUID);
 			}
-			else {
-				// show the part of the media id after the device id (MAY NOT BE UNIQUE BUT WE'LL TAKE THE RISK)
-				return mediaId.substring(deviceIdIndex + deviceId.length + 2);
-			}
+			return mediaUUID;
 		}
 		
 		private function connectToMediaServer():void {
@@ -134,25 +128,23 @@
 			});			
 		}
 		
-		private function isVideo(mediaId:String):Boolean {
-			var mediaElement:XML = getMediaElement(mediaId);
-			var deviceElement:XML = XMLUtils.getAncestorOrSelfElement(mediaElement, "device");
-			return deviceElement.@id.toString().indexOf("v") == 0;
+		private function isVideo(mediaUUID:String):Boolean {
+			return mediaUUID.indexOf("video") == 0;
 		}
 		
-		private function getMediaElement(mediaId:String):XML {
-			var mediaElement:XML = devicesElement.device.media.(@id == mediaId)[0];
+		private function getMediaElement(tagName:String, mediaId:String):XML {
+			var mediaElement:XML = devicesElement.device.*.(localName() == tagName && @id == mediaId)[0];
 			return mediaElement;
 		}
 		
 		/**
 		 *  sessionWideMediaId - eg "v1c001"
 		 */
-		public function play(mediaId:String, start:int = -1, end:int = -1):void {
-			if (mediaId == null) {
+		public function play(mediaUUID:String, start:int = -1, end:int = -1):void {
+			if (mediaUUID == null) {
 				return;
 			}
-			var mediaURL:String = mediaId + "." + (isVideo(mediaId) ? "flv" : "mp3");
+			var mediaURL:String = mediaUUID + "." + (isVideo(mediaUUID) ? "flv" : "mp3");
 			var waitPopUp:PleaseWaitPopUp = PleaseWaitPopUp.display(this, "Preparing to stream...");
 			this.slider.value = 0;
 			this.mediaServer.play(mediaURL, video, function(msg:String):void {
@@ -182,11 +174,6 @@
 			//var mediaURL:String = "rtmp://localhost/vod/" + mediaItem.type + ":" + mediaItem.filenameWithoutExtension;
 			//videoDisplay.playheadTime = 0;
 			//videoDisplay.source = mediaURL;
-		}
-		
-		private static function getSessionWideMediaId(mediaElement:XML):String {
-			var deviceElement:XML = mediaElement.parent();
-			return deviceElement.@id.toString() + mediaElement.@id.toString();
 		}
 		
 		private function getMediaUUID():String {
