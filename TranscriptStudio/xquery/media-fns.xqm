@@ -10,7 +10,7 @@ module namespace media-fns = "http://www.ishafoundation.org/ts4isha/xquery/media
    
    Note/TODO - we could try and work out the session id by looking at the ancestors of each newMedia...
 :)
-declare function media-fns:append-media-elements($newMediaElements as element()*, $sessionId as xs:string) as element()*
+declare function media-fns:append-media-elements($newMediaElements as element()*, $sessionId as xs:string) as xs:string*
 {
 	let $session := collection('/db/ts4isha/data')/session[@id = $sessionId]
 	return
@@ -29,18 +29,20 @@ declare function media-fns:append-media-elements($newMediaElements as element()*
 						return media-fns:append-media-element($newMedia, $device)
 };
 
-
-
-declare function media-fns:append-media-element($newMediaElement as element(), $deviceElement as element()) as element()?
+declare function media-fns:append-media-element($newMediaElement as element(), $deviceElement as element()) as xs:string
 {
-	let $existingMediaElements := $deviceElement/media[@id = $newMediaElement/@id]
+	let $tagName := local-name($newMediaElement)
+	let $newId := $newMediaElement/xs:string(@id)
+	let $existingMediaElements := collection('/db/ts4isha/data')//*[local-name(.) eq $tagName and @id = $newId]
 	return
-		if (exists($existingMediaElements)) then
-			()
-		else
-			let $null := update insert $newMediaElement into $deviceElement
-			return
-				$deviceElement/media[@id = $newMediaElement/@id][1]
+		let $detailPrefix := concat($tagName, ' id: ', $newId, ' - ')
+		return
+			if (exists($existingMediaElements)) then
+				concat($detailPrefix, 'NOT IMPORTED because already exists')
+			else
+				let $null := update insert $newMediaElement into $deviceElement
+				return
+				concat($detailPrefix, 'IMPORTED')
 };
 
 declare function media-fns:get-device-element($deviceId as xs:string, $devicesElement as element()) as element()
