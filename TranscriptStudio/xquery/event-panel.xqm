@@ -49,7 +49,7 @@ declare function event-panel:main() as element()*
 					order by $session/@id
 					return
 						<li>
-							<a href="main.xql?panel=session&amp;id={$session/@id}">Session: {$session/string(@subTitle)} {concat(' ', $session/string(@startAt))} audio [{event-panel:get-audio-ids-csv-for-sessions($session)}] video [{event-panel:get-video-ids-csv-for-sessions($session)}]: {$session/string(@id)}</a>
+							<a href="main.xql?panel=session&amp;id={$session/@id}">Session: {$session/string(@subTitle)} {concat(' ', $session/string(@startAt))} [{$session/string(@id)}]</a>
 							<br/>{$session/string(@comment)}<p/>							
 						</li>
 					}				
