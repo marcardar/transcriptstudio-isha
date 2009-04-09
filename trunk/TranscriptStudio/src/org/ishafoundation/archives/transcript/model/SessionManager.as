@@ -79,9 +79,6 @@ package org.ishafoundation.archives.transcript.model
 			if (session.id == null) {
 				throw new Error("Tried to store session but either the collection or transcript id was not set");
 			}
-			if (!session.unsavedChanges) {
-				throw new Error("There were no unsaved changes");				
-			}
 			setActionAttributes(session);
 			xmlRetrieverStorer.storeXML(session.sessionXML, function(sessionId:String):void {
 				trace("Successfully saved transcript");

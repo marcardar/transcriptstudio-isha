@@ -88,7 +88,6 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		public function saveChangesHandler():void {
-			this.unsavedChanges = false;
 			transcript.populateCommittedMarkupPropsMap();
 		}
 		
