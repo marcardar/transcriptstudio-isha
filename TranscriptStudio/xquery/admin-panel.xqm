@@ -11,8 +11,6 @@ declare namespace session = "http://exist-db.org/xquery/session";
 declare namespace xdb = "http://exist-db.org/xquery/xmldb";
 declare namespace util = "http://exist-db.org/xquery/util";
 
-declare variable $admin-panel:domains := ('audio', 'video', 'image', "device", 'event', 'session');
-
 declare function admin-panel:main() as element()*
 {
 if (utils:is-current-user-admin()) then	
@@ -33,7 +31,7 @@ if (utils:is-current-user-admin()) then
 					<td>Domain</td>
 					<td><select name="domain">
 						{
-						for $thisDomain in $admin-panel:domains
+						for $thisDomain in $id-utils:all-domains
 						return
 							<option value="{$thisDomain}">
 							{if ($domain = $thisDomain) then attribute selected {'selected'} else ()}

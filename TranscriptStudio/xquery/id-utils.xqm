@@ -4,6 +4,9 @@ module namespace id-utils = "http://www.ishafoundation.org/ts4isha/xquery/id-uti
 import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
 declare namespace util = "http://exist-db.org/xquery/util";
 
+declare variable $id-utils:media-domains := ('audio', 'video', 'image');
+declare variable $id-utils:all-domains := ($id-utils:media-domains, "device", 'event', 'session');
+
 declare function id-utils:generate-event-id($eventType as xs:string) as xs:string
 {
 	id-utils:generate-id('event', $eventType)
