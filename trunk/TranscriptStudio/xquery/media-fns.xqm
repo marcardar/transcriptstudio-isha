@@ -2,6 +2,8 @@ xquery version "1.0";
 
 module namespace media-fns = "http://www.ishafoundation.org/ts4isha/xquery/media-fns";
 
+import module namespace id-utils = "http://www.ishafoundation.org/ts4isha/xquery/id-utils" at "id-utils.xqm";
+
 (: adds all newMedia elements to the device element defined by the sessionId
    the device id is obtained by looking at the newMedia's parent id
    if the device element does not exist then it is created
@@ -33,16 +35,21 @@ declare function media-fns:append-media-element($newMediaElement as element(), $
 {
 	let $tagName := local-name($newMediaElement)
 	let $newId := $newMediaElement/xs:string(@id)
-	let $existingMediaElements := collection('/db/ts4isha/data')//*[local-name(.) eq $tagName and @id = $newId]
+	let $detailPrefix := concat($tagName, ' [@id = ', $newId, '] - ')
+	let $msg :=
+		if (not($tagName = $id-utils:media-domains)) then
+			concat('NOT IMPORTED because illegal tag name: ', $tagName)
+		else
+			let $existingMediaElements := collection('/db/ts4isha/data')//*[local-name(.) eq $tagName and @id = $newId]
+			return
+				if (exists($existingMediaElements)) then
+					'NOT IMPORTED because already exists'
+				else
+					let $null := update insert $newMediaElement into $deviceElement
+					return
+						'IMPORTED'
 	return
-		let $detailPrefix := concat($tagName, ' id: ', $newId, ' - ')
-		return
-			if (exists($existingMediaElements)) then
-				concat($detailPrefix, 'NOT IMPORTED because already exists')
-			else
-				let $null := update insert $newMediaElement into $deviceElement
-				return
-				concat($detailPrefix, 'IMPORTED')
+		concat($detailPrefix, $msg) 
 };
 
 declare function media-fns:get-device-element($deviceId as xs:string, $devicesElement as element()) as element()
