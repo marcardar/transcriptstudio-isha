@@ -10,13 +10,29 @@
 				<xsl:if test="exists(/session/@startAt)">
 					<xsl:value-of select="concat(' (',/session/@startAt,')')"/>
 				</xsl:if>
+				<!-- is there a cleaner way to sort the ids? -->
+				<!--xsl:value-of select="string-join(//device/audio/@id, ', ')"/-->
 				<xsl:if test="exists(//device/audio/@id)">
-					<p>Audio IDs: <xsl:value-of select="string-join(//device/audio/@id, ', ')"/>
-                    </p>
+					<p>Audio: 
+						<xsl:for-each select="//device/audio">
+							<xsl:sort select="@id"/>
+							<xsl:value-of select="@id"/>
+							<xsl:if test="position() &lt; last()">
+								<xsl:value-of select="', '"/>
+							</xsl:if>
+						</xsl:for-each>
+					</p>
 				</xsl:if>
 				<xsl:if test="exists(//device/video/@id)">
-					<p>Video IDs: <xsl:value-of select="string-join(//device/video/@id, ', ')"/>
-                    </p>
+					<p>Video: 
+						<xsl:for-each select="//device/video">
+							<xsl:sort select="@id"/>
+							<xsl:value-of select="@id"/>
+							<xsl:if test="position() &lt; last()">
+								<xsl:value-of select="', '"/>
+							</xsl:if>
+						</xsl:for-each>
+					</p>
 				</xsl:if>
 			</h2>
 			<xsl:apply-templates select="//transcript"/>

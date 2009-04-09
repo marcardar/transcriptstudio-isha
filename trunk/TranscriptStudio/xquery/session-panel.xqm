@@ -17,7 +17,7 @@ declare function session-panel:main() as element()*
 	let $doc := collection('/db/ts4isha/data')/session[@id = $sessionId]
 	return
 	(
-		<center><h1>Isha Foundation Transcript</h1></center>
+		<center><h1>Isha Foundation Session</h1></center>
 	,
 		if (empty($doc)) then
 		    if (exists($sessionId)) then

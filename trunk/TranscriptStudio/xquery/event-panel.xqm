@@ -34,9 +34,13 @@ declare function event-panel:main() as element()*
 			return
 				if (exists($sessions)) then
 				(
-					<h2>Media IDs</h2>
+					<h2>Audio IDs</h2>
 				,
-					<p>{event-panel:get-media-ids-csv-for-sessions($sessions)}</p>
+					<p>{event-panel:get-audio-ids-csv-for-sessions($sessions)}</p>
+				,
+					<h2>Video IDs</h2>
+				,
+					<p>{event-panel:get-video-ids-csv-for-sessions($sessions)}</p>
 				,
 					<h2>Sessions ({count($sessions)})</h2>
 				,
@@ -45,7 +49,7 @@ declare function event-panel:main() as element()*
 					order by $session/@id
 					return
 						<li>
-							<a href="main.xql?panel=session&amp;id={$session/@id}">Session: {$session/string(@subTitle)} {concat(' ', $session/string(@startAt))} [{event-panel:get-media-ids-csv-for-sessions($session)}]: {$session/string(@id)}</a>
+							<a href="main.xql?panel=session&amp;id={$session/@id}">Session: {$session/string(@subTitle)} {concat(' ', $session/string(@startAt))} audio [{event-panel:get-audio-ids-csv-for-sessions($session)}] video [{event-panel:get-video-ids-csv-for-sessions($session)}]: {$session/string(@id)}</a>
 							<br/>{$session/string(@comment)}<p/>							
 						</li>
 					}				
@@ -59,14 +63,29 @@ declare function event-panel:main() as element()*
 	)
 };
 
-declare function event-panel:get-media-ids-csv-for-sessions($sessions as element()*) as xs:string*
+declare function event-panel:get-audio-ids-csv-for-sessions($sessions as element()*) as xs:string*
 {
-	upper-case(string-join(event-panel:get-media-ids-for-sessions($sessions), ', '))
+	let $result := string-join(event-panel:get-media-ids-for-sessions($sessions, 'audio'), ', ')
+	return
+		if ($result = '') then
+			'<none>'
+		else
+			$result
 };
 
-declare function event-panel:get-media-ids-for-sessions($sessions as element()*) as xs:string*
+declare function event-panel:get-video-ids-csv-for-sessions($sessions as element()*) as xs:string*
 {
-	let $mediaIds := distinct-values($sessions/devices/device/media/string(@id))
+	let $result := string-join(event-panel:get-media-ids-for-sessions($sessions, 'video'), ', ')
+	return
+		if ($result = '') then
+			'<none>'
+		else
+			$result
+};
+
+declare function event-panel:get-media-ids-for-sessions($sessions as element()*, $tagName as xs:string) as xs:string*
+{
+	let $mediaIds := distinct-values($sessions/devices/device/*[local-name(.) eq $tagName]/xs:string(@id))
 	for $mediaId in $mediaIds
 	order by $mediaId
 	return $mediaId
