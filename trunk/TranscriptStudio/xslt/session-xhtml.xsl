@@ -6,16 +6,23 @@
 	<xsl:template match="/">
 		<div style="font-size:20;margin-bottom:100px;width:750px;margin-left:auto;margin-right:auto;text-align:left;">
 			<h2 style="text-align:center;font-size:22;">
-				<xsl:value-of select="string-join(//media/@id, ', ')"/>
-				<xsl:text>: </xsl:text>
-				<xsl:value-of select="/session/@name"/>
-				<xsl:value-of select="concat(' (',/session/@startAt,')')"/>
+				<xsl:value-of select="/session/@subTitle"/>
+				<xsl:if test="exists(/session/@startAt)">
+					<xsl:value-of select="concat(' (',/session/@startAt,')')"/>
+				</xsl:if>
+				<xsl:if test="exists(//device/audio/@id)">
+					<p>Audio IDs: <xsl:value-of select="string-join(//device/audio/@id, ', ')"/>
+                    </p>
+				</xsl:if>
+				<xsl:if test="exists(//device/video/@id)">
+					<p>Video IDs: <xsl:value-of select="string-join(//device/video/@id, ', ')"/>
+                    </p>
+				</xsl:if>
 			</h2>
-			<br/>
 			<xsl:apply-templates select="//transcript"/>
 		</div>
 	</xsl:template>
-	
+
 	<xsl:template match="transcript">
 		<xsl:apply-templates select="segment|superSegment"/>
 	</xsl:template>
@@ -52,7 +59,7 @@
 	<xsl:template match="content">
 		<span class="content" id="{@id}">
 			<xsl:choose>
-				<xsl:when test="@emphasis='true' and @spokenLanguage='tamil'">
+                <xsl:when test="@emphasis='true' and @spokenLanguage='tamil'">
 					<xsl:attribute name="style">font-style:italic;color:blue;</xsl:attribute>
 				</xsl:when>
 				<xsl:when test="@emphasis='true'">
