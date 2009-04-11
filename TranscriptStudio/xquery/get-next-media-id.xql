@@ -29,10 +29,7 @@ return
 				'startDigitalImageId'
 			else
 				error(concat('Unknown domain: ', $domain))
-		let $minIdInt := collection('/db/ts4isha/reference')/reference//eventType/get-next-media-id:extract-integer(@*[local-name(.) = $startDigitalAttrName])
+		let $minIdInt := collection('/db/ts4isha/reference')/reference//eventType[@id eq $prefix]/get-next-media-id:extract-integer(@*[local-name(.) = $startDigitalAttrName])
 		let $nextIdInt := max(($maxIdInt + 1, $minIdInt))
 		return
 			$nextIdInt
-		
-
-		
