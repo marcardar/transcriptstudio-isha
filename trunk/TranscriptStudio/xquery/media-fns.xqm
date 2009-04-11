@@ -17,7 +17,7 @@ declare function media-fns:append-media-elements($newMediaElements as element()*
 	let $session := collection('/db/ts4isha/data')/session[@id = $sessionId]
 	return
 		if (not(exists($session))) then
-			error(concat('Could not find session id: ', $sessionId))
+			concat('No media elements imported for unknown session id: ', $sessionId)
 		else
 			let $devicesElement := media-fns:get-devices-element($session)
 			return
