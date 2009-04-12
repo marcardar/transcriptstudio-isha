@@ -68,7 +68,7 @@
 							</w:p>
 							<w:p w:rsidR="00BD70D3" w:rsidRPr="00914051" w:rsidRDefault="00BD70D3" w:rsidP="00021F27">
 								<w:r>
-                                    <w:t>MEDIA CODE: <xsl:value-of select="string-join(//media/@id, ', ')"/>
+                                    <w:t>MEDIA CODE: <xsl:value-of select="string-join(//audio/@id, ', ')"/>
 									</w:t>
 								</w:r>
 							</w:p>
@@ -109,7 +109,7 @@
 							</w:tcPr>
 							<w:p w:rsidR="00BD70D3" w:rsidRPr="00914051" w:rsidRDefault="00BD70D3" w:rsidP="00021F27">
 								<w:r>
-                                    <w:t>LOCATION: <xsl:value-of select="string-join(($event/@venue, $event/@location, $event/@country), ', ')"/>  
+                                    <w:t>LOCATION: <xsl:value-of select="string-join(($event/metadata/@venue, $event/metadata/@location, $event/metadata/@country), ', ')"/>  
 									</w:t>
 								</w:r>
 							</w:p>
@@ -140,7 +140,7 @@
 							</w:tcPr>
 							<w:p w:rsidR="00BD70D3" w:rsidRPr="00914051" w:rsidRDefault="00BD70D3" w:rsidP="00021F27">
 								<w:r>
-                                    <w:t>SESSION DATE: <xsl:value-of select="(session/@startAt, $event/@startAt)[1]"/>
+                                    <w:t>SESSION DATE: <xsl:value-of select="(session/metadata/@startAt, $event/metadata/@startAt)[1]"/>
 									</w:t>
 								</w:r>
 							</w:p>
@@ -182,7 +182,7 @@
 							</w:p>
 							<w:p w:rsidR="00BD70D3" w:rsidRDefault="00BD70D3" w:rsidP="00CB5E63">
 								<w:r>
-                                    <w:t xml:space="preserve">NOTES: <xsl:value-of select="/session/@comment"/>
+                                    <w:t xml:space="preserve">NOTES: <xsl:value-of select="/session/metadata/@comment"/>
 									</w:t>
 								</w:r>
 							</w:p>
@@ -260,7 +260,7 @@
 	<xsl:template match="segment">
 		<xsl:variable name="syncPoint" select="content[1]/@startId"/>
 		<xsl:if test="$syncPoint and not(preceding::segment[position() &lt; 3]/content[1]/@startId)">
-			<xsl:variable name="time" select="/session/devices/device/media/sync[@timeIdRef = $syncPoint]/@timecode"/>
+			<xsl:variable name="time" select="/session//device/audio/sync[@timeIdRef = $syncPoint]/@timecode"/>
 			<w:p>
                 <w:r>
                     <w:t>Time <xsl:number format="1" value="floor($time div 60)"/>

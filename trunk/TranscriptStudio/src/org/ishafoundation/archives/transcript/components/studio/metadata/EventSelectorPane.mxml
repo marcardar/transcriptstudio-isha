@@ -98,7 +98,7 @@
 				var eventXMLList:XMLList = resultXML.event;
 				var arr:Array = []
 				for each (var eventXML:XML in eventXMLList) {
-					var eventProps:EventProperties = new EventProperties(eventXML);
+					var eventProps:EventProperties = EventProperties.createInstance(eventXML);
 					arr.push(eventProps);
 				}
 				eventsList.dataProvider = arr;

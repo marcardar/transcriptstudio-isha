@@ -74,14 +74,6 @@ package org.ishafoundation.archives.transcript.db
 		}
 		
 		public function retrieveXML(successFunc:Function, failureFunc:Function, tagName:String = null, id:String = null, collectionPath:String = null):void {
-			if (!this.loggedIn) {
-				testConnection(function():void {
-					retrieveXML(successFunc, failureFunc, tagName, id, collectionPath);
-				}, function(msg:String):void {
-					failureFunc("Tried to retrieve XML but not connected to database");					
-				});
-				return;
-			}
 			var params:Object = {}
 			if (tagName != null) {
 				params.tagName = tagName;
@@ -124,22 +116,14 @@ package org.ishafoundation.archives.transcript.db
 			}, failureFunc, HTTPService.RESULT_FORMAT_E4X);
 		}
 		
-		public function storeXML(xml:XML, successFunc:Function, failureFunc:Function):void {
-			if (!this.loggedIn) {
-				testConnection(function():void {
-					storeXML(xml, successFunc, failureFunc);
-				}, function(msg:String):void {
-					failureFunc("Tried to store XML but not connected to database");					
-				});
-				return;
-			}
+		/*public function storeXML(xml:XML, successFunc:Function, failureFunc:Function):void {
 			//new EXistXMLRPCClient(remoteMgr.getXMLRPCClient()).storeXML(xmlPath, xml, successFunction, failureFunction);
 			var params:Object = {xmlStr:xml.toXMLString()};
 			executeStoredXQuery("store-xml-doc.xql", params, function(id:String):void {
 				trace("Successfully stored xml doc: " + id);
 				successFunc(id);
 			}, failureFunc);
-		}
+		}*/
 		
 		public function query(xQuery:String, args:Array, successFunc:Function, failureFunc:Function):void {
 			if (!this.loggedIn) {

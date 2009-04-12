@@ -9,7 +9,7 @@ let $doc :=
 		let $result := doc(fn:iri-to-uri($sessionPath))
 		return
 			if (not(exists($result))) then
-				error('Could not find document at path: {$sessionPath}')
+				error((), 'Could not find document at path: {$sessionPath}')
 			else
 				$result
 	else
@@ -19,22 +19,22 @@ let $doc :=
 				let $result := collection('/db/ts4isha/data')/session[@id = $sessionId]
 				return
 					if (not(exists($result))) then
-					    error('Could not find document with id: {$sessionId}')
+					    error((), 'Could not find document with id: {$sessionId}')
 					else
 						$result
 			else
-				error('Neither sessionPath nor sessionId specified')
+				error((), 'Neither sessionPath nor sessionId specified')
 return 
 	let $docxFilename := replace(util:document-name($doc), '.xml$', '.docx')
 	let $sessionId := $doc/xs:string(@id)
 	return
 		if (not(exists($sessionId))) then
-			error('Could not find sessionId in doc')
+			error((), 'Could not find sessionId in doc')
 		else
 			let $eventId := search-fns:get-event-id($sessionId)
 			return
 				if (not(exists($eventId))) then
-					error('Could not find eventId for session: {$sessionId}')
+					error((), 'Could not find eventId for session: {$sessionId}')
 				else
 					let $event := collection('/db/ts4isha/data')/event[@id = $eventId]
 					let $eventPath := concat(util:collection-name($event), '/', util:document-name($event))

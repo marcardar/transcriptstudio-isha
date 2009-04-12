@@ -21,6 +21,8 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" xmlns:metadataNS="org.ishafoundation.archives.transcript.components.metadata.*" width="100%" height="100%" verticalGap="0" keyDown="keyDownHandler(event)">
 	<mx:Script>
 		<![CDATA[
+			import org.ishafoundation.archives.transcript.model.Transcript;
+			import org.ishafoundation.archives.transcript.model.TranscriptTextSelection;
 			import com.ericfeminella.collections.HashMap;
 			import com.ericfeminella.collections.IMap;
 			import mx.events.PropertyChangeEvent;
@@ -213,21 +215,18 @@
 								Alert.show("No document exists with id: " + docId);
 							}
 							else if (docXML.localName() == "event") {
-								var eventProps:EventProperties = new EventProperties(docXML);
+								var eventProps:EventProperties = EventProperties.createInstance(docXML);
 								SessionSelectorDialog.displayIfNecessary(eventProps, popup, databaseMgr, function(sessionProps:SessionProperties):void {
-									sessionMgr.retrieveSession(sessionProps.id, eventProps, openSessionSuccess, openSessionFailure);
+									sessionMgr.retrieveSession(sessionProps.sessionId, eventProps, openSessionSuccess, openSessionFailure);
 									popup.closeMe();
 								});
 							}
 							else if (docXML.localName() == "session") {
 								// first we need to get the event props
-								var eventId:String = new SessionProperties(docXML).eventId;
-								if (eventId == null) {
-									throw new Error("session XML does not have an eventId");
-								}
+								var sessionProps:SessionProperties = SessionProperties.createInstanceFromSessionXML(docXML);
 								trace("Opening session based on session XML already in memory");
-								DatabaseManagerUtils.retrieveEventXML(eventId, databaseMgr, function(eventXML:XML):void {
-									var eventProps:EventProperties = new EventProperties(eventXML);
+								DatabaseManagerUtils.retrieveEventXML(sessionProps.eventId, databaseMgr, function(eventXML:XML):void {
+									var eventProps:EventProperties = EventProperties.createInstance(eventXML);
 									var session:Session = new Session(docXML, eventProps, referenceMgr);
 									openSessionSuccess(session);
 									popup.closeMe();
@@ -236,12 +235,16 @@
 										callLater(function():void {
 											var node:MNode = session.transcript.mdoc.resolveId(nodeId);
 											if (node == null) {
-												Alert.show("Could not find markup with id: " + nodeId);
+												Alert.show("Could not find document internal id: " + nodeId);
 												return;
 											}
 											if (node is MSuperNode) {
 												transcriptPane.markupsPane.selectedMarkup = node as MSuperNode;
 												transcriptPane.textPane.selectMarkup(node as MSuperNode);
+											}
+											else {
+												var newSelection:TranscriptTextSelection = new TranscriptTextSelection(node);
+												transcriptPane.textPane.select(newSelection);
 											}
 										});
 									}								
@@ -295,7 +298,7 @@
 			}
 			
 			private function storeSession(successFunc:Function = null, failureFunc:Function = null):void {
-				this.sessionMgr.storeSession(session, function():void {
+				this.sessionMgr.updateSessionInDatabase(session, function():void {
 					storeSessionSuccess();
 					if (successFunc != null) {
 						successFunc();
@@ -370,8 +373,8 @@
 			
 			private function editEventProps():void {
 				var thisPanel:MainPanel = this;
-				DatabaseManagerUtils.retrieveEventXML(session.props.eventId, databaseMgr, function(eventXML:XML):void {
-					session.eventProps = new EventProperties(eventXML);
+				DatabaseManagerUtils.retrieveEventXML(session.eventProps.id, databaseMgr, function(eventXML:XML):void {
+					session.eventProps = EventProperties.createInstance(eventXML);
 					var popup:EventPropertiesEditorDialog = EventPropertiesEditorDialog.display(thisPanel, databaseMgr, referenceMgr, session.eventProps);
 					popup.addEventListener(EventPropertiesEditorDialog.EVENT_EDITED, function(event:Event):void {
 						status = "Successfully edited event";
@@ -384,17 +387,13 @@
 			}
 			
 			private function editSessionProps():void {
-				var sessionPropsXMLCopy:XML = session.sessionXML.copy();
-				delete sessionPropsXMLCopy.*;
-				var sessionPropsCopy:SessionProperties = new SessionProperties(sessionPropsXMLCopy);
+				var sessionXMLCopy:XML = session.sessionXML.copy();
+				var sessionPropsCopy:SessionProperties = SessionProperties.createInstanceFromSessionXML(sessionXMLCopy);
 				var popup:SessionPropertiesEditorDialog = SessionPropertiesEditorDialog.display(this, databaseMgr, referenceMgr, sessionPropsCopy); 
 				popup.addEventListener(SessionPropertiesEditorDialog.SESSION_PROPS_EDITED, function():void {
 					// copy the session props over the existing ones
 					// first delete the old ones
-					delete session.sessionXML.@*;
-					for each (var attr:XML in sessionPropsXMLCopy.@*) {
-						XMLUtils.setAttributeValue(session.sessionXML, attr.localName(), attr.toString());
-					}
+					session.metadata.metadataElement = sessionPropsCopy.metadataElement;
 					session.unsavedChanges = true;
 					Alert.show("Session properties edited but not yet saved");				
 					updateTitle();
@@ -476,7 +475,7 @@
 					if (session.eventProps != null) {
 						title += session.eventProps.generateFullName(referenceMgr) + "; ";
 					}
-					title += session.props.getFullName(session.eventProps.startAt) + " ";
+					title += session.metadata.getFullName(session.eventProps) + " ";
 					if (session.transcript == null) {
 						title += "- NO TRANSCRIPT";
 					}

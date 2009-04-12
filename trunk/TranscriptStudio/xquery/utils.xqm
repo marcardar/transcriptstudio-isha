@@ -4,6 +4,7 @@ module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils";
 
 import module namespace functx = "http://www.functx.com" at "functx.xqm";
 declare namespace xmldb = "http://exist-db.org/xquery/xmldb";
+declare namespace util = "http://exist-db.org/xquery/util";
 
 declare function utils:is-current-user-admin() as xs:boolean?
 {
@@ -12,9 +13,34 @@ declare function utils:is-current-user-admin() as xs:boolean?
 		xmldb:is-admin-user($currentUser)
 };
 
-declare function utils:get-event($eventId as xs:string) as element()
+declare function utils:get-event($eventId as xs:string) as element()?
 {
 	collection('/db/ts4isha/data')/event[@id = $eventId]
+};
+
+declare function utils:get-session($sessionId as xs:string) as element()?
+{
+	collection('/db/ts4isha/data')/session[@id = $sessionId]
+};
+
+declare function utils:get-event-type($eventTypeId as xs:string) as element()?
+{
+	collection('/db/ts4isha/reference')/reference//eventType[@id = $eventTypeId]
+};
+
+declare function utils:set-child-element($existingParentElement as element(), $newChildElement as element()) as element()?
+{
+	let $childTagName := local-name($newChildElement)
+	let $existingChildElement := $existingParentElement/*[local-name(.) eq $childTagName]
+	return
+		if (empty($existingChildElement)) then
+			let $null := update insert $newChildElement into $existingParentElement 
+			return ()
+		else if (exactly-one($existingChildElement)) then
+			let $null := update replace $existingChildElement with $newChildElement
+			return $existingChildElement
+		else
+			error((), concat('More the one child element named: ', $childTagName))
 };
 
 declare function utils:store($documentURI as xs:string, $xml as element()) as xs:string
@@ -117,3 +143,60 @@ declare function utils:make-filename-friendly($rawFilename as xs:string) as xs:s
 {
 	replace(replace($rawFilename, '\s+', '-'), '[^a-z0-9\-_]', '')
 };
+
+declare function utils:build-event-path($event as element()) as xs:string
+{
+	let $collectionName := concat('/db/ts4isha/data', '/', $event/@type)
+	let $docName := string-join(($event/@id, utils:build-event-full-name($event)), '_')
+	return concat($collectionName, '/', $docName, '.xml')
+};
+
+declare function utils:build-event-full-name($event as element()) as xs:string?
+{
+	let $fullName := lower-case(string-join(($event/metadata/@startAt, $event/metadata/@subTitle, $event/metadata/@location, $event/metadata/@venue), '_'))
+	let $fullName := utils:make-filename-friendly($fullName)
+	return
+		if (string-length($fullName) > 0) then
+			$fullName
+		else
+			()
+};
+
+declare function utils:build-session-path($sessionXML as element()) as xs:string
+{
+	let $eventXML := utils:get-event($sessionXML/@eventId)
+	let $collectionName := util:collection-name($eventXML)
+	let $docName := string-join(($sessionXML/@id, utils:build-session-full-name($sessionXML, $eventXML)), '_')
+	return concat($collectionName, '/', $docName, '.xml')
+};
+
+declare function utils:build-session-full-name($sessionXML as element(), $eventXML as element()) as xs:string?
+{
+	let $metadataXML := $sessionXML/metadata[1]
+	let $fullName :=
+		lower-case(string-join( 
+			(
+				utils:build-event-full-name($eventXML)
+				,
+				let $eventDate := utils:date-string-to-date($eventXML/metadata/@startAt)
+				let $sessionDate := utils:date-string-to-date($metadataXML/@startAt)
+				let $daysDiff := utils:days-diff($eventDate, $sessionDate)
+				return
+					if (exists($daysDiff) and $daysDiff >= 0) then
+						concat('day-', $daysDiff + 1)
+					else
+						()
+				,
+				$metadataXML/@subTitle
+			)
+			,
+			'_'
+		))
+	let $fullName := utils:make-filename-friendly($fullName)
+	return
+		if (exists($fullName) and string-length($fullName) > 0) then
+			$fullName
+		else
+			()
+};
+

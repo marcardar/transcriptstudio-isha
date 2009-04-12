@@ -494,11 +494,11 @@ package org.ishafoundation.archives.transcript.importer
 			}
 		}
 		
- 		public static function mergeInGuestProperties(hostElement:XML, guestElement:XML):void {
+ 		public static function mergeInGuestProperties(targetElement:XML, guestElement:XML):void {
  			for each (var attr:XML in guestElement.attributes()) {
  				var attrName:String = attr.localName();
  				var attrValue:String = attr.toString();
- 				var existingValue:String = XMLUtils.getAttributeValue(hostElement, attrName);
+ 				var existingValue:String = XMLUtils.getAttributeValue(targetElement, attrName);
  				var newValue:String;
  				if (existingValue == null) {
  					newValue = attrValue;
@@ -508,18 +508,18 @@ package org.ishafoundation.archives.transcript.importer
  				}
  				else {
  					// HACK TIME
- 					if (attrName == SessionProperties.START_AT_ATTR_NAME || attrName == EventProperties.TYPE_ATTR_NAME) {
+ 					if (attrName == EventProperties.START_AT_ATTR_NAME || attrName == EventProperties.TYPE_ATTR_NAME) {
  						// we have conflicting data
- 						var comment:String = XMLUtils.getAttributeValue(hostElement, SessionProperties.COMMENT_ATTR_NAME, "");
+ 						var comment:String = XMLUtils.getAttributeValue(targetElement, EventProperties.COMMENT_ATTR_NAME, "");
  						comment += "\nInconsistent " + attrName + ": " + attrValue.toString(); 
- 						XMLUtils.setAttributeValue(hostElement, SessionProperties.COMMENT_ATTR_NAME, comment);
+ 						XMLUtils.setAttributeValue(targetElement, EventProperties.COMMENT_ATTR_NAME, comment);
  						continue;
  					}
  					else {
 	 					newValue = existingValue + "; " + attrValue;
 	 				}
  				}
- 				XMLUtils.setAttributeValue(hostElement, attrName, newValue, "");
+ 				XMLUtils.setAttributeValue(targetElement, attrName, newValue, "");
  			}
  		}
 	}

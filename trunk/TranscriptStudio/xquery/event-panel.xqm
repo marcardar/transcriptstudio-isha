@@ -49,8 +49,8 @@ declare function event-panel:main() as element()*
 					order by $session/@id
 					return
 						<li>
-							<a href="main.xql?panel=session&amp;id={$session/@id}">Session: {$session/string(@subTitle)} {concat(' ', $session/string(@startAt))} [{$session/string(@id)}]</a>
-							<br/>{$session/string(@comment)}<p/>							
+							<a href="main.xql?panel=session&amp;id={$session/@id}">Session: {$session/metadata/string(@subTitle)} {concat(' ', $session/metadata/string(@startAt))} [{$session/string(@id)}]</a>
+							<br/>{$session/metadata/string(@comment)}<p/>							
 						</li>
 					}				
 					</ol>

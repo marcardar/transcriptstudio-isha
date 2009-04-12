@@ -51,21 +51,24 @@ package org.ishafoundation.archives.transcript.importer
 		
 		public static function createEventElement(audioTranscripts:Array):XML {
 			// get the event type from the first source
-			var eventElement:XML = <event/>;
+			var firstSource:WordMLTransformer = audioTranscripts[0]
+			var eventElement:XML = <event type={firstSource.eventElement.@type}><metadata/></event>;
+			var metadataElement:XML = eventElement.metadata[0];
 			for each (var audioTranscript:WordMLTransformer in audioTranscripts) {
 				var audioEventElement:XML = audioTranscript.eventElement;
-				WordMLTransformer.mergeInGuestProperties(eventElement, audioEventElement);
+				WordMLTransformer.mergeInGuestProperties(metadataElement, audioEventElement);
 			}
 			return eventElement;
 		}
 		
 		public static function createSessionElement(audioTranscripts:Array):XML {
-			var sessionElement:XML = <session/>;
+			var sessionElement:XML = <session><metadata/></session>;
+			var metadataElement:XML = sessionElement.*[0];
 			for each (var at1:WordMLTransformer in audioTranscripts) {
 				var audioSessionElement:XML = at1.sessionElement;
-				WordMLTransformer.mergeInGuestProperties(sessionElement, audioSessionElement);
+				WordMLTransformer.mergeInGuestProperties(metadataElement, audioSessionElement);
 				// remove the name attribute
-				delete sessionElement.@name;
+				delete metadataElement.@name;
 			}
 			var devicesElement:XML = <devices/>;
 			sessionElement.appendChild(devicesElement);
@@ -102,14 +105,14 @@ package org.ishafoundation.archives.transcript.importer
 					}
 				}
 				// the session notes can contain information about the imported file(s)
-				appendSessionCommentLine("\rImported file:", sessionElement);
-				appendAttributesToSessionComment(audioTranscript.audioTranscriptElement, sessionElement);
+				appendSessionCommentLine("\rImported file:", metadataElement);
+				appendAttributesToSessionComment(audioTranscript.audioTranscriptElement, metadataElement);
 			}
 			return sessionElement;
 		}
 		
-		private static function appendAttributesToSessionComment(audioTranscriptElement:XML, sessionElement:XML):void {
-			appendSessionCommentLine("", sessionElement);
+		private static function appendAttributesToSessionComment(audioTranscriptElement:XML, metadataElement:XML):void {
+			appendSessionCommentLine("", metadataElement);
 			var attrNames:Array = []
 			for each (var attr:XML in audioTranscriptElement.@*) {
 				// but put "filename" and "name" at front
@@ -125,19 +128,19 @@ package org.ishafoundation.archives.transcript.importer
 				if (attrName.indexOf("_") == 0) {
 					attrName = attrName.substring(1);
 				}
-				appendSessionCommentLine(attrName + ": " + audioTranscriptElement.attribute(attrName), sessionElement);
+				appendSessionCommentLine(attrName + ": " + audioTranscriptElement.attribute(attrName), metadataElement);
 			}
 		}
 		
-		private static function appendSessionCommentLine(text:String, sessionElement:XML):void {
+		private static function appendSessionCommentLine(text:String, metadataElement:XML):void {
 			/*text = Utils.normalizeSpace(text);
 			if (text.length == 0) {
 				return;
 			}*/
-			var comment:String = XMLUtils.getAttributeValue(sessionElement, SessionProperties.COMMENT_ATTR_NAME, "");
+			var comment:String = XMLUtils.getAttributeValue(metadataElement, SessionProperties.COMMENT_ATTR_NAME, "");
 			comment += "\r"
 			comment += text;
-			XMLUtils.setAttributeValue(sessionElement, SessionProperties.COMMENT_ATTR_NAME, comment);
+			XMLUtils.setAttributeValue(metadataElement, SessionProperties.COMMENT_ATTR_NAME, comment);
 		}
 		
 		private function importPathsInternal(names:Array, audioTranscripts:Array, idFunc:Function, successFunc:Function, failureFunc:Function):void {

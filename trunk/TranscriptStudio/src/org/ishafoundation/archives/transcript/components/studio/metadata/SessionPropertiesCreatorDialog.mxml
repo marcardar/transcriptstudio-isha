@@ -2,6 +2,9 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Create Session" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*">
 	<mx:Script>
 	<![CDATA[
+		import org.ishafoundation.archives.transcript.db.DatabaseManagerUtils;
+		import name.carter.mark.flex.util.XMLUtils;
+		import org.ishafoundation.archives.transcript.model.Session;
 		import org.ishafoundation.archives.transcript.model.SessionProperties;
 		import org.ishafoundation.archives.transcript.db.XMLStorer;
 		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
@@ -14,19 +17,16 @@
 		
 		public static const SESSION_EDITED:String = "SESSION_EDITED";
 		
-		private var xmlStorer:XMLStorer;
+		private var xqueryExecutor:XQueryExecutor;
 		
-		public static function display(parent:DisplayObject, xmlStorer:XMLStorer, referenceMgr:ReferenceManager, eventProps:EventProperties = null, sessionProps:SessionProperties = null):SessionPropertiesCreatorDialog {
-			if (sessionProps == null) {
-				sessionProps = new SessionProperties(<session eventId="{eventProps.id}"/>);
-			}
+		public static function display(parent:DisplayObject, xqueryExecutor:XQueryExecutor, referenceMgr:ReferenceManager, eventId:String, sessionMetadataElement:XML):SessionPropertiesCreatorDialog {
+			var sessionProps:SessionProperties = new SessionProperties(sessionMetadataElement, eventId);
 			var result:SessionPropertiesCreatorDialog = new SessionPropertiesCreatorDialog();
-			result.xmlStorer = xmlStorer;
+			result.xqueryExecutor = xqueryExecutor;
 			PopUpManager.addPopUp(result, parent, true);
 			result.sessionPropertiesPane.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
 				result.sessionPropertiesPane.referenceMgr = referenceMgr;
 				result.sessionPropertiesPane.sessionProps = sessionProps;
-				result.sessionPropertiesPane.sessionProps.eventId = eventProps.id;
 			}, true);
 			return result;
 		}
@@ -36,8 +36,10 @@
 		}
 		
 		private function okClicked():void {
-			xmlStorer.storeXML(sessionProps.sessionElement, function(sessionId:String):void {
-				sessionProps.id = sessionId;
+			var metadataElement:XML = sessionPropertiesPane.sessionProps.metadataElement;
+			DatabaseManagerUtils.createSession(sessionProps.eventId, metadataElement, xqueryExecutor, function(sessionXML:XML):void {
+				var metadataXML:XML = sessionXML.metadata[0];
+				sessionPropertiesPane.sessionProps = new SessionProperties(metadataElement, sessionProps.eventId, sessionXML.@id);
 				closeMe();
 				dispatchEvent(new Event(SESSION_EDITED));
 			}, function (msg:String):void {

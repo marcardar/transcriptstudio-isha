@@ -31,7 +31,7 @@
 		
 		private function okClicked(evt:MouseEvent):void {
 			SessionSelectorDialog.displayIfNecessary(selectedEventProps, this, eventSelectorPane.xqueryExecutor, function(sessionProps:SessionProperties):void {
-				selectedSessionId = sessionProps.id;
+				selectedSessionId = sessionProps.sessionId;
 				dispatchEvent(new Event(OPEN_SESSION_REQUEST, true));
 				closeMe();
 			});

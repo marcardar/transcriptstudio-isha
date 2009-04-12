@@ -39,13 +39,14 @@ declare function store-xml-doc:build-session-full-name($session as element(), $e
 			collection('/db/ts4isha/data')/event[@id = $session/@eventId]
 		else
 			$event
+	let $metadata := $session/metadata[1]
 	let $fullName :=
 		lower-case(string-join( 
 			(
 				store-xml-doc:build-event-full-name($event)
 				,
 				let $eventDate := utils:date-string-to-date($event/@startAt)
-				let $sessionDate := utils:date-string-to-date($session/@startAt)
+				let $sessionDate := utils:date-string-to-date($metadata/@startAt)
 				let $daysDiff := utils:days-diff($eventDate, $sessionDate)
 				return
 					if (exists($daysDiff) and $daysDiff >= 0) then
@@ -53,7 +54,7 @@ declare function store-xml-doc:build-session-full-name($session as element(), $e
 					else
 						()
 				,
-				$session/@subTitle
+				$metadata/@subTitle
 			)
 			,
 			'_'
@@ -78,12 +79,12 @@ return
 			else if (local-name($xml) = 'session') then
 				false()
 			else
-				error(concat("xml element not supported for id creation: ", $xml))
+				error((), concat("xml element not supported for id creation: ", $xml))
 		let $xml :=
 				if (not(exists($xml/@id))) then
 					let $newId :=
 						if ($isEventXML) then
-							id-utils:generate-event-id($xml/@type)
+							id-utils:generate-event-id($xml/metadata/@type)
 						else
 							id-utils:generate-session-id($xml/@eventId)
 					return functx:add-attributes($xml, xs:QName('id'), $newId)

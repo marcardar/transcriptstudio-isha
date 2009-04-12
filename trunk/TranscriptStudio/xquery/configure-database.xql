@@ -37,7 +37,7 @@ import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/ut
 				'No new collections created'
 			)
 	else
-		error('Only admin user allowed to create data collections')
+		error((), 'Only admin user allowed to create data collections')
 	}
 	</body>
 </html>

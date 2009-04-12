@@ -23,49 +23,49 @@
 				<tr>
                     <td align="right">Sub Title:</td>
                     <td>
-                        <xsl:value-of select="(@subTitle, '&lt;not set&gt;')[1]"/>
+                        <xsl:value-of select="(metadata/@subTitle, '&lt;not set&gt;')[1]"/>
                     </td>
                 </tr>
 				<tr>
                     <td align="right">Start:</td>
                     <td>
-                        <xsl:value-of select="(@startAt, '&lt;not set&gt;')[1]"/>
+                        <xsl:value-of select="(metadata/@startAt, '&lt;not set&gt;')[1]"/>
                     </td>
                 </tr>
 				<tr>
                     <td align="right">End:</td>
                     <td>
-                        <xsl:value-of select="(@endAt, '&lt;not set&gt;')[1]"/>
+                        <xsl:value-of select="(metadata/@endAt, '&lt;not set&gt;')[1]"/>
                     </td>
                 </tr>
 				<tr>
                     <td align="right">Country:</td>
                     <td>
-                        <xsl:value-of select="(@country, '&lt;not set&gt;')[1]"/>
+                        <xsl:value-of select="(metadata/@country, '&lt;not set&gt;')[1]"/>
                     </td>
                 </tr>
 				<tr>
                     <td align="right">Location:</td>
                     <td>
-                        <xsl:value-of select="(@location, '&lt;not set&gt;')[1]"/>
+                        <xsl:value-of select="(metadata/@location, '&lt;not set&gt;')[1]"/>
                     </td>
                 </tr>
 				<tr>
                     <td align="right">Venue:</td>
                     <td>
-                        <xsl:value-of select="(@venue, '&lt;not set&gt;')[1]"/>
+                        <xsl:value-of select="(metadata/@venue, '&lt;not set&gt;')[1]"/>
                     </td>
                 </tr>
 				<tr>
                     <td align="right">Language:</td>
                     <td>
-                        <xsl:value-of select="(@language, '&lt;default&gt;')[1]"/>
+                        <xsl:value-of select="(metadata/@language, '&lt;default&gt;')[1]"/>
                     </td>
                 </tr>
 				<tr>
                     <td align="right">Comment:</td>
                     <td>
-                        <xsl:value-of select="(@comment, '&lt;not set&gt;')[1]"/>
+                        <xsl:value-of select="(metadata/@comment, '&lt;not set&gt;')[1]"/>
                     </td>
                 </tr>
 			</table>

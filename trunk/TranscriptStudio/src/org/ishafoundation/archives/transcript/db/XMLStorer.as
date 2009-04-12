@@ -25,7 +25,7 @@ package org.ishafoundation.archives.transcript.db
 {
 	public interface XMLStorer
 	{
-		function storeXML(xml:XML, successFunction:Function, failureFunction:Function):void;		
+		//function storeXML(xml:XML, successFunction:Function, failureFunction:Function):void;		
 	}
 	
 }

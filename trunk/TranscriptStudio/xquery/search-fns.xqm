@@ -88,21 +88,21 @@ declare function search-fns:get-events($baseEvents as element()*, $eventSearchTe
 		let $searchTerm := $eventSearchTerms[1]
 		let $newEventSearchTerms := remove($eventSearchTerms, 1)
 		let $newBaseEvents :=
-			if (matches($searchTerm, '^[A-Z]{1,2}$')) then
+			if (matches($searchTerm, '^[a-z]{1,2}$', 'i')) then
 				(: this is an event type :)
 				$baseEvents[@type = lower-case($searchTerm)]
 			else
 				if (matches($searchTerm, '^[0-9]{4}$')) then
 					(: this is an event year :)
-					$baseEvents[starts-with(@startAt, $searchTerm)]
+					$baseEvents[starts-with(metadata/@startAt, $searchTerm)]
 				else 
-					if (matches($searchTerm, '^[A-Z]{1,2}\d{3,}$')) then
-						(: this is a media code :)
+					if (matches($searchTerm, '^[a-z]{1,2}\d+$', 'i')) then
+						(: this is an id (could be event, session or media etc) - but lets assume media id :)
 						let $sessions := search-fns:get-sessions-for-event-ids($baseEvents/@id)
-						return search-fns:get-events-for-session-ids($sessions[devices/device/media/@id = lower-case($searchTerm)]/@id)
+						return search-fns:get-events-for-session-ids($sessions[//device/*/@id = lower-case($searchTerm)]/@id)
 					else 
 						(: it could be anything :)
-						$baseEvents[matches(@*, $searchTerm, 'i')]
+						$baseEvents[matches(metadata/@*, $searchTerm, 'i')]
 		return
 			search-fns:get-events($newBaseEvents, $newEventSearchTerms)
 };
@@ -118,7 +118,9 @@ declare function search-fns:get-session-title($session as element()) as xs:strin
 
 declare function search-fns:get-event-title($event as element()) as xs:string
 {
-	concat('Event (', upper-case($event/@type), '): ', $event/@startAt, " ", $event/@name, ' @ ', $event/@location)
+	let $metadata := $event/metadata[1]
+	return
+		concat('Event (', $event/@type, '): ', string-join(($metadata/@startAt, $metadata/@subTitle, concat('@ ', $event/metadata/@location)), ' '))
 };
 
 declare function search-fns:markup-search($baseMarkups as element()*, $searchTerms as xs:string*) as element()*
