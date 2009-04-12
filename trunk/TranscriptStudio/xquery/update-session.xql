@@ -46,7 +46,7 @@ return
 						(
 							update-session:process-child-element($sessionXML, $metadataXML, 'metadata')
 						,
-							update-session:process-child-element($sessionXML, $mediaMetadataXML, 'devices')
+							update-session:process-child-element($sessionXML, $mediaMetadataXML, 'mediaMetadata')
 						,
 							update-session:process-child-element($sessionXML, $transcriptXML, 'transcript')
 						), ', ')

@@ -70,10 +70,10 @@ package org.ishafoundation.archives.transcript.importer
 				// remove the name attribute
 				delete metadataElement.@name;
 			}
-			var devicesElement:XML = <devices/>;
-			sessionElement.appendChild(devicesElement);
+			var mediaMetadataElement:XML = <mediaMetadata/>;
+			sessionElement.appendChild(mediaMetadataElement);
 			var deviceElement:XML = <device id="a1"/>
-			devicesElement.appendChild(deviceElement);
+			mediaMetadataElement.appendChild(deviceElement);
 			var transcriptElement:XML = <transcript id="t1"/>;
 			sessionElement.appendChild(transcriptElement);
 			for each (var audioTranscript:WordMLTransformer in audioTranscripts) {

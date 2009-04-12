@@ -85,7 +85,7 @@ declare function event-panel:get-video-ids-csv-for-sessions($sessions as element
 
 declare function event-panel:get-media-ids-for-sessions($sessions as element()*, $tagName as xs:string) as xs:string*
 {
-	let $mediaIds := distinct-values($sessions/devices/device/*[local-name(.) eq $tagName]/xs:string(@id))
+	let $mediaIds := distinct-values($sessions//device/*[local-name(.) eq $tagName]/xs:string(@id))
 	for $mediaId in $mediaIds
 	order by $mediaId
 	return $mediaId

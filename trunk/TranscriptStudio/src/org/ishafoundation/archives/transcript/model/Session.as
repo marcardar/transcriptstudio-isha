@@ -35,7 +35,7 @@ package org.ishafoundation.archives.transcript.model
 				sessionId = null;
 			}
 			this.metadata = new SessionProperties(sessionXML.metadata[0], eventProps.id, sessionId);
-			this.mediaMetadataElement = sessionXML.devices[0];
+			this.mediaMetadataElement = sessionXML.mediaMetadata[0];
 			var transcriptXML:XML = sessionXML.transcript[0];
 			if (transcriptXML != null) {
 				this.transcript = new Transcript(transcriptXML, referenceMgr);
@@ -114,7 +114,7 @@ package org.ishafoundation.archives.transcript.model
 		public function appendTranscript(transcriptElement:XML, deviceElements:XMLList):void {
 			if (transcript == null) {
 				if (this.mediaMetadataElement == null) {
-					mediaMetadataElement = <devices/>;
+					mediaMetadataElement = <mediaMetadata/>;
 				}
 				for each (var deviceElement:XML in deviceElements) {
 					mediaMetadataElement.appendChild(deviceElement);

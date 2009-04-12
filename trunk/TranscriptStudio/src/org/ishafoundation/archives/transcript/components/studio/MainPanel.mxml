@@ -451,7 +451,7 @@
 				var popup:TranscriptsToImportSelectorDialog = TranscriptsToImportSelectorDialog.display(this, databaseMgr);
 				popup.addEventListener(TranscriptsToImportSelectorDialog.FILES_IMPORTED, function(evt:Event):void {
 					var importedSessionXML:XML = MSWordImporter.createSessionElement(popup.selectedAudioTranscripts);
-					var importedDeviceElements:XMLList = importedSessionXML.devices.device;
+					var importedDeviceElements:XMLList = importedSessionXML..device;
 					var importedTranscriptElement:XML = importedSessionXML.transcript[0];
 					session.appendTranscript(importedTranscriptElement, importedDeviceElements);
 					storeSession();
@@ -523,7 +523,7 @@
 				}
 				else if ( actionName == "showMediaPlayer" ) {					
 					var mediaPlayerDialog:MediaPlayerDialog = MediaPlayerDialog.display(this);
-					mediaPlayerDialog.devicesElement = session.sessionXML.devices[0];
+					mediaPlayerDialog.mediaMetadataElement = session.sessionXML.mediaMetadata[0];
 				}
 				else if ( actionName == "showMarkupPropertiesPane" ) {
 					var showMarkupProps:Boolean = menuItemElement.@toggled.toString() == "true";
