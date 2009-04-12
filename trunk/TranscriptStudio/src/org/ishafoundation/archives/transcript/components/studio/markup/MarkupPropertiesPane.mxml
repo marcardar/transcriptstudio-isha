@@ -193,14 +193,14 @@
 			}
 		}
 		
-		private function commentChanged():void {
+		private function notesChanged():void {
 			if (this.markupAttrs == null) {
 				// it is possible this is called after the pane has been cleared/disabled because focusOut happens later
 				return;
 			}
-			var newText:String = StringUtil.trim(commentTextArea.text);
-			if (newText != this.markupAttrs.comment) {
-				this.markupAttrs.comment = newText; 
+			var newText:String = StringUtil.trim(notesTextArea.text);
+			if (newText != this.markupAttrs.notes) {
+				this.markupAttrs.notes = newText; 
 				somePropertyChanged();
 			}
 		}
@@ -265,8 +265,8 @@
 		<mx:VBox width="100%" height="100%" verticalGap="0" horizontalAlign="center">
 			<mx:Label text="Content summary" width="100%"/>
 			<mx:TextArea id="summaryTextArea" width="100%" height="50%" minHeight="32" editable="{allowMarkupEdit}" text="{this.markupAttrs.summary}" focusOut="summaryChanged()"/>
-			<mx:Label width="100%" textAlign="left" text="Comments"/>
-			<mx:TextArea id="commentTextArea" width="100%" height="50%" minHeight="32" editable="{allowMarkupEdit}" text="{this.markupAttrs.comment}" focusOut="commentChanged()"/>
+			<mx:Label width="100%" textAlign="left" text="Notes"/>
+			<mx:TextArea id="notesTextArea" width="100%" height="50%" minHeight="32" editable="{allowMarkupEdit}" text="{this.markupAttrs.notes}" focusOut="notesChanged()"/>
 			<mx:HBox horizontalGap="20" paddingTop="5">
 				<mx:Button id="revertButton" label="Revert Properties" enabled="{allowMarkupEdit &amp;&amp; committedMarkupAttrs != null &amp;&amp; !markupAttrs.equals(committedMarkupAttrs)}" click="revertClicked()"/>
 				<mx:Button id="removeButton" label="Remove Markup" enabled="{allowMarkupEdit}" click="removeClicked()"/>

@@ -348,7 +348,7 @@ package org.ishafoundation.archives.transcript.importer
 
  				// session - allow multiple dates to pile up because dates are in a special format
  				extractAttributeFromHeader(contentElement, sessionElement, ["DATE"], true, SessionProperties.START_AT_ATTR_NAME, false); 
- 				extractAttributeFromHeader(contentElement, sessionElement, ["NOTES", "NOTE"], false, SessionProperties.COMMENT_ATTR_NAME, false);
+ 				extractAttributeFromHeader(contentElement, sessionElement, ["NOTES", "NOTE"], false, SessionProperties.NOTES_ATTR_NAME, false);
 				
 				// event
  				var newValue:String = extractAttributeFromHeader(contentElement, eventElement, ["LOCATION"], false, EventProperties.VENUE_ATTR_NAME, false);
@@ -513,9 +513,9 @@ package org.ishafoundation.archives.transcript.importer
  					// HACK TIME
  					if (attrName == EventProperties.START_AT_ATTR_NAME || attrName == EventProperties.TYPE_ATTR_NAME) {
  						// we have conflicting data
- 						var comment:String = XMLUtils.getAttributeValue(targetElement, EventProperties.COMMENT_ATTR_NAME, "");
- 						comment += "\nInconsistent " + attrName + ": " + attrValue.toString(); 
- 						XMLUtils.setAttributeValue(targetElement, EventProperties.COMMENT_ATTR_NAME, comment);
+ 						var notes:String = XMLUtils.getAttributeValue(targetElement, EventProperties.NOTES_ATTR_NAME, "");
+ 						notes += "\nInconsistent " + attrName + ": " + attrValue.toString(); 
+ 						XMLUtils.setAttributeValue(targetElement, EventProperties.NOTES_ATTR_NAME, notes);
  						continue;
  					}
  					else {

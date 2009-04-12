@@ -182,7 +182,7 @@
 							</w:p>
 							<w:p w:rsidR="00BD70D3" w:rsidRDefault="00BD70D3" w:rsidP="00CB5E63">
 								<w:r>
-                                    <w:t xml:space="preserve">NOTES: <xsl:value-of select="/session/metadata/@comment"/>
+                                    <w:t xml:space="preserve">NOTES: <xsl:value-of select="/session/metadata/@notes"/>
 									</w:t>
 								</w:r>
 							</w:p>

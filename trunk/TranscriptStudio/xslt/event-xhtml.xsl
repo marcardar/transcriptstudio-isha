@@ -63,9 +63,9 @@
                     </td>
                 </tr>
 				<tr>
-                    <td align="right">Comment:</td>
+                    <td align="right">Notes:</td>
                     <td>
-                        <xsl:value-of select="(metadata/@comment, '&lt;not set&gt;')[1]"/>
+                        <xsl:value-of select="(metadata/@notes, '&lt;not set&gt;')[1]"/>
                     </td>
                 </tr>
 			</table>
@@ -74,7 +74,7 @@
 			<h2 style="text-align:center;font-size:22;">
 				<xsl:value-of select="string-join(//media/@id, ', ')"/>
 				<xsl:text>: </xsl:text>
-				<xsl:value-of select="/session/@name"/>
+				<xsl:value-of select="/session/@subTitle"/>
 				<xsl:value-of select="concat(' (',/session/@startAt,')')"/>
 			</h2>
 			<br/>

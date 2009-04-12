@@ -105,14 +105,14 @@ package org.ishafoundation.archives.transcript.importer
 					}
 				}
 				// the session notes can contain information about the imported file(s)
-				appendSessionCommentLine("\rImported file:", metadataElement);
-				appendAttributesToSessionComment(audioTranscript.audioTranscriptElement, metadataElement);
+				appendSessionNotesLine("\rImported file:", metadataElement);
+				appendAttributesToSessionNotes(audioTranscript.audioTranscriptElement, metadataElement);
 			}
 			return sessionElement;
 		}
 		
-		private static function appendAttributesToSessionComment(audioTranscriptElement:XML, metadataElement:XML):void {
-			appendSessionCommentLine("", metadataElement);
+		private static function appendAttributesToSessionNotes(audioTranscriptElement:XML, metadataElement:XML):void {
+			appendSessionNotesLine("", metadataElement);
 			var attrNames:Array = []
 			for each (var attr:XML in audioTranscriptElement.@*) {
 				// but put "filename" and "name" at front
@@ -128,19 +128,19 @@ package org.ishafoundation.archives.transcript.importer
 				if (attrName.indexOf("_") == 0) {
 					attrName = attrName.substring(1);
 				}
-				appendSessionCommentLine(attrName + ": " + audioTranscriptElement.attribute(attrName), metadataElement);
+				appendSessionNotesLine(attrName + ": " + audioTranscriptElement.attribute(attrName), metadataElement);
 			}
 		}
 		
-		private static function appendSessionCommentLine(text:String, metadataElement:XML):void {
+		private static function appendSessionNotesLine(text:String, metadataElement:XML):void {
 			/*text = Utils.normalizeSpace(text);
 			if (text.length == 0) {
 				return;
 			}*/
-			var comment:String = XMLUtils.getAttributeValue(metadataElement, SessionProperties.COMMENT_ATTR_NAME, "");
-			comment += "\r"
-			comment += text;
-			XMLUtils.setAttributeValue(metadataElement, SessionProperties.COMMENT_ATTR_NAME, comment);
+			var notes:String = XMLUtils.getAttributeValue(metadataElement, SessionProperties.NOTES_ATTR_NAME, "");
+			notes += "\r"
+			notes += text;
+			XMLUtils.setAttributeValue(metadataElement, SessionProperties.NOTES_ATTR_NAME, notes);
 		}
 		
 		private function importPathsInternal(names:Array, audioTranscripts:Array, idFunc:Function, successFunc:Function, failureFunc:Function):void {
