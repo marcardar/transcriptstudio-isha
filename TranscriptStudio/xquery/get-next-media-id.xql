@@ -5,6 +5,7 @@ declare namespace get-next-media-id = "http://www.ishafoundation.org/ts4isha/xqu
 declare option exist:serialize "media-type=text/plain";
 
 import module namespace id-utils = "http://www.ishafoundation.org/ts4isha/xquery/id-utils" at "id-utils.xqm";
+import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
  
 declare function get-next-media-id:extract-integer($str as xs:string?) as xs:integer?
 {
@@ -29,7 +30,7 @@ return
 				'startDigitalImageId'
 			else
 				error(concat('Unknown domain: ', $domain))
-		let $minIdInt := collection('/db/ts4isha/reference')/reference//eventType[@id eq $prefix]/get-next-media-id:extract-integer(@*[local-name(.) = $startDigitalAttrName])
+		let $minIdInt := utils:get-event-type($prefix)/get-next-media-id:extract-integer(@*[local-name(.) = $startDigitalAttrName])
 		let $nextIdInt := max(($maxIdInt + 1, $minIdInt))
 		return
-			$nextIdInt
+			$nextIdInt		

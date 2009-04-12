@@ -36,29 +36,30 @@ package org.ishafoundation.archives.transcript.model
 	{
 		private var username:String;
 		private var referenceMgr:ReferenceManager;
-		private var xmlRetrieverStorer:XMLRetrieverStorer;		
+		private var xmlRetriever:XMLRetriever;
+		private var xqueryExecutor:XQueryExecutor;
 		
-		public function SessionManager(username:String, referenceMgr:ReferenceManager, xmlRetrieverStorer:XMLRetrieverStorer)
+		public function SessionManager(username:String, referenceMgr:ReferenceManager, databaseMgr:DatabaseManager)
 		{
 			this.username = username;
 			this.referenceMgr = referenceMgr;
-			this.xmlRetrieverStorer = xmlRetrieverStorer;
+			this.xmlRetriever = databaseMgr;
+			this.xqueryExecutor = databaseMgr;
 		}
 		
-		public function createSession(sessionXML:XML, eventProps:EventProperties, successFunc:Function, failureFunc:Function):Session {
-			var result:Session = new Session(sessionXML, eventProps, referenceMgr);
-			result.unsavedChanges = true; // need to save all this stuff			
-			storeSession(result, function():void {
-				successFunc();
+		public function createSession(sessionXML:XML, eventProps:EventProperties, successFunc:Function, failureFunc:Function):void {
+			DatabaseManagerUtils.createSession(eventProps.id, sessionXML.metadata[0], xqueryExecutor, function(sessionXML:XML):void {
+				var result:Session = new Session(sessionXML, eventProps, referenceMgr);
+				result.unsavedChanges = true; // need to save all this stuff
+				successFunc(result);
 			}, failureFunc);
-			return result;
 		} 
 		
 		public function retrieveSession(sessionId:String, eventProps:EventProperties, externalSuccess:Function, externalFailure:Function):void {
 			if (sessionId == null || StringUtil.trim(sessionId).length == 0) {
 				throw new Error("Passed a blank sessionId");
 			}
-			DatabaseManagerUtils.retrieveSessionXML(sessionId, xmlRetrieverStorer, function(sessionXML:XML):void {
+			DatabaseManagerUtils.retrieveSessionXML(sessionId, xmlRetriever, function(sessionXML:XML):void {
 				trace("Successfully retrieved session");
 				var session:Session = openSessionForEvent(sessionXML, eventProps);
 				externalSuccess(session);		
@@ -75,14 +76,13 @@ package org.ishafoundation.archives.transcript.model
 			return new Session(sessionXML, eventProps, referenceMgr);
 		}
 			
-		public function storeSession(session:Session, externalSuccess:Function, externalFailure:Function):void {
+		public function updateSessionInDatabase(session:Session, externalSuccess:Function, externalFailure:Function):void {
 			if (session.id == null) {
 				throw new Error("Tried to store session but either the collection or transcript id was not set");
 			}
 			setActionAttributes(session);
-			xmlRetrieverStorer.storeXML(session.sessionXML, function(sessionId:String):void {
-				trace("Successfully saved transcript");
-				session.id = sessionId;
+			DatabaseManagerUtils.updateSession(session.id, session.metadata.metadataElement, session.mediaMetadataElement, session.transcript.mdoc.nodeElement, xqueryExecutor, function(msg:String):void {
+				trace("Successfully saved transcript: " + msg);
 				session.unsavedChanges = false;
 				externalSuccess();
 			}, externalFailure);

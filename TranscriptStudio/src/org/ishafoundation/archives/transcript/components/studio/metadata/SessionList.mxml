@@ -2,6 +2,8 @@
 <mx:List xmlns:mx="http://www.adobe.com/2006/mxml" labelFunction="{itemLabelFunc}">
 	<mx:Script>
 	<![CDATA[
+		import mx.controls.Alert;
+		import name.carter.mark.flex.util.XMLUtils;
 		import org.ishafoundation.archives.transcript.model.EventProperties;
 		import mx.rpc.http.HTTPService;
 		import org.ishafoundation.archives.transcript.model.SessionProperties;
@@ -36,15 +38,20 @@
 			return selectedItem as SessionProperties;
 		}
 		
-		public function refresh(sessionId:String):void {
+		public function refresh(selectedSessionId:String):void {
 			xqueryExecutor.executeStoredXQuery("retrieve-session-props.xql", {eventId:eventProps.id}, function(returnVal:XML):void {
 				var sessionPropsElements:XMLList = returnVal.*;
 				var arr:Array = [];
 				var propsToSelect:SessionProperties;
 				for each (var sessionPropsElement:XML in sessionPropsElements) {
-					var props:SessionProperties = new SessionProperties(sessionPropsElement);
+					var sessionId:String = XMLUtils.getAttributeValue(sessionPropsElement, "_sessionId");
+					if (sessionId == null) {
+						Alert.show("Session metadata does not have a corresponding session id");
+						continue;
+					}
+					var props:SessionProperties = new SessionProperties(sessionPropsElement, eventProps.id, sessionId);
 					arr.push(props);
-					if (props.id == sessionId) {
+					if (sessionId == selectedSessionId) {
 						propsToSelect = props;
 					}
 				}
@@ -65,7 +72,7 @@
 		}
 		
 		private function itemLabelFunc(sessionProps:SessionProperties):String {
-			return sessionProps.getFullName(eventProps.startAt);
+			return sessionProps.getFullName(eventProps);
 		}		
 	]]>
 	</mx:Script>

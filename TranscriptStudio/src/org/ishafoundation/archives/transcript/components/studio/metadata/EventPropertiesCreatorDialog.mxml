@@ -2,6 +2,7 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Create Event" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*">
 	<mx:Script>
 	<![CDATA[
+		import org.ishafoundation.archives.transcript.db.DatabaseManagerUtils;
 		import org.ishafoundation.archives.transcript.db.XMLStorer;
 		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
 		import mx.events.FlexEvent;
@@ -13,16 +14,21 @@
 		
 		public static const EVENT_EDITED:String = "EVENT_EDITED";
 		
-		private var xmlStorer:XMLStorer;
+		private var xqueryExecutor:XQueryExecutor;
 		
-		public static function display(parent:DisplayObject, xmlStorer:XMLStorer, referenceMgr:ReferenceManager, eventProps:EventProperties):EventPropertiesCreatorDialog {
+		public static function display(parent:DisplayObject, xqueryExecutor:XQueryExecutor, referenceMgr:ReferenceManager, eventProps:EventProperties):EventPropertiesCreatorDialog {
 			var result:EventPropertiesCreatorDialog = new EventPropertiesCreatorDialog();
-			result.xmlStorer = xmlStorer;
+			result.xqueryExecutor = xqueryExecutor;
 			PopUpManager.addPopUp(result, parent, true);
 			result.eventPropertiesPane.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
 				result.eventPropertiesPane.referenceMgr = referenceMgr;
 				result.eventPropertiesPane.callLater(function():void {
-					result.eventPropertiesPane.eventProps = eventProps == null ? new EventProperties(<event type="a"/>) : eventProps;
+					if (eventProps == null) {
+						result.eventPropertiesPane.eventProps = new EventProperties(<metadata/>, 'a');
+					}
+					else {
+						result.eventPropertiesPane.eventProps = eventProps;
+					}
 				});
 			}, true);
 			return result;
@@ -33,8 +39,8 @@
 		}
 		
 		private function okClicked():void {
-			xmlStorer.storeXML(eventProps.eventElement, function(eventId:String):void {
-				eventProps.id = eventId;
+			DatabaseManagerUtils.createEvent(eventProps.type, eventProps.eventMetadataElement, xqueryExecutor, function(eventXML:XML):void {
+				eventProps.id = eventXML.@id;
 				closeMe();
 				dispatchEvent(new Event(EVENT_EDITED));
 			}, function (msg:String):void {

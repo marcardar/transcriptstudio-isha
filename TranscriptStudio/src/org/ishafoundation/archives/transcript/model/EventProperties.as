@@ -24,20 +24,35 @@ package org.ishafoundation.archives.transcript.model
 		public static const TYPES:Array = createTypesArray();
 		private static const DATE_FORMATTER:DateFormatter = DateUtils.createDateFormatter("DD-MMM-YY");
 		
-		public var eventElement:XML;
+		public var eventMetadataElement:XML;
+		private var _type:String;
+		private var _id:String;
 		
-		public function EventProperties(eventElement:XML = null)
+		public function EventProperties(eventMetadataElement:XML, eventType:String, eventId:String = null)
 		{
-			if (eventElement == null) {
-				this.eventElement = <event/>;
+			if (eventMetadataElement == null) {
+				this.eventMetadataElement = <metadata/>;
+			}
+			else if (eventMetadataElement.localName() != "metadata") {
+				throw new Error("Passed an invalid event metadata element: " + eventMetadataElement.localName());
 			}
 			else {
-				this.eventElement = eventElement;
+				this.eventMetadataElement = eventMetadataElement;
+			}
+			this.type = eventType;
+			if (eventId != null) {
+				this.id = eventId;
 			}
 		}
 		
+		public static function createInstance(eventXML:XML):EventProperties {
+			var eventType:String = eventXML.@type;
+			var eventId:String = XMLUtils.getAttributeValue(eventXML, "id", null);
+			return new EventProperties(eventXML.metadata[0], eventType, eventId);
+		}
+		
 		public function copy():EventProperties {
-			return new EventProperties(eventElement.copy());
+			return new EventProperties(eventMetadataElement.copy(), type, id);
 		}
 
 		private static function createTypesArray():Array {
@@ -49,101 +64,101 @@ package org.ishafoundation.archives.transcript.model
 		}
 
 		public function get path():String {
-			var result:String = eventElement.attribute("_document-uri");
+			var result:String = eventMetadataElement.attribute("_document-uri");
 			return result;
 		}
 		
 		[Bindable]
 		public function get id():String {
-			return XMLUtils.getAttributeValue(eventElement, ID_ATTR_NAME);
+			return this._id;
 		}
 		
 		public function set id(newValue:String):void {
 			if (newValue == null || StringUtil.trim(newValue).length == 0) {
 				throw new Error("Passed a blank event id");
 			} 
-			XMLUtils.setAttributeValue(eventElement, ID_ATTR_NAME, newValue);
+			this._id = newValue;
 		}
 		
 		[Bindable]
 		public function get subTitle():String {
-			return XMLUtils.getAttributeValue(eventElement, SUB_TITLE_ATTR_SUB_TITLE);			
+			return XMLUtils.getAttributeValue(eventMetadataElement, SUB_TITLE_ATTR_SUB_TITLE);			
 		}
 		
 		public function set subTitle(newValue:String):void {
-			XMLUtils.setAttributeValue(eventElement, SUB_TITLE_ATTR_SUB_TITLE, newValue);
+			XMLUtils.setAttributeValue(eventMetadataElement, SUB_TITLE_ATTR_SUB_TITLE, newValue);
 		}
 		
 		[Bindable]
 		public function get type():String {
-			return XMLUtils.getAttributeValue(eventElement, TYPE_ATTR_NAME);			
+			return _type;			
 		}
 		
 		public function set type(newValue:String):void {
-			XMLUtils.setAttributeValue(eventElement, TYPE_ATTR_NAME, newValue);
+			this._type = newValue;
 		}
 		
 		[Bindable]
 		public function get startAt():Date {
-			return XMLUtils.getAttributeAsDate(eventElement, START_AT_ATTR_NAME);
+			return XMLUtils.getAttributeAsDate(eventMetadataElement, START_AT_ATTR_NAME);
 		}
 		
 		public function set startAt(newValue:Date):void {
-			XMLUtils.setAttributeAsDate(eventElement, START_AT_ATTR_NAME, newValue, false);
+			XMLUtils.setAttributeAsDate(eventMetadataElement, START_AT_ATTR_NAME, newValue, false);
 		}
 		
 		[Bindable]
 		public function get endAt():Date {
-			return XMLUtils.getAttributeAsDate(eventElement, END_AT_ATTR_NAME);
+			return XMLUtils.getAttributeAsDate(eventMetadataElement, END_AT_ATTR_NAME);
 		}
 		
 		public function set endAt(newValue:Date):void {
-			XMLUtils.setAttributeAsDate(eventElement, END_AT_ATTR_NAME, newValue, false);
+			XMLUtils.setAttributeAsDate(eventMetadataElement, END_AT_ATTR_NAME, newValue, false);
 		}
 		
 		[Bindable]
 		public function get country():String {
-			return XMLUtils.getAttributeValue(eventElement, COUNTRY_ATTR_NAME);
+			return XMLUtils.getAttributeValue(eventMetadataElement, COUNTRY_ATTR_NAME);
 		}
 		
 		public function set country(newValue:String):void {
-			XMLUtils.setAttributeValue(eventElement, COUNTRY_ATTR_NAME, newValue);
+			XMLUtils.setAttributeValue(eventMetadataElement, COUNTRY_ATTR_NAME, newValue);
 		}
 		
 		[Bindable]
 		public function get location():String {
-			return XMLUtils.getAttributeValue(eventElement, LOCATION_ATTR_NAME);
+			return XMLUtils.getAttributeValue(eventMetadataElement, LOCATION_ATTR_NAME);
 		}
 		
 		public function set location(newValue:String):void {
-			XMLUtils.setAttributeValue(eventElement, LOCATION_ATTR_NAME, newValue);
+			XMLUtils.setAttributeValue(eventMetadataElement, LOCATION_ATTR_NAME, newValue);
 		}
 		
 		[Bindable]
 		public function get venue():String {
-			return XMLUtils.getAttributeValue(eventElement, VENUE_ATTR_NAME);
+			return XMLUtils.getAttributeValue(eventMetadataElement, VENUE_ATTR_NAME);
 		}
 		
 		public function set venue(newValue:String):void {
-			XMLUtils.setAttributeValue(eventElement, VENUE_ATTR_NAME, newValue);
+			XMLUtils.setAttributeValue(eventMetadataElement, VENUE_ATTR_NAME, newValue);
 		}
 		
 		[Bindable]
 		public function get language():String {
-			return XMLUtils.getAttributeValue(eventElement, LANGUAGE_ATTR_NAME, LANGUAGE_DEFAULT);
+			return XMLUtils.getAttributeValue(eventMetadataElement, LANGUAGE_ATTR_NAME, LANGUAGE_DEFAULT);
 		}
 		
 		public function set language(newValue:String):void {
-			XMLUtils.setAttributeValue(eventElement, LANGUAGE_ATTR_NAME, newValue, LANGUAGE_DEFAULT);
+			XMLUtils.setAttributeValue(eventMetadataElement, LANGUAGE_ATTR_NAME, newValue, LANGUAGE_DEFAULT);
 		}
 		
 		[Bindable]
 		public function get comment():String {
-			return XMLUtils.getAttributeValue(eventElement, COMMENT_ATTR_NAME);
+			return XMLUtils.getAttributeValue(eventMetadataElement, COMMENT_ATTR_NAME);
 		}
 		
 		public function set comment(newValue:String):void {
-			XMLUtils.setAttributeValue(eventElement, COMMENT_ATTR_NAME, newValue);
+			XMLUtils.setAttributeValue(eventMetadataElement, COMMENT_ATTR_NAME, newValue);
 		}
 
 		/**

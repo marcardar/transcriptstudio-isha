@@ -3,16 +3,17 @@ package org.ishafoundation.archives.transcript.model
 	import mx.binding.utils.ChangeWatcher;
 	import mx.events.PropertyChangeEvent;
 	
-	import name.carter.mark.flex.util.XMLUtils;
-	
 	public class Session
 	{
 		private static const SOURCE_ID_REG_EXP:RegExp = /^[a-z]+\d+/i;
 		
-		public var sessionXML:XML;
+		public var sessionId:String;
 		public var eventProps:EventProperties;
 
-		public var transcript:Transcript;
+		/** The 3 main components of a session */
+		public var metadata:SessionProperties;
+		public var mediaMetadataElement:XML;
+		private var _transcript:Transcript;
 		
 		private var referenceMgr:ReferenceManager;
 		
@@ -24,30 +25,53 @@ package org.ishafoundation.archives.transcript.model
 			if (sessionXML == null) {
 				throw new ArgumentError("Passed a null sessionXML");
 			}
-			this.sessionXML = sessionXML;
+			this.sessionId = sessionXML.@id;
 			this.eventProps = eventProps;
-			this.referenceMgr = referenceMgr;
+			var sessionId:String;
+			if (sessionXML.hasOwnProperty("@id")) {
+				sessionId = sessionXML.@id;
+			}
+			else {
+				sessionId = null;
+			}
+			this.metadata = new SessionProperties(sessionXML.metadata[0], eventProps.id, sessionId);
+			this.mediaMetadataElement = sessionXML.devices[0];
 			var transcriptXML:XML = sessionXML.transcript[0];
 			if (transcriptXML != null) {
 				this.transcript = new Transcript(transcriptXML, referenceMgr);
-				ChangeWatcher.watch(this.transcript.mdoc, "modified", function(evt:PropertyChangeEvent):void {
-					// only care about positive changes (because negative changes are driven from outside)
-					if (new Boolean(evt.newValue)) {
-						unsavedChanges = true;					
-					}
-				});
 			}
 			else {
 				this.transcript = null;
 			}
+			this.referenceMgr = referenceMgr;
 		}
 		
-		public function get props():SessionProperties {
-			return new SessionProperties(sessionXML);
+		public function set transcript(newValue:Transcript):void {
+			this._transcript = newValue;
+			if (newValue == null) {
+				return;
+			}
+			ChangeWatcher.watch(newValue.mdoc, "modified", function(evt:PropertyChangeEvent):void {
+				// only care about positive changes (because negative changes are driven from outside)
+				if (new Boolean(evt.newValue)) {
+					unsavedChanges = true;
+				}
+			});
 		}
 		
-		public function get path():String {
-			var result:String = sessionXML.attribute("_document-uri");
+		public function get transcript():Transcript {
+			return _transcript;
+		}
+		
+		public function get sessionXML():XML {
+			var result:XML = <session id={sessionId} eventId={eventProps.id}/>;
+			result.appendChild(metadata.metadataElement);
+			if (mediaMetadataElement != null) {
+				result.appendChild(mediaMetadataElement);
+			}
+			if (transcript != null) {
+				result.appendChild(transcript.mdoc.nodeElement);
+			}
 			return result;
 		}
 		
@@ -68,11 +92,7 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		public function get id():String {
-			return sessionXML.@id;
-		}
-		
-		public function set id(newValue:String):void {
-			XMLUtils.setAttributeValue(sessionXML, SessionProperties.ID_ATTR_NAME, newValue);
+			return sessionId;
 		}
 		
 		[Bindable]
@@ -92,15 +112,13 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		public function appendTranscript(transcriptElement:XML, deviceElements:XMLList):void {
-			if (sessionXML.transcript.length() == 0) {
-				if (sessionXML.devices.length() == 0) {
-					sessionXML.insertChildAfter(null, <devices/>);
+			if (transcript == null) {
+				if (this.mediaMetadataElement == null) {
+					mediaMetadataElement = <devices/>;
 				}
-				var devicesElement:XML = sessionXML.devices[0];
 				for each (var deviceElement:XML in deviceElements) {
-					devicesElement.appendChild(deviceElement);
+					mediaMetadataElement.appendChild(deviceElement);
 				}
-				sessionXML.appendChild(transcriptElement);
 				transcript = new Transcript(transcriptElement, this.referenceMgr); 
 			}
 			else {

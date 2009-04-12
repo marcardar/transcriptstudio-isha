@@ -32,14 +32,14 @@
 		
 	   	public static const EVENT_EDITED:String = "EVENT_EDITED";
 	   	
-	   	public var xmlRetrieverStorer:XMLRetrieverStorer;
+	   	public var xqueryExecutor:XQueryExecutor;
 	   	
 	   	[Bindable]
 	   	public var referenceMgr:ReferenceManager;
 	   	
-		public static function display(parent:DisplayObject, xmlRetrieverStorer:XMLRetrieverStorer, referenceMgr:ReferenceManager, eventProps:EventProperties):EventPropertiesEditorDialog {
+		public static function display(parent:DisplayObject, xqueryExecutor:XQueryExecutor, referenceMgr:ReferenceManager, eventProps:EventProperties):EventPropertiesEditorDialog {
 			var result:EventPropertiesEditorDialog = new EventPropertiesEditorDialog();
-			result.xmlRetrieverStorer = xmlRetrieverStorer;
+			result.xqueryExecutor = xqueryExecutor;
 			result.referenceMgr = referenceMgr;
 			PopUpManager.addPopUp(result, parent, true);
 			result.eventPropertiesPane.eventTypeComboBox.enabled = false;
@@ -58,7 +58,8 @@
 		
 		private function editEvent(evt:MouseEvent):void {
 			// need to create the new event file
-			xmlRetrieverStorer.storeXML(eventProps.eventElement, function():void {
+			var params:Object = {id:eventProps.id, metadataXML:eventProps.eventMetadataElement.toXMLString()};
+			xqueryExecutor.executeStoredXQuery("update-event-metadata", params, function():void {
 				closeMe();
 				var evt:Event = new Event(EVENT_EDITED);
 				dispatchEvent(evt);

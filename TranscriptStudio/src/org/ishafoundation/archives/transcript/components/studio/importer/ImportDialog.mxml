@@ -2,6 +2,7 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="600" horizontalAlign="center" title="Event / Session Builder" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*" xmlns:importer="org.ishafoundation.archives.transcript.components.studio.importer.*" creationComplete="init()">
 	<mx:Script>
 	<![CDATA[
+		import name.carter.mark.flex.util.XMLUtils;
 		import mx.binding.utils.BindingUtils;
 		import org.ishafoundation.archives.transcript.components.studio.metadata.EventSelectorDialog;
 		import org.ishafoundation.archives.transcript.components.studio.metadata.SessionPropertiesCreatorDialog;
@@ -35,7 +36,7 @@
 		
 		[Bindable]
 		private var importedEventProps:EventProperties;
-		private var importedSessionProps:SessionProperties;
+		private var importedSessionMetadataElement:XML;
 		private var importedDeviceElements:XMLList;
 		private var importedTranscriptElement:XML;
 		
@@ -72,28 +73,34 @@
 			transcriptsToImportSelectorDialog.addEventListener(TranscriptsToImportSelectorDialog.FILES_IMPORTED, function(evt:Event):void {
 				if (transcriptsToImportSelectorDialog.selectedAudioTranscripts.length == 0) {
 					importedEventProps = null;
-					importedSessionProps = null;
+					importedSessionMetadataElement = null;
 					importedTranscriptElement = null;
 					importedDeviceElements = null;
 				}
 				else {
 					var importedEventXML:XML = MSWordImporter.createEventElement(transcriptsToImportSelectorDialog.selectedAudioTranscripts);
-					importedEventProps = new EventProperties(importedEventXML);
+					var importedEventMetadataElement:XML = importedEventXML.metadata[0];
 					var importedSessionXML:XML = MSWordImporter.createSessionElement(transcriptsToImportSelectorDialog.selectedAudioTranscripts);
-					importedSessionProps = new SessionProperties(importedSessionXML);
 					importedDeviceElements = importedSessionXML.devices.device;
-					delete importedSessionXML.devices;
 					importedTranscriptElement = importedSessionXML.transcript[0];
-					delete importedSessionXML.transcript;
-					if (importedEventProps.startAt == null) {
-						importedEventProps.startAt = importedSessionProps.startAt;
-					}
-					if (importedEventProps.endAt == null) {
-						importedEventProps.endAt = importedEventProps.startAt;
-					}
+
+					setMissingAttributeValue(importedEventMetadataElement, EventProperties.START_AT_ATTR_NAME, importedSessionXML.metadata.@startAt);
+					setMissingAttributeValue(importedEventMetadataElement, EventProperties.END_AT_ATTR_NAME, importedSessionXML.metadata.@startAt);
+
+					importedEventProps = EventProperties.createInstance(importedEventXML);
+					importedSessionMetadataElement = importedSessionXML.metadata[0];
 				}
 				transcriptsToImportList.dataProvider = transcriptsToImportSelectorDialog.selectedPaths;
 			});
+		}
+		
+		private function setMissingAttributeValue(metadataElement:XML, attrName:String, attrValue:String):void {
+			if (attrValue == null || attrValue.toString() == "") {
+				return;
+			}
+			if (XMLUtils.getAttributeValue(metadataElement, attrName) == null) {
+				XMLUtils.setAttributeValue(metadataElement, attrName, attrValue);
+			}
 		}
 			
 		private function eventSelectorHandler():void {
@@ -124,13 +131,19 @@
 		}
 		
 		private function sessionCreatorHandler():void {
-			var templateProps:SessionProperties = importedSessionProps == null ? null : importedSessionProps.copy();
-			var sessionCreatorDialog:SessionPropertiesCreatorDialog = SessionPropertiesCreatorDialog.display(this, databaseMgr, referenceMgr, eventProps, templateProps);
+			var templateSessionMetadataElement:XML;
+			if (importedSessionMetadataElement == null) {
+				templateSessionMetadataElement = <metadata/>
+			} 
+			else {
+				templateSessionMetadataElement = importedSessionMetadataElement.copy();
+			}
+			var sessionCreatorDialog:SessionPropertiesCreatorDialog = SessionPropertiesCreatorDialog.display(this, databaseMgr, referenceMgr, eventProps.id, templateSessionMetadataElement);
 			sessionCreatorDialog.addEventListener(SessionPropertiesCreatorDialog.SESSION_EDITED, function(evt:Event):void {
 				var newSessionProps:SessionProperties = sessionCreatorDialog.sessionProps;
-				sessionList.refresh(newSessionProps.id);
-				status = "Successfully created session: " + newSessionProps.id;
-				Alert.show("Session ID: " + newSessionProps.id, "Successfully created session");
+				sessionList.refresh(newSessionProps.sessionId);
+				status = "Successfully created session: " + newSessionProps.sessionId;
+				Alert.show("Session ID: " + newSessionProps.sessionId, "Successfully created session");
 			});
 		}
 		
@@ -147,7 +160,7 @@
 		}
 		
 		private function sessionListLabelFunc(sessionProps:SessionProperties):String {
-			return sessionProps.getFullName(eventProps.startAt);
+			return sessionProps.getFullName(eventProps);
 		}
 		
 		private function get sessionProps():SessionProperties {
@@ -177,8 +190,8 @@
 				dispatchEvent(new Event(IMPORT_CLICKED));
 				closeMe();
 			}, function(msg:String):void {
-				Alert.show(msg, "Could not retrieve selected session: " + sessionProps.id);
-			}, "session", sessionProps.id, DatabaseConstants.DATA_COLLECTION_PATH);
+				Alert.show(msg, "Could not retrieve selected session: " + sessionProps.sessionId);
+			}, "session", sessionProps.sessionId, DatabaseConstants.DATA_COLLECTION_PATH);
 		}
 		
 		/*private function fixMediaUUIDs():void {
@@ -243,7 +256,7 @@
 	</mx:HBox>
 	<mx:HBox width="100%" verticalAlign="middle" paddingTop="20">
 		<mx:Label text="Session:" width="60"/>
-		<mx:Label text="{sessionList.selectedItem == null ? '&lt;Nothing selected&gt;' : 'ID: ' + sessionList.selectedItem.id}"/>
+		<mx:Label text="{sessionList.selectedItem == null ? '&lt;Nothing selected&gt;' : 'ID: ' + (sessionList.selectedItem as  SessionProperties).sessionId}"/>
 		<mx:Spacer height="100%" width="100%"/>
 		<mx:Button label="New..." id="newSessionButton" enabled="{eventProps != null}" click="sessionCreatorHandler()"/>
 	</mx:HBox>

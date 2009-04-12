@@ -6,9 +6,9 @@
 	<xsl:template match="/">
 		<div style="font-size:20;margin-bottom:100px;width:750px;margin-left:auto;margin-right:auto;text-align:left;">
 			<h2 style="text-align:center;font-size:22;">
-				<xsl:value-of select="/session/@subTitle"/>
-				<xsl:if test="exists(/session/@startAt)">
-					<xsl:value-of select="concat(' (',/session/@startAt,')')"/>
+				<xsl:value-of select="/session/metadata/@subTitle"/>
+				<xsl:if test="exists(/session/metadata/@startAt)">
+					<xsl:value-of select="concat(' (',/session/metadata/@startAt,')')"/>
 				</xsl:if>
 				<!-- is there a cleaner way to sort the ids? -->
 				<!--xsl:value-of select="string-join(//device/audio/@id, ', ')"/-->

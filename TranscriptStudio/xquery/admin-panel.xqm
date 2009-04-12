@@ -66,7 +66,7 @@ if (utils:is-current-user-admin()) then
 		</div>
 	)
 else
-	error('Only admin user allowed to use admin panel')
+	error((), 'Only admin user allowed to use admin panel')
 };
 
 declare function admin-panel:process-find-max-id($domain as xs:string, $prefix as xs:string?) as element()*
