@@ -17,20 +17,20 @@ let $result :=
 	if (not(exists($year)) or $year = '[any]') then
 		$result
 	else if ($yearType = 'before') then
-		$result[exists(@startAt) and substring(@startAt, 1, 4) < $year]
+		$result[exists(metadata/@startAt) and substring(metadata/@startAt, 1, 4) < $year]
 	else if ($yearType = 'after') then
-		$result[exists(@startAt) and substring(@startAt, 1, 4) > $year]
+		$result[exists(metadata/@startAt) and substring(metadata/@startAt, 1, 4) > $year]
 	else
-		$result[exists(@startAt) and starts-with(@startAt, $year)]
+		$result[exists(metadata/@startAt) and starts-with(metadata/@startAt, $year)]
 let $result :=
 	if (not(exists($country)) or $country = '[any]') then
 		$result
 	else
-		$result[lower-case(@country) = $country]
+		$result[lower-case(metadata/@country) = $country]
 return
 	<result> 
 		{for $event in $result
-		 order by exists($event/@startAt), $event/@startAt, $event/@id
+		 order by exists($event/metadata/@startAt), $event/metadata/@startAt, $event/@id
 		 return
 		 	$event
 		}
