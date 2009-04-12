@@ -14,7 +14,7 @@ declare function id-utils:generate-event-id($eventType as xs:string) as xs:strin
 
 declare function id-utils:generate-session-id($eventId as xs:string) as xs:string?
 {
-	id-utils:generate-id('session', concat($eventId, '-'))
+	id-utils:generate-id('session', $eventId)
 };
 
 declare function id-utils:generate-id($tagName as xs:string, $prefix as xs:string) as xs:string
@@ -50,5 +50,5 @@ declare function id-utils:get-id-integer-component($id as xs:string?, $prefix as
 		let $afterNumber := replace($afterPrefix, '\d+', '')
 		let $number := substring($afterPrefix, 1, string-length($afterPrefix) - string-length($afterNumber))
 		return
-			util:catch('java.lang.Exception', xs:integer($number), ()) 
+			util:catch('java.lang.Exception', xs:integer($number), -1) 
 };
