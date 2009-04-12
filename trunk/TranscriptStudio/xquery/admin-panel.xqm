@@ -19,6 +19,11 @@ if (utils:is-current-user-admin()) then
 	,
 		let $domain := request:get-parameter('domain', ())
 		let $prefix := request:get-parameter('prefix', ())
+		let $prefix :=
+			if (empty($prefix) or $prefix eq '' or substring($prefix, string-length($prefix), 1) eq '-') then
+				$prefix
+			else
+				concat($prefix, '-')
 		let $uploadedFilename := request:get-uploaded-file-name("upload-media-metadata")
 		return
 		<div class="panel">
@@ -74,14 +79,17 @@ declare function admin-panel:process-find-max-id($domain as xs:string, $prefix a
 	if (not(exists($prefix)) or normalize-space($prefix) = '') then
 		<span>Cannot specify blank prefix</span>
 	else
-		(:let $intValue := util:catch('java.lang.Exception', xs:integer($prefix), ()) 
+		let $maxIdInteger := id-utils:get-max-id-integer($domain, $prefix)
 		return
-			if (exists($intValue)) then
-				<span>Cannot specify integer value for prefix</span>
-			else:)
-				let $maxId := id-utils:get-max-id($domain, $prefix, 0)
-				return
-					<p>Max id for domain '{<b>{$domain}</b>}' with prefix '{<b>{$prefix}</b>}' is: {<b>{$maxId}</b>}</p> 
+			if (empty($maxIdInteger)) then
+				<p>No ids found for domain '{<b>{$domain}</b>}' with prefix '{<b>{$prefix}</b>}'</p>
+			else
+				if ($maxIdInteger < 0) then
+					<p>{$domain}/@id does not support prefix: {$prefix}</p>
+				else
+					let $maxId := concat($prefix, $maxIdInteger)
+					return
+						<p>Max id for domain '{<b>{$domain}</b>}' with prefix '{<b>{$prefix}</b>}' is: {<b>{$maxId}</b>}</p>
 };
 
 declare function admin-panel:process-upload-media-metadata($uploadedFilename as xs:string) as element()*

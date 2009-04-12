@@ -69,7 +69,10 @@ package org.ishafoundation.archives.transcript.importer
 			
 			this.audioTranscriptElement = <audioTranscript filename={importName}/>;
 			var importedBy:String = Utils.getClassName(this) + "-v" + ApplicationUtils.getApplicationVersion();
-			this.mediaElement = <audio id={sourceId}/>;
+			var audioIdInt:String = sourceId.replace(/\D/, '');
+			var prefix:String = sourceId.replace(/\d+.*/, '');
+			var mediaId:String = prefix + "-" + audioIdInt; 
+			this.mediaElement = <audio id={mediaId}/>;
 			this.sessionElement = <session/>;
 			this.eventElement = <event {EventProperties.TYPE_ATTR_NAME}={eventType}/>;
 
