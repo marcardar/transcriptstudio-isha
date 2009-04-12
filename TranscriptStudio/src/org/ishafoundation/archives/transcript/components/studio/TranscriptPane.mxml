@@ -53,7 +53,7 @@
 		import org.ishafoundation.archives.transcript.util.*;
 		
 		public static const MAX_START_TEXT_LENGTH:int = 140;
-		public static const MAX_COMMENT_LENGTH:int = 140;
+		public static const MAX_NOTES_LENGTH:int = 140;
 		
 		[Bindable]
 		public var referenceMgr:ReferenceManager;

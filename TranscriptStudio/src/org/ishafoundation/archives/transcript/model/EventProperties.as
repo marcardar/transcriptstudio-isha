@@ -19,7 +19,7 @@ package org.ishafoundation.archives.transcript.model
 		public static const VENUE_ATTR_NAME:String = "venue";
 		public static const LANGUAGE_ATTR_NAME:String = "language";
 		public static const LANGUAGE_DEFAULT:String = "english";
-		public static const COMMENT_ATTR_NAME:String = "comment";
+		public static const NOTES_ATTR_NAME:String = "notes";
 		
 		public static const TYPES:Array = createTypesArray();
 		private static const DATE_FORMATTER:DateFormatter = DateUtils.createDateFormatter("DD-MMM-YY");
@@ -153,12 +153,12 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		[Bindable]
-		public function get comment():String {
-			return XMLUtils.getAttributeValue(eventMetadataElement, COMMENT_ATTR_NAME);
+		public function get notes():String {
+			return XMLUtils.getAttributeValue(eventMetadataElement, NOTES_ATTR_NAME);
 		}
 		
-		public function set comment(newValue:String):void {
-			XMLUtils.setAttributeValue(eventMetadataElement, COMMENT_ATTR_NAME, newValue);
+		public function set notes(newValue:String):void {
+			XMLUtils.setAttributeValue(eventMetadataElement, NOTES_ATTR_NAME, newValue);
 		}
 
 		/**
@@ -217,9 +217,9 @@ package org.ishafoundation.archives.transcript.model
 				result += place;
 			}
 			result += "\nLanguage: " + language; 
-			if (comment != null) {
+			if (notes != null) {
 				result += "\n";
-				result += "Notes: " + comment;
+				result += "Notes: " + notes;
 			}
 			return result;
 		}

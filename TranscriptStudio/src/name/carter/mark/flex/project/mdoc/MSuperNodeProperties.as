@@ -28,7 +28,7 @@ package name.carter.mark.flex.project.mdoc
 		public static const MARKUP_CATEGORY_SUGGESTION_TAG_NAME:String = "markupCategorySuggestion";
 		public static const ADDITIONAL_CONCEPT_TAG_NAME:String = "concept";
 		public static const SUMMARY_PROP_NAME:String = "summary";
-		public static const COMMENT_PROP_NAME:String = "comment";
+		public static const NOTES_PROP_NAME:String = "notes";
 		public static const RATING_PROP_NAME:String = "rating";
 		public static const RATING_PROP_DEFAULT:int = -1;
 		
@@ -44,7 +44,7 @@ package name.carter.mark.flex.project.mdoc
 			markupCategorySuggestion = props.markupCategorySuggestion;
 			additionalConcepts = props.additionalConcepts;
 			summary = props.summary;
-			comment = props.comment;
+			notes = props.notes;
 			rating = props.rating;
 		}
 		
@@ -94,12 +94,12 @@ package name.carter.mark.flex.project.mdoc
 		}
 		
 		[Bindable]
-		public function set comment(newValue:String):void {
-			superNode.setProperty(COMMENT_PROP_NAME, newValue);
+		public function set notes(newValue:String):void {
+			superNode.setProperty(NOTES_PROP_NAME, newValue);
 		}
 		
-		public function get comment():String {
-			return superNode.getPropertyValue(COMMENT_PROP_NAME, "");
+		public function get notes():String {
+			return superNode.getPropertyValue(NOTES_PROP_NAME, "");
 		}
 		
 		[Bindable]
@@ -141,7 +141,7 @@ package name.carter.mark.flex.project.mdoc
 			if (this.summary != guest.summary) {
 				return false;
 			}
-			if (this.comment != guest.comment) {
+			if (this.notes != guest.notes) {
 				return false;
 			}
 			if (this.rating != guest.rating) {

@@ -11,7 +11,7 @@ package org.ishafoundation.archives.transcript.model
 		public static const EVENT_ID_ATTR_NAME:String = "eventId";
 		public static const SUB_TITLE_ATTR_NAME:String = "subTitle";
 		public static const START_AT_ATTR_NAME:String = "startAt";
-		public static const COMMENT_ATTR_NAME:String = "comment";
+		public static const NOTES_ATTR_NAME:String = "notes";
 		
 		public var metadataElement:XML;
 		public var eventId:String;
@@ -87,12 +87,12 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		[Bindable]
-		public function get comment():String {
-			return XMLUtils.getAttributeValue(metadataElement, COMMENT_ATTR_NAME);
+		public function get notes():String {
+			return XMLUtils.getAttributeValue(metadataElement, NOTES_ATTR_NAME);
 		}
 		
-		public function set comment(newValue:String):void {
-			XMLUtils.setAttributeValue(metadataElement, COMMENT_ATTR_NAME, newValue);
+		public function set notes(newValue:String):void {
+			XMLUtils.setAttributeValue(metadataElement, NOTES_ATTR_NAME, newValue);
 		}
 		
 		private static const TIME_FORMATTER:DateFormatter = DateUtils.createDateFormatter("JJ:NN");
