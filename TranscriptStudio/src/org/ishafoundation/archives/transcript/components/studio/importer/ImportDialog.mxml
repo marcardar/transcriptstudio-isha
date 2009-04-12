@@ -81,7 +81,7 @@
 					var importedEventXML:XML = MSWordImporter.createEventElement(transcriptsToImportSelectorDialog.selectedAudioTranscripts);
 					var importedEventMetadataElement:XML = importedEventXML.metadata[0];
 					var importedSessionXML:XML = MSWordImporter.createSessionElement(transcriptsToImportSelectorDialog.selectedAudioTranscripts);
-					importedDeviceElements = importedSessionXML.devices.device;
+					importedDeviceElements = importedSessionXML..device;
 					importedTranscriptElement = importedSessionXML.transcript[0];
 
 					setMissingAttributeValue(importedEventMetadataElement, EventProperties.START_AT_ATTR_NAME, importedSessionXML.metadata.@startAt);

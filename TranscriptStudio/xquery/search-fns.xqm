@@ -111,7 +111,7 @@ declare function search-fns:get-session-title($session as element()) as xs:strin
 {
 	let $eventId := $session/@eventId
 	let $event := collection('/db/ts4isha/data')/event[@id = $eventId]
-	(: let $sources := concat(' (', string-join($session/devices/device/media/upper-case(@id), ', '), ')') :)
+	(: let $sources := concat(' (', string-join($session//device/media/upper-case(@id), ', '), ')') :)
 	return
 		search-fns:get-event-title($event)
 };
