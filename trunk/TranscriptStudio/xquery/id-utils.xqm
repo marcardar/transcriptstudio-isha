@@ -9,12 +9,12 @@ declare variable $id-utils:all-domains := ($id-utils:media-domains, "device", 'e
 
 declare function id-utils:generate-event-id($eventType as xs:string) as xs:string
 {
-	id-utils:generate-id('event', $eventType)
+	id-utils:generate-id('event', concat($eventType, '-'))
 };
 
 declare function id-utils:generate-session-id($eventId as xs:string) as xs:string?
 {
-	id-utils:generate-id('session', $eventId)
+	id-utils:generate-id('session', concat($eventId, '-'))
 };
 
 declare function id-utils:generate-id($tagName as xs:string, $prefix as xs:string) as xs:string
