@@ -123,6 +123,7 @@
 		private function eventCreatorHandler():void {
 			var templateProps:EventMetadata = importedEventMetadata == null ? null : importedEventMetadata.copy();
 			var eventCreatorDialog:EventCreatorDialog = EventCreatorDialog.display(this, databaseMgr, referenceMgr, templateProps);
+			eventCreatorDialog.eventPropertiesPane.eventTypeComboBox.enabled = templateProps == null;
 			eventCreatorDialog.addEventListener(EventCreatorDialog.EVENT_EDITED, function(evt:Event):void {
 				eventMetadata = eventCreatorDialog.eventMetadata;
 				status = "Successfully created event: " + eventMetadata.id;
@@ -193,31 +194,7 @@
 				Alert.show(msg, "Could not retrieve selected session: " + sessionMetadata.sessionId);
 			}, "session", sessionMetadata.sessionId, DatabaseConstants.DATA_COLLECTION_PATH);
 		}
-		
-		/*private function fixMediaUUIDs():void {
-			// now we might have the session date so use that to prefix the media UUIDs
-			var mediaIdPrefix:String = eventMetadata.type + "-";
-			if (sessionMetadata.startAt == null) {
-				mediaIdPrefix += "00000000";
-			}
-			else {
-				var startAtDate:Date = sessionMetadata.startAt;
-				mediaIdPrefix += startAtDate.fullYear + EventPropertiesPane.fixWidth(startAtDate.month + 1, 2) + EventPropertiesPane.fixWidth(startAtDate.date, 2);
-			}
-			// use the digits from the sourceId in the new mediaId
-			mediaIdPrefix += "-" + eventMetadata.type;
-			mediaIdPrefix += "1"; // TODO: maybe sometimes this should really be "2" or even "3"
-			mediaIdPrefix += "-a1";
-			for each (var mediaElement:XML in importedDeviceElements.media) {
-				var sourceId:String = mediaElement.@id.toString();
-				var mediaIdSuffix:String = sourceId.replace(/[a-z]/ig, "");
-				while (mediaIdSuffix.length < 6) {
-					mediaIdSuffix = "0" + mediaIdSuffix;
-				}
-				mediaElement.@id = mediaIdPrefix + "-" + mediaIdSuffix;
-			}			
-		}*/
-		
+
 		private function getEventText(eventMetadata:EventMetadata):String {
 			if (eventMetadata == null) {
 				return null;
