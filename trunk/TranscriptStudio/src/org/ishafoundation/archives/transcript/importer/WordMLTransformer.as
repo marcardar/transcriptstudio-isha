@@ -74,7 +74,7 @@ package org.ishafoundation.archives.transcript.importer
 			var mediaId:String = prefix + "-" + audioIdInt; 
 			this.mediaElement = <audio id={mediaId}/>;
 			this.sessionElement = <session/>;
-			this.eventElement = <event {EventProperties.TYPE_ATTR_NAME}={eventType}/>;
+			this.eventElement = <event {EventProperties.TYPE_ATTR_NAME}={eventType}><metadata/></event>;
 
 			transformXML(wordMLDoc, idFunc);
 
@@ -334,6 +334,7 @@ package org.ishafoundation.archives.transcript.importer
  		}
  		 		
 		private function extractHeaders():void {
+			var eventMetadataElement:XML = eventElement.metadata[0];
  			for each (var contentElement:XML in getHeaderContents()) {
  				// actions
  				extractAttributeFromHeader(contentElement, audioTranscriptElement, ["TRANSCRIBED BY"], false, TRANSCRIBED_BY_ATTR_NAME, true);
@@ -358,14 +359,14 @@ package org.ishafoundation.archives.transcript.importer
 	 			} 
 				
 				// event
- 				var newValue:String = extractAttributeFromHeader(contentElement, eventElement, ["LOCATION"], false, EventProperties.VENUE_ATTR_NAME, false);
+ 				var newValue:String = extractAttributeFromHeader(contentElement, eventMetadataElement, ["LOCATION"], false, EventProperties.VENUE_ATTR_NAME, false);
  				if (newValue != null) {
  					// make sure only certain characters are used
  					newValue = newValue.replace(/[^a-zA-Z0-9\ ]+/g, " ");
  					newValue = Utils.normalizeSpace(newValue);
- 					XMLUtils.setAttributeValue(eventElement, EventProperties.VENUE_ATTR_NAME, newValue, "");
+ 					XMLUtils.setAttributeValue(eventMetadataElement, EventProperties.VENUE_ATTR_NAME, newValue, "");
  				}
- 				extractAttributeFromHeader(contentElement, eventElement, ["LANGUAGE"], false, EventProperties.LANGUAGE_ATTR_NAME, true, EventProperties.LANGUAGE_DEFAULT);
+ 				extractAttributeFromHeader(contentElement, eventMetadataElement, ["LANGUAGE"], false, EventProperties.LANGUAGE_ATTR_NAME, true, EventProperties.LANGUAGE_DEFAULT);
  			}
  			// handle actionBy's properly (i.e. extract bracketed dates
 			processActionBy(TRANSCRIBED_AT_ATTR_NAME, TRANSCRIBED_BY_ATTR_NAME);
