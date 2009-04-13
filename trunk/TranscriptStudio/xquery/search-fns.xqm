@@ -248,8 +248,8 @@ declare function search-fns:markup-as-table-row($markup as element()) as element
 	let $targetId := ($targetId, $markup/@id) [1]
 	let $text :=
 		if (local-name($markup) = "superSegment") then
-			if ($markup/@summary) then
-				string-join(("[summary]", $markup/@summary), " ")
+			if (exists($markup/summary)) then
+				string-join(("[summary]", $markup/summary), " ")
 			else
 				search-fns:element-text($markup)
 		else
