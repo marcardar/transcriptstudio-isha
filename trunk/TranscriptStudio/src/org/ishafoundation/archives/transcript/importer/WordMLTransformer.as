@@ -352,7 +352,8 @@ package org.ishafoundation.archives.transcript.importer
  				// hack time - actually we want notes as an element
  				var notes:String = XMLUtils.getAttributeValue(sessionElement, SessionProperties.NOTES_ELEMENT_NAME, null);
  				if (notes != null) {
-	 				XMLUtils.appendChildElementText(sessionElement, SessionProperties.NOTES_ELEMENT_NAME, notes);
+ 					notes = "\r" + notes;
+	 				XMLUtils.appendChildElementText(sessionElement, SessionProperties.NOTES_ELEMENT_NAME, notes, false);
 	 				delete sessionElement.@notes[0];
 	 			} 
 				

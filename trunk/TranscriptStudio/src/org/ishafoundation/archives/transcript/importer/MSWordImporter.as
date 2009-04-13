@@ -134,7 +134,8 @@ package org.ishafoundation.archives.transcript.importer
 		}
 		
 		private static function appendSessionNotesLine(text:String, metadataElement:XML):void {
-			XMLUtils.appendChildElementText(metadataElement, SessionProperties.NOTES_ELEMENT_NAME, text, true);
+			text = "\r" + text;
+			XMLUtils.appendChildElementText(metadataElement, SessionProperties.NOTES_ELEMENT_NAME, text, false);
 		}
 		
 		private function importPathsInternal(names:Array, audioTranscripts:Array, idFunc:Function, successFunc:Function, failureFunc:Function):void {
