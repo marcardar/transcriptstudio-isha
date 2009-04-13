@@ -86,11 +86,11 @@ package name.carter.mark.flex.project.mdoc
 		
 		[Bindable]
 		public function set summary(newValue:String):void {
-			superNode.setProperty(SUMMARY_PROP_NAME, newValue);
+			superNode.setElementProperty(SUMMARY_PROP_NAME, newValue);
 		}
 		
 		public function get summary():String {
-			return superNode.getPropertyValue(SUMMARY_PROP_NAME, "");
+			return superNode.getElementPropertyValue(SUMMARY_PROP_NAME, "");
 		}
 		
 		[Bindable]
