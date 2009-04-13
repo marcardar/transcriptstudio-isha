@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="600" horizontalAlign="center" title="Event / Session Builder" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*" xmlns:importer="org.ishafoundation.archives.transcript.components.studio.importer.*" creationComplete="init()">
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="600" horizontalAlign="center" title="Event / Session Builder" xmlns:session="org.ishafoundation.archives.transcript.components.studio.session.*" xmlns:importer="org.ishafoundation.archives.transcript.components.studio.importer.*" creationComplete="init()">
 	<mx:Script>
 	<![CDATA[
 		import name.carter.mark.flex.util.XMLUtils;
 		import mx.binding.utils.BindingUtils;
-		import org.ishafoundation.archives.transcript.components.studio.metadata.EventSelectorDialog;
-		import org.ishafoundation.archives.transcript.components.studio.metadata.SessionCreatorDialog;
-		import org.ishafoundation.archives.transcript.components.studio.metadata.EventCreatorDialog;
+		import org.ishafoundation.archives.transcript.components.studio.event.EventSelectorDialog;
+		import org.ishafoundation.archives.transcript.components.studio.session.SessionCreatorDialog;
+		import org.ishafoundation.archives.transcript.components.studio.event.EventCreatorDialog;
 		import org.ishafoundation.archives.transcript.model.Session;
 		import mx.rpc.http.HTTPService;
 		import org.ishafoundation.archives.transcript.db.DatabaseConstants;
 		import mx.events.FlexEvent;
 		import mx.utils.StringUtil;
 		import mx.managers.PopUpManager;
-		import org.ishafoundation.archives.transcript.components.studio.metadata.EventMetadataPane;
+		import org.ishafoundation.archives.transcript.components.studio.event.EventMetadataPane;
 		import mx.managers.CursorManager;
 		import mx.controls.Alert;
 		import org.ishafoundation.archives.transcript.model.SessionMetadata;
@@ -262,7 +262,7 @@
 	</mx:HBox>
 	<mx:HBox width="100%">
 		<mx:Spacer height="100%" width="60"/>
-		<metadata:SessionList width="100%" height="70" id="sessionList" enabled="{eventMetadata != null}" xqueryExecutor="{databaseMgr}" errorHandler="{sessionListErrorHandler}" eventMetadata="{eventMetadata}"/>
+		<session:SessionList width="100%" height="70" id="sessionList" enabled="{eventMetadata != null}" xqueryExecutor="{databaseMgr}" errorHandler="{sessionListErrorHandler}" eventMetadata="{eventMetadata}"/>
 	</mx:HBox>
 	
 	<mx:HBox id="buttonBox">

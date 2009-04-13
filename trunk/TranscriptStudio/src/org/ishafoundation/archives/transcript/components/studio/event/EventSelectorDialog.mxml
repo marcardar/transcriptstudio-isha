@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Select Event" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*">
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Select Event" xmlns:event="org.ishafoundation.archives.transcript.components.studio.event.*">
 	<mx:Script>
 	<![CDATA[
 		import mx.managers.PopUpManager;
@@ -44,7 +44,7 @@
 	]]>
 	</mx:Script>
 	
-	<metadata:EventSelectorPane id="eventSelectorPane" width="100%" height="100%" doubleClickEnabled="true" doubleClick="{listDoubleClickHandler(event)}"/>
+	<event:EventSelectorPane id="eventSelectorPane" width="100%" height="100%" doubleClickEnabled="true" doubleClick="{listDoubleClickHandler(event)}"/>
 	<mx:HBox id="buttonBox">
 		<mx:Button label="OK" enabled="{eventSelectorPane.eventsList.selectedItem != null}" click="okClicked()" />
 		<mx:Button label="Cancel" click="closeMe()"/>

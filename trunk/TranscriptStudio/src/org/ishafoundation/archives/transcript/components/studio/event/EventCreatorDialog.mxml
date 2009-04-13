@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Create Event" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*">
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Create Event" xmlns:event="org.ishafoundation.archives.transcript.components.studio.event.*">
 	<mx:Script>
 	<![CDATA[
 		import org.ishafoundation.archives.transcript.model.EventMetadata;
@@ -54,7 +54,7 @@
 	]]>
 	</mx:Script>
 	
-	<metadata:EventMetadataPane id="eventPropertiesPane" width="100%" height="100%"/>
+	<event:EventMetadataPane id="eventPropertiesPane" width="100%" height="100%"/>
 	<mx:HBox id="buttonBox">
 		<mx:Button id="okButton" label="OK" enabled="{eventPropertiesPane.ready}" click="okClicked()"/>
 		<mx:Button label="Cancel" click="closeMe()"/>
