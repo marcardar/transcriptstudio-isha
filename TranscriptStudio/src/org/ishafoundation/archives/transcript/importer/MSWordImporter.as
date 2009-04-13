@@ -52,11 +52,15 @@ package org.ishafoundation.archives.transcript.importer
 		public static function createEventElement(audioTranscripts:Array):XML {
 			// get the event type from the first source
 			var firstSource:WordMLTransformer = audioTranscripts[0]
-			var eventElement:XML = <event type={firstSource.eventElement.@type}><metadata/></event>;
+			var eventType:String = firstSource.eventElement.@type;
+			var eventElement:XML = <event type={eventType}><metadata/></event>;
 			var metadataElement:XML = eventElement.metadata[0];
 			for each (var audioTranscript:WordMLTransformer in audioTranscripts) {
 				var audioEventElement:XML = audioTranscript.eventElement;
-				WordMLTransformer.mergeInGuestProperties(metadataElement, audioEventElement);
+				if (audioEventElement.@type != eventType) {
+					throw new Error("All transcripts must have the same event type");
+				}
+				WordMLTransformer.mergeInGuestProperties(metadataElement, audioEventElement.metadata[0]);
 			}
 			return eventElement;
 		}
