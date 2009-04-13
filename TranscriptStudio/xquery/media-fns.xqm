@@ -2,7 +2,10 @@ xquery version "1.0";
 
 module namespace media-fns = "http://www.ishafoundation.org/ts4isha/xquery/media-fns";
 
+declare namespace util = "http://exist-db.org/xquery/util";
+
 import module namespace id-utils = "http://www.ishafoundation.org/ts4isha/xquery/id-utils" at "id-utils.xqm";
+import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
 
 (: adds all newMedia elements to the device element defined by the sessionId
    the device id is obtained by looking at the newMedia's parent id
@@ -79,4 +82,35 @@ declare function media-fns:get-media-metadata-element($sessionElement as element
 					update insert <mediaMetadata xmlns=''/> into $sessionElement
 			return
 				$sessionElement/mediaMetadata[1]
+};
+
+declare function media-fns:extract-integer($str as xs:string?) as xs:integer?
+{
+	util:catch('java.lang.Exception', xs:integer(replace($str, '\D', '')), ())
+};
+
+declare function media-fns:get-next-media-id($domain as xs:string, $eventType as xs:string) as xs:string
+{
+	let $nextMediaIdInteger := (media-fns:get-next-media-id-integer($domain, $eventType), 1)[1]
+	return
+		concat($eventType, '-', $nextMediaIdInteger)
+};
+
+declare function media-fns:get-next-media-id-integer($domain as xs:string, $eventType as xs:string) as xs:integer?
+{
+	let $prefix := concat($eventType, '-')
+	let $maxIdInt := (id-utils:get-max-id-integer($domain, $prefix), 0)[1]
+	let $startDigitalAttrName :=
+		if ($domain eq 'audio') then
+			'startDigitalAudioId'
+		else if ($domain eq 'video') then
+			'startDigitalVideoId'
+		else if ($domain eq 'image') then
+			'startDigitalImageId'
+		else
+			error((), concat('Unknown domain: ', $domain))
+	let $minIdInt := utils:get-event-type($eventType)/media-fns:extract-integer(@*[local-name(.) = $startDigitalAttrName])
+	let $nextIdInt := max(($maxIdInt + 1, $minIdInt))
+	return
+		$nextIdInt
 };

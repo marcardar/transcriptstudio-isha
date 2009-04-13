@@ -4,6 +4,7 @@ declare namespace get-next-media-id = "http://www.ishafoundation.org/ts4isha/xqu
 
 declare option exist:serialize "media-type=text/plain";
 
+import module namespace media-fns = "http://www.ishafoundation.org/ts4isha/xquery/media-fns" at "media-fns.xqm";
 import module namespace id-utils = "http://www.ishafoundation.org/ts4isha/xquery/id-utils" at "id-utils.xqm";
 import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
  
@@ -13,24 +14,12 @@ declare function get-next-media-id:extract-integer($str as xs:string?) as xs:int
 };
 
 let $domain := request:get-parameter("domain", ())
-let $prefix := request:get-parameter("prefix", ())
+let $eventType := request:get-parameter("eventType", ())
 return
 	if (empty($domain)) then
-		'ERROR - no domain specified'
-	else if (empty($prefix)) then
-		'ERROR - no prefix specified'
+		error(xs:QName('illegal-argument-exception'), 'no domain specified')
+	else if (empty($eventType)) then
+		error(xs:QName('illegal-argument-exception'), 'no eventType specified')
 	else
-		let $maxIdInt := (id-utils:get-max-id-integer($domain, $prefix), 0)[1]
-		let $startDigitalAttrName :=
-			if ($domain eq 'audio') then
-				'startDigitalAudioId'
-			else if ($domain eq 'video') then
-				'startDigitalVideoId'
-			else if ($domain eq 'image') then
-				'startDigitalImageId'
-			else
-				error(concat('Unknown domain: ', $domain))
-		let $minIdInt := utils:get-event-type($prefix)/get-next-media-id:extract-integer(@*[local-name(.) = $startDigitalAttrName])
-		let $nextIdInt := max(($maxIdInt + 1, $minIdInt))
-		return
-			$nextIdInt		
+		media-fns:get-next-media-id-integer($domain, $eventType)
+		

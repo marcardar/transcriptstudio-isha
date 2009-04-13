@@ -62,7 +62,7 @@ return
 								return xs:string($importedMediaId)
 							else
 								let $eventTypeId := utils:get-event($sessionXML/@eventId)/@type
-								let $newId := id-utils:generate-id($domain, concat($eventTypeId, '-'))
+								let $newId := media-fns:get-next-media-id($domain, $eventTypeId)
 								let $newMediaXML := functx:add-attributes($mediaXML, xs:QName('id'), $newId)
 								let $null := update insert $newMediaXML into $deviceXML
 								return $newId
