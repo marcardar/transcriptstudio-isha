@@ -8,10 +8,10 @@ package org.ishafoundation.archives.transcript.model
 		private static const SOURCE_ID_REG_EXP:RegExp = /^[a-z]+\d+/i;
 		
 		public var sessionId:String;
-		public var eventProps:EventProperties;
+		public var eventMetadata:EventMetadata;
 
 		/** The 3 main components of a session */
-		public var metadata:SessionProperties;
+		public var metadata:SessionMetadata;
 		public var mediaMetadataElement:XML;
 		private var _transcript:Transcript;
 		
@@ -20,13 +20,13 @@ package org.ishafoundation.archives.transcript.model
 		[Bindable]
 		private var _unsavedChanges:Boolean;
 
-		public function Session(sessionXML:XML, eventProps:EventProperties, referenceMgr:ReferenceManager)
+		public function Session(sessionXML:XML, eventMetadata:EventMetadata, referenceMgr:ReferenceManager)
 		{
 			if (sessionXML == null) {
 				throw new ArgumentError("Passed a null sessionXML");
 			}
 			this.sessionId = sessionXML.@id;
-			this.eventProps = eventProps;
+			this.eventMetadata = eventMetadata;
 			var sessionId:String;
 			if (sessionXML.hasOwnProperty("@id")) {
 				sessionId = sessionXML.@id;
@@ -34,7 +34,7 @@ package org.ishafoundation.archives.transcript.model
 			else {
 				sessionId = null;
 			}
-			this.metadata = new SessionProperties(sessionXML.metadata[0], eventProps.id, sessionId);
+			this.metadata = new SessionMetadata(sessionXML.metadata[0], eventMetadata.id, sessionId);
 			this.mediaMetadataElement = sessionXML.mediaMetadata[0];
 			var transcriptXML:XML = sessionXML.transcript[0];
 			if (transcriptXML != null) {
@@ -64,7 +64,7 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		public function get sessionXML():XML {
-			var result:XML = <session id={sessionId} eventId={eventProps.id}/>;
+			var result:XML = <session id={sessionId} eventId={eventMetadata.id}/>;
 			result.appendChild(metadata.metadataElement);
 			if (mediaMetadataElement != null) {
 				result.appendChild(mediaMetadataElement);

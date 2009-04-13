@@ -47,21 +47,21 @@ package org.ishafoundation.archives.transcript.model
 			this.xqueryExecutor = databaseMgr;
 		}
 		
-		public function createSession(sessionXML:XML, eventProps:EventProperties, successFunc:Function, failureFunc:Function):void {
-			DatabaseManagerUtils.createSession(eventProps.id, sessionXML.metadata[0], xqueryExecutor, function(sessionXML:XML):void {
-				var result:Session = new Session(sessionXML, eventProps, referenceMgr);
+		public function createSession(sessionXML:XML, eventMetadata:EventMetadata, successFunc:Function, failureFunc:Function):void {
+			DatabaseManagerUtils.createSession(eventMetadata.id, sessionXML.metadata[0], xqueryExecutor, function(sessionXML:XML):void {
+				var result:Session = new Session(sessionXML, eventMetadata, referenceMgr);
 				result.unsavedChanges = true; // need to save all this stuff
 				successFunc(result);
 			}, failureFunc);
 		} 
 		
-		public function retrieveSession(sessionId:String, eventProps:EventProperties, externalSuccess:Function, externalFailure:Function):void {
+		public function retrieveSession(sessionId:String, eventMetadata:EventMetadata, externalSuccess:Function, externalFailure:Function):void {
 			if (sessionId == null || StringUtil.trim(sessionId).length == 0) {
 				throw new Error("Passed a blank sessionId");
 			}
 			DatabaseManagerUtils.retrieveSessionXML(sessionId, xmlRetriever, function(sessionXML:XML):void {
 				trace("Successfully retrieved session");
-				var session:Session = openSessionForEvent(sessionXML, eventProps);
+				var session:Session = openSessionForEvent(sessionXML, eventMetadata);
 				externalSuccess(session);		
 			}, function (msg:String):void {
 				trace("Could not load session xml because: " + msg);
@@ -72,8 +72,8 @@ package org.ishafoundation.archives.transcript.model
 		/**
 		 * For when we already have the event props
 		 */
-		public function openSessionForEvent(sessionXML:XML, eventProps:EventProperties):Session {
-			return new Session(sessionXML, eventProps, referenceMgr);
+		public function openSessionForEvent(sessionXML:XML, eventMetadata:EventMetadata):Session {
+			return new Session(sessionXML, eventMetadata, referenceMgr);
 		}
 			
 		public function updateSessionInDatabase(session:Session, externalSuccess:Function, externalFailure:Function):void {

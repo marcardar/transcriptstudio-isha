@@ -12,10 +12,10 @@
 		import org.ishafoundation.archives.transcript.importer.MSWordImporter;
 		import mx.core.Container;
 		import org.ishafoundation.archives.transcript.db.XMLStorer;
-		import org.ishafoundation.archives.transcript.model.EventProperties;
+		import org.ishafoundation.archives.transcript.model.EventMetadata;
 		import mx.events.PropertyChangeEvent;
 		import mx.binding.utils.ChangeWatcher;
-		import org.ishafoundation.archives.transcript.model.SessionProperties;
+		import org.ishafoundation.archives.transcript.model.SessionMetadata;
 		import name.carter.mark.flex.util.XMLUtils;
 		import name.carter.mark.flex.util.Utils;
 		import mx.managers.CursorManager;
@@ -37,14 +37,14 @@
 	   	[Bindable]
 	   	public var referenceMgr:ReferenceManager;
 	   	
-		public static function display(parent:DisplayObject, xqueryExecutor:XQueryExecutor, referenceMgr:ReferenceManager, eventProps:EventProperties):EventPropertiesEditorDialog {
-			var result:EventPropertiesEditorDialog = new EventPropertiesEditorDialog();
+		public static function display(parent:DisplayObject, xqueryExecutor:XQueryExecutor, referenceMgr:ReferenceManager, eventMetadata:EventMetadata):EventMetadataEditorDialog {
+			var result:EventMetadataEditorDialog = new EventMetadataEditorDialog();
 			result.xqueryExecutor = xqueryExecutor;
 			result.referenceMgr = referenceMgr;
 			PopUpManager.addPopUp(result, parent, true);
 			result.eventPropertiesPane.eventTypeComboBox.enabled = false;
 			result.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
-				result.eventPropertiesPane.eventProps = eventProps;
+				result.eventPropertiesPane.eventMetadata = eventMetadata;
 			});
 			return result;
 		}
@@ -52,19 +52,19 @@
 		private function init():void {
 		}
 		
-		private function get eventProps():EventProperties {
-			return eventPropertiesPane.eventProps;
+		private function get eventMetadata():EventMetadata {
+			return eventPropertiesPane.eventMetadata;
 		}
 		
 		private function editEvent(evt:MouseEvent):void {
 			// need to create the new event file
-			var params:Object = {id:eventProps.id, metadataXML:eventProps.eventMetadataElement.toXMLString()};
+			var params:Object = {id:eventMetadata.id, metadataXML:eventMetadata.eventMetadataElement.toXMLString()};
 			xqueryExecutor.executeStoredXQuery("update-event-metadata", params, function():void {
 				closeMe();
 				var evt:Event = new Event(EVENT_EDITED);
 				dispatchEvent(evt);
 			}, function (msg:String):void {
-				Alert.show(msg, "Could not store event file '" + eventProps.path + "'");
+				Alert.show(msg, "Could not store event file '" + eventMetadata.path + "'");
 			});
 		}
 			
@@ -78,7 +78,7 @@
 	]]>
 	</mx:Script>
 	
-	<metadata:EventPropertiesPane id="eventPropertiesPane" label="Event Properties" width="100%" height="100%" referenceMgr="{referenceMgr}"/>
+	<metadata:EventMetadataPane id="eventPropertiesPane" label="Event Properties" width="100%" height="100%" referenceMgr="{referenceMgr}"/>
 	<mx:HBox id="buttonBox">
 		<mx:Button label="OK" enabled="{eventPropertiesPane.ready}" click="okClicked(event)" />
 		<mx:Button label="Cancel" click="closeMe()"/>

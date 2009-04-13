@@ -15,8 +15,8 @@ package org.ishafoundation.archives.transcript.importer
 	import name.carter.mark.flex.util.collection.HashSet;
 	import name.carter.mark.flex.util.collection.ISet;
 	
-	import org.ishafoundation.archives.transcript.model.EventProperties;
-	import org.ishafoundation.archives.transcript.model.SessionProperties;
+	import org.ishafoundation.archives.transcript.model.EventMetadata;
+	import org.ishafoundation.archives.transcript.model.SessionMetadata;
 	import org.ishafoundation.archives.transcript.util.ApplicationUtils;
 	
 	public class WordMLTransformer
@@ -74,7 +74,7 @@ package org.ishafoundation.archives.transcript.importer
 			var mediaId:String = prefix + "-" + audioIdInt; 
 			this.mediaElement = <audio id={mediaId}/>;
 			this.sessionElement = <session/>;
-			this.eventElement = <event {EventProperties.TYPE_ATTR_NAME}={eventType}><metadata/></event>;
+			this.eventElement = <event {EventMetadata.TYPE_ATTR_NAME}={eventType}><metadata/></event>;
 
 			transformXML(wordMLDoc, idFunc);
 
@@ -348,25 +348,25 @@ package org.ishafoundation.archives.transcript.importer
  				extractAttributeFromHeader(contentElement, mediaElement, ["AUDIO CLARITY (E G F P)"], false, AUDIO_QUALITY_ATTR_NAME, true); 				
 
  				// session - allow multiple dates to pile up because dates are in a special format
- 				extractAttributeFromHeader(contentElement, sessionElement, ["DATE"], true, SessionProperties.START_AT_ATTR_NAME, false); 
- 				extractAttributeFromHeader(contentElement, sessionElement, ["NOTES", "NOTE"], false, SessionProperties.NOTES_ELEMENT_NAME, false);
+ 				extractAttributeFromHeader(contentElement, sessionElement, ["DATE"], true, SessionMetadata.START_AT_ATTR_NAME, false); 
+ 				extractAttributeFromHeader(contentElement, sessionElement, ["NOTES", "NOTE"], false, SessionMetadata.NOTES_ELEMENT_NAME, false);
  				// hack time - actually we want notes as an element
- 				var notes:String = XMLUtils.getAttributeValue(sessionElement, SessionProperties.NOTES_ELEMENT_NAME, null);
+ 				var notes:String = XMLUtils.getAttributeValue(sessionElement, SessionMetadata.NOTES_ELEMENT_NAME, null);
  				if (notes != null) {
  					notes = "\r" + notes;
-	 				XMLUtils.appendChildElementText(sessionElement, SessionProperties.NOTES_ELEMENT_NAME, notes, false);
+	 				XMLUtils.appendChildElementText(sessionElement, SessionMetadata.NOTES_ELEMENT_NAME, notes, false);
 	 				delete sessionElement.@notes[0];
 	 			} 
 				
 				// event
- 				var newValue:String = extractAttributeFromHeader(contentElement, eventMetadataElement, ["LOCATION"], false, EventProperties.VENUE_ATTR_NAME, false);
+ 				var newValue:String = extractAttributeFromHeader(contentElement, eventMetadataElement, ["LOCATION"], false, EventMetadata.VENUE_ATTR_NAME, false);
  				if (newValue != null) {
  					// make sure only certain characters are used
  					newValue = newValue.replace(/[^a-zA-Z0-9\ ]+/g, " ");
  					newValue = Utils.normalizeSpace(newValue);
- 					XMLUtils.setAttributeValue(eventMetadataElement, EventProperties.VENUE_ATTR_NAME, newValue, "");
+ 					XMLUtils.setAttributeValue(eventMetadataElement, EventMetadata.VENUE_ATTR_NAME, newValue, "");
  				}
- 				extractAttributeFromHeader(contentElement, eventMetadataElement, ["LANGUAGE"], false, EventProperties.LANGUAGE_ATTR_NAME, true, EventProperties.LANGUAGE_DEFAULT);
+ 				extractAttributeFromHeader(contentElement, eventMetadataElement, ["LANGUAGE"], false, EventMetadata.LANGUAGE_ATTR_NAME, true, EventMetadata.LANGUAGE_DEFAULT);
  			}
  			// handle actionBy's properly (i.e. extract bracketed dates
 			processActionBy(TRANSCRIBED_AT_ATTR_NAME, TRANSCRIBED_BY_ATTR_NAME);
@@ -435,7 +435,7 @@ package org.ishafoundation.archives.transcript.importer
 				value = StringUtil.trim(value.substring(colonIndex + 1));
 			}
 			// HACK!
-			if (attrName == SessionProperties.START_AT_ATTR_NAME) {
+			if (attrName == SessionMetadata.START_AT_ATTR_NAME) {
 				value = formatNonStandardDateString(value);
 			}
  			var existingValue:String = XMLUtils.getAttributeValue(targetElement, attrName, defaultValue);
@@ -519,11 +519,11 @@ package org.ishafoundation.archives.transcript.importer
  				}
  				else {
  					// HACK TIME
- 					if (attrName == EventProperties.START_AT_ATTR_NAME || attrName == EventProperties.TYPE_ATTR_NAME) {
+ 					if (attrName == EventMetadata.START_AT_ATTR_NAME || attrName == EventMetadata.TYPE_ATTR_NAME) {
  						// we have conflicting data
- 						var notes:String = XMLUtils.getChildElementText(targetElement, EventProperties.NOTES_ELEMENT_NAME, "");
+ 						var notes:String = XMLUtils.getChildElementText(targetElement, EventMetadata.NOTES_ELEMENT_NAME, "");
  						notes += "\nInconsistent " + attrName + ": " + attrValue.toString(); 
- 						XMLUtils.setChildElementText(targetElement, EventProperties.NOTES_ELEMENT_NAME, notes);
+ 						XMLUtils.setChildElementText(targetElement, EventMetadata.NOTES_ELEMENT_NAME, notes);
  						continue;
  					}
  					else {

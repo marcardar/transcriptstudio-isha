@@ -5,19 +5,19 @@
 		import name.carter.mark.flex.util.XMLUtils;
 		import mx.binding.utils.BindingUtils;
 		import org.ishafoundation.archives.transcript.components.studio.metadata.EventSelectorDialog;
-		import org.ishafoundation.archives.transcript.components.studio.metadata.SessionPropertiesCreatorDialog;
-		import org.ishafoundation.archives.transcript.components.studio.metadata.EventPropertiesCreatorDialog;
+		import org.ishafoundation.archives.transcript.components.studio.metadata.SessionCreatorDialog;
+		import org.ishafoundation.archives.transcript.components.studio.metadata.EventCreatorDialog;
 		import org.ishafoundation.archives.transcript.model.Session;
 		import mx.rpc.http.HTTPService;
 		import org.ishafoundation.archives.transcript.db.DatabaseConstants;
 		import mx.events.FlexEvent;
 		import mx.utils.StringUtil;
 		import mx.managers.PopUpManager;
-		import org.ishafoundation.archives.transcript.components.studio.metadata.EventPropertiesPane;
+		import org.ishafoundation.archives.transcript.components.studio.metadata.EventMetadataPane;
 		import mx.managers.CursorManager;
 		import mx.controls.Alert;
-		import org.ishafoundation.archives.transcript.model.SessionProperties;
-		import org.ishafoundation.archives.transcript.model.EventProperties;
+		import org.ishafoundation.archives.transcript.model.SessionMetadata;
+		import org.ishafoundation.archives.transcript.model.EventMetadata;
 		import org.ishafoundation.archives.transcript.importer.MSWordImporter;
 		import org.ishafoundation.archives.transcript.model.ReferenceManager;
 		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
@@ -35,13 +35,13 @@
 		public var referenceMgr:ReferenceManager;
 		
 		[Bindable]
-		private var importedEventProps:EventProperties;
+		private var importedEventMetadata:EventMetadata;
 		private var importedSessionMetadataElement:XML;
 		private var importedDeviceElements:XMLList;
 		private var importedTranscriptElement:XML;
 		
 		[Bindable]
-		private var _eventProps:EventProperties;
+		private var _eventMetadata:EventMetadata;
 		public var sessionXML:XML;
 	
 		public static function display(parent:DisplayObject, databaseMgr:DatabaseManager, referenceMgr:ReferenceManager):ImportDialog {
@@ -59,12 +59,12 @@
 		}
 		
 		[Bindable]
-		public function get eventProps():EventProperties {
-			return _eventProps;
+		public function get eventMetadata():EventMetadata {
+			return _eventMetadata;
 		}
 		
-		public function set eventProps(eventProps:EventProperties):void {
-			_eventProps = eventProps;
+		public function set eventMetadata(eventMetadata:EventMetadata):void {
+			_eventMetadata = eventMetadata;
 			refreshEventTextArea();
 		}
 		
@@ -72,7 +72,7 @@
 			var transcriptsToImportSelectorDialog:TranscriptsToImportSelectorDialog = TranscriptsToImportSelectorDialog.display(this, databaseMgr);
 			transcriptsToImportSelectorDialog.addEventListener(TranscriptsToImportSelectorDialog.FILES_IMPORTED, function(evt:Event):void {
 				if (transcriptsToImportSelectorDialog.selectedAudioTranscripts.length == 0) {
-					importedEventProps = null;
+					importedEventMetadata = null;
 					importedSessionMetadataElement = null;
 					importedTranscriptElement = null;
 					importedDeviceElements = null;
@@ -84,10 +84,10 @@
 					importedDeviceElements = importedSessionXML..device;
 					importedTranscriptElement = importedSessionXML.transcript[0];
 
-					setMissingAttributeValue(importedEventMetadataElement, EventProperties.START_AT_ATTR_NAME, importedSessionXML.metadata.@startAt);
-					setMissingAttributeValue(importedEventMetadataElement, EventProperties.END_AT_ATTR_NAME, importedSessionXML.metadata.@startAt);
+					setMissingAttributeValue(importedEventMetadataElement, EventMetadata.START_AT_ATTR_NAME, importedSessionXML.metadata.@startAt);
+					setMissingAttributeValue(importedEventMetadataElement, EventMetadata.END_AT_ATTR_NAME, importedSessionXML.metadata.@startAt);
 
-					importedEventProps = EventProperties.createInstance(importedEventXML);
+					importedEventMetadata = EventMetadata.createInstance(importedEventXML);
 					importedSessionMetadataElement = importedSessionXML.metadata[0];
 				}
 				transcriptsToImportList.dataProvider = transcriptsToImportSelectorDialog.selectedPaths;
@@ -106,27 +106,27 @@
 		private function eventSelectorHandler():void {
 			var eventSelectorDialog:EventSelectorDialog = EventSelectorDialog.display(this, databaseMgr, referenceMgr);
 			eventSelectorDialog.eventSelectorPane.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
-				if (importedEventProps != null) {
-					eventSelectorDialog.eventSelectorPane.eventTypeComboBox.selectedItem = importedEventProps.type;
+				if (importedEventMetadata != null) {
+					eventSelectorDialog.eventSelectorPane.eventTypeComboBox.selectedItem = importedEventMetadata.type;
 					eventSelectorDialog.eventSelectorPane.eventTypeComboBox.enabled = false;
-					if (importedEventProps.startAt != null) {
-						eventSelectorDialog.eventSelectorPane.yearComboBox.selectedItem = importedEventProps.startAt.fullYear.toString();
+					if (importedEventMetadata.startAt != null) {
+						eventSelectorDialog.eventSelectorPane.yearComboBox.selectedItem = importedEventMetadata.startAt.fullYear.toString();
 					}
 					eventSelectorDialog.eventSelectorPane.searchClicked();
 				}
 			});
 			eventSelectorDialog.addEventListener(EventSelectorDialog.EVENT_SELECTED, function(evt:Event):void {
-				eventProps = eventSelectorDialog.selectedEventProps;
+				eventMetadata = eventSelectorDialog.selectedEventMetadata;
 			});
 		}
 		
 		private function eventCreatorHandler():void {
-			var templateProps:EventProperties = importedEventProps == null ? null : importedEventProps.copy();
-			var eventCreatorDialog:EventPropertiesCreatorDialog = EventPropertiesCreatorDialog.display(this, databaseMgr, referenceMgr, templateProps);
-			eventCreatorDialog.addEventListener(EventPropertiesCreatorDialog.EVENT_EDITED, function(evt:Event):void {
-				eventProps = eventCreatorDialog.eventProps;
-				status = "Successfully created event: " + eventProps.id;
-				Alert.show("Event ID: " + eventProps.id, "Successfully created event");
+			var templateProps:EventMetadata = importedEventMetadata == null ? null : importedEventMetadata.copy();
+			var eventCreatorDialog:EventCreatorDialog = EventCreatorDialog.display(this, databaseMgr, referenceMgr, templateProps);
+			eventCreatorDialog.addEventListener(EventCreatorDialog.EVENT_EDITED, function(evt:Event):void {
+				eventMetadata = eventCreatorDialog.eventMetadata;
+				status = "Successfully created event: " + eventMetadata.id;
+				Alert.show("Event ID: " + eventMetadata.id, "Successfully created event");
 			});
 		}
 		
@@ -138,33 +138,33 @@
 			else {
 				templateSessionMetadataElement = importedSessionMetadataElement.copy();
 			}
-			var sessionCreatorDialog:SessionPropertiesCreatorDialog = SessionPropertiesCreatorDialog.display(this, databaseMgr, referenceMgr, eventProps.id, templateSessionMetadataElement);
-			sessionCreatorDialog.addEventListener(SessionPropertiesCreatorDialog.SESSION_EDITED, function(evt:Event):void {
-				var newSessionProps:SessionProperties = sessionCreatorDialog.sessionProps;
-				sessionList.refresh(newSessionProps.sessionId);
-				status = "Successfully created session: " + newSessionProps.sessionId;
-				Alert.show("Session ID: " + newSessionProps.sessionId, "Successfully created session");
+			var sessionCreatorDialog:SessionCreatorDialog = SessionCreatorDialog.display(this, databaseMgr, referenceMgr, eventMetadata.id, templateSessionMetadataElement);
+			sessionCreatorDialog.addEventListener(SessionCreatorDialog.SESSION_EDITED, function(evt:Event):void {
+				var newSessionMetadata:SessionMetadata = sessionCreatorDialog.sessionMetadata;
+				sessionList.refresh(newSessionMetadata.sessionId);
+				status = "Successfully created session: " + newSessionMetadata.sessionId;
+				Alert.show("Session ID: " + newSessionMetadata.sessionId, "Successfully created session");
 			});
 		}
 		
 		private function refreshEventTextArea():void {
-			if (eventProps == null) {
+			if (eventMetadata == null) {
 				eventTextArea.text = null;
 				return;
 			}
-			eventTextArea.text = eventProps.id;
+			eventTextArea.text = eventMetadata.id;
 		}
 		
 		private function sessionListErrorHandler(msg:String):void {
-			Alert.show(msg, "Could not retrieve sessions for selected event: " + eventProps.id); 
+			Alert.show(msg, "Could not retrieve sessions for selected event: " + eventMetadata.id); 
 		}
 		
-		private function sessionListLabelFunc(sessionProps:SessionProperties):String {
-			return sessionProps.getFullName(eventProps);
+		private function sessionListLabelFunc(sessionMetadata:SessionMetadata):String {
+			return sessionMetadata.getFullName(eventMetadata);
 		}
 		
-		private function get sessionProps():SessionProperties {
-			return sessionList.selectedItem as SessionProperties;
+		private function get sessionMetadata():SessionMetadata {
+			return sessionList.selectedItem as SessionMetadata;
 		}
 		
 		private function importClicked():void {
@@ -184,28 +184,28 @@
 					Alert.show("Session already has transcript - choose another");
 					return;
 				}
-				var session:Session = new Session(existingSessionXML, eventProps, referenceMgr);
+				var session:Session = new Session(existingSessionXML, eventMetadata, referenceMgr);
 				session.appendTranscript(importedTranscriptElement, importedDeviceElements);
 				sessionXML = session.sessionXML;
 				dispatchEvent(new Event(IMPORT_CLICKED));
 				closeMe();
 			}, function(msg:String):void {
-				Alert.show(msg, "Could not retrieve selected session: " + sessionProps.sessionId);
-			}, "session", sessionProps.sessionId, DatabaseConstants.DATA_COLLECTION_PATH);
+				Alert.show(msg, "Could not retrieve selected session: " + sessionMetadata.sessionId);
+			}, "session", sessionMetadata.sessionId, DatabaseConstants.DATA_COLLECTION_PATH);
 		}
 		
 		/*private function fixMediaUUIDs():void {
 			// now we might have the session date so use that to prefix the media UUIDs
-			var mediaIdPrefix:String = eventProps.type + "-";
-			if (sessionProps.startAt == null) {
+			var mediaIdPrefix:String = eventMetadata.type + "-";
+			if (sessionMetadata.startAt == null) {
 				mediaIdPrefix += "00000000";
 			}
 			else {
-				var startAtDate:Date = sessionProps.startAt;
+				var startAtDate:Date = sessionMetadata.startAt;
 				mediaIdPrefix += startAtDate.fullYear + EventPropertiesPane.fixWidth(startAtDate.month + 1, 2) + EventPropertiesPane.fixWidth(startAtDate.date, 2);
 			}
 			// use the digits from the sourceId in the new mediaId
-			mediaIdPrefix += "-" + eventProps.type;
+			mediaIdPrefix += "-" + eventMetadata.type;
 			mediaIdPrefix += "1"; // TODO: maybe sometimes this should really be "2" or even "3"
 			mediaIdPrefix += "-a1";
 			for each (var mediaElement:XML in importedDeviceElements.media) {
@@ -218,11 +218,11 @@
 			}			
 		}*/
 		
-		private function getEventText(eventProps:EventProperties):String {
-			if (eventProps == null) {
+		private function getEventText(eventMetadata:EventMetadata):String {
+			if (eventMetadata == null) {
 				return null;
 			}
-			var result:String = eventProps.generateLongText(referenceMgr);
+			var result:String = eventMetadata.generateLongText(referenceMgr);
 			return result;
 		}
 		
@@ -234,35 +234,35 @@
 	</mx:Script>
 	<mx:HBox width="100%" verticalAlign="bottom" paddingTop="10">
 		<mx:Label text="Transcripts to import: "/>
-		<mx:Label text="{importedEventProps == null ? '&lt;Nothing selected&gt;' : transcriptsToImportList.dataProvider.source.length + ' file(s) selected'}"/>
+		<mx:Label text="{importedEventMetadata == null ? '&lt;Nothing selected&gt;' : transcriptsToImportList.dataProvider.source.length + ' file(s) selected'}"/>
 		<mx:Spacer height="100%" width="100%"/>
 		<mx:Button label="Select..." id="selectExternalTranscriptsButton" click="transcriptsToImportSelectorHandler()"/>
 		<mx:Button label="New..." visible="false"/>
 	</mx:HBox>
 	<mx:HBox width="100%">
 		<mx:Spacer height="100%" width="60"/>
-		<mx:List height="50" width="100%" id="transcriptsToImportList" selectable="false" enabled="{importedEventProps != null}"/>
+		<mx:List height="50" width="100%" id="transcriptsToImportList" selectable="false" enabled="{importedEventMetadata != null}"/>
 	</mx:HBox>
 	<mx:HBox width="100%" verticalAlign="bottom" paddingTop="20">
 		<mx:Label text="Event:" width="60"/>
-		<mx:Label text="{eventProps == null ? '&lt;Nothing selected&gt;' : 'ID: ' + eventProps.id}"/>
+		<mx:Label text="{eventMetadata == null ? '&lt;Nothing selected&gt;' : 'ID: ' + eventMetadata.id}"/>
 		<mx:Spacer height="100%" width="100%"/>
 		<mx:Button label="Select..." id="selectEventButton" click="eventSelectorHandler()"/>
 		<mx:Button label="New..." id="newEventButton" click="eventCreatorHandler()"/>
 	</mx:HBox>
 	<mx:HBox width="100%">
 		<mx:Spacer height="100%" width="60"/>
-		<mx:TextArea width="100%" height="80" id="eventTextArea" enabled="{eventProps != null}" editable="false" text="{getEventText(eventProps)}" borderStyle="none" borderThickness="0"/>
+		<mx:TextArea width="100%" height="80" id="eventTextArea" enabled="{eventMetadata != null}" editable="false" text="{getEventText(eventMetadata)}" borderStyle="none" borderThickness="0"/>
 	</mx:HBox>
 	<mx:HBox width="100%" verticalAlign="middle" paddingTop="20">
 		<mx:Label text="Session:" width="60"/>
-		<mx:Label text="{sessionList.selectedItem == null ? '&lt;Nothing selected&gt;' : 'ID: ' + (sessionList.selectedItem as  SessionProperties).sessionId}"/>
+		<mx:Label text="{sessionList.selectedItem == null ? '&lt;Nothing selected&gt;' : 'ID: ' + (sessionList.selectedItem as  SessionMetadata).sessionId}"/>
 		<mx:Spacer height="100%" width="100%"/>
-		<mx:Button label="New..." id="newSessionButton" enabled="{eventProps != null}" click="sessionCreatorHandler()"/>
+		<mx:Button label="New..." id="newSessionButton" enabled="{eventMetadata != null}" click="sessionCreatorHandler()"/>
 	</mx:HBox>
 	<mx:HBox width="100%">
 		<mx:Spacer height="100%" width="60"/>
-		<metadata:SessionList width="100%" height="70" id="sessionList" enabled="{eventProps != null}" xqueryExecutor="{databaseMgr}" errorHandler="{sessionListErrorHandler}" eventProps="{eventProps}"/>
+		<metadata:SessionList width="100%" height="70" id="sessionList" enabled="{eventMetadata != null}" xqueryExecutor="{databaseMgr}" errorHandler="{sessionListErrorHandler}" eventMetadata="{eventMetadata}"/>
 	</mx:HBox>
 	
 	<mx:HBox id="buttonBox">

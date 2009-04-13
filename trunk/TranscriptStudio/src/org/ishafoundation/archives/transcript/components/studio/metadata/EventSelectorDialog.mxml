@@ -3,7 +3,7 @@
 	<mx:Script>
 	<![CDATA[
 		import mx.managers.PopUpManager;
-		import org.ishafoundation.archives.transcript.model.EventProperties;
+		import org.ishafoundation.archives.transcript.model.EventMetadata;
 		import mx.events.FlexEvent;
 		import org.ishafoundation.archives.transcript.model.ReferenceManager;
 		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
@@ -22,12 +22,12 @@
 			return result;
 		}
 	
-		public function get selectedEventProps():EventProperties {
-			return eventSelectorPane.selectedEventProps;
+		public function get selectedEventMetadata():EventMetadata {
+			return eventSelectorPane.selectedEventMetadata;
 		}
 		
 		private function listDoubleClickHandler(evt:MouseEvent):void {
-			if (selectedEventProps == null) {
+			if (selectedEventMetadata == null) {
 				return;
 			}
 			okClicked();

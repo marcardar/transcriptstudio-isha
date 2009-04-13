@@ -5,61 +5,61 @@
 		import mx.events.FlexEvent;
 		import mx.rpc.http.HTTPService;
 		import name.carter.mark.flex.util.DateUtils;
-		import org.ishafoundation.archives.transcript.model.SessionProperties;
-		import org.ishafoundation.archives.transcript.model.EventProperties;
+		import org.ishafoundation.archives.transcript.model.SessionMetadata;
+		import org.ishafoundation.archives.transcript.model.EventMetadata;
 		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
 		import mx.controls.Alert;
 		import mx.managers.PopUpManager;
 		
 		private var eventStartDate:Date;
 	   	
-		/*public static function display(xqueryExecutor:XQueryExecutor, eventProps:EventProperties, parent:DisplayObject):SessionSelectorDialog {
+		/*public static function display(xqueryExecutor:XQueryExecutor, eventMetadata:EventProperties, parent:DisplayObject):SessionSelectorDialog {
 			var result:SessionSelectorDialog = new SessionSelectorDialog();
 			result.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
 				result.sessionList.xqueryExecutor = xqueryExecutor;
 				result.sessionList.errorHandler = result.sessionListErrorHandler;
-				result.sessionList.eventProps = eventProps;
+				result.sessionList.eventMetadata = eventMetadata;
 			});
 			PopUpManager.addPopUp(result, parent, true);
 			return result;
 		}*/
 	
 		private function sessionListErrorHandler(msg:String):void {
-			Alert.show(msg, "Could not retrieve sessions for event: " + sessionList.eventProps.id); 
+			Alert.show(msg, "Could not retrieve sessions for event: " + sessionList.eventMetadata.id); 
 		}
 		
-		public static function displayIfNecessary(eventProps:EventProperties, parent:DisplayObject, xqueryExecutor:XQueryExecutor, successFunc:Function):void {
+		public static function displayIfNecessary(eventMetadata:EventMetadata, parent:DisplayObject, xqueryExecutor:XQueryExecutor, successFunc:Function):void {
 			var result:SessionSelectorDialog = new SessionSelectorDialog();
 			result.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
 				result.sessionList.xqueryExecutor = xqueryExecutor;
 				result.sessionList.errorHandler = result.sessionListErrorHandler;
-				result.sessionList.successHandler = function(sessionPropsArr:Array):void {
-					switch (sessionPropsArr.length) {
+				result.sessionList.successHandler = function(sessionMetadataArr:Array):void {
+					switch (sessionMetadataArr.length) {
 						case 0:
-							Alert.show("No sessions defined for event: " + eventProps.id);
+							Alert.show("No sessions defined for event: " + eventMetadata.id);
 							result.closeMe();
 							break;
 						case 1:
-							successFunc(sessionPropsArr[0]);
+							successFunc(sessionMetadataArr[0]);
 							result.closeMe();
 							break;
 						default:
 							// leave the dialog open and let the user select a session
 							result.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
 								// the user has selected a session
-								successFunc(result.selectedSessionProps);
+								successFunc(result.selectedSessionMetadata);
 							});						
 					}
 				};
 				result.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
-					successFunc(result.sessionList.selectedSessionProps);
+					successFunc(result.sessionList.selectedSessionMetadata);
 					result.closeMe();
 				});
 				result.sessionList.addEventListener(MouseEvent.DOUBLE_CLICK, function(evt:MouseEvent):void {
-					successFunc(result.sessionList.selectedSessionProps);
+					successFunc(result.sessionList.selectedSessionMetadata);
 					result.closeMe();
 				});
-				result.sessionList.eventProps = eventProps;
+				result.sessionList.eventMetadata = eventMetadata;
 			});
 			PopUpManager.addPopUp(result, parent, true);
 		}
@@ -67,8 +67,8 @@
 		private function init():void {
 		}
 		
-		public function get selectedSessionProps():SessionProperties {
-			return sessionList.selectedItem as SessionProperties;
+		public function get selectedSessionMetadata():SessionMetadata {
+			return sessionList.selectedItem as SessionMetadata;
 		}
 		
 		private function okClicked(evt:MouseEvent):void {

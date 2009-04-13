@@ -43,15 +43,15 @@
 			import org.ishafoundation.archives.transcript.db.DatabaseManagerUtils;
 			import mx.controls.Alert;
 			import org.ishafoundation.archives.transcript.components.generic.AboutBox;
-			import org.ishafoundation.archives.transcript.components.studio.metadata.SessionPropertiesEditorDialog;
-			import org.ishafoundation.archives.transcript.model.SessionProperties;
+			import org.ishafoundation.archives.transcript.components.studio.metadata.SessionMetadataEditorDialog;
+			import org.ishafoundation.archives.transcript.model.SessionMetadata;
 			import org.ishafoundation.archives.transcript.model.SessionManager;
 			import org.ishafoundation.archives.transcript.model.ReferenceManager;
 			import mx.managers.PopUpManager;
 			import name.carter.mark.flex.project.mdoc.*;
 			import org.ishafoundation.archives.transcript.components.studio.media.MediaPlayerDialog;
-			import org.ishafoundation.archives.transcript.components.studio.metadata.EventPropertiesEditorDialog;
-			import org.ishafoundation.archives.transcript.model.EventProperties;
+			import org.ishafoundation.archives.transcript.components.studio.metadata.EventMetadataEditorDialog;
+			import org.ishafoundation.archives.transcript.model.EventMetadata;
 			import org.ishafoundation.archives.transcript.components.generic.DebugPopUp;
 			import org.ishafoundation.archives.transcript.components.studio.concept.ConceptManagerDialog;
 			import org.ishafoundation.archives.transcript.components.studio.category.CategoryManagerDialog;
@@ -194,7 +194,7 @@
 					CursorManager.setBusyCursor();
 					// first update the reference file - continue even if it fails
 					reloadReferencesBeforeContinuing(function():void {
-						sessionMgr.retrieveSession(sessionId, popup.eventSelectorPane.selectedEventProps, openSessionSuccess, openSessionFailure);
+						sessionMgr.retrieveSession(sessionId, popup.eventSelectorPane.selectedEventMetadata, openSessionSuccess, openSessionFailure);
 					});					
 				});
 			}
@@ -215,19 +215,19 @@
 								Alert.show("No document exists with id: " + docId);
 							}
 							else if (docXML.localName() == "event") {
-								var eventProps:EventProperties = EventProperties.createInstance(docXML);
-								SessionSelectorDialog.displayIfNecessary(eventProps, popup, databaseMgr, function(sessionProps:SessionProperties):void {
-									sessionMgr.retrieveSession(sessionProps.sessionId, eventProps, openSessionSuccess, openSessionFailure);
+								var eventMetadata:EventMetadata = EventMetadata.createInstance(docXML);
+								SessionSelectorDialog.displayIfNecessary(eventMetadata, popup, databaseMgr, function(sessionMetadata:SessionMetadata):void {
+									sessionMgr.retrieveSession(sessionMetadata.sessionId, eventMetadata, openSessionSuccess, openSessionFailure);
 									popup.closeMe();
 								});
 							}
 							else if (docXML.localName() == "session") {
 								// first we need to get the event props
-								var sessionProps:SessionProperties = SessionProperties.createInstanceFromSessionXML(docXML);
+								var sessionMetadata:SessionMetadata = SessionMetadata.createInstanceFromSessionXML(docXML);
 								trace("Opening session based on session XML already in memory");
-								DatabaseManagerUtils.retrieveEventXML(sessionProps.eventId, databaseMgr, function(eventXML:XML):void {
-									var eventProps:EventProperties = EventProperties.createInstance(eventXML);
-									var session:Session = new Session(docXML, eventProps, referenceMgr);
+								DatabaseManagerUtils.retrieveEventXML(sessionMetadata.eventId, databaseMgr, function(eventXML:XML):void {
+									var eventMetadata:EventMetadata = EventMetadata.createInstance(eventXML);
+									var session:Session = new Session(docXML, eventMetadata, referenceMgr);
 									openSessionSuccess(session);
 									popup.closeMe();
 									// the nodeId might refer to a markup or something
@@ -362,7 +362,7 @@
 					return;
 				}
 				var reloadSessionFunction:Function = function():void {
-					sessionMgr.retrieveSession(session.id, session.eventProps, openSessionSuccess, openSessionFailure);
+					sessionMgr.retrieveSession(session.id, session.eventMetadata, openSessionSuccess, openSessionFailure);
 				}
 				// first update the reference file - continue even if it fails
 				referenceMgr.loadReferences(reloadSessionFunction, function(msg:String):void {
@@ -371,12 +371,12 @@
 				});
 			}
 			
-			private function editEventProps():void {
+			private function editEventMetadata():void {
 				var thisPanel:MainPanel = this;
-				DatabaseManagerUtils.retrieveEventXML(session.eventProps.id, databaseMgr, function(eventXML:XML):void {
-					session.eventProps = EventProperties.createInstance(eventXML);
-					var popup:EventPropertiesEditorDialog = EventPropertiesEditorDialog.display(thisPanel, databaseMgr, referenceMgr, session.eventProps);
-					popup.addEventListener(EventPropertiesEditorDialog.EVENT_EDITED, function(event:Event):void {
+				DatabaseManagerUtils.retrieveEventXML(session.eventMetadata.id, databaseMgr, function(eventXML:XML):void {
+					session.eventMetadata = EventMetadata.createInstance(eventXML);
+					var popup:EventMetadataEditorDialog = EventMetadataEditorDialog.display(thisPanel, databaseMgr, referenceMgr, session.eventMetadata);
+					popup.addEventListener(EventMetadataEditorDialog.EVENT_EDITED, function(event:Event):void {
 						status = "Successfully edited event";
 						Alert.show("Successfully edited event"); 
 						updateTitle();
@@ -386,14 +386,14 @@
 				});
 			}
 			
-			private function editSessionProps():void {
+			private function editSessionMetadata():void {
 				var sessionXMLCopy:XML = session.sessionXML.copy();
-				var sessionPropsCopy:SessionProperties = SessionProperties.createInstanceFromSessionXML(sessionXMLCopy);
-				var popup:SessionPropertiesEditorDialog = SessionPropertiesEditorDialog.display(this, databaseMgr, referenceMgr, sessionPropsCopy); 
-				popup.addEventListener(SessionPropertiesEditorDialog.SESSION_PROPS_EDITED, function():void {
+				var sessionMetadataCopy:SessionMetadata = SessionMetadata.createInstanceFromSessionXML(sessionXMLCopy);
+				var popup:SessionMetadataEditorDialog = SessionMetadataEditorDialog.display(this, databaseMgr, referenceMgr, sessionMetadataCopy); 
+				popup.addEventListener(SessionMetadataEditorDialog.SESSION_PROPS_EDITED, function():void {
 					// copy the session props over the existing ones
 					// first delete the old ones
-					session.metadata.metadataElement = sessionPropsCopy.metadataElement;
+					session.metadata.metadataElement = sessionMetadataCopy.metadataElement;
 					session.unsavedChanges = true;
 					Alert.show("Session properties edited but not yet saved");				
 					updateTitle();
@@ -437,7 +437,7 @@
 			private function importTranscriptComplex():void {
 				var popup:ImportDialog = ImportDialog.display(this, databaseMgr, referenceMgr);
 				popup.addEventListener(ImportDialog.IMPORT_CLICKED, function(event:Event):void {
-					var newSession:Session = sessionMgr.openSessionForEvent(popup.sessionXML, popup.eventProps);
+					var newSession:Session = sessionMgr.openSessionForEvent(popup.sessionXML, popup.eventMetadata);
 					openSessionSuccess(newSession);
 					storeSession();
 				});
@@ -472,10 +472,10 @@
 					title += "No session open";
 				}
 				else {
-					if (session.eventProps != null) {
-						title += session.eventProps.generateFullName(referenceMgr) + "; ";
+					if (session.eventMetadata != null) {
+						title += session.eventMetadata.generateFullName(referenceMgr) + "; ";
 					}
-					title += session.metadata.getFullName(session.eventProps) + " ";
+					title += session.metadata.getFullName(session.eventMetadata) + " ";
 					if (session.transcript == null) {
 						title += "- NO TRANSCRIPT";
 					}
@@ -497,11 +497,11 @@
 				else if ( actionName == "reloadTranscript" ) {
 					reloadClicked();
 				}
-				else if ( actionName == "eventProps" ) {
-					editEventProps();
+				else if ( actionName == "eventMetadata" ) {
+					editEventMetadata();
 				}
-				else if ( actionName == "sessionProps" ) {
-					editSessionProps();
+				else if ( actionName == "sessionMetadata" ) {
+					editSessionMetadata();
 				}
 				else if ( actionName == "markupText" ) {
 					this.transcriptPane.markupText();
@@ -585,8 +585,8 @@
 				<menuitem id="store" label="Save" enabled="{myMenuBar != null &amp;&amp; session != null &amp;&amp; session.unsavedChanges}"/>
 				<menuitem id="reloadTranscript" label="Reload from database" enabled="{myMenuBar != null &amp;&amp; session != null}"/>
 				<menuitem type="separator"/>
-				<menuitem id="eventProps" label="Event properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/>
-				<menuitem id="sessionProps" label="Session properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/>
+				<menuitem id="eventMetadata" label="Event properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/>
+				<menuitem id="sessionMetadata" label="Session properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/>
 				<!--menuitem id="mediaProps" label="Media properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/-->
 			</menuitem>
 			<menuitem label="Selection" enabled="{transcriptPane.textPane.ttSelection != null}">

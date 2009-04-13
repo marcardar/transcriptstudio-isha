@@ -4,7 +4,7 @@
 	<![CDATA[
 		import org.ishafoundation.archives.transcript.model.ReferenceManager;
 		import org.ishafoundation.archives.transcript.db.DatabaseConstants;
-		import org.ishafoundation.archives.transcript.model.EventProperties;
+		import org.ishafoundation.archives.transcript.model.EventMetadata;
 		import name.carter.mark.flex.util.collection.ISet;
 		import mx.utils.StringUtil;
 		import mx.formatters.DateBase;
@@ -18,7 +18,7 @@
 		public var referenceMgr:ReferenceManager;
 
 		[Bindable]
-		private var _eventProps:EventProperties;
+		private var _eventMetadata:EventMetadata;
 
 		private function creationCompleteHandler():void {
 			eventLanguageComboBox.dataProvider = referenceMgr.getLanguages();
@@ -28,24 +28,24 @@
 		}
 		
 		[Bindable]
-		public function get eventProps():EventProperties {
-			return _eventProps;
+		public function get eventMetadata():EventMetadata {
+			return _eventMetadata;
 		}
 		
-		public function set eventProps(newEventProps:EventProperties):void {
-			if (newEventProps === _eventProps) {
+		public function set eventMetadata(newEventMetadata:EventMetadata):void {
+			if (newEventMetadata === _eventMetadata) {
 				return;
 			}
-			_eventProps = newEventProps;
-			eventSubTitleTextInput.text = _eventProps.subTitle;
-			eventTypeComboBox.selectedItem = _eventProps.type;
-			startAtDateField.selectedDate = _eventProps.startAt; 
-			endAtDateField.selectedDate = _eventProps.endAt;
-			eventCountryComboBox.text = _eventProps.country; 
-			eventLocationComboBox.text = _eventProps.location; 
-			eventVenueComboBox.text = _eventProps.venue; 
-			eventLanguageComboBox.selectedItem = _eventProps.language;
-			notesTextArea.text = _eventProps.notes;
+			_eventMetadata = newEventMetadata;
+			eventSubTitleTextInput.text = _eventMetadata.subTitle;
+			eventTypeComboBox.selectedItem = _eventMetadata.type;
+			startAtDateField.selectedDate = _eventMetadata.startAt; 
+			endAtDateField.selectedDate = _eventMetadata.endAt;
+			eventCountryComboBox.text = _eventMetadata.country; 
+			eventLocationComboBox.text = _eventMetadata.location; 
+			eventVenueComboBox.text = _eventMetadata.venue; 
+			eventLanguageComboBox.selectedItem = _eventMetadata.language;
+			notesTextArea.text = _eventMetadata.notes;
 		}
 
 		public static function getArrayCollectionSequence(first:int, last:int, width:int, includeUnknown:Boolean):ArrayCollection {
@@ -63,13 +63,13 @@
 		}
 
 		private function countryChangeHandler():void {
-			eventProps.country = eventCountryComboBox.text;
+			eventMetadata.country = eventCountryComboBox.text;
 			eventLocationComboBox.dataProvider = referenceMgr.getLocations(eventCountryComboBox.text);
 			eventLocationComboBox.selectedIndex = -1;
 		}
 
 		private function locationChangeHandler():void {
-			eventProps.location = eventLocationComboBox.text;
+			eventMetadata.location = eventLocationComboBox.text;
 			var oldText:String = eventVenueComboBox.text;
 			eventVenueComboBox.dataProvider = referenceMgr.getVenues(eventCountryComboBox.text, eventLocationComboBox.text);
 			eventVenueComboBox.selectedIndex = -1;
@@ -115,7 +115,7 @@
 				<mx:Label text="Event Type"/>
 			</mx:GridItem>
 			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
-				<mx:ComboBox id="eventTypeComboBox" width="100" textAlign="center" change="{eventProps.type = eventTypeComboBox.selectedItem as String}"/>
+				<mx:ComboBox id="eventTypeComboBox" width="100" textAlign="center" change="{eventMetadata.type = eventTypeComboBox.selectedItem as String}"/>
 			</mx:GridItem>
 		</mx:GridRow>
 		<mx:GridRow width="100%">
@@ -131,7 +131,7 @@
 				<mx:Label text="Event Sub Title"/>
 			</mx:GridItem>
 			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
-				<mx:TextInput width="100%" id="eventSubTitleTextInput" restrict="a-zA-Z0-9\ " change="{eventProps.subTitle = eventSubTitleTextInput.text}"/>
+				<mx:TextInput width="100%" id="eventSubTitleTextInput" restrict="a-zA-Z0-9\ " change="{eventMetadata.subTitle = eventSubTitleTextInput.text}"/>
 			</mx:GridItem>
 		</mx:GridRow>
 		<mx:GridRow width="100%">
@@ -139,7 +139,7 @@
 				<mx:Label text="Event Start Date"/>
 			</mx:GridItem>
 			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
-				<mx:DateField id="startAtDateField" formatString="DD/MM/YYYY" change="{eventProps.startAt = startAtDateField.selectedDate}" selectableRange="{endAtDateField.selectedDate == null ? null : {rangeEnd : endAtDateField.selectedDate}}"/>
+				<mx:DateField id="startAtDateField" formatString="DD/MM/YYYY" change="{eventMetadata.startAt = startAtDateField.selectedDate}" selectableRange="{endAtDateField.selectedDate == null ? null : {rangeEnd : endAtDateField.selectedDate}}"/>
 			</mx:GridItem>
 		</mx:GridRow>
 		<mx:GridRow width="100%">
@@ -147,7 +147,7 @@
 				<mx:Label text="Event End Date"/>
 			</mx:GridItem>
 			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
-				<mx:DateField id="endAtDateField" formatString="DD/MM/YYYY" change="{eventProps.endAt = endAtDateField.selectedDate}" selectableRange="{(startAtDateField.selectedDate == null) ? null : {rangeStart : startAtDateField.selectedDate}}"/>
+				<mx:DateField id="endAtDateField" formatString="DD/MM/YYYY" change="{eventMetadata.endAt = endAtDateField.selectedDate}" selectableRange="{(startAtDateField.selectedDate == null) ? null : {rangeStart : startAtDateField.selectedDate}}"/>
 			</mx:GridItem>
 		</mx:GridRow>
 		<mx:GridRow width="100%">
@@ -171,7 +171,7 @@
 				<mx:Label text="Venue"/>
 			</mx:GridItem>
 			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
-				<mx:ComboBox width="100%" id="eventVenueComboBox" editable="true" restrict="a-zA-Z0-9\ " change="{eventProps.venue = eventVenueComboBox.text}"/>
+				<mx:ComboBox width="100%" id="eventVenueComboBox" editable="true" restrict="a-zA-Z0-9\ " change="{eventMetadata.venue = eventVenueComboBox.text}"/>
 			</mx:GridItem>
 		</mx:GridRow>
 		<mx:GridRow width="100%">
@@ -179,7 +179,7 @@
 				<mx:Label text="Language"/>
 			</mx:GridItem>
 			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
-				<mx:ComboBox id="eventLanguageComboBox" width="100" textAlign="center" change="{eventProps.language = eventLanguageComboBox.selectedItem as String}"/>
+				<mx:ComboBox id="eventLanguageComboBox" width="100" textAlign="center" change="{eventMetadata.language = eventLanguageComboBox.selectedItem as String}"/>
 			</mx:GridItem>
 		</mx:GridRow>
 		<mx:GridRow width="100%" height="100%">
@@ -187,7 +187,7 @@
 				<mx:Label text="Notes"/>
 			</mx:GridItem>
 			<mx:GridItem width="100%" height="100%" verticalAlign="middle">
-				<mx:TextArea id="notesTextArea" width="100%" height="100%" change="{eventProps.notes = notesTextArea.text}"/>
+				<mx:TextArea id="notesTextArea" width="100%" height="100%" change="{eventMetadata.notes = notesTextArea.text}"/>
 			</mx:GridItem>
 		</mx:GridRow>
 	</mx:Grid>

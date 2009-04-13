@@ -2,12 +2,12 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Create Event" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*">
 	<mx:Script>
 	<![CDATA[
+		import org.ishafoundation.archives.transcript.model.EventMetadata;
 		import org.ishafoundation.archives.transcript.db.DatabaseManagerUtils;
 		import org.ishafoundation.archives.transcript.db.XMLStorer;
 		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
 		import mx.events.FlexEvent;
 		import org.ishafoundation.archives.transcript.model.ReferenceManager;
-		import org.ishafoundation.archives.transcript.model.EventProperties;
 		import org.ishafoundation.archives.transcript.db.DatabaseManager;
 		import mx.controls.Alert;
 		import mx.managers.PopUpManager;
@@ -16,31 +16,31 @@
 		
 		private var xqueryExecutor:XQueryExecutor;
 		
-		public static function display(parent:DisplayObject, xqueryExecutor:XQueryExecutor, referenceMgr:ReferenceManager, eventProps:EventProperties):EventPropertiesCreatorDialog {
-			var result:EventPropertiesCreatorDialog = new EventPropertiesCreatorDialog();
+		public static function display(parent:DisplayObject, xqueryExecutor:XQueryExecutor, referenceMgr:ReferenceManager, eventMetadata:EventMetadata):EventCreatorDialog {
+			var result:EventCreatorDialog = new EventCreatorDialog();
 			result.xqueryExecutor = xqueryExecutor;
 			PopUpManager.addPopUp(result, parent, true);
 			result.eventPropertiesPane.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
 				result.eventPropertiesPane.referenceMgr = referenceMgr;
 				result.eventPropertiesPane.callLater(function():void {
-					if (eventProps == null) {
-						result.eventPropertiesPane.eventProps = new EventProperties(<metadata/>, 'a');
+					if (eventMetadata == null) {
+						result.eventPropertiesPane.eventMetadata = new EventMetadata(<metadata/>, 'a');
 					}
 					else {
-						result.eventPropertiesPane.eventProps = eventProps;
+						result.eventPropertiesPane.eventMetadata = eventMetadata;
 					}
 				});
 			}, true);
 			return result;
 		}
 	
-		public function get eventProps():EventProperties {
-			return eventPropertiesPane.eventProps;
+		public function get eventMetadata():EventMetadata {
+			return eventPropertiesPane.eventMetadata;
 		}
 		
 		private function okClicked():void {
-			DatabaseManagerUtils.createEvent(eventProps.type, eventProps.eventMetadataElement, xqueryExecutor, function(eventXML:XML):void {
-				eventProps.id = eventXML.@id;
+			DatabaseManagerUtils.createEvent(eventMetadata.type, eventMetadata.eventMetadataElement, xqueryExecutor, function(eventXML:XML):void {
+				eventMetadata.id = eventXML.@id;
 				closeMe();
 				dispatchEvent(new Event(EVENT_EDITED));
 			}, function (msg:String):void {
@@ -54,7 +54,7 @@
 	]]>
 	</mx:Script>
 	
-	<metadata:EventPropertiesPane id="eventPropertiesPane" width="100%" height="100%"/>
+	<metadata:EventMetadataPane id="eventPropertiesPane" width="100%" height="100%"/>
 	<mx:HBox id="buttonBox">
 		<mx:Button id="okButton" label="OK" enabled="{eventPropertiesPane.ready}" click="okClicked()"/>
 		<mx:Button label="Cancel" click="closeMe()"/>

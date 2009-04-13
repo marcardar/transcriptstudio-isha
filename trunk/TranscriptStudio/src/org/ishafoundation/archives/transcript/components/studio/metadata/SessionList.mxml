@@ -4,9 +4,9 @@
 	<![CDATA[
 		import mx.controls.Alert;
 		import name.carter.mark.flex.util.XMLUtils;
-		import org.ishafoundation.archives.transcript.model.EventProperties;
+		import org.ishafoundation.archives.transcript.model.EventMetadata;
 		import mx.rpc.http.HTTPService;
-		import org.ishafoundation.archives.transcript.model.SessionProperties;
+		import org.ishafoundation.archives.transcript.model.SessionMetadata;
 		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
 		
 		public var xqueryExecutor:XQueryExecutor;
@@ -23,33 +23,33 @@
 		 */
 		public var autoSelect:Boolean = false;
 		
-		private var _eventProps:EventProperties;
+		private var _eventMetadata:EventMetadata;
 		
-		public function set eventProps(newValue:EventProperties):void {
-			_eventProps = newValue;
+		public function set eventMetadata(newValue:EventMetadata):void {
+			_eventMetadata = newValue;
 			refresh(null);
 		}
 		
-		public function get eventProps():EventProperties {
-			return _eventProps;
+		public function get eventMetadata():EventMetadata {
+			return _eventMetadata;
 		}
 		
-		public function get selectedSessionProps():SessionProperties {
-			return selectedItem as SessionProperties;
+		public function get selectedSessionMetadata():SessionMetadata {
+			return selectedItem as SessionMetadata;
 		}
 		
 		public function refresh(selectedSessionId:String):void {
-			xqueryExecutor.executeStoredXQuery("retrieve-session-props.xql", {eventId:eventProps.id}, function(returnVal:XML):void {
-				var sessionPropsElements:XMLList = returnVal.*;
+			xqueryExecutor.executeStoredXQuery("retrieve-session-props.xql", {eventId:eventMetadata.id}, function(returnVal:XML):void {
+				var sessionMetadataElements:XMLList = returnVal.*;
 				var arr:Array = [];
-				var propsToSelect:SessionProperties;
-				for each (var sessionPropsElement:XML in sessionPropsElements) {
-					var sessionId:String = XMLUtils.getAttributeValue(sessionPropsElement, "_sessionId");
+				var propsToSelect:SessionMetadata;
+				for each (var sessionMetadataElement:XML in sessionMetadataElements) {
+					var sessionId:String = XMLUtils.getAttributeValue(sessionMetadataElement, "_sessionId");
 					if (sessionId == null) {
 						Alert.show("Session metadata does not have a corresponding session id");
 						continue;
 					}
-					var props:SessionProperties = new SessionProperties(sessionPropsElement, eventProps.id, sessionId);
+					var props:SessionMetadata = new SessionMetadata(sessionMetadataElement, eventMetadata.id, sessionId);
 					arr.push(props);
 					if (sessionId == selectedSessionId) {
 						propsToSelect = props;
@@ -71,8 +71,8 @@
 			}, HTTPService.RESULT_FORMAT_E4X);
 		}
 		
-		private function itemLabelFunc(sessionProps:SessionProperties):String {
-			return sessionProps.getFullName(eventProps);
+		private function itemLabelFunc(sessionMetadata:SessionMetadata):String {
+			return sessionMetadata.getFullName(eventMetadata);
 		}		
 	]]>
 	</mx:Script>

@@ -27,7 +27,8 @@ package org.ishafoundation.archives.transcript.importer
 	import name.carter.mark.flex.util.XMLUtils;
 	
 	import org.ishafoundation.archives.transcript.db.XQueryExecutor;
-	import org.ishafoundation.archives.transcript.model.SessionProperties;
+	import org.ishafoundation.archives.transcript.model.MediaMetadata;
+	import org.ishafoundation.archives.transcript.model.SessionMetadata;
 	
 	public class MSWordImporter
 	{
@@ -76,7 +77,7 @@ package org.ishafoundation.archives.transcript.importer
 			}
 			var mediaMetadataElement:XML = <mediaMetadata/>;
 			sessionElement.appendChild(mediaMetadataElement);
-			var deviceElement:XML = <device id="a1"/>
+			var deviceElement:XML = <device id={MediaMetadata.MAIN_AUDIO_DEVICE_ID}/>
 			mediaMetadataElement.appendChild(deviceElement);
 			var transcriptElement:XML = <transcript id="t1"/>;
 			sessionElement.appendChild(transcriptElement);
@@ -139,7 +140,7 @@ package org.ishafoundation.archives.transcript.importer
 		
 		private static function appendSessionNotesLine(text:String, metadataElement:XML):void {
 			text = "\r" + text;
-			XMLUtils.appendChildElementText(metadataElement, SessionProperties.NOTES_ELEMENT_NAME, text, false);
+			XMLUtils.appendChildElementText(metadataElement, SessionMetadata.NOTES_ELEMENT_NAME, text, false);
 		}
 		
 		private function importPathsInternal(names:Array, audioTranscripts:Array, idFunc:Function, successFunc:Function, failureFunc:Function):void {
