@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="600" horizontalAlign="center" title="Event / Session Builder" xmlns:session="org.ishafoundation.archives.transcript.components.studio.session.*" xmlns:importer="org.ishafoundation.archives.transcript.components.studio.importer.*" creationComplete="init()">
+	<mx:Script>
+	<![CDATA[
+		import name.carter.mark.flex.util.XMLUtils;
+		import mx.binding.utils.BindingUtils;
+		import org.ishafoundation.archives.transcript.components.studio.event.EventSelectorDialog;
+		import org.ishafoundation.archives.transcript.components.studio.session.SessionCreatorDialog;
+		import org.ishafoundation.archives.transcript.components.studio.event.EventCreatorDialog;
+		import org.ishafoundation.archives.transcript.model.Session;
+		import mx.rpc.http.HTTPService;
+		import org.ishafoundation.archives.transcript.db.DatabaseConstants;
+		import mx.events.FlexEvent;
+		import mx.utils.StringUtil;
+		import mx.managers.PopUpManager;
+		import org.ishafoundation.archives.transcript.components.studio.event.EventMetadataPane;
+		import mx.managers.CursorManager;
+		import mx.controls.Alert;
+		import org.ishafoundation.archives.transcript.model.SessionMetadata;
+		import org.ishafoundation.archives.transcript.model.EventMetadata;
+		import org.ishafoundation.archives.transcript.importer.MSWordImporter;
+		import org.ishafoundation.archives.transcript.model.ReferenceManager;
+		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
+		import org.ishafoundation.archives.transcript.db.DatabaseManager;
+		import mx.core.Container;
+		import mx.events.PropertyChangeEvent;
+		import mx.binding.utils.ChangeWatcher;
+		
+		public static const IMPORT_CLICKED:String = "IMPORT_CLICKED";
+		
+		[Bindable]
+		public var databaseMgr:DatabaseManager;
+		
+		[Bindable]
+		public var referenceMgr:ReferenceManager;
+		
+		[Bindable]
+		private var importedEventMetadata:EventMetadata;
+		private var importedSessionMetadataElement:XML;
+		private var importedDeviceElements:XMLList;
+		private var importedTranscriptElement:XML;
+		
+		[Bindable]
+		private var _eventMetadata:EventMetadata;
+		public var sessionXML:XML;
+	
+		public static function display(parent:DisplayObject, databaseMgr:DatabaseManager, referenceMgr:ReferenceManager):ImportDialog {
+			var result:ImportDialog = new ImportDialog();
+			result.databaseMgr = databaseMgr;
+			result.referenceMgr = referenceMgr;
+			PopUpManager.addPopUp(result, parent, true);
+			return result;
+		}
+		
+		private function init():void {
+			ChangeWatcher.watch(transcriptsToImportList, "dataProvider", function():void {
+				callLater(buttonBox.invalidateProperties);
+			});
+		}
+		
+		[Bindable]
+		public function get eventMetadata():EventMetadata {
+			return _eventMetadata;
+		}
+		
+		public function set eventMetadata(eventMetadata:EventMetadata):void {
+			_eventMetadata = eventMetadata;
+			refreshEventTextArea();
+		}
+		
+		private function transcriptsToImportSelectorHandler():void {
+			var transcriptsToImportSelectorDialog:TranscriptsToImportSelectorDialog = TranscriptsToImportSelectorDialog.display(this, databaseMgr);
+			transcriptsToImportSelectorDialog.addEventListener(TranscriptsToImportSelectorDialog.FILES_IMPORTED, function(evt:Event):void {
+				if (transcriptsToImportSelectorDialog.selectedAudioTranscripts.length == 0) {
+					importedEventMetadata = null;
+					importedSessionMetadataElement = null;
+					importedTranscriptElement = null;
+					importedDeviceElements = null;
+				}
+				else {
+					var importedEventXML:XML = MSWordImporter.createEventElement(transcriptsToImportSelectorDialog.selectedAudioTranscripts);
+					var importedEventMetadataElement:XML = importedEventXML.metadata[0];
+					var importedSessionXML:XML = MSWordImporter.createSessionElement(transcriptsToImportSelectorDialog.selectedAudioTranscripts);
+					importedDeviceElements = importedSessionXML..device;
+					importedTranscriptElement = importedSessionXML.transcript[0];
+
+					setMissingAttributeValue(importedEventMetadataElement, EventMetadata.START_AT_ATTR_NAME, importedSessionXML.metadata.@startAt);
+					setMissingAttributeValue(importedEventMetadataElement, EventMetadata.END_AT_ATTR_NAME, importedSessionXML.metadata.@startAt);
+
+					importedEventMetadata = EventMetadata.createInstance(importedEventXML);
+					importedSessionMetadataElement = importedSessionXML.metadata[0];
+				}
+				transcriptsToImportList.dataProvider = transcriptsToImportSelectorDialog.selectedPaths;
+			});
+		}
+		
+		private function setMissingAttributeValue(metadataElement:XML, attrName:String, attrValue:String):void {
+			if (attrValue == null || attrValue.toString() == "") {
+				return;
+			}
+			if (XMLUtils.getAttributeValue(metadataElement, attrName) == null) {
+				XMLUtils.setAttributeValue(metadataElement, attrName, attrValue);
+			}
+		}
+			
+		private function eventSelectorHandler():void {
+			var eventSelectorDialog:EventSelectorDialog = EventSelectorDialog.display(this, databaseMgr, referenceMgr);
+			eventSelectorDialog.eventSelectorPane.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
+				if (importedEventMetadata != null) {
+					eventSelectorDialog.eventSelectorPane.eventTypeComboBox.selectedItem = importedEventMetadata.type;
+					eventSelectorDialog.eventSelectorPane.eventTypeComboBox.enabled = false;
+					if (importedEventMetadata.startAt != null) {
+						eventSelectorDialog.eventSelectorPane.yearComboBox.selectedItem = importedEventMetadata.startAt.fullYear.toString();
+					}
+					eventSelectorDialog.eventSelectorPane.searchClicked();
+				}
+			});
+			eventSelectorDialog.addEventListener(EventSelectorDialog.EVENT_SELECTED, function(evt:Event):void {
+				eventMetadata = eventSelectorDialog.selectedEventMetadata;
+			});
+		}
+		
+		private function eventCreatorHandler():void {
+			var templateProps:EventMetadata = importedEventMetadata == null ? null : importedEventMetadata.copy();
+			var eventCreatorDialog:EventCreatorDialog = EventCreatorDialog.display(this, databaseMgr, referenceMgr, templateProps);
+			eventCreatorDialog.eventPropertiesPane.eventTypeComboBox.enabled = templateProps == null;
+			eventCreatorDialog.addEventListener(EventCreatorDialog.EVENT_EDITED, function(evt:Event):void {
+				eventMetadata = eventCreatorDialog.eventMetadata;
+				status = "Successfully created event: " + eventMetadata.id;
+				Alert.show("Event ID: " + eventMetadata.id, "Successfully created event");
+			});
+		}
+		
+		private function sessionCreatorHandler():void {
+			var templateSessionMetadataElement:XML;
+			if (importedSessionMetadataElement == null) {
+				templateSessionMetadataElement = <metadata/>
+			} 
+			else {
+				templateSessionMetadataElement = importedSessionMetadataElement.copy();
+			}
+			var sessionCreatorDialog:SessionCreatorDialog = SessionCreatorDialog.display(this, databaseMgr, referenceMgr, eventMetadata.id, templateSessionMetadataElement);
+			sessionCreatorDialog.addEventListener(SessionCreatorDialog.SESSION_EDITED, function(evt:Event):void {
+				var newSessionMetadata:SessionMetadata = sessionCreatorDialog.sessionMetadata;
+				sessionList.refresh(newSessionMetadata.sessionId);
+				status = "Successfully created session: " + newSessionMetadata.sessionId;
+				Alert.show("Session ID: " + newSessionMetadata.sessionId, "Successfully created session");
+			});
+		}
+		
+		private function refreshEventTextArea():void {
+			if (eventMetadata == null) {
+				eventTextArea.text = null;
+				return;
+			}
+			eventTextArea.text = eventMetadata.id;
+		}
+		
+		private function sessionListErrorHandler(msg:String):void {
+			Alert.show(msg, "Could not retrieve sessions for selected event: " + eventMetadata.id); 
+		}
+		
+		private function sessionListLabelFunc(sessionMetadata:SessionMetadata):String {
+			return sessionMetadata.getFullName(eventMetadata);
+		}
+		
+		private function get sessionMetadata():SessionMetadata {
+			return sessionList.selectedItem as SessionMetadata;
+		}
+		
+		private function importClicked():void {
+			if (sessionList.selectedItem == null) {
+				throw new Error("No session was selected");
+			}
+			if (importedTranscriptElement == null) {
+				throw new Error("No transcript to import");
+			}
+			// now we might have the session date so use that to prefix the media UUIDs
+			// no need to fix media UUIDS - just use the ID given at the start of the imported filename
+			//fixMediaUUIDs();
+			// there is a transcript to import into the session
+			// load the session from the database
+			databaseMgr.retrieveXML(function(existingSessionXML:XML):void {
+				if ((existingSessionXML.transcript as XMLList).length() > 0) {
+					Alert.show("Session already has transcript - choose another");
+					return;
+				}
+				var session:Session = new Session(existingSessionXML, eventMetadata, referenceMgr);
+				session.appendTranscript(importedTranscriptElement, importedDeviceElements);
+				sessionXML = session.sessionXML;
+				dispatchEvent(new Event(IMPORT_CLICKED));
+				closeMe();
+			}, function(msg:String):void {
+				Alert.show(msg, "Could not retrieve selected session: " + sessionMetadata.sessionId);
+			}, "session", sessionMetadata.sessionId, DatabaseConstants.DATA_COLLECTION_PATH);
+		}
+
+		private function getEventText(eventMetadata:EventMetadata):String {
+			if (eventMetadata == null) {
+				return null;
+			}
+			var result:String = eventMetadata.generateLongText(referenceMgr);
+			return result;
+		}
+		
+		private function closeMe():void {
+			PopUpManager.removePopUp(this);
+		}
+		
+	]]>
+	</mx:Script>
+	<mx:HBox width="100%" verticalAlign="bottom" paddingTop="10">
+		<mx:Label text="Transcripts to import: "/>
+		<mx:Label text="{importedEventMetadata == null ? '&lt;Nothing selected&gt;' : transcriptsToImportList.dataProvider.source.length + ' file(s) selected'}"/>
+		<mx:Spacer height="100%" width="100%"/>
+		<mx:Button label="Select..." id="selectExternalTranscriptsButton" click="transcriptsToImportSelectorHandler()"/>
+		<mx:Button label="New..." visible="false"/>
+	</mx:HBox>
+	<mx:HBox width="100%">
+		<mx:Spacer height="100%" width="60"/>
+		<mx:List height="50" width="100%" id="transcriptsToImportList" selectable="false" enabled="{importedEventMetadata != null}"/>
+	</mx:HBox>
+	<mx:HBox width="100%" verticalAlign="bottom" paddingTop="20">
+		<mx:Label text="Event:" width="60"/>
+		<mx:Label text="{eventMetadata == null ? '&lt;Nothing selected&gt;' : 'ID: ' + eventMetadata.id}"/>
+		<mx:Spacer height="100%" width="100%"/>
+		<mx:Button label="Select..." id="selectEventButton" click="eventSelectorHandler()"/>
+		<mx:Button label="New..." id="newEventButton" click="eventCreatorHandler()"/>
+	</mx:HBox>
+	<mx:HBox width="100%">
+		<mx:Spacer height="100%" width="60"/>
+		<mx:TextArea width="100%" height="80" id="eventTextArea" enabled="{eventMetadata != null}" editable="false" text="{getEventText(eventMetadata)}" borderStyle="none" borderThickness="0"/>
+	</mx:HBox>
+	<mx:HBox width="100%" verticalAlign="middle" paddingTop="20">
+		<mx:Label text="Session:" width="60"/>
+		<mx:Label text="{sessionList.selectedItem == null ? '&lt;Nothing selected&gt;' : 'ID: ' + (sessionList.selectedItem as  SessionMetadata).sessionId}"/>
+		<mx:Spacer height="100%" width="100%"/>
+		<mx:Button label="New..." id="newSessionButton" enabled="{eventMetadata != null}" click="sessionCreatorHandler()"/>
+	</mx:HBox>
+	<mx:HBox width="100%">
+		<mx:Spacer height="100%" width="60"/>
+		<session:SessionList width="100%" height="70" id="sessionList" enabled="{eventMetadata != null}" xqueryExecutor="{databaseMgr}" errorHandler="{sessionListErrorHandler}" eventMetadata="{eventMetadata}"/>
+	</mx:HBox>
+	
+	<mx:HBox id="buttonBox">
+		<mx:HBox id="importButtonBox" visible="{transcriptsToImportList.dataProvider != null &amp;&amp; transcriptsToImportList.dataProvider.length > 0}" includeInLayout="{importButtonBox.visible}">
+			<mx:Button label="Import" click="importClicked()" id="importButton" enabled="{sessionList.selectedItem != null}"/>
+			<mx:Button label="Cancel" click="closeMe()" id="cancelButton"/>
+		</mx:HBox>
+		
+		<mx:HBox id="nonImportButtonBox" visible="{!importButtonBox.visible}" includeInLayout="{nonImportButtonBox.visible}">
+			<mx:Button label="Done" click="closeMe()" id="doneButton"/>
+		</mx:HBox>		
+	</mx:HBox>
+	
+</mx:TitleWindow>
