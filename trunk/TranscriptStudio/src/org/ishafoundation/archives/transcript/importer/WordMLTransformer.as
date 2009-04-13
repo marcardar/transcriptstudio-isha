@@ -348,7 +348,13 @@ package org.ishafoundation.archives.transcript.importer
 
  				// session - allow multiple dates to pile up because dates are in a special format
  				extractAttributeFromHeader(contentElement, sessionElement, ["DATE"], true, SessionProperties.START_AT_ATTR_NAME, false); 
- 				extractAttributeFromHeader(contentElement, sessionElement, ["NOTES", "NOTE"], false, SessionProperties.NOTES_ATTR_NAME, false);
+ 				extractAttributeFromHeader(contentElement, sessionElement, ["NOTES", "NOTE"], false, SessionProperties.NOTES_ELEMENT_NAME, false);
+ 				// hack time - actually we want notes as an element
+ 				var notes:String = XMLUtils.getAttributeValue(sessionElement, SessionProperties.NOTES_ELEMENT_NAME, null);
+ 				if (notes != null) {
+	 				XMLUtils.appendChildElementText(sessionElement, SessionProperties.NOTES_ELEMENT_NAME, notes);
+	 				delete sessionElement.@notes[0];
+	 			} 
 				
 				// event
  				var newValue:String = extractAttributeFromHeader(contentElement, eventElement, ["LOCATION"], false, EventProperties.VENUE_ATTR_NAME, false);
@@ -513,9 +519,9 @@ package org.ishafoundation.archives.transcript.importer
  					// HACK TIME
  					if (attrName == EventProperties.START_AT_ATTR_NAME || attrName == EventProperties.TYPE_ATTR_NAME) {
  						// we have conflicting data
- 						var notes:String = XMLUtils.getAttributeValue(targetElement, EventProperties.NOTES_ATTR_NAME, "");
+ 						var notes:String = XMLUtils.getChildElementText(targetElement, EventProperties.NOTES_ELEMENT_NAME, "");
  						notes += "\nInconsistent " + attrName + ": " + attrValue.toString(); 
- 						XMLUtils.setAttributeValue(targetElement, EventProperties.NOTES_ATTR_NAME, notes);
+ 						XMLUtils.setChildElementText(targetElement, EventProperties.NOTES_ELEMENT_NAME, notes);
  						continue;
  					}
  					else {

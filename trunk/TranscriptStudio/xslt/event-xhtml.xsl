@@ -65,7 +65,7 @@
 				<tr>
                     <td align="right">Notes:</td>
                     <td>
-                        <xsl:value-of select="(metadata/@notes, '&lt;not set&gt;')[1]"/>
+                        <xsl:value-of select="(metadata/notes, '&lt;not set&gt;')[1]"/>
                     </td>
                 </tr>
 			</table>

@@ -95,11 +95,11 @@ package name.carter.mark.flex.project.mdoc
 		
 		[Bindable]
 		public function set notes(newValue:String):void {
-			superNode.setProperty(NOTES_PROP_NAME, newValue);
+			superNode.setElementProperty(NOTES_PROP_NAME, newValue);
 		}
 		
 		public function get notes():String {
-			return superNode.getPropertyValue(NOTES_PROP_NAME, "");
+			return superNode.getElementPropertyValue(NOTES_PROP_NAME, "");
 		}
 		
 		[Bindable]

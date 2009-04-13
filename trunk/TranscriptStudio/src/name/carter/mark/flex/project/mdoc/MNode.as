@@ -43,18 +43,21 @@ package name.carter.mark.flex.project.mdoc
 		}
 		
 		public function getPropertyValue(propName:String, defaultValue:String = null):String {
-			var attrs:XMLList = nodeElement.attribute(propName);
-			if (attrs.length() == 0) {
-				return defaultValue;
-			}
-			else {
-				return attrs.toString();
-			}
+			return XMLUtils.getAttributeValue(nodeElement, propName, defaultValue);			
+		}
+		
+		public function getElementPropertyValue(propName:String, defaultValue:String = null):String {
+			return XMLUtils.getChildElementText(nodeElement, propName, defaultValue);
 		}
 	
 		public function setProperty(name:String, value:String, defaultValue:String = null):void {
 			this.modified = true;
-			XMLUtils.setAttributeValue(nodeElement, name, value);
+			XMLUtils.setAttributeValue(nodeElement, name, value, defaultValue);
+		}
+		
+		public function setElementProperty(name:String, value:String, defaultValue:String = null):void {
+			this.modified = true;
+			XMLUtils.setChildElementText(nodeElement, name, value, defaultValue);
 		}
 		
 		public function get childNodes():Array
@@ -118,6 +121,9 @@ package name.carter.mark.flex.project.mdoc
 		
 		[Bindable]
 		public function set modified(value:Boolean):void {
+			if (this is MDocument) {
+				trace("Setting nodeId '" + id + "' modified: " + value);
+			}
 			_modified = value;
 			if (value) {
 				// true - so also set the document

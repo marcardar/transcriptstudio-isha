@@ -105,8 +105,9 @@ package org.ishafoundation.archives.transcript.importer
 					}
 				}
 				// the session notes can contain information about the imported file(s)
-				appendSessionNotesLine("\rImported file:", metadataElement);
+				appendSessionNotesLine("Imported file:", metadataElement);
 				appendAttributesToSessionNotes(audioTranscript.audioTranscriptElement, metadataElement);
+				appendSessionNotesLine("", metadataElement);
 			}
 			return sessionElement;
 		}
@@ -133,14 +134,7 @@ package org.ishafoundation.archives.transcript.importer
 		}
 		
 		private static function appendSessionNotesLine(text:String, metadataElement:XML):void {
-			/*text = Utils.normalizeSpace(text);
-			if (text.length == 0) {
-				return;
-			}*/
-			var notes:String = XMLUtils.getAttributeValue(metadataElement, SessionProperties.NOTES_ATTR_NAME, "");
-			notes += "\r"
-			notes += text;
-			XMLUtils.setAttributeValue(metadataElement, SessionProperties.NOTES_ATTR_NAME, notes);
+			XMLUtils.appendChildElementText(metadataElement, SessionProperties.NOTES_ELEMENT_NAME, text, true);
 		}
 		
 		private function importPathsInternal(names:Array, audioTranscripts:Array, idFunc:Function, successFunc:Function, failureFunc:Function):void {
