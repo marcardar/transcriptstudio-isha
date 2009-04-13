@@ -1,11 +1,11 @@
 <mediaMetadata>
-	<device id="a1" sessionId="p1-1">
-		<audio id="p12" audioQuality="excellent"/>
-		<audio id="p13" audioQuality="good"/>
-		<video id="p12" audioQuality="good" videoQuality="excellent"/>
+	<device id="a1" sessionId="p-1-1">
+		<audios id="p-12" audioQuality="excellent"/>
+		<audio id="p-13" audioQuality="good"/>
+		<video id="p-12" audioQuality="good" videoQuality="excellent"/>
 	</device>
-	<device id="v1" sessionId="p1-2">
-		<video id="p13" audioQuality="good" videoQuality="excellent"/>
-		<video id="p14" audioQuality="good" videoQuality="excellent"/>
+	<device id="v1" sessionId="p-1-2">
+		<video id="p-13" audioQuality="good" videoQuality="excellent"/>
+		<video id="p-14" audioQuality="good" videoQuality="excellent"/>
 	</device>
 </mediaMetadata>

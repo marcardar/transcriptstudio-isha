@@ -7,6 +7,8 @@ declare namespace util = "http://exist-db.org/xquery/util";
 import module namespace id-utils = "http://www.ishafoundation.org/ts4isha/xquery/id-utils" at "id-utils.xqm";
 import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
 
+import module namespace functx = "http://www.functx.com" at "functx.xqm";
+
 (: adds all newMedia elements to the device element defined by the sessionId
    the device id is obtained by looking at the newMedia's parent id
    if the device element does not exist then it is created
@@ -15,44 +17,62 @@ import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/ut
    
    Note/TODO - we could try and work out the session id by looking at the ancestors of each newMedia...
 :)
-declare function media-fns:append-media-elements($newMediaElements as element()*, $sessionId as xs:string) as xs:string*
+declare function media-fns:import-media-elements($importMediaXMLs as element()*, $sessionId as xs:string, $deviceId as xs:string) as xs:string*
 {
-	let $session := collection('/db/ts4isha/data')/session[@id = $sessionId]
+	let $sessionXML := utils:get-session($sessionId)
 	return
-		if (not(exists($session))) then
-			concat('No media elements imported for unknown session id: ', $sessionId)
+		if (empty($sessionXML)) then
+			concat('Unknown sessionId: ', $sessionId)
 		else
-			let $mediaMetadataElement := media-fns:get-media-metadata-element($session)
+			let $mediaMetadataXML := media-fns:get-media-metadata-element($sessionXML)
+			let $deviceXML := media-fns:get-device-element($deviceId, $mediaMetadataXML)
 			return
-				for $newMedia in $newMediaElements
-				let $deviceId := $newMedia/../@id
+				for $importMediaXML in $importMediaXMLs
 				return
-					if (not(exists($deviceId))) then
-						()
-					else
-						let $device := media-fns:get-device-element($deviceId, $mediaMetadataElement)
-						return media-fns:append-media-element($newMedia, $device)
+					util:catch('java.lang.Exception', 
+						concat(media-fns:import-media-element($importMediaXML, $deviceXML), ': Success'),
+						concat($importMediaXML/@id, ': Fail')
+						)
 };
 
-declare function media-fns:append-media-element($newMediaElement as element(), $deviceElement as element()) as xs:string
+declare function media-fns:import-media-element($importMediaXML as element(), $deviceXML as element()) as xs:string
 {
-	let $tagName := local-name($newMediaElement)
-	let $newId := $newMediaElement/xs:string(@id)
-	let $detailPrefix := concat($tagName, ' [@id = ', $newId, '] - ')
-	let $msg :=
-		if (not($tagName = $id-utils:media-domains)) then
-			concat('NOT IMPORTED because illegal tag name: ', $tagName)
-		else
-			let $existingMediaElements := collection('/db/ts4isha/data')//*[local-name(.) eq $tagName and @id = $newId]
-			return
-				if (exists($existingMediaElements)) then
-					'NOT IMPORTED because already exists'
-				else
-					let $null := update insert $newMediaElement into $deviceElement
-					return
-						'IMPORTED'
+	let $domain := local-name($importMediaXML)
 	return
-		concat($detailPrefix, $msg) 
+		if (not($domain = $id-utils:media-domains)) then
+			error((), concat('Invalid mediaXML tag name: ', $domain))
+		else
+			let $importMediaId := $importMediaXML/@id
+			return 
+				if (exists($importMediaId)) then
+					(: check whether id already exists :)
+					let $null :=
+						if (id-utils:id-already-exists($domain, $importMediaId)) then
+							let $existingMediaXML := $deviceXML/*[local-name(.) eq $domain and @id eq $importMediaId]
+							let $newMediaXML :=
+								(: check that it exists for this session-device :)
+								if (empty($existingMediaXML)) then
+									error(xs:QName('illegal-argument-exception'), concat('mediaId already used for different session-device: ', $importMediaId))
+								else
+									(: merge the existing and new together :)
+									element {$domain}
+										{$existingMediaXML/@*
+										,$importMediaXML/@*[not(local-name(.) = $existingMediaXML/@*/local-name(.))]
+										,$existingMediaXML/*
+										,$importMediaXML/*
+										}
+							return
+								update replace $existingMediaXML with $newMediaXML
+						else
+							update insert $importMediaXML into $deviceXML
+					return xs:string($importMediaId)
+				else
+					let $eventId := $deviceXML/ancestor::session/@eventId
+					let $eventTypeId := utils:get-event($eventId)/@type
+					let $newId := media-fns:get-next-media-id($domain, $eventTypeId)
+					let $newMediaXML := functx:add-attributes($importMediaXML, xs:QName('id'), $newId)
+					let $null := update insert $newMediaXML into $deviceXML
+					return $newId
 };
 
 declare function media-fns:get-device-element($deviceId as xs:string, $mediaMetadataElement as element()) as element()
