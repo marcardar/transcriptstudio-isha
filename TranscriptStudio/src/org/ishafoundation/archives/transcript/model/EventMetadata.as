@@ -7,7 +7,7 @@ package org.ishafoundation.archives.transcript.model
 	import name.carter.mark.flex.util.Utils;
 	import name.carter.mark.flex.util.XMLUtils;
 	
-	public class EventProperties
+	public class EventMetadata
 	{
 		public static const ID_ATTR_NAME:String = "id";
 		public static const SUB_TITLE_ATTR_SUB_TITLE:String = "subTitle";
@@ -28,7 +28,7 @@ package org.ishafoundation.archives.transcript.model
 		private var _type:String;
 		private var _id:String;
 		
-		public function EventProperties(eventMetadataElement:XML, eventType:String, eventId:String = null)
+		public function EventMetadata(eventMetadataElement:XML, eventType:String, eventId:String = null)
 		{
 			if (eventMetadataElement == null) {
 				this.eventMetadataElement = <metadata/>;
@@ -45,14 +45,14 @@ package org.ishafoundation.archives.transcript.model
 			}
 		}
 		
-		public static function createInstance(eventXML:XML):EventProperties {
+		public static function createInstance(eventXML:XML):EventMetadata {
 			var eventType:String = eventXML.@type;
 			var eventId:String = XMLUtils.getAttributeValue(eventXML, "id", null);
-			return new EventProperties(eventXML.metadata[0], eventType, eventId);
+			return new EventMetadata(eventXML.metadata[0], eventType, eventId);
 		}
 		
-		public function copy():EventProperties {
-			return new EventProperties(eventMetadataElement.copy(), type, id);
+		public function copy():EventMetadata {
+			return new EventMetadata(eventMetadataElement.copy(), type, id);
 		}
 
 		private static function createTypesArray():Array {

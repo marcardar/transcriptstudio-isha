@@ -2,9 +2,9 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Select Event" creationComplete="init()" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*">
 	<mx:Script>
 	<![CDATA[
-		import org.ishafoundation.archives.transcript.model.SessionProperties;
+		import org.ishafoundation.archives.transcript.model.SessionMetadata;
 		import mx.managers.PopUpManager;
-		import org.ishafoundation.archives.transcript.model.EventProperties;
+		import org.ishafoundation.archives.transcript.model.EventMetadata;
 		import mx.events.FlexEvent;
 		import org.ishafoundation.archives.transcript.model.ReferenceManager;
 		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
@@ -30,19 +30,19 @@
 		}
 		
 		private function okClicked(evt:MouseEvent):void {
-			SessionSelectorDialog.displayIfNecessary(selectedEventProps, this, eventSelectorPane.xqueryExecutor, function(sessionProps:SessionProperties):void {
-				selectedSessionId = sessionProps.sessionId;
+			SessionSelectorDialog.displayIfNecessary(selectedEventMetadata, this, eventSelectorPane.xqueryExecutor, function(sessionMetadata:SessionMetadata):void {
+				selectedSessionId = sessionMetadata.sessionId;
 				dispatchEvent(new Event(OPEN_SESSION_REQUEST, true));
 				closeMe();
 			});
 		}
 		
-		private function get selectedEventProps():EventProperties {
-			return eventSelectorPane.eventsList.selectedItem as EventProperties;
+		private function get selectedEventMetadata():EventMetadata {
+			return eventSelectorPane.eventsList.selectedItem as EventMetadata;
 		}
 		
 		private function listDoubleClickHandler(evt:MouseEvent):void {
-			if (selectedEventProps == null) {
+			if (selectedEventMetadata == null) {
 				return;
 			}
 			okClicked(evt);

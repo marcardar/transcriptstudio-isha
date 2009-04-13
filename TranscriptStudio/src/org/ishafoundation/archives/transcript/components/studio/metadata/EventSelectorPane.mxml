@@ -2,13 +2,13 @@
 <mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()">
 	<mx:Script>
 	<![CDATA[
+		import org.ishafoundation.archives.transcript.model.EventMetadata;
 		import mx.core.Container;
 		import mx.core.ScrollPolicy;
 		import name.carter.mark.flex.util.Utils;
 		import mx.formatters.DateFormatter;
 		import name.carter.mark.flex.util.DateUtils;
 		import mx.messaging.SubscriptionInfo;
-		import org.ishafoundation.archives.transcript.model.EventProperties;
 		import mx.rpc.http.HTTPService;
 		import mx.utils.ObjectProxy;
 		import mx.controls.Alert;
@@ -76,8 +76,8 @@
 			}
 		}
 		
-		public function get selectedEventProps():EventProperties {
-			return eventsList.selectedItem as EventProperties;
+		public function get selectedEventMetadata():EventMetadata {
+			return eventsList.selectedItem as EventMetadata;
 		}
 	
 		public function selectEvent(eventId:String):void {
@@ -98,8 +98,8 @@
 				var eventXMLList:XMLList = resultXML.event;
 				var arr:Array = []
 				for each (var eventXML:XML in eventXMLList) {
-					var eventProps:EventProperties = EventProperties.createInstance(eventXML);
-					arr.push(eventProps);
+					var eventMetadata:EventMetadata = EventMetadata.createInstance(eventXML);
+					arr.push(eventMetadata);
 				}
 				eventsList.dataProvider = arr;
 				if (arr.length == 0) {
@@ -115,8 +115,8 @@
 			}, HTTPService.RESULT_FORMAT_E4X);
 		}
 		
-		private function resultLabelFunc(eventProps:EventProperties):String {
-			var result:String = eventProps.generateFullName(referenceMgr);
+		private function resultLabelFunc(eventMetadata:EventMetadata):String {
+			var result:String = eventMetadata.generateFullName(referenceMgr);
 			return result;
 		}
 		

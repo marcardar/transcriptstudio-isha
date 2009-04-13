@@ -5,7 +5,7 @@ package org.ishafoundation.archives.transcript.model
 	import name.carter.mark.flex.util.DateUtils;
 	import name.carter.mark.flex.util.XMLUtils;
 	
-	public class SessionProperties
+	public class SessionMetadata
 	{
 		public static const ID_ATTR_NAME:String = "id";
 		public static const EVENT_ID_ATTR_NAME:String = "eventId";
@@ -17,7 +17,7 @@ package org.ishafoundation.archives.transcript.model
 		public var eventId:String;
 		public var sessionId:String;
 		
-		public function SessionProperties(metadataElement:XML, eventId:String, sessionId:String = null)
+		public function SessionMetadata(metadataElement:XML, eventId:String, sessionId:String = null)
 		{
 			if (metadataElement == null) {
 				throw new Error("Passed a null metadata element");
@@ -27,18 +27,18 @@ package org.ishafoundation.archives.transcript.model
 			this.sessionId = sessionId;
 		}
 		
-		public static function createInstanceFromSessionXML(sessionXML:XML):SessionProperties {
+		public static function createInstanceFromSessionXML(sessionXML:XML):SessionMetadata {
 			var metadataElement:XML = sessionXML.metadata[0];
 			if (metadataElement == null) {
 				throw new Error("Session XML does not have any metadata");
 			}
 			var eventId:String = sessionXML.@eventId;
 			var sessionId:String = sessionXML.@id;
-			return new SessionProperties(metadataElement, eventId, sessionId);
+			return new SessionMetadata(metadataElement, eventId, sessionId);
 		}
 
-		public function copy():SessionProperties {
-			return new SessionProperties(metadataElement.copy(), eventId, sessionId);
+		public function copy():SessionMetadata {
+			return new SessionMetadata(metadataElement.copy(), eventId, sessionId);
 		}
 
 		public function get path():String {
@@ -97,9 +97,9 @@ package org.ishafoundation.archives.transcript.model
 		
 		private static const TIME_FORMATTER:DateFormatter = DateUtils.createDateFormatter("JJ:NN");
 
-		public function getFullName(eventProps:EventProperties):String {
+		public function getFullName(eventMetadata:EventMetadata):String {
 			var result:String = sessionId + ": ";
-			var eventDay:int = getEventDay(eventProps.startAt);
+			var eventDay:int = getEventDay(eventMetadata.startAt);
 			result += "Day " + (eventDay == 0 ? "?" : eventDay);
 			var addedHyphen:Boolean = false;
 			if (startAtIncludesTime()) {
