@@ -50,7 +50,7 @@ declare function event-panel:main() as element()*
 					return
 						<li>
 							<a href="main.xql?panel=session&amp;id={$session/@id}">Session: {$session/metadata/string(@subTitle)} {concat(' ', $session/metadata/string(@startAt))} [{$session/string(@id)}]</a>
-							<br/>{$session/metadata/string(@notes)}<p/>							
+							<br/>{$session/metadata/notes}<p/>							
 						</li>
 					}				
 					</ol>

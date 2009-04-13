@@ -381,6 +381,34 @@ package name.carter.mark.flex.util
 			element.appendChild(text);
 		}
 		
+		public static function getChildElementText(parentElement:XML, childTagName:String, defaultValue:String = null):String {
+			var result:String = parentElement.*.(localName() == childTagName).text();
+			if (result == null || StringUtil.trim(result) == "") {
+				return defaultValue;
+			}
+			else {
+				return result;
+			}
+		}
+		
+		public static function setChildElementText(parentElement:XML, childTagName:String, text:String, defaultValue:String = null):void {
+			removeAllElements(parentElement.*.(localName() == childTagName));
+			if (text != null && StringUtil.trim(text) != "" && text != defaultValue) {
+				var childElement:XML = <{childTagName}/>;
+				childElement.appendChild(text);
+				parentElement.appendChild(childElement);				
+			}
+		}
+		
+		public static function appendChildElementText(parentElement:XML, childTagName:String, text:String, prependLineBreak:Boolean = false):void {
+			var existingText:String = getChildElementText(parentElement, childTagName, "");
+			if (prependLineBreak && existingText != "") {
+				existingText += '\r';
+			}
+			existingText += text;
+			setChildElementText(parentElement, childTagName, existingText);
+		}
+		
 		/**
 		 * Recurses into all descendant elements (excluding self).
 		 */

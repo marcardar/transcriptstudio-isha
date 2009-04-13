@@ -19,7 +19,7 @@ package org.ishafoundation.archives.transcript.model
 		public static const VENUE_ATTR_NAME:String = "venue";
 		public static const LANGUAGE_ATTR_NAME:String = "language";
 		public static const LANGUAGE_DEFAULT:String = "english";
-		public static const NOTES_ATTR_NAME:String = "notes";
+		public static const NOTES_ELEMENT_NAME:String = "notes";
 		
 		public static const TYPES:Array = createTypesArray();
 		private static const DATE_FORMATTER:DateFormatter = DateUtils.createDateFormatter("DD-MMM-YY");
@@ -154,11 +154,11 @@ package org.ishafoundation.archives.transcript.model
 		
 		[Bindable]
 		public function get notes():String {
-			return XMLUtils.getAttributeValue(eventMetadataElement, NOTES_ATTR_NAME);
+			return XMLUtils.getChildElementText(eventMetadataElement, NOTES_ELEMENT_NAME);
 		}
 		
 		public function set notes(newValue:String):void {
-			XMLUtils.setAttributeValue(eventMetadataElement, NOTES_ATTR_NAME, newValue);
+			XMLUtils.setChildElementText(eventMetadataElement, NOTES_ELEMENT_NAME, newValue);
 		}
 
 		/**

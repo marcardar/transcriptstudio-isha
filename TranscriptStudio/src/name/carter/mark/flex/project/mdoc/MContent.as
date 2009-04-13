@@ -96,10 +96,26 @@ package name.carter.mark.flex.project.mdoc
 			var textToPrepend:String = precedingContent.text + " ";
 			text = textToPrepend + text;
 			// take the start time from the preceding content
-			var startSyncPointId:String = precedingContent.getPropertyValue(MContentProperties.START_ID_PROP_NAME);
-			setProperty(MContentProperties.START_ID_PROP_NAME, startSyncPointId);
+			var startSyncPointId:String = precedingContent.startId;
+			this.startId = startSyncPointId;
 			precedingContent.remove();
 			return textToPrepend;
+		}
+		
+		public function set startId(newValue:String):void {
+			setProperty(MContentProperties.START_ID_PROP_NAME, newValue);
+		}
+		
+		public function get startId():String {
+			return getPropertyValue(MContentProperties.START_ID_PROP_NAME);
+		}
+		
+		public function set endId(newValue:String):void {
+			setProperty(MContentProperties.END_ID_PROP_NAME, newValue);
+		}
+		
+		public function get endId():String {
+			return getPropertyValue(MContentProperties.END_ID_PROP_NAME);
 		}
 		
 		/**
@@ -118,8 +134,8 @@ package name.carter.mark.flex.project.mdoc
 			var textToAppend:String = " " + followingContent.text;
 			text += textToAppend;
 			// take the start time from the folllowing content
-			var endSyncPointId:String = followingContent.getPropertyValue(MContentProperties.END_ID_PROP_NAME);
-			setProperty(MContentProperties.END_ID_PROP_NAME, endSyncPointId);
+			var endSyncPointId:String = followingContent.endId;
+			this.endId = endSyncPointId;
 			followingContent.remove();
 			return textToAppend;
 		}
