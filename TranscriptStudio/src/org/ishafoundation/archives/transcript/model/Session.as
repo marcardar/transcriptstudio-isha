@@ -3,6 +3,8 @@ package org.ishafoundation.archives.transcript.model
 	import mx.binding.utils.ChangeWatcher;
 	import mx.events.PropertyChangeEvent;
 	
+	import name.carter.mark.flex.util.XMLUtils;
+	
 	public class Session
 	{
 		private static const SOURCE_ID_REG_EXP:RegExp = /^[a-z]+\d+/i;
@@ -117,7 +119,35 @@ package org.ishafoundation.archives.transcript.model
 					mediaMetadataElement = <mediaMetadata/>;
 				}
 				for each (var deviceElement:XML in deviceElements) {
-					mediaMetadataElement.appendChild(deviceElement);
+					if (this.mediaMetadataElement != null) {
+						var existingDeviceElement:XML = this.mediaMetadataElement.device.(@id == deviceElement.@id)[0]
+						if (existingDeviceElement) {
+							// already have a device element so use that
+							for each (var mediaElement:XML in deviceElement.*) {
+								var existingMediaElement:XML = existingDeviceElement.*.(@id == mediaElement.@id)[0]
+								if (existingMediaElement) {
+									// already have this media element so just append all the children
+									for each (var attr:XML in mediaElement.attributes()) {
+										if (!existingMediaElement.hasOwnProperty("@" + attr.localName())) {
+											XMLUtils.setAttributeValue(existingMediaElement, attr.localName(), attr.toString());
+										}
+									}
+									for each (var childElement:XML in mediaElement.*) {
+										existingMediaElement.appendChild(childElement);
+									}
+								}
+								else {
+									existingDeviceElement.appendChild(mediaElement);
+								}
+							}
+						}
+						else {
+							this.mediaMetadataElement.appendChild(deviceElement);
+						}
+					} 
+					else {
+						mediaMetadataElement.appendChild(deviceElement);
+					}
 				}
 				transcript = new Transcript(transcriptElement, this.referenceMgr); 
 			}
