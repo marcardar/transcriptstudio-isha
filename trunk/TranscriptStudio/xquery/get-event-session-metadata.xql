@@ -7,7 +7,7 @@ let $sessions := collection('/db/ts4isha/data')/session[@id = $sessionIds]
 let $eventIds := $sessions/@eventId
 let $events := collection('/db/ts4isha/data')/event[@id = $eventIds]
 return
-	<result>{
+	<events>{
 		for $event in $events
 		let $eventId := $event/@id
 		return
@@ -23,4 +23,4 @@ return
 					</session>
 			}
 			</event>
-	}</result>
+	}</events>
