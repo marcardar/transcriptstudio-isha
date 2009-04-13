@@ -57,7 +57,8 @@ package name.carter.mark.flex.project.mdoc
 		
 		public function setElementProperty(name:String, value:String, defaultValue:String = null):void {
 			this.modified = true;
-			XMLUtils.setChildElementText(nodeElement, name, value, defaultValue);
+			// always put element properties at the start of the children (false param)
+			XMLUtils.setChildElementText(nodeElement, name, value, false, defaultValue);
 		}
 		
 		public function get childNodes():Array

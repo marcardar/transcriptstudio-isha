@@ -391,22 +391,27 @@ package name.carter.mark.flex.util
 			}
 		}
 		
-		public static function setChildElementText(parentElement:XML, childTagName:String, text:String, defaultValue:String = null):void {
+		public static function setChildElementText(parentElement:XML, childTagName:String, text:String, appendChild:Boolean = true, defaultValue:String = null):void {
 			removeAllElements(parentElement.*.(localName() == childTagName));
 			if (text != null && StringUtil.trim(text) != "" && text != defaultValue) {
 				var childElement:XML = <{childTagName}/>;
 				childElement.appendChild(text);
-				parentElement.appendChild(childElement);				
+				if (appendChild) {
+					parentElement.appendChild(childElement);
+				}				
+				else {
+					parentElement.prependChild(childElement);
+				}
 			}
 		}
 		
-		public static function appendChildElementText(parentElement:XML, childTagName:String, text:String, prependLineBreak:Boolean = false):void {
+		/**
+		 * If appendChild is true, then the child is placed after any existing children, otherwise as first child.
+		 */
+		public static function appendChildElementText(parentElement:XML, childTagName:String, text:String, appendChild:Boolean):void {
 			var existingText:String = getChildElementText(parentElement, childTagName, "");
-			if (prependLineBreak && existingText != "") {
-				existingText += '\r';
-			}
 			existingText += text;
-			setChildElementText(parentElement, childTagName, existingText);
+			setChildElementText(parentElement, childTagName, existingText, appendChild);
 		}
 		
 		/**
