@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" x="50" width="470" horizontalAlign="center" title="Select Session" creationComplete="init()" xmlns:metadata="org.ishafoundation.archives.transcript.components.studio.metadata.*">
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" x="50" width="470" horizontalAlign="center" title="Select Session" creationComplete="init()" xmlns:session="org.ishafoundation.archives.transcript.components.studio.session.*">
 	<mx:Script>
 	<![CDATA[
 		import mx.events.FlexEvent;
@@ -81,7 +81,7 @@
 	]]>
 	</mx:Script>
 
-	<metadata:SessionList id="sessionList" width="100%" doubleClickEnabled="true"/>
+	<session:SessionList id="sessionList" width="100%" doubleClickEnabled="true"/>
 	<mx:HBox id="buttonBox">
 		<mx:Button id="okButton" label="OK" enabled="{sessionList.selectedItem != null}" click="okClicked(event)" />
 		<mx:Button label="Cancel" click="closeMe()"/>

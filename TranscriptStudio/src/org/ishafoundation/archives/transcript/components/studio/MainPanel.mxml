@@ -18,7 +18,7 @@
    Transcript Studio for Isha Foundation. If not, see http://www.gnu.org/licenses/.
 -->
 
-<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" xmlns:metadataNS="org.ishafoundation.archives.transcript.components.metadata.*" width="100%" height="100%" verticalGap="0" keyDown="keyDownHandler(event)">
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" xmlns:event="org.ishafoundation.archives.transcript.components.event.*" width="100%" height="100%" verticalGap="0" keyDown="keyDownHandler(event)">
 	<mx:Script>
 		<![CDATA[
 			import org.ishafoundation.archives.transcript.model.Transcript;
@@ -30,9 +30,9 @@
 			import org.ishafoundation.archives.transcript.components.studio.importer.ImportDialog;
 			import mx.utils.StringUtil;
 			import mx.managers.CursorManager;
-			import org.ishafoundation.archives.transcript.components.studio.metadata.SessionSelectorDialog;
-			import org.ishafoundation.archives.transcript.components.studio.metadata.OpenDialog;
-			import org.ishafoundation.archives.transcript.components.studio.metadata.OpenByIdDialog;
+			import org.ishafoundation.archives.transcript.components.studio.session.SessionSelectorDialog;
+			import org.ishafoundation.archives.transcript.components.studio.OpenDialog;
+			import org.ishafoundation.archives.transcript.components.studio.OpenByIdDialog;
 			import org.ishafoundation.archives.transcript.util.ApplicationUtils;
 			import org.ishafoundation.archives.transcript.db.DatabaseConstants;
 			import org.ishafoundation.archives.transcript.importer.MSWordImporter;
@@ -43,14 +43,14 @@
 			import org.ishafoundation.archives.transcript.db.DatabaseManagerUtils;
 			import mx.controls.Alert;
 			import org.ishafoundation.archives.transcript.components.generic.AboutBox;
-			import org.ishafoundation.archives.transcript.components.studio.metadata.SessionMetadataEditorDialog;
+			import org.ishafoundation.archives.transcript.components.studio.session.SessionMetadataEditorDialog;
 			import org.ishafoundation.archives.transcript.model.SessionMetadata;
 			import org.ishafoundation.archives.transcript.model.SessionManager;
 			import org.ishafoundation.archives.transcript.model.ReferenceManager;
 			import mx.managers.PopUpManager;
 			import name.carter.mark.flex.project.mdoc.*;
 			import org.ishafoundation.archives.transcript.components.studio.media.MediaPlayerDialog;
-			import org.ishafoundation.archives.transcript.components.studio.metadata.EventMetadataEditorDialog;
+			import org.ishafoundation.archives.transcript.components.studio.event.EventMetadataEditorDialog;
 			import org.ishafoundation.archives.transcript.model.EventMetadata;
 			import org.ishafoundation.archives.transcript.components.generic.DebugPopUp;
 			import org.ishafoundation.archives.transcript.components.studio.concept.ConceptManagerDialog;
