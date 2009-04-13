@@ -108,21 +108,21 @@ declare function admin-panel:process-upload-media-metadata($uploadedFilename as 
 				concat('Incorrect root element name: ', $rootElementName)
 			else
 				let $newMediaDetails :=
-					for $device in $doc//device
-					let $sessionId := $device/ancestor-or-self::*[exists(@sessionId)]/xs:string(@sessionId)
-					let $mediaElementsToImport := $device/*
-					let $appendedMediaDetails := media-fns:append-media-elements($mediaElementsToImport, $sessionId)
+					for $deviceXML in $doc//device
+					let $sessionId := $deviceXML/ancestor-or-self::*[exists(@sessionId)]/xs:string(@sessionId)
+					let $mediaElementsToImport := $deviceXML/*
+					let $importedMediaDetails := media-fns:import-media-elements($mediaElementsToImport, $sessionId, $deviceXML/@id)
 					return
 					(
-						<h3>Session ID: {$sessionId}, Device ID: {$device/xs:string(@id)}</h3>
+						<h3>Session ID: {$sessionId}, Device ID: {$deviceXML/xs:string(@id)}</h3>
 					,
-						if (not(exists($appendedMediaDetails))) then
+						if (empty($importedMediaDetails)) then
 							<p>Nothing imported</p>
 						else
 							<p>{
-							for $appendedMediaDetail in $appendedMediaDetails
+							for $importedMediaDetail in $importedMediaDetails
 							return
-								($appendedMediaDetail, <br/>)
+								($importedMediaDetail, <br/>)
 							}</p>
 					)
 				return
