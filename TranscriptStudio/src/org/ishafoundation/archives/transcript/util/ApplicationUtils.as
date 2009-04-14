@@ -24,8 +24,8 @@ package org.ishafoundation.archives.transcript.util
 			return getPropertyValue("application.name");
 		}
 
-		public static function getApplicationNameCondensed():String {
-			return getPropertyValue("application.name.condensed");
+		public static function getApplicationNameShort():String {
+			return getPropertyValue("application.name.short");
 		}
 
 		public static function getApplicationVersion():String {
