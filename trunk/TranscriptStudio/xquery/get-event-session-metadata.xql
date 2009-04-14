@@ -1,7 +1,5 @@
 xquery version "1.0";
 
-import module namespace functx = "http://www.functx.com" at "functx.xqm";
-
 let $sessionIds := tokenize(request:get-parameter('sessionIds', ()), '\s*,\s*')
 let $sessions := collection('/db/ts4isha/data')/session[@id = $sessionIds]
 let $eventIds := $sessions/@eventId
@@ -10,15 +8,17 @@ return
 	<events>{
 		for $event in $events
 		let $eventId := $event/@id
+		order by $eventId
 		return
 			<event>
 			{$event/@*}
 			{$event/metadata}
 			{
 				for $session in $sessions[@eventId eq $eventId]
+				order by $session/@id
 				return
 					<session>
-					{$session/@*}
+					{$session/@*[local-name(.) != 'eventId']}
 					{$session/metadata}
 					</session>
 			}
