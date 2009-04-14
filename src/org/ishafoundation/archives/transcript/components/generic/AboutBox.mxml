@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+   Transcript Studio for Isha Foundation: An XML based application that allows users to define 
+   and store contextual metadata for contiguous sections within a text document. 
+
+   Copyright 2008 Mark Carter, Swami Kevala
+
+   This file is part of Transcript Studio for Isha Foundation.
+
+   Transcript Studio for Isha Foundation is free software: you can redistribute it and/or modify it 
+   under the terms of the GNU General Public License as  published by the Free Software 
+   Foundation, either version 3 of the License, or (at your option) any later version.
+
+   Transcript Studio for Isha Foundation is distributed in the hope that it will be useful, but 
+   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along with 
+   Transcript Studio for Isha Foundation. If not, see http://www.gnu.org/licenses/.
+-->
+
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" x="40" y="40" title="About..." width="410" borderThickness="1" alpha="2.0" layout="absolute">
+	<mx:Script>
+		<![CDATA[
+			import org.ishafoundation.archives.transcript.db.DatabaseConstants;
+			import org.ishafoundation.archives.transcript.util.ApplicationUtils;
+			import name.carter.mark.flex.util.Utils;
+			import mx.binding.utils.BindingUtils;
+			import mx.managers.PopUpManager;
+	        import flash.system.Capabilities;	
+			
+			private static const flexSdkVersion:String = mx_internal::VERSION;
+			private static const flashPlayerVersion:String = Capabilities.version + " (" + Capabilities.playerType + (Capabilities.isDebugger ? " Debug" : "") + ")";
+			
+			private static const message:String = "<br/>Written for the Isha Foundation.<br/><br/>Main Contributors: Mark Carter, Swami Kevala.<br/><br/>Please visit the website for more details:<br/><br/><u><a href='" + ApplicationUtils.getApplicationWebsite() + "' target='_blank'>" + ApplicationUtils.getApplicationWebsite() + "</a></u>";
+
+			private var databaseURL:String = DatabaseConstants.EXIST_URL;
+			[Bindable]
+			private var databaseUrlHTML:String = "<u><a href='" + databaseURL + "' target='_blank'>" + databaseURL + "</a></u>";
+			[Bindable]
+			private var databaseUsername:String = DatabaseConstants.EXIST_USERNAME;
+		]]>
+	</mx:Script>
+	<mx:VBox width="100%" height="100%" horizontalAlign="center" verticalAlign="top" borderThickness="10" fontSize="12">
+		<mx:Image horizontalAlign="center" source="{Utils.DEFAULT_ICON_CLASS}"/>
+		<mx:Text fontSize="16" width="100%" textAlign="center" htmlText="&lt;b&gt;{ApplicationUtils.getApplicationName()}&lt;br/&gt;{ApplicationUtils.getApplicationVersion()}&lt;/b&gt;"/>
+		<mx:Text fontSize="14" width="100%" htmlText="{message}"/>
+		<mx:Text fontSize="14" paddingTop="10" width="100%" text="Technical Info:"/>
+		<mx:VBox paddingTop="5" paddingBottom="10">
+			<mx:Text width="100%" text="Flash Player: {flashPlayerVersion}"/>
+			<mx:Text width="100%" text="Flex SDK: {flexSdkVersion}"/>
+			<mx:Text width="100%" htmlText="Database URL: {databaseUrlHTML}"/>
+			<mx:Text width="100%" text="Username: {databaseUsername}"/>
+		</mx:VBox>
+		<mx:Button label="Ok" textAlign="center" click="{PopUpManager.removePopUp(this)}"/>		
+	</mx:VBox>
+</mx:Panel>
