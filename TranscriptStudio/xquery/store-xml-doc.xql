@@ -8,7 +8,7 @@ import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/ut
 
 declare function store-xml-doc:build-event-path($event as element()) as xs:string
 {
-	let $collectionName := concat('/db/ts4isha/data', '/', $event/@type)
+	let $collectionName := concat($utils:dataCollectionPath, '/', $event/@type)
 	let $docName := string-join(($event/@id, store-xml-doc:build-event-full-name($event)), '_')
 	return concat($collectionName, '/', $docName, '.xml')
 };
@@ -26,7 +26,7 @@ declare function store-xml-doc:build-event-full-name($event as element()) as xs:
 
 declare function store-xml-doc:build-session-path($session as element()) as xs:string
 {
-	let $event := collection('/db/ts4isha/data')/event[@id = $session/@eventId]
+	let $event := $utils:dataCollection/event[@id = $session/@eventId]
 	let $collectionName := util:collection-name($event)
 	let $docName := string-join(($session/@id, store-xml-doc:build-session-full-name($session, $event)), '_')
 	return concat($collectionName, '/', $docName, '.xml')
@@ -36,7 +36,7 @@ declare function store-xml-doc:build-session-full-name($session as element(), $e
 {
 	let $event :=
 		if (not(exists($event))) then
-			collection('/db/ts4isha/data')/event[@id = $session/@eventId]
+			$utils:dataCollection/event[@id = $session/@eventId]
 		else
 			$event
 	let $metadata := $session/metadata[1]
@@ -93,9 +93,9 @@ return
 		let $id := xs:string($xml/@id)
 		let $existingXML :=
 			if ($isEventXML) then
-				collection('/db/ts4isha/data')/event[@id = $id]
+				$utils:dataCollection/event[@id = $id]
 			else 
-				collection('/db/ts4isha/data')/session[@id = $id]
+				$utils:dataCollection/session[@id = $id]
 		let $documentURI :=
 			if (exists($existingXML)) then
 			(

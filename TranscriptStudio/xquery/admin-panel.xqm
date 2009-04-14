@@ -98,7 +98,7 @@ declare function admin-panel:process-upload-media-metadata($uploadedFilename as 
 		<span>No file specified</span>
 	else
 		let $uploadedFile := request:get-uploaded-file("upload-media-metadata")
-		let $tempColl := xdb:create-collection('/db/ts4isha', 'temp')
+		let $tempColl := utils:create-collection($utils:tempCollectionPath, true())
 		let $tempFile := concat(util:uuid(), '.xml')
 		let $tempPath := xdb:store($tempColl, $tempFile, $uploadedFile)
 		let $doc := doc($tempPath)

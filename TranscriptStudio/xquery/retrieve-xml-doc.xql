@@ -3,7 +3,7 @@ xquery version "1.0";
 import module namespace functx = "http://www.functx.com" at "functx.xqm";
 import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
 
-let $collectionPath := request:get-parameter('collectionPath', '/db/ts4isha')
+let $collectionPath := request:get-parameter('collectionPath', $utils:ts4ishaCollectionPath)
 let $id := request:get-parameter('id', ())
 let $tagName := request:get-parameter('tagName', ())
 let $topElements :=

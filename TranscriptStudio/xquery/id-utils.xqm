@@ -9,7 +9,7 @@ declare variable $id-utils:all-domains := ($id-utils:media-domains, 'event', 'se
 
 declare function id-utils:id-already-exists($tagName as xs:string?, $id as xs:string) as xs:boolean
 {
-	exists(collection('/db/ts4isha/data')//*[(empty($tagName) or local-name(.) eq $tagName) and @id eq $id])
+	exists($utils:dataCollection//*[(empty($tagName) or local-name(.) eq $tagName) and @id eq $id])
 };
 
 declare function id-utils:generate-event-id($eventType as xs:string) as xs:string
@@ -37,7 +37,7 @@ declare function id-utils:get-max-id($tagName as xs:string, $prefix as xs:string
 
 declare function id-utils:get-max-id-integer($tagName as xs:string, $prefix as xs:string) as xs:integer?
 {
-	max(collection('/db/ts4isha/data')//*[local-name(.) eq $tagName]/id-utils:get-id-integer-component(@id, $prefix))
+	max($utils:dataCollection//*[local-name(.) eq $tagName]/id-utils:get-id-integer-component(@id, $prefix))
 };
 
 (:
