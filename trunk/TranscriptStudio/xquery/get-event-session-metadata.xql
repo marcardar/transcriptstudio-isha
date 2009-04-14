@@ -1,5 +1,7 @@
 xquery version "1.0";
 
+declare option exist:serialize "media-type=text/xml method=xml indent=yes";
+
 let $sessionIds := tokenize(request:get-parameter('sessionIds', ()), '\s*,\s*')
 return
 	if (empty($sessionIds)) then
@@ -9,22 +11,19 @@ let $sessions := collection('/db/ts4isha/data')/session[@id = $sessionIds]
 let $eventIds := $sessions/@eventId
 let $events := collection('/db/ts4isha/data')/event[@id = $eventIds]
 return
-	<events>{
+	<idRefs>{
+	(
 		for $event in $events
-		let $eventId := $event/@id
-		order by $eventId
+		order by $event/@id
 		return
-			<event>
-			{$event/@*}
-			{$event/metadata}
-			{
-				for $session in $sessions[@eventId eq $eventId]
-				order by $session/@id
-				return
-					<session>
-					{$session/@*[local-name(.) != 'eventId']}
-					{$session/metadata}
-					</session>
-			}
-			</event>
-	}</events>
+			$event
+	,
+		for $session in $sessions
+		order by $session/@id
+		return
+			<session>
+			{$session/@*}
+			{$session/metadata}
+			</session>
+	)
+	}</idRefs>
