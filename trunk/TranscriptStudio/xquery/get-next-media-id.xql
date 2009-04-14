@@ -12,5 +12,5 @@ return
 	else if (empty($eventType)) then
 		error(xs:QName('illegal-argument-exception'), 'no eventType specified')
 	else
-		media-fns:get-next-media-id-integer($domain, $eventType)
+		media-fns:get-next-media-id($domain, $eventType)
 		
