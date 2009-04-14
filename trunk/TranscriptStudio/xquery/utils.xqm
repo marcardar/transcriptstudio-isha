@@ -3,8 +3,50 @@ xquery version "1.0";
 module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils";
 
 import module namespace functx = "http://www.functx.com" at "functx.xqm";
+import module namespace transform = "http://exist-db.org/xquery/transform";
+
 declare namespace xmldb = "http://exist-db.org/xquery/xmldb";
 declare namespace util = "http://exist-db.org/xquery/util";
+
+declare variable $utils:ts4ishaCollectionPath := '/db/ts4isha';
+declare variable $utils:dataCollectionPath := concat($utils:ts4ishaCollectionPath, '/data');
+declare variable $utils:dataCollection := collection($utils:dataCollectionPath);
+declare variable $utils:referenceCollectionPath := concat($utils:ts4ishaCollectionPath, '/reference');
+declare variable $utils:referenceCollection := collection($utils:referenceCollectionPath);
+declare variable $utils:xsltCollectionPath := concat($utils:ts4ishaCollectionPath, '/xslt');
+declare variable $utils:tempCollectionPath := concat($utils:ts4ishaCollectionPath, '/temp');
+
+declare function utils:create-collection($path as xs:string, $dbaOnly as xs:boolean) as xs:string
+{
+	if ($dbaOnly and not(utils:is-current-user-admin())) then
+		error(xs:QName('illegal-access-exception'), concat('Only dba allowed to create collection: ', $path))
+	else
+		utils:create-collection-internal('/', tokenize($path, '/'))
+};
+
+declare function utils:create-collection-internal($baseCollection as xs:string, $seq as xs:string*) as xs:string
+{
+	if (empty($seq)) then
+		$baseCollection
+	else
+		let $newBaseCollection :=
+			if ($seq[1] = '') then
+				$baseCollection
+			else
+				xmldb:create-collection($baseCollection, $seq[1])
+		let $newSeq := $seq[position() > 1]
+		return utils:create-collection-internal($newBaseCollection, $newSeq)
+};
+
+declare function utils:transform($doc as element(), $xsltDocName as xs:string, $params as element()?) as node()?
+{
+	transform:transform($doc, utils:xsltDoc($xsltDocName), $params)
+};
+
+declare function utils:xsltDoc($docName as xs:string) as node()?
+{
+	doc(concat($utils:xsltCollectionPath, '/', $docName))
+};
 
 declare function utils:is-current-user-admin() as xs:boolean?
 {
@@ -15,17 +57,17 @@ declare function utils:is-current-user-admin() as xs:boolean?
 
 declare function utils:get-event($eventId as xs:string) as element()?
 {
-	collection('/db/ts4isha/data')/event[@id = $eventId]
+	$utils:dataCollection/event[@id = $eventId]
 };
 
 declare function utils:get-session($sessionId as xs:string) as element()?
 {
-	collection('/db/ts4isha/data')/session[@id = $sessionId]
+	$utils:dataCollection/session[@id = $sessionId]
 };
 
 declare function utils:get-event-type($eventTypeId as xs:string) as element()?
 {
-	collection('/db/ts4isha/reference')/reference//eventType[@id = $eventTypeId]
+	$utils:referenceCollection/reference//eventType[@id = $eventTypeId]
 };
 
 declare function utils:set-child-element($existingParentElement as element(), $newChildElement as element()) as element()?
@@ -146,7 +188,7 @@ declare function utils:make-filename-friendly($rawFilename as xs:string) as xs:s
 
 declare function utils:build-event-path($event as element()) as xs:string
 {
-	let $collectionName := concat('/db/ts4isha/data', '/', $event/@type)
+	let $collectionName := concat($utils:dataCollectionPath, '/', $event/@type)
 	let $docName := string-join(($event/@id, utils:build-event-full-name($event)), '_')
 	return concat($collectionName, '/', $docName, '.xml')
 };

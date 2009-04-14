@@ -6,11 +6,12 @@ declare namespace request = "http://exist-db.org/xquery/request";
 declare namespace session = "http://exist-db.org/xquery/session";
 
 import module namespace search-fns = "http://www.ishafoundation.org/ts4isha/xquery/search-fns" at "search-fns.xqm";
+import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
 
 declare function categories-panel:main() as element()*
 {	
 	let $conceptId := request:get-parameter('conceptId', ())
-	let $reference := collection('/db/ts4isha/reference')/reference
+	let $reference := $utils:referenceCollection/reference
 	let $categories := 
 		if ($conceptId) then
 			$reference/markupCategories/markupCategory/tag[@type eq 'concept' and @value eq $conceptId]/..

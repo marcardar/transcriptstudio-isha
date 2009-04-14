@@ -2,14 +2,16 @@ xquery version "1.0";
 
 declare option exist:serialize "media-type=text/xml method=xml indent=yes";
 
+import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
+
 let $sessionIds := tokenize(request:get-parameter('sessionIds', ()), '\s*,\s*')
 return
 	if (empty($sessionIds)) then
 		error(xs:QName('missing-argument-exception'), 'sessionIds not specified')
 	else
-let $sessions := collection('/db/ts4isha/data')/session[@id = $sessionIds]
+let $sessions := $utils:dataCollection/session[@id = $sessionIds]
 let $eventIds := $sessions/@eventId
-let $events := collection('/db/ts4isha/data')/event[@id = $eventIds]
+let $events := $utils:dataCollection/event[@id = $eventIds]
 return
 	<idRefs>{
 	(

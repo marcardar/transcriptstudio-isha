@@ -6,17 +6,17 @@ declare namespace request = "http://exist-db.org/xquery/request";
 declare namespace util = "http://exist-db.org/xquery/util";
 
 import module namespace search-fns = "http://www.ishafoundation.org/ts4isha/xquery/search-fns" at "search-fns.xqm";
-import module namespace transform = "http://exist-db.org/xquery/transform";
+import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
 
 declare function event-panel:transformToXHTML($event as element()) as element()
 {
-    transform:transform($event, doc('/db/ts4isha/xslt/event-xhtml.xsl'), ())
+    utils:transform($event, 'event-xhtml.xsl', ())
 };
 
 declare function event-panel:main() as element()*
 {
 	let $eventId := request:get-parameter("id", ())	
-	let $event := collection('/db/ts4isha/data')//event[@id = $eventId]
+	let $event := $utils:dataCollection//event[@id = $eventId]
 	return
 	(
 		<center><h1>Isha Foundation Event: {$eventId}</h1></center>

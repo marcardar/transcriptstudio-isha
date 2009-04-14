@@ -1,15 +1,14 @@
 xquery version "1.0";
 
 module namespace login-panel = "http://www.ishafoundation.org/ts4isha/xquery/login-panel";
+import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
 
 declare namespace request = "http://exist-db.org/xquery/request";
 declare namespace session = "http://exist-db.org/xquery/session";
 
-import module namespace transform = "http://exist-db.org/xquery/transform";
-
 declare function login-panel:transformToXHTML($doc as element(), $highlightId as xs:string?) as element()
 {
-    transform:transform($doc, doc('/db/ts4isha/xslt/session-xhtml.xsl'), ())
+    utils:transform($doc, 'session-xhtml.xsl', ())
 };
 
 declare function login-panel:main() as element()*

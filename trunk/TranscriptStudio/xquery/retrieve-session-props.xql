@@ -1,13 +1,14 @@
 xquery version "1.0";
 
 import module namespace functx = "http://www.functx.com" at "functx.xqm";
+import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
 
 let $eventId := request:get-parameter('eventId', ())
 let $sessionMetadataElements :=
 	if (not(exists($eventId))) then
-		collection('/db/ts4isha/data')/session/metadata
+		$utils:dataCollection/session/metadata
 	else
-		collection('/db/ts4isha/data')/session[@eventId = $eventId]/metadata
+		$utils:dataCollection/session[@eventId = $eventId]/metadata
 return
 	<result>{
 		for $sessionMetadataElement in $sessionMetadataElements
