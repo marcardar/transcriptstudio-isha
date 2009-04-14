@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" creationComplete="init()">
+	<mx:Script>
+	<![CDATA[
+		import mx.core.Container;
+		import mx.core.ScrollPolicy;
+		import name.carter.mark.flex.util.Utils;
+		import mx.formatters.DateFormatter;
+		import name.carter.mark.flex.util.DateUtils;
+		import mx.messaging.SubscriptionInfo;
+		import org.ishafoundation.archives.transcript.model.EventProperties;
+		import mx.rpc.http.HTTPService;
+		import mx.utils.ObjectProxy;
+		import mx.controls.Alert;
+		import org.ishafoundation.archives.transcript.db.XQueryExecutor;
+		import org.ishafoundation.archives.transcript.model.ReferenceManager;
+		
+		private static const ANY:String = "[any]";
+		private static const OTHER:String = "[other]";
+		
+		public var referenceMgr:ReferenceManager;
+		public var xqueryExecutor:XQueryExecutor;
+	
+		private function init():void {
+			var eventTypeArr:Array = referenceMgr.getEventTypes();
+			eventTypeArr.splice(0, 0, ANY);
+			//eventTypeArr.push(OTHER);
+			eventTypeComboBox.dataProvider = eventTypeArr;
+			var yearArr:Array = [ANY];
+			var nowDate:Date = new Date();
+			nowDate.month += 6;
+			for (var year:int = nowDate.fullYear; year >= 1994; year--) {
+				yearArr.push(year.toString());
+			}
+			yearComboBox.dataProvider = yearArr;
+			var countryArr:Array = referenceMgr.getCountries()
+			countryArr.splice(0, 0, ANY);
+			//countryArr.push(OTHER);
+			countryComboBox.dataProvider = countryArr;
+		}
+		
+		private function eventTypeLabelFunc(item:String):String {
+			if (item == ANY) {
+				return "[any type]";
+			}
+			else if (item == OTHER) {
+				return "[some other type]";
+			}
+			else {
+				var name:String = referenceMgr.getEventTypeName(item);
+				if (name == null || name.length == 0) {
+					throw new Error("Unrecognised event type: " + item); 
+				}
+				return item + ": " + name;
+			}
+		}
+		
+		private function yearLabelFunc(item:String):String {
+			if (item == ANY) {
+				return "[anytime]";
+			}
+			else {
+				return item.toString();
+			}
+		}
+		
+		private function countryLabelFunc(item:String):String {
+			if (item == ANY) {
+				return "[anywhere]";
+			}
+			else if (item == OTHER) {
+				return "[somewhere else]";
+			}
+			else {
+				return item.toString();
+			}
+		}
+		
+		public function get selectedEventProps():EventProperties {
+			return eventsList.selectedItem as EventProperties;
+		}
+	
+		public function selectEvent(eventId:String):void {
+			if (eventId == null) {
+				eventsList.selectedItem = null;
+				return;
+			}
+			showAlert("Not yet implemented: auto event selection");
+		}
+		
+		private function searchCriteriaChanged():void {
+			eventsList.enabled = false;
+		}
+		
+		public function searchClicked():void {
+			var thisPane:Container = this;
+			this.xqueryExecutor.executeStoredXQuery("event-search.xql", {eventType:eventTypeComboBox.selectedItem, year:yearComboBox.selectedItem.toString(), yearType:yearTypeComboBox.selectedItem, country:countryComboBox.selectedItem}, function(resultXML:XML):void {
+				var eventXMLList:XMLList = resultXML.event;
+				var arr:Array = []
+				for each (var eventXML:XML in eventXMLList) {
+					var eventProps:EventProperties = new EventProperties(eventXML);
+					arr.push(eventProps);
+				}
+				eventsList.dataProvider = arr;
+				if (arr.length == 0) {
+					showAlert("No events found");
+				}
+				eventsList.enabled = true;
+				callLater(function():void {
+					eventsList.maxHorizontalScrollPosition = eventsList.measureWidthOfItems() - eventsList.width + 5;
+					eventsList.horizontalScrollPosition = 0;
+				});				
+			}, function(msg:String):void {
+				showAlert(msg, "Search failed");
+			}, HTTPService.RESULT_FORMAT_E4X);
+		}
+		
+		private function resultLabelFunc(eventProps:EventProperties):String {
+			var result:String = eventProps.generateFullName(referenceMgr);
+			return result;
+		}
+		
+		private function showAlert(msg:String, title:String = null):void {
+			Alert.show(msg, title, 0x4, this);			
+		}
+	]]>
+	</mx:Script>
+	<mx:Boolean id="ready">{eventsList.selectedItem != null}</mx:Boolean>
+	<mx:HBox width="100%">
+		<mx:Grid width="100%" verticalGap="3">
+			<mx:GridRow width="100%" height="100%">
+				<mx:GridItem height="100%" horizontalAlign="right" verticalAlign="middle">
+					<mx:Label text="Event type"/>
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+					<mx:ComboBox id="eventTypeComboBox" rowCount="10" labelFunction="{eventTypeLabelFunc}" change="searchCriteriaChanged()"/>
+				</mx:GridItem>
+			</mx:GridRow>
+			<mx:GridRow width="100%" height="100%">
+				<mx:GridItem height="100%" horizontalAlign="right" verticalAlign="middle">
+					<mx:Label text="Year"/>
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+					<mx:ComboBox id="yearTypeComboBox" enabled="{yearComboBox.selectedItem != ANY}" dataProvider="[before, on, after]" selectedIndex="1" change="searchCriteriaChanged()"/>
+					<mx:ComboBox id="yearComboBox" rowCount="10" labelFunction="{yearLabelFunc}" change="searchCriteriaChanged()"/>
+				</mx:GridItem>
+			</mx:GridRow>
+			<mx:GridRow width="100%" height="100%">
+				<mx:GridItem height="100%" horizontalAlign="right" verticalAlign="middle">
+					<mx:Label text="Country"/>
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+					<mx:ComboBox id="countryComboBox" rowCount="10" labelFunction="{countryLabelFunc}" change="searchCriteriaChanged()"/>
+				</mx:GridItem>
+			</mx:GridRow>
+		</mx:Grid>
+	</mx:HBox>
+	<mx:HBox width="100%" horizontalAlign="center">
+		<mx:Button id="searchButton" label="Search" click="searchClicked()"/>
+	</mx:HBox>
+	<mx:List id="eventsList" width="100%" height="100%" enabled="false" horizontalScrollPolicy="{ScrollPolicy.ON}" labelFunction="{resultLabelFunc}"/>
+	<mx:Button id="createEventButton" label="Create New Event..."/>	
+</mx:VBox>
