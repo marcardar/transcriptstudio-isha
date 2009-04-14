@@ -77,7 +77,7 @@ package org.ishafoundation.archives.transcript.importer
 			}
 			var mediaMetadataElement:XML = <mediaMetadata/>;
 			sessionElement.appendChild(mediaMetadataElement);
-			var deviceElement:XML = <device id={MediaMetadata.MAIN_AUDIO_DEVICE_ID}/>
+			var deviceElement:XML = <device code={MediaMetadata.MAIN_AUDIO_DEVICE_CODE}/>
 			mediaMetadataElement.appendChild(deviceElement);
 			var transcriptElement:XML = <transcript id="t1"/>;
 			sessionElement.appendChild(transcriptElement);

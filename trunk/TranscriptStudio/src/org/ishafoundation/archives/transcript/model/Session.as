@@ -120,7 +120,7 @@ package org.ishafoundation.archives.transcript.model
 				}
 				for each (var deviceElement:XML in deviceElements) {
 					if (this.mediaMetadataElement != null) {
-						var existingDeviceElement:XML = this.mediaMetadataElement.device.(@id == deviceElement.@id)[0]
+						var existingDeviceElement:XML = this.mediaMetadataElement.device.(@code == deviceElement.@code)[0]
 						if (existingDeviceElement) {
 							// already have a device element so use that
 							for each (var mediaElement:XML in deviceElement.*) {

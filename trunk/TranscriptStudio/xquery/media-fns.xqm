@@ -10,14 +10,14 @@ import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/ut
 import module namespace functx = "http://www.functx.com" at "functx.xqm";
 
 (: adds all newMedia elements to the device element defined by the sessionId
-   the device id is obtained by looking at the newMedia's parent id
+   the device code is obtained by looking at the newMedia's parent id
    if the device element does not exist then it is created
    if the mediaElement id already exists then it is not added
    returns all mediaElements that were added
    
    Note/TODO - we could try and work out the session id by looking at the ancestors of each newMedia...
 :)
-declare function media-fns:import-media-elements($importMediaXMLs as element()*, $sessionId as xs:string, $deviceId as xs:string) as xs:string*
+declare function media-fns:import-media-elements($importMediaXMLs as element()*, $sessionId as xs:string, $deviceCode as xs:string) as xs:string*
 {
 	let $sessionXML := utils:get-session($sessionId)
 	return
@@ -25,7 +25,7 @@ declare function media-fns:import-media-elements($importMediaXMLs as element()*,
 			concat('Unknown sessionId: ', $sessionId)
 		else
 			let $mediaMetadataXML := media-fns:get-media-metadata-element($sessionXML)
-			let $deviceXML := media-fns:get-device-element($deviceId, $mediaMetadataXML)
+			let $deviceXML := media-fns:get-device-element($deviceCode, $mediaMetadataXML)
 			return
 				for $importMediaXML in $importMediaXMLs
 				return
@@ -75,16 +75,16 @@ declare function media-fns:import-media-element($importMediaXML as element(), $d
 					return $newId
 };
 
-declare function media-fns:get-device-element($deviceId as xs:string, $mediaMetadataElement as element()) as element()
+declare function media-fns:get-device-element($deviceCode as xs:string, $mediaMetadataElement as element()) as element()
 {
-	let $deviceElements := $mediaMetadataElement/device[@id = $deviceId]
+	let $deviceElements := $mediaMetadataElement/device[@code = $deviceCode]
 	return
 		if (exists($deviceElements)) then
 			$deviceElements[1]
 		else
-			let $null := update insert <device xmlns='' id='{$deviceId}'/> into $mediaMetadataElement
+			let $null := update insert <device xmlns='' code='{$deviceCode}'/> into $mediaMetadataElement
 			return
-				$mediaMetadataElement/device[@id = $deviceId][1]
+				$mediaMetadataElement/device[@code = $deviceCode][1]
 };
 
 (: creates mediaMetadata element if it does not exist :)
