@@ -111,10 +111,10 @@ declare function admin-panel:process-upload-media-metadata($uploadedFilename as 
 					for $deviceXML in $doc//device
 					let $sessionId := $deviceXML/ancestor-or-self::*[exists(@sessionId)]/xs:string(@sessionId)
 					let $mediaElementsToImport := $deviceXML/*
-					let $importedMediaDetails := media-fns:import-media-elements($mediaElementsToImport, $sessionId, $deviceXML/@id)
+					let $importedMediaDetails := media-fns:import-media-elements($mediaElementsToImport, $sessionId, $deviceXML/@code)
 					return
 					(
-						<h3>Session ID: {$sessionId}, Device ID: {$deviceXML/xs:string(@id)}</h3>
+						<h3>Session ID: {$sessionId}, Device Code: {$deviceXML/xs:string(@code)}</h3>
 					,
 						if (empty($importedMediaDetails)) then
 							<p>Nothing imported</p>

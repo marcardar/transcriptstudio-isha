@@ -5,7 +5,7 @@ import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/ut
 declare namespace util = "http://exist-db.org/xquery/util";
 
 declare variable $id-utils:media-domains := ('audio', 'video', 'image');
-declare variable $id-utils:all-domains := ($id-utils:media-domains, "device", 'event', 'session');
+declare variable $id-utils:all-domains := ($id-utils:media-domains, 'event', 'session');
 
 declare function id-utils:id-already-exists($tagName as xs:string?, $id as xs:string) as xs:boolean
 {

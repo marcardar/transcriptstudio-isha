@@ -38,6 +38,17 @@
 		<eventType id="ak" name="Isha Samskriti"/>
 		<eventType id="al" name="Ashram Life"/>
 	</eventTypes>
+	<deviceCodes>
+		<deviceCode id="aud-1" name="Audio Recorder"/>
+		<deviceCode id="cam-1" name="Main Video Camera"/>
+		<deviceCode id="cam-2" name="Secondary Video Camera"/>
+		<deviceCode id="cam-3" name="Tertiary Video Camera"/>
+		<deviceCode id="pho-1" name="Photographer 1"/>
+		<deviceCode id="pho-2" name="Photographer 2"/>
+		<deviceCode id="pho-3" name="Photographer 3"/>
+		<deviceCode id="pho-4" name="Photographer 4"/>
+		<deviceCode id="pho-5" name="Photographer 5"/>
+	</deviceCodes>
 	<places>
 		<country name="India">
 			<location name="Isha Yoga Center">
