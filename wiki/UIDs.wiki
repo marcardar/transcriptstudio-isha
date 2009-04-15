@@ -60,9 +60,9 @@ These are the main UIDs.
 || Markup type || *markup-type:topic* || markup-type || || || topic ||
 || Markup category || *markup-category:pope-joke-1* || markup-category || || || pope-joke-1 ||
 || Concept || *concept:life* || concept || || || life ||
-|| Segment || *segment:n-123-1#p1* || segment || n-123-1 || || p1 ||
-|| Content || *content:n-123-1#c1* || content || n-123-1 || || c1 ||
-|| Markup || *markup:n-123-1#o1* || markup || n-123-1 || || o1 ||
+|| Segment || *segment:n-123-1#p1* || segment || n-123-1 (session local-id) || || p1 ||
+|| Content || *content:n-123-1#c1* || content || n-123-1 (session local-id) || || c1 ||
+|| Markup || *markup:n-123-1#o1* || markup || n-123-1 (session local-id) || || o1 ||
 || Tape || *tape:1* || tape || || || 1 ||
 
 Note - p1, c1 and o1 really should change format to p-1, c-1 and o-1 (p, c and o are really groupings) to be consistent.
