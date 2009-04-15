@@ -1,0 +1,110 @@
+#summary UIDs for event, session, video, audio and photos
+
+Note - this is just a draft - it still needs to be properly fleshed out.
+
+=Introduction=
+
+Here we talk about UIDs rather than UUIDs because we do not care about uniqueness beyond this application. If we wanted a UUID, then we would just prefix the UID with an application identifier...
+
+Anything we want to refer to within the application, has a UID. This includes events, sessions, paragraphs, device codes, event types etc.
+
+=Format=
+
+There format of a UID is:
+
+*{top-level-domain}-{local-id}*
+
+where top-level-domain is one of: [event-type|event|session|audio|video|image|device-code|markup-type|markup-category|concept|tape]
+
+Example: *event-type-n* (where top-level-domain = event-type, local-id = n)
+
+The regexp for top-level-domain is: [a-z0-9]`*`([a-z0-9]\-[a-z0-9])`*`[a-z0-9]`*`
+
+(but not the empty string)
+
+which is essentially saying that it contains any collection of letters, digits and hyphens and that every hyphen is surrounded by letters/digits.
+
+The local-id is unique within the top-level-domain, only.
+
+The format of the local-id is one of the following:
+
+incremental: *[{sub-domain}-]{incremental-value}*
+code-based: *{code}*
+
+where sub-domain is optional
+and   incremental-value is an integer
+and   code conforms to the same regexp as top-level-domain
+
+incremental example: *n-123* (where sub-domain = n, incremental value = 123)
+code-based example: *n* (where code = "n")
+
+Some local-ids fit both formats. For example "aud-1" can be seen as:
+
+  # sub-domain = aud, incremental-value=1
+  # code = aud-1
+
+This isn't a problem but for any given top-level-domain we should be consistent on which local-id format we use.
+
+Any local-id can be used as a sub-domain for "child" items.
+
+For example, an event's local-id (n-123) can be used for one of its sessions (n-123-1).
+
+=Examples=
+
+These are the main UIDs.
+
+|| || UID || top-level-domain || local-id  || sub-domain || incremental-value || code ||
+|| Event type || *event-type-n* || event-type || n || || || n ||
+|| Event || *event-n-123* || event || n-123 || n (event-type local-id)|| 123 || ||
+|| Session || *session-n-123-1* || session || n-123-1 || n-123 (event local-id) || 1 || ||
+|| Media || *audio-n-123* || audio || n-123 || n (event-type local-id) || 123 || ||
+|| Device code || *device-code-aud-1* || device-code || aud-1 || aud || 1 || aud-1 ||
+|| Markup type || *markup-type-topic* || markup-type || topic || || || topic ||
+|| Markup category || *markup-category-pope-joke-1* || markup-category || pope-joke-1 || || || pope-joke-1 ||
+|| Concept || *concept-life* || concept || life || || || life ||
+|| Tape || *tape-1* || tape || 1 || || 1 || ||
+
+` `
+
+=Representation in XML=
+
+In the XML we refer to local-ids as "@id" attributes. The top level domains are used as the element tag name. For example:
+
+<event id="n-123" ...>
+
+Referring to a UID we do something like:
+
+<session ... eventId="n-123"> (for incremental local-ids)
+<device ... deviceCode="aud-1"> (for code-based local-ids)
+
+i.e. the top-level-domain is used in the attribute name and the local-id is attribute value
+
+This is not strictly enforced. For example:
+
+<event ... type="n">
+
+should really be
+
+<event ... eventType="n">
+
+but who cares :)
+
+=Sub-Session=
+
+For sub-session items (like segments) we use a slightly different format for the UID:
+
+TODO: Update the UID format (defined above) to allow for this.
+
+*{top-level-domain}-{session-local-id}#{node-id}*
+
+where top-level-domain is one of [segment|content|super-segment|super-content]
+  and node-id conforms to the same regexp as top-level-domain
+
+For example:
+
+*segment-n-123-1#p1 (where node-id = p1)*
+
+UID examples for this:
+
+*segment-n-123-1#p1* (in the XML the corresponding element would be <segment id="p1" ...>
+*super-segment-n-123-1#o1* (in the XML the corresponding element would be <superSegment id="o1" ...>
