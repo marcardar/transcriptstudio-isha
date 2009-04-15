@@ -1,153 +1,109 @@
-#summary UUIDs for event, session, video, audio and photos
+#summary UIDs for event, session, video, audio and photos
 
-= Introduction =
+Note - this is just a draft - it still needs to be properly fleshed out.
 
-Here we define the format of UUIDs for the various entities. These UUIDs provide more than just uniqueness. They also provide a certain level of readability as well as ordering.
+=Introduction=
 
-= Details =
+Here we talk about UIDs rather than UUIDs because we do not care about uniqueness beyond this application. If we wanted a UUID, then we would just prefix the UID with an application identifier...
 
-==Event UUID (e.g. 20090319-y1)==
+Anything we want to refer to within the application, has a UID. This includes events, sessions, paragraphs, device codes, event types etc.
 
-  * aim: provide ordering and some level of readability to event UUID
-  * format: <8-digit date when event started>-<event id unique within date>
-  * fixed width: no
-  * order: by date
-  * grouping: by event type within date
-  * examples:
-    * 20090319-d1
-    * 00000000-n124 (this means there are probably at least 124 intro talks on an unknown date)
+=Format=
 
-===<8-digit date when event started> (e.g. 20090319)===
+There format of a UID is:
 
-  * aim: provide chronological ordering and information about exact date
-  * format: yyyymmdd
-  * fixed width: yes (8)
-  * order: by date
-  * grouping: n/a
-  * examples:
-    * 20090319 (if date known)
-    * 00000000 (if date not known)
-    * 20090000 (if only year known)
+*{top-level-domain}-{local-id}*
 
-===<event id unique within date> (e.g. n1)===
+where top-level-domain is one of: [event-type|event|session|audio|video|image|device-code|markup-type|markup-category|concept|tape]
 
-  * aim: provide uniqueness within date as well as show the event type. The integer is necessary because there may be more the one event with the same type starting on the same date
-  * format: <variable width event type><variable width integer providing uniqueness>
-  * fixed width: no
-  * order: none
-  * grouping: by event type
-  * notes: So for the same date we can have "n1" and "y1" - i.e. we can reuse the integer for different event types.
-  * examples:
-    * n1 (intro talk)
-    * n2 (another intro talk on the same day)
-    * y1 (bramhachari meet)
+Example: *event-type-n* (where top-level-domain = event-type, local-id = n)
 
-----
+The regexp for top-level-domain is: [a-z0-9]`*`([a-z0-9]\-[a-z0-9])`*`[a-z0-9]`*`
 
-==Session UUID (e.g. 20090319-y1-1-1830)==
+(but not the empty string)
 
-  * aim: provide ordering and some level of readablity to session UUIDs
-  * format: <event UUID>-<day within event>-<session start time>
-  * fixed width: no
-  * order: same as event id and then chronologically within event
-  * grouping: n/a
-  * examples:
-    * 20090319-n1-1-1800 (session starting at 6:30pm on first day)
-    * 20090319-n1-0-0013 (13th session where the day is unknown)
+which is essentially saying that it contains any collection of letters, digits and hyphens and that every hyphen is surrounded by letters/digits.
 
-===<day within event> (e.g. 1)===
+The local-id is unique within the top-level-domain, only.
 
-  * aim: provide easy way to tell which day (of the event) the session started on
-  * format: integer (1=first day, 0=unknown day)
-  * fixed width: no
-  * order: chronological (but only if less than 10 days in event - very rare)
-  * grouping: n/a
-  * notes: for most events we either know all the "day" values or none of them.  If we have a situation where we know some of them then the order will be messed up...
-  * examples:
-    * 1 (first day)
-    * 0 (unknown day)
+The format of the local-id is one of the following:
 
-===<session start time> (e.g. 1830) ===
+incremental: *[{sub-domain}-]{incremental-value}*
+code-based: *{code}*
 
-  * aim: provide ordering for sessions within a day and also information about time of day
-  * format: hhmm
-  * fixed-width (when time known): yes(4)
-  * fixed-width (when time unknown): yes(4)
-  * order: chronological order (unless there is a mixture of known and unknown times)
-  * grouping: n/a
-  * examples:
-    * 1830 (session starts at 6:30pm)
-    * 0003 (unknown session start time)
+where sub-domain is optional
+and   incremental-value is an integer
+and   code conforms to the same regexp as top-level-domain
 
-----
+incremental example: *n-123* (where sub-domain = n, incremental value = 123)
+code-based example: *n* (where code = "n")
 
-===Media UUID (e.g. 20090319-n1-v1-183059)===
+Some local-ids fit both formats. For example "aud-1" can be seen as:
 
-  * aim: provide ordering and some level of readablity to media UUIDs
-  * format: <8-digit date when collection started>-<collection id within date>-<device or person id>-<time when taken>
-  * fixed-width: no
-  * order/grouping: first by date taken, then grouping by collection, then grouping by 
-device/person, then order by time taken
-  * notes: Important to note that the first two components together (e.g. 200903190-n1 are NOT the event id)
-  * examples:
-    * 20090319-n1-v1-183059 (a video clip taken at 18:30:59 on 19 March 2009, using the main camera while capturing some intro talk session)
-    * 00000000-y2-i0-000125 (nothing known about when the photo was taken, or by whom, but final component may indicate that the original media id was y125...)
+  # sub-domain = aud, incremental-value=1
+  # code = aud-1
 
-===<8-digit date when collection started>===
+This isn't a problem but for any given top-level-domain we should be consistent on which local-id format we use.
 
-  * aim: provide chronological ordering and information about exact date
-  * format: yyyymmdd
-  * fixed width: yes (8)
-  * order: chronological order (date, but not also time)
-  * grouping: n/a
-  * notes: in nearly all cases this will be the same as the date the shot was taken. However, its important we do it this way because otherwise listing the UUIDs in order could lead to some collections being separated into multiple groups.
-  * examples:
-    * 20090319 (if date known)
-    * 00000000 (if date not known)
-    * 20090000 (if only year known)
+Any local-id can be used as a sub-domain for "child" items.
 
-===<collection id within date (e.g. n1)>===
+For example, an event's local-id (n-123) can be used for one of its sessions (n-123-1).
 
-  * aim: provides a unique id for a logical grouping of media for a given date.
-  * format: <variable width event type><variable width integer providing uniqueness>
-  * fixed width: no
-  * order: none
-  * grouping: by event type
-  * notes: Typically, this will correspond to a session. In this case, its important not to confuse this value with the last component of an event UUID.
-  * examples:
-    * n1 (a collection related to an intro talk)
-    * n2 (another collection related to an intro talk (could be the same intro talk, or not) on the same day)
-    * y1 (bramhachari meet)
-    * HOW TO REPRESENT UNKNOWN EVENT TYPE?
+=Examples=
 
-===<device or person id> (e.g. v1)===
+These are the main UIDs.
 
-  * aim: group media by device/person for the given collection
-  * format: {v|a|i}<variable width integer providing uniqueness>
-  * fixed width: no
-  * order: none
-  * grouping: by media type (camera media, camcorder media, audio media grouped apart)
-  * notes: v=using camcorder, a=using audio recorder, i=using still camera. IDs beginning with "v" and "a" represent devices, beginning with "i" represents a photographer. Almost always, there is a one-to-one mapping of device-to-operator for a given session at least. Usually, this mapping is also true across sessions, events etc
-  * examples:
-    * v1 (main cam)
-    * v2 (secondary cam)
-    * v0 (unknown or unimportant camcorder)
-    * a1 (mixer)
-    * i1 (main photographer)
-    * i23 (part-time photographers get higher integers)
-    * i0 (unknown or unimportant photographer)
+|| || UID || top-level-domain || local-id  || sub-domain || incremental-value || code ||
+|| Event type || *event-type-n* || event-type || n || || || n ||
+|| Event || *event-n-123* || event || n-123 || n (event-type local-id)|| 123 || ||
+|| Session || *session-n-123-1* || session || n-123-1 || n-123 (event local-id) || 1 || ||
+|| Media || *audio-n-123* || audio || n-123 || n (event-type local-id) || 123 || ||
+|| Device code || *device-code-aud-1* || device-code || aud-1 || aud || 1 || aud-1 ||
+|| Markup type || *markup-type-topic* || markup-type || topic || || || topic ||
+|| Markup category || *markup-category-pope-joke-1* || markup-category || pope-joke-1 || || || pope-joke-1 ||
+|| Concept || *concept-life* || concept || life || || || life ||
+|| Tape || tape-1 || tape || 1 || || 1 || ||
 
-===<time when taken> (e.g. 142513)===
+=XML representation=
 
-  * aim: order the media within the given device-collection
-  * format: hhmmss (or 1-based integer if not known)
-  * fixed-width: yes (6) (for both known and unknown times)
-  * order: chronological
-  * grouping: n/a
-  * notes: when the time is unknown, we still want to preserve the order. The value does not need to start from zero or one. We can try and use existing IDs where possible. For example, if we have two audio files for a session N123, N124, those can convert to 000123 and 000124 (assuming the order is correct)
-  * important note: if the collection spans multiple dates (over midnight), then we need to adjust the time accordingly (to keep the order). Therefore, the shots taken on the second day need 24 hours added to their times etc. 
-  * examples:
-    * 142513 (taken at 14:25:13)
-    * 251031 (taken at 01:10:31 on the day after the collection start date)
-    * 000001 (unknown time but the first media in this device-collection)
-    * 001123 (unknown time but id hints at original media filename)
+In the XML we refer to local-ids as "@id" attributes. The top level domains are used as the element tag name. For example:
+
+<event id="n-123" ...>
+
+Referring to a UID we do something like:
+
+<session ... eventId="n-123"> (for incremental local-ids)
+<device ... deviceCode="aud-1"> (for code-based local-ids)
+
+i.e. the top-level-domain is used in the attribute name and the local-id is attribute value
+
+This is not strictly enforced. For example:
+
+<event ... type="n">
+
+should really be
+
+<event ... eventType="n">
+
+but who cares :)
+
+=Sub-Session=
+
+For sub-session items (like segments) we use a slightly different format for the UID:
+
+TODO: Update the UID format (defined above) to allow for this.
+
+*{top-level-domain}-{session-local-id}#{node-id}*
+
+where top-level-domain is one of [segment|content|super-segment|super-content]
+  and node-id conforms to the same regexp as top-level-domain
+
+For example:
+
+*segment-n-123-1#p1 (where node-id = p1)*
+
+UID examples for this:
+
+*segment-n-123-1#p1* (in the XML the corresponding element would be <segment id="p1" ...>
+*super-segment-n-123-1#o1* (in the XML the corresponding element would be <superSegment id="o1" ...>
+
