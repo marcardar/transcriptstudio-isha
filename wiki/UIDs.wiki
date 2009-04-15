@@ -97,12 +97,14 @@ TODO: Update the UID format (defined above) to allow for this.
 
 *{top-level-domain}-{session-local-id}#{node-id}*
 
-where top-level-domain is one of [segment|content|super-segment|super-content]
+where top-level-domain is one of {segment|content|super-segment|super-content}
   and node-id conforms to the same regexp as top-level-domain
 
 For example:
 
 *segment-n-123-1#p1 (where node-id = p1)*
+
+TODO: Maybe we should make node-id of the format: {sub-domain}-{incremental-value} (where sub-domain is one of [p|c|o] so it is more consistent with the other local-ids?
 
 UID examples for this:
 
