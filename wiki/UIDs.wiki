@@ -18,7 +18,7 @@ where top-level-domain is one of: [event-type|event|session|audio|video|image|de
 
 Example: *event-type-n* (where top-level-domain = event-type, local-id = n)
 
-The regexp for top-level-domain is: [a-z0-9]`*`([a-z0-9]\-[a-z0-9])`*`[a-z0-9]`*`
+The regexp for top-level-domain is: `[a-z0-9]*([a-z0-9]\-[a-z0-9])*[a-z0-9]*`
 
 (but not the empty string)
 
