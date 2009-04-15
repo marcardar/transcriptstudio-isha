@@ -62,9 +62,11 @@ These are the main UIDs.
 || Markup type || *markup-type-topic* || markup-type || topic || || || topic ||
 || Markup category || *markup-category-pope-joke-1* || markup-category || pope-joke-1 || || || pope-joke-1 ||
 || Concept || *concept-life* || concept || life || || || life ||
-|| Tape || tape-1 || tape || 1 || || 1 || ||
+|| Tape || *tape-1* || tape || 1 || || 1 || ||
 
-=XML representation=
+` `
+
+=Representation in XML=
 
 In the XML we refer to local-ids as "@id" attributes. The top level domains are used as the element tag name. For example:
 
@@ -106,4 +108,3 @@ UID examples for this:
 
 *segment-n-123-1#p1* (in the XML the corresponding element would be <segment id="p1" ...>
 *super-segment-n-123-1#o1* (in the XML the corresponding element would be <superSegment id="o1" ...>
-
