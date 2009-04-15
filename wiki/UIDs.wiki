@@ -36,7 +36,7 @@ and   incremental-value is an integer
 and   code conforms to the same regexp as top-level-domain
 
 incremental example: *n-123* (where sub-domain = n, incremental value = 123)
-code-based example: *n* (where code = "n")
+code-based example: *n* (where code = n)
 
 Some local-ids fit both formats. For example "aud-1" can be seen as:
 
@@ -102,7 +102,7 @@ where top-level-domain is one of {segment|content|super-segment|super-content}
 
 For example:
 
-*segment-n-123-1#p1 (where node-id = p1)*
+*segment-n-123-1#p1* (where node-id = p1)
 
 TODO: Maybe we should make node-id of the format: {sub-domain}-{incremental-value} (where sub-domain is one of [p|c|o] so it is more consistent with the other local-ids?
 
