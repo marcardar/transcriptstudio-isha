@@ -10,9 +10,9 @@ Anything we want to refer to within the application, has a UID. This includes ev
 
 The format of a UID is:
 
-*{domain}:{domain-wide-id}*
+*{domain}{domain-wide-id}*
 
-where domain has the format: *{top-level-domain}[-{context}]*
+where domain has the format: *{top-level-domain}:[{context}#]*
 and   id has the format: *[{grouping}-]{local-id}*
 
 top-level-domain is one of: event-type|event|session|audio|video|image|device-code|markup-type|markup-category|concept|tape
