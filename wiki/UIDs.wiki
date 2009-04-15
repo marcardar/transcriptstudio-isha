@@ -55,9 +55,11 @@ These are the main UIDs.
 || Markup type || *markup-type:topic* || markup-type || || || topic ||
 || Markup category || *markup-category:pope-joke-1* || markup-category || || || pope-joke-1 ||
 || Concept || *concept:life* || concept || || || life ||
-|| Segment || *segment:n-123-1#p-1* || segment || n-123-1 || p || 1 ||
-|| Markup || *markup:n-123-1#o-1* || markup || n-123-1 || o || 1 ||
+|| Segment || *segment:n-123-1#p1* || segment || n-123-1 |||| p1 ||
+|| Markup || *markup:n-123-1#o1* || markup || n-123-1 || || o1 ||
 || Tape || *tape:1* || tape || || || 1 ||
+
+Note - p1 and o1 really should change format to p-1 and o-1 (p and o are groupings) to be consistent.
 
 ` `
 
@@ -86,4 +88,4 @@ but who cares :)
 
 Another inconsistency: the markup elements are named "superSegment" and "superContent" rather than "markup" - this is to assist queries and is not really a problem since superSegment and superContent are both types of markup.
 
-Where there is a context component in the UID, this is always specified by way of the element being a descendant of some element representing that context. For example, the segment with UID segment:n-123-1#p-1 is represented by an element (with @id = p-1) that is a descendant of the session with UID n-123-1.
+Where there is a context component in the UID, this is always specified by way of the element being a descendant of some element representing that context. For example, the segment with UID segment:n-123-1#p1 is represented by an element (with @id = p1) that is a descendant of the session with UID n-123-1.
