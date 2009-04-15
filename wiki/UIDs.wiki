@@ -22,7 +22,7 @@ context and grouping are both optional
 
 So, expanded in full, the format of a UID is:
 
-*{top-level-domain}-[{context}#][{grouping}-]{local-id}*
+*{top-level-domain}:[{context}#][{grouping}-]{local-id}*
 
 Example: *event-type-n* (where top-level-domain = event-type, local-id = n)
 
