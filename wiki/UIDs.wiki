@@ -10,19 +10,18 @@ Anything we want to refer to within the application, has a UID. This includes ev
 
 The format of a UID is:
 
-*{domain}{domain-wide-id}*
+*{domain}:[{context}#]{local-id}*
 
-where domain has the format: *{top-level-domain}:[{context}#]*
-and   id has the format: *[{grouping}-]{local-id}*
+where local-id has the format: *[{grouping}-]{sub-id}*
 
 top-level-domain is one of: event-type|event|session|audio|video|image|device-code|markup-type|markup-category|concept|tape
 context and grouping are both optional
 
 So, expanded in full, the format of a UID is:
 
-*{top-level-domain}:[{context}#][{grouping}-]{local-id}*
+*{domain}:[{context}#][{grouping}-]{sub-id}*
 
-Example: *event-type-n* (where top-level-domain = event-type, local-id = n)
+Example: *event-type-n* (where domain = event-type, sub-id = n)
 
 The regexp for each of these four components is:
 
@@ -32,13 +31,13 @@ The regexp for each of these four components is:
 
 which is essentially saying that it contains any sequence of letters, digits and hyphens and that every hyphen is surrounded by letters/digits.
 
-In situations where we do not have direct control over the UID (e.g. event, session), the local-id is an incremental integer.
+In situations where we do not have direct control over the UID (e.g. event, session), the sub-id is an incremental integer.
 
-Where we do have direct control over the UID (event-type, device-code), the local-id is a bit more descriptive (e.g. aud-1, topic)
+Where we do have direct control over the UID (event-type, device-code), the sub-id is a bit more descriptive (e.g. aud-1, topic)
 
-Any domain-wide-id can be used as a context or grouping.
+Any local-id can be used as a context or grouping.
 
-For example, an event's domain-wide-id (n-123) is used as the grouping value for sessions (n-123-1).
+For example, an event's local-id (n-123) is used as the grouping value for sessions (n-123-1).
 
 =When do we make something a context, and when a grouping?=
 
@@ -48,12 +47,12 @@ There is grey line between context and grouping. The decision dictates what goes
 
 These are the main UIDs.
 
-|| || UID || domain (part 1) || domain (part 2) || domain-wide-id (part 1) || domain-wide-id (part 2) ||
-|| || || top-level-domain || context || grouping || local-id ||
+|| || UID || || || local-id (part 1) || local-id (part 2) ||
+|| || || domain || context || grouping || sub-id ||
 || Event type || *event-type:n* || event-type || || || n ||
-|| Event || *event:n-123* || event || || n (event-type dwid)|| 123 ||
-|| Session || *session:n-123-1* || session || || n-123 (event dwid) || 1 ||
-|| Media || *audio:n-123* || audio || || n (event-type dwid) || 123 ||
+|| Event || *event:n-123* || event || || n (event-type local-id)|| 123 ||
+|| Session || *session:n-123-1* || session || || n-123 (event local-id) || 1 ||
+|| Media || *audio:n-123* || audio || || n (event-type local-id) || 123 ||
 || Device code || *device-code:aud-1* || device-code || || || aud-1 ||
 || Markup type || *markup-type:topic* || markup-type || || || topic ||
 || Markup category || *markup-category:pope-joke-1* || markup-category || || || pope-joke-1 ||
@@ -72,16 +71,16 @@ For similar reasons, markup-category also has no groupings.
 
 =Representation in XML=
 
-In the XML we specify domain-wide-ids in the "@id" attributes. The top level domains are used as the element tag name. For example:
+In the XML we specify local-ids in the "@id" attributes. The domains are used as the element tag name. For example:
 
 <event id="n-123" ...>
 
 Referring to a UID we do something like:
 
-<session ... eventId="n-123"> (for incremental local-ids)
-<device ... deviceCode="aud-1"> (for code-based local-ids)
+<session ... eventId="n-123"> (for incremental sub-ids)
+<device ... deviceCode="aud-1"> (for code-based sub-ids)
 
-i.e. the top-level-domain is used in the attribute name and the local-id is attribute value
+i.e. the domain is used in the attribute name and the local-id is attribute value
 
 This is not strictly enforced. For example:
 
