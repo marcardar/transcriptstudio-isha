@@ -22,7 +22,7 @@ So, expanded in full, the format of a UID is:
 
 *{domain}:[{context}#][{grouping}-]{sub-id}*
 
-Example: *event-type-n* (where domain = event-type, sub-id = n)
+Example: *event-type:n* (where domain = event-type, no context, no grouping, local-id/sub-id = n)
 
 The regexp for each of these four components is:
 
@@ -39,6 +39,8 @@ Where we do have direct control over the UID (event-type, device-code), the sub-
 Any local-id can be used as a context or grouping.
 
 For example, an event's local-id (n-123) is used as the grouping value for sessions (n-123-1).
+
+Also a session's local-id (n-123-1) is used as a context for segments.
 
 =When do we make something a context, and when a grouping?=
 
