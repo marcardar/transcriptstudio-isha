@@ -1,7 +1,5 @@
 #summary UIDs for event, session, video, audio and photos
 
-Note - this is just a draft - it still needs to be properly fleshed out.
-
 =Introduction=
 
 Here we talk about UIDs rather than UUIDs because we do not care about uniqueness beyond this application. If we wanted a UUID, then we would just prefix the UID with an application identifier...
@@ -42,24 +40,33 @@ Any domain-wide-id can be used as a context or grouping.
 
 For example, an event's domain-wide-id (n-123) is used as the grouping value for sessions (n-123-1).
 
+=When do we make something a context, and when a grouping?=
+
+There is grey line between context and grouping. The decision dictates what goes in the ID attribute (grouping does, context doesnt). Essentially, if something is likely to be used in isolation, then use groupings, otherwise use contexts. So, we use things like events, sessions and media in isolation, but markups and segments are always in the context of its transcript/session.
+
 =Examples=
 
 These are the main UIDs.
 
-|| || UID || top-level-domain || context || grouping || local-id ||
+|| || UID || domain (part 1) || domain (part 2) || domain-wide-id (part 1) || domain-wide-id (part 2) ||
+|| || || top-level-domain || context || grouping || local-id ||
 || Event type || *event-type:n* || event-type || || || n ||
-|| Event || *event:n-123* || event || || n (event-type local-id)|| 123 ||
-|| Session || *session:n-123-1* || session || || n-123 (event local-id) || 1 ||
-|| Media || *audio:n-123* || audio || || n (event-type local-id) || 123 ||
+|| Event || *event:n-123* || event || || n (event-type dwid)|| 123 ||
+|| Session || *session:n-123-1* || session || || n-123 (event dwid) || 1 ||
+|| Media || *audio:n-123* || audio || || n (event-type dwid) || 123 ||
 || Device code || *device-code:aud-1* || device-code || || || aud-1 ||
 || Markup type || *markup-type:topic* || markup-type || || || topic ||
 || Markup category || *markup-category:pope-joke-1* || markup-category || || || pope-joke-1 ||
 || Concept || *concept:life* || concept || || || life ||
-|| Segment || *segment:n-123-1#p1* || segment || n-123-1 |||| p1 ||
+|| Segment || *segment:n-123-1#p1* || segment || n-123-1 || || p1 ||
 || Markup || *markup:n-123-1#o1* || markup || n-123-1 || || o1 ||
 || Tape || *tape:1* || tape || || || 1 ||
 
-Note - p1 and o1 really should change format to p-1 and o-1 (p and o are groupings) to be consistent.
+Note - p1 and o1 really should change format to p-1 and o-1 (p and o are really groupings) to be consistent.
+
+Note - You may be wondering why "aud-1" is not split into two parts. This is because we never use "aud" as a logical grouping. "aud-1" and "aud-2" are considered no less different than "vid-1". Maybe later we decide that aud-1 and aud-2 are more similar, in which case we just split "aud" out as a grouping.
+
+For similar reasons, markup-category also has no groupings.
 
 ` `
 
