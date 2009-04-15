@@ -14,7 +14,8 @@ The format of a UID is:
 
 where local-id has the format: *[{grouping}-]{sub-id}*
 
-top-level-domain is one of: event-type|event|session|audio|video|image|device-code|markup-type|markup-category|concept|tape
+domain is one of: event-type|event|session|audio|video|image|device-code|markup-type|markup-category|concept|tape
+
 context and grouping are both optional
 
 So, expanded in full, the format of a UID is:
