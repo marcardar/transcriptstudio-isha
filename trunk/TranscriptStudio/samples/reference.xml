@@ -1,43 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <reference>
 	<eventTypes>
-		<eventType id="a" name="Inner Engineering"/>
-		<eventType id="b" name="Isha Yoga"/>
-		<eventType id="c" name="Spiritual Cultural"/>
-		<eventType id="d" name="Samyama"/>
-		<eventType id="e" name="Wholeness"/>
-		<eventType id="f" name="BSP"/>
-		<eventType id="g" name="Himalayan Trek"/>
-		<eventType id="h" name="Mahashivarathri"/>
-		<eventType id="i" name="Ishafest"/>
-		<eventType id="j" name="Mahasathsang"/>
-		<eventType id="k" name="Special Event"/>
-		<eventType id="l" name="Conference"/>
-		<eventType id="m" name="Meditator Sathsang"/>
-		<eventType id="n" name="Intro Talk"/>
-		<eventType id="p" name="Resident Sathsang"/>
-		<eventType id="q" name="Interview Press"/>
-		<eventType id="r" name="Visit Activity"/>
-		<eventType id="s" name="Dhyanalinga"/>
-		<eventType id="t" name="Ashram Event"/>
-		<eventType id="u" name="Prison"/>
-		<eventType id="v" name="Construction"/>
-		<eventType id="w" name="Teachers"/>
-		<eventType id="x" name="Private Meeting"/>
-		<eventType id="y" name="Bramhacharis"/>
-		<eventType id="aa" name="Vanashree Eco Center"/>
-		<eventType id="ab" name="Sharings"/>
-		<eventType id="ac" name="ARR"/>
-		<eventType id="ad" name="Committee Meet"/>
-		<eventType id="ae" name="Tsunami 2005"/>
-		<eventType id="af" name="ARR Function"/>
-		<eventType id="ag" name="???"/>
-		<eventType id="ah" name="Isha Home School"/>
-		<eventType id="ai" name="Isha Rejuvenation"/>
-		<eventType id="aj" name="Sounds of Isha"/>
-		<eventType id="ak" name="Isha Samskriti"/>
-		<eventType id="al" name="Ashram Life"/>
+		<eventType id="a" newId="ie" name="Inner Engineering"/>
+		<eventType id="b" newId="iy" name="Isha Yoga"/>
+		<eventType id="c" newId="sc" name="Spiritual Cultural"/>
+		<eventType id="d" newId="sam" name="Samyama"/>
+		<eventType id="e" newId="who" name="Wholeness"/>
+		<eventType id="f" newId="bsp" name="BSP"/>
+		<eventType id="g" newId="ht" name="Himalayan Trek"/>
+		<eventType id="h" newId="ms" name="Mahashivarathri"/>
+		<eventType id="i" newId="if" name="Ishafest"/>
+		<eventType id="j" newId="mas" name="Mahasathsang"/>
+		<eventType id="k" newId="se" name="Special Event"/>
+		<eventType id="l" newId="cnf" name="Conference"/>
+		<eventType id="m" newId="mes" name="Meditator Sathsang"/>
+		<eventType id="n" newId="it" name="Intro Talk"/>
+		<eventType id="p" newId="res" name="Resident Sathsang"/>
+		<eventType id="q" newId="ip" name="Interview Press"/>
+		<eventType id="r" newId="va" name="Visit Activity"/>
+		<eventType id="s" newId="dhy" name="Dhyanalinga"/>
+		<eventType id="t" newId="aev" name="Ashram Event"/>
+		<eventType id="u" newId="pri" name="Prison"/>
+		<eventType id="v" newId="cns" name="Construction"/>
+		<eventType id="w" newId="tea" name="Teachers"/>
+		<eventType id="x" newId="pm" name="Private Meeting"/>
+		<eventType id="y" newId="bra" name="Bramhacharis"/>
+		<eventType id="aa" newId="vec" name="Vanashree Eco Center"/>
+		<eventType id="ab" newId="sha" name="Sharings"/>
+		<eventType id="ac" newId="arr" name="ARR"/>
+		<eventType id="ad" newId="cm" name="Committee Meet"/>
+		<eventType id="ae" newId="tsu" name="Tsunami 2005"/>
+		<eventType id="af" newId="arf" name="ARR Function"/>
+		<eventType id="ag" newId="???" name="???"/>
+		<eventType id="ah" newId="ihs" name="Isha Home School"/>
+		<eventType id="ai" newId="ir" name="Isha Rejuvenation"/>
+		<eventType id="aj" newId="soi" name="Sounds of Isha"/>
+		<eventType id="ak" newId="is" name="Isha Samskriti"/>
+		<eventType id="al" newId="al" name="Ashram Life"/>
 	</eventTypes>
+	<deviceCodes>
+		<deviceCode id="aud-1" name="Audio Recorder"/>
+		<deviceCode id="cam-1" name="Main Video Camera"/>
+		<deviceCode id="cam-2" name="Secondary Video Camera"/>
+		<deviceCode id="cam-3" name="Tertiary Video Camera"/>
+		<deviceCode id="pho-1" name="Photographer 1"/>
+		<deviceCode id="pho-2" name="Photographer 2"/>
+		<deviceCode id="pho-3" name="Photographer 3"/>
+		<deviceCode id="pho-4" name="Photographer 4"/>
+		<deviceCode id="pho-5" name="Photographer 5"/>
+	</deviceCodes>
 	<places>
 		<country name="India">
 			<location name="Isha Yoga Center">
