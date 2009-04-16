@@ -20,14 +20,14 @@
 			var result:EventCreatorDialog = new EventCreatorDialog();
 			result.xqueryExecutor = xqueryExecutor;
 			PopUpManager.addPopUp(result, parent, true);
-			result.eventPropertiesPane.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
-				result.eventPropertiesPane.referenceMgr = referenceMgr;
-				result.eventPropertiesPane.callLater(function():void {
+			result.eventMetadataPane.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
+				result.eventMetadataPane.referenceMgr = referenceMgr;
+				result.eventMetadataPane.callLater(function():void {
 					if (eventMetadata == null) {
-						result.eventPropertiesPane.eventMetadata = new EventMetadata(<metadata/>, 'a');
+						result.eventMetadataPane.eventMetadata = new EventMetadata(<metadata/>, 'a');
 					}
 					else {
-						result.eventPropertiesPane.eventMetadata = eventMetadata;
+						result.eventMetadataPane.eventMetadata = eventMetadata;
 					}
 				});
 			}, true);
@@ -35,7 +35,7 @@
 		}
 	
 		public function get eventMetadata():EventMetadata {
-			return eventPropertiesPane.eventMetadata;
+			return eventMetadataPane.eventMetadata;
 		}
 		
 		private function okClicked():void {
@@ -54,9 +54,9 @@
 	]]>
 	</mx:Script>
 	
-	<event:EventMetadataPane id="eventPropertiesPane" width="100%" height="100%"/>
+	<event:EventMetadataPane id="eventMetadataPane" width="100%" height="100%"/>
 	<mx:HBox id="buttonBox">
-		<mx:Button id="okButton" label="OK" enabled="{eventPropertiesPane.ready}" click="okClicked()"/>
+		<mx:Button id="okButton" label="OK" enabled="{eventMetadataPane.ready}" click="okClicked()"/>
 		<mx:Button label="Cancel" click="closeMe()"/>
 	</mx:HBox>
 	

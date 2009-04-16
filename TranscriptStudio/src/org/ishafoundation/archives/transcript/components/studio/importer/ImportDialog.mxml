@@ -123,7 +123,7 @@
 		private function eventCreatorHandler():void {
 			var templateProps:EventMetadata = importedEventMetadata == null ? null : importedEventMetadata.copy();
 			var eventCreatorDialog:EventCreatorDialog = EventCreatorDialog.display(this, databaseMgr, referenceMgr, templateProps);
-			eventCreatorDialog.eventPropertiesPane.eventTypeComboBox.enabled = templateProps == null;
+			eventCreatorDialog.eventMetadataPane.eventTypeComboBox.enabled = templateProps == null;
 			eventCreatorDialog.addEventListener(EventCreatorDialog.EVENT_EDITED, function(evt:Event):void {
 				eventMetadata = eventCreatorDialog.eventMetadata;
 				status = "Successfully created event: " + eventMetadata.id;
@@ -139,7 +139,7 @@
 			else {
 				templateSessionMetadataElement = importedSessionMetadataElement.copy();
 			}
-			var sessionCreatorDialog:SessionCreatorDialog = SessionCreatorDialog.display(this, databaseMgr, referenceMgr, eventMetadata.id, templateSessionMetadataElement);
+			var sessionCreatorDialog:SessionCreatorDialog = SessionCreatorDialog.display(this, databaseMgr, referenceMgr, eventMetadata, templateSessionMetadataElement);
 			sessionCreatorDialog.addEventListener(SessionCreatorDialog.SESSION_EDITED, function(evt:Event):void {
 				var newSessionMetadata:SessionMetadata = sessionCreatorDialog.sessionMetadata;
 				sessionList.refresh(newSessionMetadata.sessionId);
