@@ -171,6 +171,25 @@ package org.ishafoundation.archives.transcript.model
 			return placeStr;
 		}
 		
+		/**
+		 * Returns an object with (optionally) two properties: rangeStart, rangeEnd
+		 * 
+		 * This is useful for a data chooser.
+		 */
+		public function get dateRange():Object {
+			if (startAt == null && endAt == null) {
+				return null;
+			}
+			var result:Object = {};
+			if (startAt != null) {
+				result.rangeStart = startAt;
+			}
+			if (endAt != null) {
+				result.rangeEnd = endAt;
+			}
+			return result;			
+		}
+		
 		public function generateFullName(referenceMgr:ReferenceManager):String {
 			var result:String = id + ":";
 			if (startAt != null) {
