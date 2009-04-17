@@ -26,8 +26,8 @@
 	<property name="exist.webapp.dir" location="${exist.dir}/webapp"/>
 
 	<property name="dist.dir" location="./dist"/>
-	<property name="dist.client.dir" location="${dist.dir}/${application.name.condensed}-client"/>
-	<property name="dist.server.dir" location="${dist.dir}/${application.name.condensed}-server"/>
+	<property name="dist.client.dir" location="${dist.dir}/${application.name.short}-client"/>
+	<property name="dist.server.dir" location="${dist.dir}/${application.name.short}-server"/>
 	<property name="dist.exist.app.dir" location="${dist.server.dir}/exist-app"/>
 	<property name="dist.exist.db.dir" location="${dist.server.dir}/exist-db"/>
 
@@ -40,7 +40,7 @@
 		<echo>Starting at:  ${TSTAMP}</echo>
 		<echo/>
 		<echo>App name:     ${application.name}</echo>
-		<echo>App name2:    ${application.name.condensed}</echo>
+		<echo>App name2:    ${application.name.short}</echo>
 		<echo>App version:  ${application.version}</echo>
 		<echo/>
 		<echo>Flex home:    ${FLEX_HOME}</echo>
@@ -66,7 +66,7 @@
 				<attribute name="Project-Name" value="Transcript Studio eXist extensions"/>
 				<!--attribute name="Project-Version" value="${application.version}"/>
 				<attribute name="Project-Build" value="${DSTAMP}"/>
-				<attribute name="Project-CodeName" value="${application.name.condensed}"/>
+				<attribute name="Project-CodeName" value="${application.name.short}"/>
 				<attribute name="SVN-Revision" value="${svn.revision}"/-->
 			</manifest>
 		</jar>
@@ -157,7 +157,7 @@
 	</target>
 		
 	<target name="dist-zips" depends="dist-server,dist-client">
-		<property name="simple.archive.name" value="${application.name.condensed}"/>
+		<property name="simple.archive.name" value="${application.name.short}"/>
 		<property name="client.archive.name" value="${simple.archive.name}-${application.version}-client"/>
 		<property name="server.archive.name" value="${simple.archive.name}-${application.version}-server"/>
 		<zip destfile="${dist.dir}/${client.archive.name}.zip" basedir="${dist.dir}" includes="*-client/**"/>
