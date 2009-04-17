@@ -16,6 +16,7 @@ package org.ishafoundation.archives.transcript.importer
 	import name.carter.mark.flex.util.collection.ISet;
 	
 	import org.ishafoundation.archives.transcript.model.EventMetadata;
+	import org.ishafoundation.archives.transcript.model.ReferenceManager;
 	import org.ishafoundation.archives.transcript.model.SessionMetadata;
 	import org.ishafoundation.archives.transcript.util.ApplicationUtils;
 	
@@ -62,10 +63,10 @@ package org.ishafoundation.archives.transcript.importer
 		public var sessionElement:XML; // only properties
 		public var eventElement:XML; // only properties
 		
-		public function WordMLTransformer(importName:String, wordMLDoc:XML, idFunc:Function)
+		public function WordMLTransformer(importName:String, wordMLDoc:XML, referenceMgr:ReferenceManager, idFunc:Function)
 		{
 			var sourceId:String = extractSourceIdFromName(importName);
-			var eventType:String = extractEventTypeFromSourceId(sourceId);
+			var eventType:String = extractEventTypeFromSourceId(sourceId, referenceMgr);
 			
 			this.audioTranscriptElement = <audioTranscript filename={importName}/>;
 			var importedBy:String = Utils.getClassName(this) + "-v" + ApplicationUtils.getApplicationVersion();
@@ -104,12 +105,18 @@ package org.ishafoundation.archives.transcript.importer
 			return result;
 		}
 		
-		private static function extractEventTypeFromSourceId(sourceId:String):String {
+		private static function extractEventTypeFromSourceId(sourceId:String, referenceMgr:ReferenceManager):String {
 			var arr:Array = SOURCE_ID_PATTERN.exec(sourceId);
 			if (arr == null) {
 				return null;
 			}
-			return arr[1];
+			var oldOrNewEventTypeId:String = arr[1];
+			// get the real eventType
+			var result:String = referenceMgr.getEventTypeId(oldOrNewEventTypeId);
+			if (result == null) {
+				throw new Error("Could not extract valid event type from sourceId: " + sourceId); 
+			}
+			return result;
 		}
 		
 		private static function extractSourceIdFromName(importName:String):String {

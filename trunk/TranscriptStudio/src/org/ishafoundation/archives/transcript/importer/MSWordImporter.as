@@ -30,6 +30,7 @@ package org.ishafoundation.archives.transcript.importer
 	
 	import org.ishafoundation.archives.transcript.db.XQueryExecutor;
 	import org.ishafoundation.archives.transcript.model.MediaMetadata;
+	import org.ishafoundation.archives.transcript.model.ReferenceManager;
 	import org.ishafoundation.archives.transcript.model.SessionMetadata;
 	
 	public class MSWordImporter
@@ -37,9 +38,11 @@ package org.ishafoundation.archives.transcript.importer
 		private static var DATE_FORMAT_STRINGS:Array = ["DD-MMMM-YY", "DD-MMM-YY", "DD-MM-YY"];
 		
 		private var xqueryExecutor:XQueryExecutor;
+		private var referenceMgr:ReferenceManager;
 				
-		public function MSWordImporter(xqueryExecutor:XQueryExecutor) {
-			this.xqueryExecutor = xqueryExecutor;	
+		public function MSWordImporter(xqueryExecutor:XQueryExecutor, referenceMgr:ReferenceManager) {
+			this.xqueryExecutor = xqueryExecutor;
+			this.referenceMgr = referenceMgr;	
 		}
 		
 		public function importAudioTranscripts(names:Array, successFunc:Function, failureFunc:Function):void {
@@ -154,7 +157,14 @@ package org.ishafoundation.archives.transcript.importer
 			var nextName:String = names.shift();
 			var encodedNextName:String = encodeURIComponent(nextName);
 			xqueryExecutor.executeStoredXQuery("import-transcript.xql", {transcriptName:encodedNextName}, function(wordXML:XML):void {
-				var audioTranscript:WordMLTransformer = new WordMLTransformer(nextName, wordXML, idFunc);
+				var audioTranscript:WordMLTransformer;
+				try {
+					audioTranscript = new WordMLTransformer(nextName, wordXML, referenceMgr, idFunc);
+				}
+				catch (e:Error) {
+					failureFunc(e.message);
+					return;
+				}
 				audioTranscripts.push(audioTranscript); 
 				importPathsInternal(names, audioTranscripts, idFunc, successFunc, failureFunc);
 			}, function(msg:String):void {

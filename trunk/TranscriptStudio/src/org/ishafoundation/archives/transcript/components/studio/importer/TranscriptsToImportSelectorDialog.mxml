@@ -2,6 +2,7 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Import Transcripts">
 	<mx:Script>
 	<![CDATA[
+		import org.ishafoundation.archives.transcript.model.ReferenceManager;
 		import mx.managers.CursorManager;
 		import org.ishafoundation.archives.transcript.importer.MSWordImporter;
 		import mx.events.FlexEvent;
@@ -16,9 +17,9 @@
 	   	
 		private var importer:MSWordImporter;
 			   	
-		public static function display(parent:DisplayObject, xqueryExecutor:XQueryExecutor):TranscriptsToImportSelectorDialog {
+		public static function display(parent:DisplayObject, xqueryExecutor:XQueryExecutor, referenceMgr:ReferenceManager):TranscriptsToImportSelectorDialog {
 			var result:TranscriptsToImportSelectorDialog = new TranscriptsToImportSelectorDialog();
-			result.importer = new MSWordImporter(xqueryExecutor);		
+			result.importer = new MSWordImporter(xqueryExecutor, referenceMgr);
 			PopUpManager.addPopUp(result, parent, true);
 			result.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
 				xqueryExecutor.query("import module namespace ts4isha='http://ishafoundation.org/ts4isha/xquery' at 'java:org.ishafoundation.ts4isha.xquery.modules.TranscriptStudioModule';ts4isha:import-file-name-list()", [], function(xml:XML):void {
