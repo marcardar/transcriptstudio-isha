@@ -452,7 +452,7 @@
 				if (session == null) {
 					throw new Error("Cannot do a simple import when no session is open");
 				}
-				var popup:TranscriptsToImportSelectorDialog = TranscriptsToImportSelectorDialog.display(this, databaseMgr);
+				var popup:TranscriptsToImportSelectorDialog = TranscriptsToImportSelectorDialog.display(this, databaseMgr, referenceMgr);
 				popup.addEventListener(TranscriptsToImportSelectorDialog.FILES_IMPORTED, function(evt:Event):void {
 					var importedSessionXML:XML = MSWordImporter.createSessionElement(popup.selectedAudioTranscripts);
 					var importedDeviceElements:XMLList = importedSessionXML..device;

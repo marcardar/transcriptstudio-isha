@@ -24,6 +24,7 @@ package org.ishafoundation.archives.transcript.model
 	import mx.events.PropertyChangeEvent;
 	
 	import name.carter.mark.flex.project.mdoc.MTag;
+	import name.carter.mark.flex.util.Utils;
 	import name.carter.mark.flex.util.XMLUtils;
 	import name.carter.mark.flex.util.collection.HashSet;
 	import name.carter.mark.flex.util.collection.ISet;
@@ -442,6 +443,34 @@ package org.ishafoundation.archives.transcript.model
 		
 		public function getEventTypeName(eventTypeId:String):String {
 			return referenceXML.eventTypes.eventType.(@id == eventTypeId).@name;
+		}
+		
+		public function getEventTypeId(oldOrNewEventTypeId:String):String {
+			if (Utils.isBlank(oldOrNewEventTypeId)) {
+				return null;
+			}
+			var matchingIds:XMLList = referenceXML..eventType.(testEventTypeForId(@id, hasOwnProperty("@oldId") ? @oldId : null, oldOrNewEventTypeId)).@id;
+			switch (matchingIds.length()) {
+				case 0:
+					return null;
+				case 1:
+					return matchingIds[0];
+				default:
+					throw new Error("More than one event type id (or oldId) matches: " + oldOrNewEventTypeId);
+			}
+		}
+		
+		private function testEventTypeForId(id:String, oldId:String, oldOrNewId:String):Boolean {
+			oldOrNewId = oldOrNewId.toLowerCase();
+			if (id.toLowerCase() == oldOrNewId) {
+				return true;
+			}
+			if (oldId != null) {
+				if (oldId.toLowerCase() == oldOrNewId) {
+					return true;
+				}	
+			}
+			return false;
 		}
 		
 		public function getLanguages():Array {

@@ -115,6 +115,10 @@ package name.carter.mark.flex.util
 			return result;
 		}
 		
+		public static function isBlank(text:String):Boolean {
+			return text == null || normalizeSpace(text) == "";
+		}
+		
 		/**
 		 * For each item, removes leading/trailing whitespace and condenses consecutive (one or more) whitespace to a single space
 		 * If the item is reduced to an empty string then that item is removed from the array

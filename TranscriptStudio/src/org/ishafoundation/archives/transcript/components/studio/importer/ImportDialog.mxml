@@ -69,7 +69,7 @@
 		}
 		
 		private function transcriptsToImportSelectorHandler():void {
-			var transcriptsToImportSelectorDialog:TranscriptsToImportSelectorDialog = TranscriptsToImportSelectorDialog.display(this, databaseMgr);
+			var transcriptsToImportSelectorDialog:TranscriptsToImportSelectorDialog = TranscriptsToImportSelectorDialog.display(this, databaseMgr, referenceMgr);
 			transcriptsToImportSelectorDialog.addEventListener(TranscriptsToImportSelectorDialog.FILES_IMPORTED, function(evt:Event):void {
 				if (transcriptsToImportSelectorDialog.selectedAudioTranscripts.length == 0) {
 					importedEventMetadata = null;
