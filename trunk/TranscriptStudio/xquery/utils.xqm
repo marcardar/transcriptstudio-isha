@@ -70,6 +70,11 @@ declare function utils:get-event-type($eventTypeId as xs:string) as element()?
 	$utils:referenceCollection/reference//eventType[@id = $eventTypeId]
 };
 
+declare function utils:get-device-code-element($deviceCode as xs:string) as element()?
+{
+	$utils:referenceCollection/reference//deviceCode[@id = $deviceCode]
+};
+
 declare function utils:set-child-element($existingParentElement as element(), $newChildElement as element()) as element()?
 {
 	let $childTagName := local-name($newChildElement)

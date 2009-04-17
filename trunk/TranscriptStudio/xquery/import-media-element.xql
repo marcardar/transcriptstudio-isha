@@ -23,7 +23,7 @@ return
 		let $sessionXML := utils:get-session($sessionId)
 		return
 			if (empty($sessionXML)) then
-				error((), concat('Unknown sessionId: ', $sessionId))
+				error(xs:QName('illegal-argument-exception'), concat('Unknown sessionId: ', $sessionId))
 			else
 				let $mediaMetadataXML := media-fns:get-media-metadata-element($sessionXML)
 				let $deviceXML := media-fns:get-device-element($deviceCode, $mediaMetadataXML)
