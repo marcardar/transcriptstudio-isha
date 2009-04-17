@@ -23,6 +23,8 @@ package org.ishafoundation.archives.transcript.importer
 	import com.ericfeminella.collections.HashMap;
 	import com.ericfeminella.collections.IMap;
 	
+	import mx.rpc.http.HTTPService;
+	
 	import name.carter.mark.flex.util.Utils;
 	import name.carter.mark.flex.util.XMLUtils;
 	
@@ -151,15 +153,13 @@ package org.ishafoundation.archives.transcript.importer
 			names = Utils.copyArray(names);
 			var nextName:String = names.shift();
 			var encodedNextName:String = encodeURIComponent(nextName);
-			xqueryExecutor.query("import module namespace ts4isha='http://ishafoundation.org/ts4isha/xquery' at 'java:org.ishafoundation.ts4isha.xquery.modules.TranscriptStudioModule';ts4isha:import-file-read($arg0)", [encodedNextName], function(resultXML:XML):void {
-				var existNS:Namespace = resultXML.namespace("exist");
-				var wordXML:XML = resultXML.existNS::value.*.(nodeKind() == "element")[0];
+			xqueryExecutor.executeStoredXQuery("import-transcript.xql", {transcriptName:encodedNextName}, function(wordXML:XML):void {
 				var audioTranscript:WordMLTransformer = new WordMLTransformer(nextName, wordXML, idFunc);
 				audioTranscripts.push(audioTranscript); 
 				importPathsInternal(names, audioTranscripts, idFunc, successFunc, failureFunc);
 			}, function(msg:String):void {
 				failureFunc(msg);
-			});
+			}, HTTPService.RESULT_FORMAT_E4X);
 		}
 		
 		private static function getIdFunc():Function {
