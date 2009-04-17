@@ -25,14 +25,18 @@ declare function media-fns:import-media-elements($importMediaXMLs as element()*,
 			concat('Unknown sessionId: ', $sessionId)
 		else
 			let $mediaMetadataXML := media-fns:get-media-metadata-element($sessionXML)
-			let $deviceXML := media-fns:get-device-element($deviceCode, $mediaMetadataXML)
 			return
-				for $importMediaXML in $importMediaXMLs
-				return
-					util:catch('java.lang.Exception', 
-						concat(media-fns:import-media-element($importMediaXML, $deviceXML), ': Success'),
-						concat($importMediaXML/@id, ': Fail')
-						)
+				util:catch('java.lang.Exception', 
+					let $deviceXML := media-fns:get-device-element($deviceCode, $mediaMetadataXML)
+					return
+						for $importMediaXML in $importMediaXMLs
+						return
+							util:catch('java.lang.Exception', 
+								concat(media-fns:import-media-element($importMediaXML, $deviceXML), ': Success'),
+								concat($importMediaXML/@id, ': Fail')
+							),
+					concat('Unknown deviceCode: ', $deviceCode)
+				)
 };
 
 declare function media-fns:import-media-element($importMediaXML as element(), $deviceXML as element()) as xs:string
@@ -77,14 +81,17 @@ declare function media-fns:import-media-element($importMediaXML as element(), $d
 
 declare function media-fns:get-device-element($deviceCode as xs:string, $mediaMetadataElement as element()) as element()
 {
-	let $deviceElements := $mediaMetadataElement/device[@code = $deviceCode]
-	return
-		if (exists($deviceElements)) then
-			$deviceElements[1]
-		else
-			let $null := update insert <device xmlns='' code='{$deviceCode}'/> into $mediaMetadataElement
-			return
-				$mediaMetadataElement/device[@code = $deviceCode][1]
+	if (empty(utils:get-device-code-element($deviceCode))) then
+		error(xs:QName('illegal-argument-exception'), concat('Unknown deviceCode: ', $deviceCode))
+	else
+		let $deviceElements := $mediaMetadataElement/device[@code = $deviceCode]
+		return
+			if (exists($deviceElements)) then
+				$deviceElements[1]
+			else
+				let $null := update insert <device xmlns='' code='{$deviceCode}'/> into $mediaMetadataElement
+				return
+					$mediaMetadataElement/device[@code = $deviceCode][1]
 };
 
 (: creates mediaMetadata element if it does not exist :)

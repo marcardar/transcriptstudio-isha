@@ -4,7 +4,7 @@
 		<audio id="p-13" audioQuality="good"/>
 		<video id="p-12" audioQuality="good" videoQuality="excellent"/>
 	</device>
-	<device code="vid-1" sessionId="p-1-1">
+	<device code="cam-1" sessionId="p-1-1">
 		<video id="p-13" audioQuality="good" videoQuality="excellent"/>
 		<video id="p-14" audioQuality="good" videoQuality="excellent"/>
 	</device>
