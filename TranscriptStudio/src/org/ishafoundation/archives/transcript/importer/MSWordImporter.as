@@ -156,7 +156,12 @@ package org.ishafoundation.archives.transcript.importer
 			names = Utils.copyArray(names);
 			var nextName:String = names.shift();
 			var encodedNextName:String = encodeURIComponent(nextName);
+			// We don't want to ignore whitespace when parsing the WordML
+			// TODO - is there a less hacky way to do this?
+			var oldWhitespace:Boolean = XML.ignoreWhitespace;
+			XML.ignoreWhitespace = false;
 			xqueryExecutor.executeStoredXQuery("import-transcript.xql", {transcriptName:encodedNextName}, function(wordXML:XML):void {
+				XML.ignoreWhitespace = oldWhitespace;
 				var audioTranscript:WordMLTransformer;
 				try {
 					audioTranscript = new WordMLTransformer(nextName, wordXML, referenceMgr, idFunc);
@@ -168,6 +173,7 @@ package org.ishafoundation.archives.transcript.importer
 				audioTranscripts.push(audioTranscript); 
 				importPathsInternal(names, audioTranscripts, idFunc, successFunc, failureFunc);
 			}, function(msg:String):void {
+				XML.ignoreWhitespace = oldWhitespace;
 				failureFunc(msg);
 			}, HTTPService.RESULT_FORMAT_E4X);
 		}
