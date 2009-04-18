@@ -8,6 +8,7 @@ package org.ishafoundation.archives.transcript.importer
 	
 	import name.carter.mark.flex.project.mdoc.MContent;
 	import name.carter.mark.flex.project.mdoc.MContentProperties;
+	import name.carter.mark.flex.project.mdoc.MSegment;
 	import name.carter.mark.flex.project.mdoc.MSegmentProperties;
 	import name.carter.mark.flex.util.DateUtils;
 	import name.carter.mark.flex.util.Utils;
@@ -203,7 +204,7 @@ package org.ishafoundation.archives.transcript.importer
 				
 				removeTrackTime(segmentElement);
 
-				segmentElement.@id = idFunc("p");
+				segmentElement.@id = idFunc(MSegment.ID_PREFIX);
 				for each (var contentElement:XML in segmentElement..content) {
 					contentElement.@id = idFunc("c");
 				}

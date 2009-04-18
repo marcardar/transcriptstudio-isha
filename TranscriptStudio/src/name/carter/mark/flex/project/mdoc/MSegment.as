@@ -6,7 +6,7 @@ package name.carter.mark.flex.project.mdoc
 	public class MSegment extends TaggableMNode
 	{
 		public static var TAG_NAME:String = "segment";
-		public static var ID_PREFIX:String = "p";
+		public static var ID_PREFIX:String = "s";
 		
 		public function MSegment(segmentElement:XML, xmlBasedDoc:MDocument)
 		{

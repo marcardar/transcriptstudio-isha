@@ -11,7 +11,6 @@ package name.carter.mark.flex.project.mdoc
 	public class MSuperContent extends MSuperNode
 	{
 		public static var TAG_NAME:String = "superContent";
-		public static var ID_PREFIX:String = "i";
 
 		public function MSuperContent(inlineElement:XML, xmlBasedDoc:MDocument)
 		{

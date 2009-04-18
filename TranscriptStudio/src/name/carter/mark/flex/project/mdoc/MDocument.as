@@ -100,7 +100,7 @@ package name.carter.mark.flex.project.mdoc
 		
 		public function createSuperSegment(segmentRange:MSegmentRange):MSuperSegment {
 			var ancestorSiblings:Array = MUtils.getCorrespondingAncestorSiblings(segmentRange.first, segmentRange.last);
-			var markupElement:XML = createElement(MSuperSegment.TAG_NAME, MSuperSegment.ID_PREFIX);
+			var markupElement:XML = createElement(MSuperSegment.TAG_NAME, MSuperNode.ID_PREFIX);
 			XMLUtils.insertParentElement(markupElement, nodesToElements(ancestorSiblings));
 			return resolveElement(markupElement) as MSuperSegment;
 		}
@@ -115,7 +115,7 @@ package name.carter.mark.flex.project.mdoc
 		
 		public function createSuperContent(conceptRange:MContentRange):MSuperContent {
 			var ancestorSiblings:Array = MUtils.getCorrespondingAncestorSiblings(conceptRange.first, conceptRange.last);
-			var markupElement:XML = createElement(MSuperContent.TAG_NAME, MSuperContent.ID_PREFIX);
+			var markupElement:XML = createElement(MSuperContent.TAG_NAME, MSuperNode.ID_PREFIX);
 			XMLUtils.insertParentElement(markupElement, nodesToElements(ancestorSiblings));
 			return resolveElement(markupElement) as MSuperContent;
 		}
