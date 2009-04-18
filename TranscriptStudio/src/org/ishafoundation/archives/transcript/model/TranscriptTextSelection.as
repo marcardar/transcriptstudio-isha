@@ -51,7 +51,12 @@ package org.ishafoundation.archives.transcript.model
 				}
 				else {
 					segmentSubset.expandAccordingToSuperContents();
-					this.selectedObj = segmentSubset;
+					if (segmentSubset.isWholeSegment()) {
+						this.selectedObj = segmentSubset.segment;
+					}
+					else {
+						this.selectedObj = segmentSubset;
+					}
 				}
 			}
 			else {
