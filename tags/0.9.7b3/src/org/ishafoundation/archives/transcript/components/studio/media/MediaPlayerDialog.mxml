@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" minWidth="320" layout="vertical" horizontalAlign="center" title="Media Player" creationComplete="init()" xmlns:display="flash.display.*">
+	<mx:Script>
+    <![CDATA[
+    	import flash.sampler.getMemberNames;
+    	import org.ishafoundation.archives.transcript.media.MediaConstants;
+    	import org.ishafoundation.archives.transcript.media.MediaConnection;
+    	import mx.events.PropertyChangeEvent;
+    	import mx.binding.utils.ChangeWatcher;
+    	import mx.events.SliderEventClickTarget;
+    	import mx.events.SliderEvent;
+    	import mx.binding.utils.BindingUtils;
+    	import org.ishafoundation.archives.transcript.components.generic.PleaseWaitPopUp;
+    	import flash.sampler.getSetterInvocationCount;
+    	import org.ishafoundation.archives.transcript.model.Session;
+    	import name.carter.mark.flex.util.XMLUtils;
+    	import mx.controls.Alert;
+    	import mx.collections.ArrayCollection;
+    	import org.ishafoundation.archives.transcript.db.DatabaseConstants;
+    	import flash.utils.getTimer;
+    	import flash.net.sendToURL;
+    	import mx.managers.PopUpManager;
+    	import mx.core.UIComponent;
+		import mx.events.ResizeEvent;
+
+		[Bindable]
+		public var mediaMetadataElement:XML;
+		
+		private var video:Video = new Video();
+		[Bindable]
+		private var mediaServer:MediaConnection = new MediaConnection(); 
+		
+		[Bindable]
+		public var isPlaying:Boolean = false;
+		private var monitorTimer:Timer = new Timer(1000);
+		
+		private function init():void {
+			videoBox.addChild(video);
+			connectToMediaServer();
+			monitorTimer.addEventListener(TimerEvent.TIMER, function(evt:TimerEvent):void {
+				if (!isPlaying) {
+					return;
+				}
+				var newTime:Number = mediaServer.mediaStream.time;
+				if (newTime == this.seekFromTime) {
+					trace("Looks like seek is still in progress... (current time=" + newTime + ")");
+				}
+				else {
+					trace("Updating slider: " + newTime);
+					slider.value = newTime;
+				}
+			});
+			ChangeWatcher.watch(this, "isPlaying", function(evt:PropertyChangeEvent):void {
+				if (evt.newValue) {
+					monitorTimer.start();
+				}
+				else {
+					monitorTimer.stop();
+				}
+			});
+		}
+		
+		private static function getDeviceCodes(mediaMetadataElement:XML):Array {
+			var result:Array = [];
+			for each (var deviceElement:XML in mediaMetadataElement.device) {
+				result.push(deviceElement.@code.toString());
+			}
+			return result;
+		}
+		
+		private function getMediaIds(deviceCode:String):Array {
+			if (deviceCode == null) {
+				return [];
+			}
+			var result:Array = [];
+			var mediaElements:XMLList = this.mediaMetadataElement.device.(@code == deviceCode).*;
+			for each (var mediaElement:XML in mediaElements) {
+				result.push(mediaElement.localName() + "-" + mediaElement.@code.toString())
+			}
+			return result;
+		}
+		
+		private function deviceLabelFunc(deviceCode:String):String {
+			if (deviceCode == null || deviceCode.length == 0) {
+				return "<Select Device>";
+			}
+			var deviceElement:XML = mediaMetadataElement.device.(@code == deviceCode)[0];
+			// TODO - read a nice name from the reference
+			return deviceCode;
+		} 
+		
+		private function mediaLabelFunc(mediaUUID:String):String {
+			if (mediaUUID == null || mediaUUID.length == 0) {
+				return "<Select Device>";
+			}
+			var firstHyphenIndex:int = mediaUUID.indexOf('-');
+			if (firstHyphenIndex < 0) {
+				throw new Error("Passed an invalid mediaUUID: " + mediaUUID);
+			}
+			return mediaUUID;
+		}
+		
+		private function connectToMediaServer():void {
+			var waitPopUp:PleaseWaitPopUp = PleaseWaitPopUp.display(this, "Trying to connect...");
+			var thisHandle:MediaPlayerDialog = this;
+			this.mediaServer.connect(function():void {
+				waitPopUp.closePopUp();
+				Alert.show("Connected");
+			}, function(msg:String):void {
+				mediaServer.close();
+				waitPopUp.closePopUp();
+				if (msg == "NetConnection.Connect.Failed") {
+					var popUp:MediaServerPopUp = PopUpManager.createPopUp(thisHandle, MediaServerPopUp, true) as MediaServerPopUp;
+					PopUpManager.centerPopUp(popUp);
+					popUp.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+						MediaConstants.MEDIA_SERVER_URL = popUp.urlTextInput.text;
+						PopUpManager.removePopUp(popUp);
+						connectToMediaServer();
+					});
+					popUp.cancelButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+						PopUpManager.removePopUp(popUp);
+						closeMe();
+					});
+				}
+				else {
+					Alert.show(msg, "Connect failed");
+				}
+			});			
+		}
+		
+		private function isVideo(mediaUUID:String):Boolean {
+			return mediaUUID.indexOf("video") == 0;
+		}
+		
+		private function getMediaElement(tagName:String, mediaId:String):XML {
+			var mediaElement:XML = mediaMetadataElement.device.*.(localName() == tagName && @id == mediaId)[0];
+			return mediaElement;
+		}
+		
+		/**
+		 *  sessionWideMediaId - eg "v1c001"
+		 */
+		public function play(mediaUUID:String, start:int = -1, end:int = -1):void {
+			if (mediaUUID == null) {
+				return;
+			}
+			var mediaURL:String = mediaUUID + "." + (isVideo(mediaUUID) ? "flv" : "mp3");
+			var waitPopUp:PleaseWaitPopUp = PleaseWaitPopUp.display(this, "Preparing to stream...");
+			this.slider.value = 0;
+			this.mediaServer.play(mediaURL, video, function(msg:String):void {
+				trace("Status msg: " + msg);
+				if (msg.indexOf("NetStream.Play.Complete") >= 0) {					
+					isPlaying = false;
+					slider.value = 0;
+					seekFromTime = -1;
+					mediaServer.mediaStream.close();
+					return;
+				}
+				// update videoWidth
+				if (video.videoWidth > 0) {
+					videoBox.width = video.videoWidth;
+				}
+				if (video.videoHeight > 0) {
+					videoBox.height = video.videoHeight;
+				}
+				waitPopUp.closePopUp();
+			}, function(msg:String):void {
+				isPlaying = false;
+				waitPopUp.closePopUp();
+				Alert.show(msg);
+			}, start, end);
+			this.seekFromTime = -1;
+			this.isPlaying = true;
+			//var mediaURL:String = "rtmp://localhost/vod/" + mediaItem.type + ":" + mediaItem.filenameWithoutExtension;
+			//videoDisplay.playheadTime = 0;
+			//videoDisplay.source = mediaURL;
+		}
+		
+		private function getMediaUUID():String {
+			var mediaId:String = mediaComboBox.selectedItem as String;
+			return mediaId;
+		}
+		
+		private function deviceChangeHandler():void {
+			trace("Changing device");
+			var mediaIds:Array = getMediaIds(deviceComboBox.selectedItem as String);
+			mediaComboBox.dataProvider = mediaIds;
+			mediaComboBox.enabled = mediaIds.length > 1;
+			var mediaId:String = getMediaUUID();
+			if (mediaId == null) {
+				videoBox.visible = false;				
+				videoBox.includeInLayout = false;
+			}
+			else {
+				if (isVideo(mediaId) > 0) {
+					videoBox.visible = true;
+				}
+				else {
+					videoBox.visible = false;
+				}
+				videoBox.includeInLayout = videoBox.visible;
+				// check the media id for the old device is not still there
+				play(mediaId);
+			}
+		}
+		
+		private function mediaChangeHandler():void {
+			trace("Changing media");
+			var mediaUUID:String = getMediaUUID();
+			play(mediaUUID);
+		}
+		
+    	public static function display(parent:DisplayObject):MediaPlayerDialog {
+    		var result:MediaPlayerDialog = new MediaPlayerDialog();
+			PopUpManager.addPopUp(result, parent, true);
+			return result;
+    	}
+    
+		private function closeMe():void {
+        	PopUpManager.removePopUp(this);
+        	this.isPlaying = false;
+        	this.mediaServer.close();
+		}
+		
+		private function skipClicked():void {
+			//playerObject.view.sendEvent(ViewEvent.SEEK, 5);
+		}
+		
+		/**
+		 * When seeking, the old time will continue to be reported by the stream until the seek has reached its destination.
+		 * If we don't handle this properly then you get an ugly situation where you drag the slider, release the
+		 * mouse button and then the slider jumps back to its old place before correcting itself
+		 */
+		[Bindable]
+		private var seekFromTime:Number = -1;
+		
+		private function playPauseClickHandler():void {
+			if (this.isPlaying) {
+				mediaServer.mediaStream.pause();
+			}
+			else if (mediaServer.mediaStream.isOpen()) {
+				mediaServer.mediaStream.resume();
+			}
+			else {
+				mediaServer.mediaStream.play(video);
+			}
+			this.isPlaying = !this.isPlaying;
+		}
+		
+		private function sliderChange(evt:SliderEvent):void {
+			if (evt.clickTarget != null) {
+				// workaround for a bug:
+				if (evt.value == 0 && this.seekFromTime < 0) {
+					return;
+				}
+				if (mediaServer == null || mediaServer.mediaStream == null || !mediaServer.mediaStream.isOpen()) {
+					return;
+				}
+				// change was not caused by the media itself
+				trace("Slider change: " + evt.value + ", " + evt.clickTarget);
+				this.seekFromTime = mediaServer.mediaStream.time;
+				this.slider.value = evt.value;
+				mediaServer.mediaStream.seek(Math.floor(evt.value));
+			}
+		}
+		
+    ]]>
+	</mx:Script>
+	<mx:Grid width="100%" horizontalGap="20" paddingLeft="20" paddingRight="20" verticalGap="0">
+		<mx:GridRow width="100%" height="100%">
+			<mx:GridItem width="50%">
+				<mx:Label width="100%" text="Device"/>
+			</mx:GridItem>
+			<mx:GridItem width="50%">
+				<mx:Label width="100%" text="Media"/>
+			</mx:GridItem>
+		</mx:GridRow>
+		<mx:GridRow width="100%" height="100%">
+			<mx:GridItem width="50%" height="100%">
+				<mx:ComboBox id="deviceComboBox" prompt="Select Device..." labelFunction="{deviceLabelFunc}" dataProvider="{getDeviceCodes(this.mediaMetadataElement)}" change="deviceChangeHandler()"/>
+			</mx:GridItem>
+			<mx:GridItem width="50%" height="100%">
+				<mx:ComboBox minWidth="150" id="mediaComboBox" enabled="false" labelFunction="{mediaLabelFunc}" change="mediaChangeHandler()"/>
+			</mx:GridItem>
+		</mx:GridRow>
+	</mx:Grid>
+
+	<mx:Image id="videoBox" minWidth="320" minHeight="250" scaleContent="false" autoLoad="true"  width="100%" height="100%" horizontalAlign="center" verticalAlign="middle"/> 
+	<mx:HBox width="100%" verticalAlign="middle">
+		<mx:Button label="{isPlaying ? 'Pause' : 'Play'}" id="playPauseButton" enabled="{mediaServer.mediaStream != null}" click="playPauseClickHandler()" width="70"/>
+		<mx:HSlider width="100%" id="slider" liveDragging="true" slideDuration="100" showTrackHighlight="true" enabled="{mediaServer.mediaStream != null &amp;&amp; mediaServer.mediaStream.duration &gt; 0}" minimum="0" maximum="{mediaServer.mediaStream.duration}" change="sliderChange(event)"/>
+	</mx:HBox>
+	<!--mx:Text text="Time tracker" id="timelabel" /-->
+
+	<mx:HBox>
+		<!--mx:Button label="Skip" id="skipButton" click="skipClicked()"/-->
+		<mx:Button label="OK" id="okButton" click="closeMe()"/>		
+	</mx:HBox>
+</mx:TitleWindow>
