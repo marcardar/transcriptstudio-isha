@@ -61,6 +61,7 @@
 		
 		[Bindable]
 		public function set transcript(transcript:Transcript):void {
+			trace("Setting transcript");
 			this._transcript = transcript;
 			this.transcriptTextArea.transcript = transcript;
 			select(null);
