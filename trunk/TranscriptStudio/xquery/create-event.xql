@@ -9,16 +9,21 @@ let $eventType := request:get-parameter('type', ())
 let $metadataXMLStr := request:get-parameter('metadataXML', ())
 return
 	if (empty($eventType) or $eventType eq '') then
-		error((), 'No type specified')
+		error(xs:QName('missing-argument-exception'), 'No type specified')
 	else if (empty($metadataXMLStr)) then
-		error((), 'No metadataXML specified')
+		error(xs:QName('missing-argument-exception'), 'No metadataXML specified')
 	else if (empty(utils:get-event-type($eventType))) then
-		error((), concat('Unknown type: ', $eventType))
-	else
-		let $metadataXML := (util:parse($metadataXMLStr), <metadata/>)[1]
-		let $newId := id-utils:generate-event-id($eventType)
-		let $eventXML := <event id="{$newId}" type="{$eventType}">{$metadataXML}</event>
-		let $documentURI :=	utils:build-event-path($eventXML)
-		let $null := utils:store($documentURI, $eventXML)
+		error(xs:QName('illegal-argument-exception'), concat('Unknown type: ', $eventType))
+	else 
+		let $collectionPath := concat($utils:dataCollectionPath, '/', $eventType)
 		return
-			$eventXML
+			if (not(xmldb:collection-exists($collectionPath))) then
+				error(xs:QName('illegal-state-exception'), concat('Could not find event type collection: ', $collectionPath))
+			else
+				let $metadataXML := (util:parse($metadataXMLStr), <metadata/>)[1]
+				let $newId := id-utils:generate-event-id($eventType)
+				let $eventXML := <event id="{$newId}" type="{$eventType}">{$metadataXML}</event>
+				let $documentURI :=	utils:build-event-path($eventXML)
+				let $null := utils:store($documentURI, $eventXML)
+				return
+					$eventXML
