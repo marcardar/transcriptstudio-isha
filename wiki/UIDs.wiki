@@ -98,4 +98,4 @@ but who cares :)
 
 Another inconsistency: the markup elements are named "superSegment" and "superContent" rather than "markup" - this is to assist queries and is not really a problem since superSegment and superContent are both types of markup.
 
-Where there is a context component in the UID, this is always specified by way of the element being a descendant of some element representing that context. For example, the segment with UID segment:n-123-1#p1 is represented by an element (with @id = p1) that is a descendant of the session with UID n-123-1.
+Where there is a context component in the UID, this is always specified by way of the element being a descendant of some element representing that context. For example, the segment with local-id n-123-1#s1 is represented by an element (with @id = s1) that is a descendant of the session with local-id n-123-1.
