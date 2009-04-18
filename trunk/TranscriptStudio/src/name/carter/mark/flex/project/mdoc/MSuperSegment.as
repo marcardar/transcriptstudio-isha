@@ -5,7 +5,6 @@ package name.carter.mark.flex.project.mdoc
 	public class MSuperSegment extends MSuperNode implements Nudgeable
 	{
 		public static var TAG_NAME:String = "superSegment";
-		public static var ID_PREFIX:String = "o";
 
 		public function MSuperSegment(element:XML, xmlBasedDoc:MDocument)
 		{

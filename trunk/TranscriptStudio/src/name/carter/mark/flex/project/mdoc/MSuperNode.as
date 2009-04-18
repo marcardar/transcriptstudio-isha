@@ -4,6 +4,8 @@ package name.carter.mark.flex.project.mdoc
 
 	public class MSuperNode extends TaggableMNode
 	{
+		public static var ID_PREFIX:String = "m";
+
 		public function MSuperNode(element:XML, xmlBasedDoc:MDocument)
 		{
 			super(element, xmlBasedDoc);
