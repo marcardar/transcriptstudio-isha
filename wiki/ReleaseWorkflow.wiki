@@ -4,17 +4,17 @@
 
 Typically for this project, development is done in Trunk. So far, we have not had reason to use any branches - probably something to do with the number of developers on this project :)
 
-build.properties specifies the version number which is takes one of three forms:
+build.properties specifies the version number which takes one of three forms:
 
   # Stable Release: 1.0.0
   # Beta: 1.0.0b1 (the first beta on the way towards releasing 1.0.0)
-  # Development: 1.0.0dev (this form should almost always be the one in Trunk)
+  # Development: 1.0.0dev (development towards 1.0.0 in progress - this form should almost always be the one in Trunk)
 
-When we Tag the code, the version number should be one of the first two forms. As we develop (make changes to the code) the third form is used.
+When we tag the code, the version number should be one of the first two forms. As we develop (make changes to the code) the third form is used.
 
 =Version format=
 
-Here is a typical lifecycle of the version from one stable release to the next:
+Here is a typical life cycle of the version from one stable release to the next:
 
 1.0.0
 1.0.1dev
@@ -28,7 +28,7 @@ Here is a typical lifecycle of the version from one stable release to the next:
 
 =How to make a new release=
 
-Here's another example - this time making a very simple change to 1.0.0:
+Here's a more detailed example - here, we are making a very simple change to 1.0.0:
 
   # Ensure that the current version is 1.0.1dev
   # Make the change and commit to SVN
