@@ -60,12 +60,12 @@ These are the main UIDs.
 || Markup type || *markup-type:topic* || markup-type || || || topic ||
 || Markup category || *markup-category:pope-joke-1* || markup-category || || || pope-joke-1 ||
 || Concept || *concept:life* || concept || || || life ||
-|| Segment || *segment:n-123-1#p1* || segment || n-123-1 (session local-id) || || p1 ||
+|| Segment || *segment:n-123-1#p1* || segment || n-123-1 (session local-id) || || s1 ||
 || Content || *content:n-123-1#c1* || content || n-123-1 (session local-id) || || c1 ||
-|| Markup || *markup:n-123-1#o1* || markup || n-123-1 (session local-id) || || o1 ||
+|| Markup || *markup:n-123-1#o1* || markup || n-123-1 (session local-id) || || m1 ||
 || Tape || *tape:1* || tape || || || 1 ||
 
-Note - p1, c1 and o1 really should change format to p-1, c-1 and o-1 (p, c and o are really groupings) to be consistent.
+Note - the single-letter prefixes to s1, c1 and m1 are only there so that we have uniqueness of id attributes within a session document. Probably, in a UID, they should not be there at all because that iniformation is available from the domain. Problem is, we normally don't want to bother specifying the domain. In other words we would rather specify the id as: n-123-1#m1 than markup:n-123-1#1.  One way around this would be to group these three domains into one: session-fragment:n-123-1#m1.  Or even use the session domain: session:n-123-1#m1 in which case we should rewrite this document to allow for this different use of the "#" character.
 
 Note - You may be wondering why "aud-1" is not split into two parts. This is because we never use "aud" as a logical grouping. "aud-1" and "aud-2" are considered no less different than "vid-1". Maybe later we decide that aud-1 and aud-2 are more similar, in which case we just split "aud" out as a grouping.
 
