@@ -16,15 +16,15 @@ When we tag the code, the version number should be one of the first two forms. A
 
 Here is a typical life cycle of the version from one stable release to the next:
 
-1.0.0
-1.0.1dev
-1.0.1b1
-1.0.1dev
-1.0.1b2
-1.0.1dev
-1.0.1b3
-1.0.1dev (after some time, we confirm that this version is stable enough to release)
-1.0.1
+  * 1.0.0
+  * 1.0.1dev
+  * 1.0.1b1
+  * 1.0.1dev
+  * 1.0.1b2
+  * 1.0.1dev
+  * 1.0.1b3
+  * 1.0.1dev (after some time, we confirm that this version is stable enough to release)
+  * 1.0.1
 
 =How to make a new release=
 
