@@ -106,7 +106,7 @@ declare function ids-panel:process-reserve-ids($domain as xs:string, $eventType 
 		let $nextIdInteger := media-fns:get-next-media-id-integer($domain, $eventType)
 		let $newReservedInteger := $nextIdInteger + xs:integer($number) - 1
 		let $lastReservedAttrName := media-fns:get-reserve-attr-name($domain)
-		let $reserveElement := $utils:referenceCollection/nextMediaIds//eventType[@id = $eventType]
+		let $reserveElement := $utils:referenceCollection/nextMediaIds//eventType[@idRef = $eventType]
 		let $newReserveElement := element {node-name($reserveElement)} { $reserveElement/@*[not(local-name(.) = $lastReservedAttrName)], attribute {$lastReservedAttrName} {$newReservedInteger} }
 		let $null := update replace $reserveElement with $newReserveElement
 		return

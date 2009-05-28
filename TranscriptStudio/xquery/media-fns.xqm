@@ -131,7 +131,7 @@ declare function media-fns:get-next-media-id-integer($domain as xs:string, $even
 		let $prefix := concat($eventType, '-')
 		let $maxIdInt := (id-utils:get-max-id-integer($domain, $prefix), 0)[1]
 		let $lastReservedAttrName := media-fns:get-reserve-attr-name($domain)
-		let $reserveElement := $utils:referenceCollection/nextMediaIds//eventType[@id = $eventType]
+		let $reserveElement := $utils:referenceCollection/nextMediaIds//eventType[@idRef = $eventType]
 		let $minIdInt := $reserveElement/media-fns:extract-integer(@*[local-name(.) = $lastReservedAttrName])
 		let $nextIdInt := max(($maxIdInt + 1, $minIdInt + 1))
 		return
