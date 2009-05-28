@@ -18,6 +18,7 @@ import module namespace session-panel = "http://www.ishafoundation.org/ts4isha/x
 import module namespace all-concepts-panel = "http://www.ishafoundation.org/ts4isha/xquery/all-concepts-panel" at "all-concepts-panel.xqm";
 import module namespace categories-panel = "http://www.ishafoundation.org/ts4isha/xquery/categories-panel" at "categories-panel.xqm";
 import module namespace admin-panel = "http://www.ishafoundation.org/ts4isha/xquery/admin-panel" at "admin-panel.xqm";
+import module namespace ids-panel = "http://www.ishafoundation.org/ts4isha/xquery/ids-panel" at "ids-panel.xqm";
 
 (:
 	Select the page to show. Every page is defined in its own module 
@@ -51,6 +52,10 @@ declare function main:display-panel($panel) as element()*
 	else if ($panel eq "admin") then
 	(
 		admin-panel:main()
+	)
+	else if ($panel eq "ids") then
+	(
+		ids-panel:main()
 	)
 	else
 	(

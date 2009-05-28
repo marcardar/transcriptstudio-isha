@@ -29,26 +29,6 @@ if (utils:is-current-user-admin()) then
 		<div class="panel">
 			<h3>Configure Database</h3>
 			Click <a href="configure-database.xql">here</a> to add the event collections
-			<h3>Find max ID</h3>
-			<form id="find-max-id-form">
-				<input type="hidden" name="panel" value="admin"/>
-				<table id="find-max-id-form-table" cellpadding="2"><tr>
-					<td>Domain</td>
-					<td><select name="domain">
-						{
-						for $thisDomain in $id-utils:all-domains
-						return
-							<option value="{$thisDomain}">
-							{if ($domain = $thisDomain) then attribute selected {'selected'} else ()}
-							{$thisDomain}
-							</option>
-						}
-					</select></td>
-					<td>with prefix</td>
-					<td><input type="text" name="prefix" size="5" value="{if (exists($prefix)) then $prefix else ()}"/></td>
-					<td><input type="submit" value="Find"/></td> 
-				</tr></table>
-			</form>
 			<h3>Upload Media Metadata</h3>
 			<form id="upload-media-metadata-form" method="POST" enctype="multipart/form-data">
 				<input type="hidden" name="panel" value="admin"/>
@@ -61,9 +41,7 @@ if (utils:is-current-user-admin()) then
 			</form>
 			<hr/>
 			{
-			if (exists($domain)) then
-				admin-panel:process-find-max-id($domain, $prefix)
-			else if (exists($uploadedFilename)) then
+			if (exists($uploadedFilename)) then
 				admin-panel:process-upload-media-metadata($uploadedFilename)
 			else
 				()
@@ -72,24 +50,6 @@ if (utils:is-current-user-admin()) then
 	)
 else
 	error((), 'Only admin user allowed to use admin panel')
-};
-
-declare function admin-panel:process-find-max-id($domain as xs:string, $prefix as xs:string?) as element()*
-{
-	if (not(exists($prefix)) or normalize-space($prefix) = '') then
-		<span>Cannot specify blank prefix</span>
-	else
-		let $maxIdInteger := id-utils:get-max-id-integer($domain, $prefix)
-		return
-			if (empty($maxIdInteger)) then
-				<p>No ids found for domain '{<b>{$domain}</b>}' with prefix '{<b>{$prefix}</b>}'</p>
-			else
-				if ($maxIdInteger < 0) then
-					<p>{$domain}/@id does not support prefix: {$prefix}</p>
-				else
-					let $maxId := concat($prefix, $maxIdInteger)
-					return
-						<p>Max id for domain '{<b>{$domain}</b>}' with prefix '{<b>{$prefix}</b>}' is: {<b>{$maxId}</b>}</p>
 };
 
 declare function admin-panel:process-upload-media-metadata($uploadedFilename as xs:string) as element()*
