@@ -54,6 +54,13 @@ declare function utils:is-current-user-admin() as xs:boolean?
 	return
 		xmldb:is-admin-user($currentUser)
 };
+declare function utils:is-current-user-in-group($group as xs:string) as xs:boolean?
+{ 
+	let $currentUser := xmldb:get-current-user()
+	let $groups := xmldb:get-user-groups($currentUser) 
+	return
+		contains($groups, $group)
+};
 
 declare function utils:get-event($eventId as xs:string) as element()?
 {
@@ -65,9 +72,12 @@ declare function utils:get-session($sessionId as xs:string) as element()?
 	$utils:dataCollection/session[@id = $sessionId]
 };
 
-declare function utils:get-event-type($eventTypeId as xs:string) as element()?
+declare function utils:get-event-type($eventTypeId as xs:string?) as element()?
 {
-	$utils:referenceCollection/reference//eventType[@id = $eventTypeId]
+	if (not(exists($eventTypeId))) then
+		()
+	else
+		$utils:referenceCollection/reference//eventType[@id = $eventTypeId]
 };
 
 declare function utils:get-device-code-element($deviceCode as xs:string) as element()?

@@ -6,7 +6,6 @@ declare namespace util = "http://exist-db.org/xquery/util";
 
 import module namespace id-utils = "http://www.ishafoundation.org/ts4isha/xquery/id-utils" at "id-utils.xqm";
 import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
-
 import module namespace functx = "http://www.functx.com" at "functx.xqm";
 
 (: adds all newMedia elements to the device element defined by the sessionId
@@ -123,21 +122,31 @@ declare function media-fns:get-next-media-id($domain as xs:string, $eventType as
 		concat($eventType, '-', $nextMediaIdInteger)
 };
 
-declare function media-fns:get-next-media-id-integer($domain as xs:string, $eventType as xs:string) as xs:integer?
+declare function media-fns:get-next-media-id-integer($domain as xs:string, $eventType as xs:string) as xs:integer
 {
-	let $prefix := concat($eventType, '-')
-	let $maxIdInt := (id-utils:get-max-id-integer($domain, $prefix), 0)[1]
-	let $startDigitalAttrName :=
-		if ($domain eq 'audio') then
-			'startDigitalAudioId'
-		else if ($domain eq 'video') then
-			'startDigitalVideoId'
-		else if ($domain eq 'image') then
-			'startDigitalImageId'
-		else
-			error((), concat('Unknown domain: ', $domain))
-	let $minIdInt := utils:get-event-type($eventType)/media-fns:extract-integer(@*[local-name(.) = $startDigitalAttrName])
-	let $nextIdInt := max(($maxIdInt + 1, $minIdInt))
-	return
-		$nextIdInt
+	if (not(utils:get-event-type($eventType))) then
+		error((), concat('Unknown event type: ', $eventType))
+	else
+	(	
+		let $prefix := concat($eventType, '-')
+		let $maxIdInt := (id-utils:get-max-id-integer($domain, $prefix), 0)[1]
+		let $lastReservedAttrName := media-fns:get-reserve-attr-name($domain)
+		let $reserveElement := $utils:referenceCollection/nextMediaIds//eventType[@id = $eventType]
+		let $minIdInt := $reserveElement/media-fns:extract-integer(@*[local-name(.) = $lastReservedAttrName])
+		let $nextIdInt := max(($maxIdInt + 1, $minIdInt + 1))
+		return
+			$nextIdInt
+	)
+};
+
+declare function media-fns:get-reserve-attr-name($domain as xs:string) as xs:string
+{
+	if ($domain eq 'audio') then
+		'lastReservedAudioId'
+	else if ($domain eq 'video') then
+		'lastReservedVideoId'
+	else if ($domain eq 'image') then
+		'lastReservedImageId'
+	else
+		error((), concat('Unknown domain: ', $domain))
 };

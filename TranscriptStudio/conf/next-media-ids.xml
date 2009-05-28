@@ -1,0 +1,40 @@
+<nextMediaIds>
+	<eventTypes>
+		<eventType id="a" lastReservedVideoId="120" lastReservedAudioId="6" lastReservedImageId="157"/>
+		<eventType id="b"/>
+		<eventType id="c"/>
+		<eventType id="d"/>
+		<eventType id="e"/>
+		<eventType id="f"/>
+		<eventType id="g" lastReservedVideoId="35"/>
+		<eventType id="h"/>
+		<eventType id="i"/>
+		<eventType id="j" lastReservedVideoId="11"/>
+		<eventType id="k" lastReservedVideoId="115"/>
+		<eventType id="l"/>
+		<eventType id="m"/>
+		<eventType id="n" lastReservedAudioId="112" lastReservedImageId="33423" lastReservedVideoId="370"/>
+		<eventType id="p" lastReservedVideoId="194"/>
+		<eventType id="q"/>
+		<eventType id="r" lastReservedVideoId="13"/>
+		<eventType id="s" lastReservedVideoId="10" lastReservedAudioId="23"/>
+		<eventType id="t"/>
+		<eventType id="u"/>
+		<eventType id="v"/>
+		<eventType id="w" lastReservedAudioId="12"/>
+		<eventType id="x"/>
+		<eventType id="y" lastReservedVideoId="257"/>
+		<eventType id="aa"/>
+		<eventType id="ab"/>
+		<eventType id="ac"/>
+		<eventType id="ad"/>
+		<eventType id="ae"/>
+		<eventType id="af"/>
+		<eventType id="ag"/>
+		<eventType id="ah"/>
+		<eventType id="ai"/>
+		<eventType id="aj"/>
+		<eventType id="ak"/>
+		<eventType id="al"/>
+	</eventTypes>
+</nextMediaIds>

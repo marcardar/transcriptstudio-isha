@@ -122,6 +122,7 @@
 		</copy>
 		<copy todir="${dist.exist.db.dir}/ts4isha/reference">
 			<fileset dir="conf">
+				<include name="next-media-ids.xml"/>
 				<include name="reference.xml"/>
 			</fileset>
 		</copy>

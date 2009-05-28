@@ -2,6 +2,9 @@ body{
   margin:0;
   padding:0 0 0 10px;
 }
+ul{
+ list-style-type: none;
+}
 .single-result{
  padding-bottom: 15px;
 }

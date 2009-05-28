@@ -78,6 +78,9 @@ declare function search-panel:main() as element()*
 				else
 					()
 			}
+			<div class="additional-info">
+				Utilities: <a href="main.xql?panel=ids">id lookup</a>
+			</div>
 			<br/>
 		</div>
 	)

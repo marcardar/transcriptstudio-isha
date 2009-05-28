@@ -38,6 +38,7 @@
 		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
 			<fileset dir="${dist.exist.db.dir}">
 				<include name="**"/>
+				<exclude name="ts4isha/reference/next-media-ids.xml"/>
 				<exclude name="ts4isha/reference/reference.xml"/>
 			</fileset>
 		</xdb:store>
@@ -58,6 +59,11 @@
 		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
 			<fileset dir="${dist.exist.db.dir}">
 				<include name="ts4isha/reference/reference.xml"/>
+			</fileset>
+		</xdb:store>
+		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
+			<fileset dir="${dist.exist.db.dir}">
+				<include name="ts4isha/reference/next-media-ids.xml"/>
 			</fileset>
 		</xdb:store>
 	</target>
