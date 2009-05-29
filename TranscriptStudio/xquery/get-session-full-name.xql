@@ -2,7 +2,7 @@ xquery version "1.0";
 
 import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
 
-let $sessionId := request:get-parameter("session_id", ())
+let $sessionId := request:get-parameter("sessionId", ())
 let $sessionXML := utils:get-session($sessionId)
 let $eventId := $sessionXML/@eventId
 let $eventXML := utils:get-event($eventId)
