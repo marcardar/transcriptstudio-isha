@@ -110,7 +110,9 @@ package org.ishafoundation.archives.transcript.model
 		}
 		
 		public function saveChangesHandler():void {
-			transcript.populateCommittedMarkupPropsMap();
+			if (transcript != null) {
+				transcript.populateCommittedMarkupPropsMap();
+			}
 		}
 		
 		public function appendTranscript(transcriptElement:XML, deviceElements:XMLList):void {

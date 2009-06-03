@@ -81,7 +81,8 @@ package org.ishafoundation.archives.transcript.model
 				throw new Error("Tried to store session but either the collection or transcript id was not set");
 			}
 			setActionAttributes(session);
-			DatabaseManagerUtils.updateSession(session.id, session.metadata.metadataElement, session.mediaMetadataElement, session.transcript.mdoc.nodeElement, xqueryExecutor, function(msg:String):void {
+			var transcriptXML:XML = session.transcript == null ? null : session.transcript.mdoc.nodeElement;
+			DatabaseManagerUtils.updateSession(session.id, session.metadata.metadataElement, session.mediaMetadataElement, transcriptXML, xqueryExecutor, function(msg:String):void {
 				trace("Successfully saved transcript: " + msg);
 				session.unsavedChanges = false;
 				externalSuccess();
