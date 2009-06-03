@@ -6,6 +6,9 @@
 
 	 <compiler>
 
+		<!-- Turn on headless server option for non-graphics environment -->
+		<headless-server>true</headless-server>
+
 		<!-- Turn on generation of accessible SWFs. -->
 		<accessible>false</accessible>
 
