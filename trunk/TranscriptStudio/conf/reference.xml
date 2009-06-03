@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <reference>
 	<eventTypes>
 		<eventType id="a" name="Inner Engineering"/>
@@ -31,12 +30,22 @@
 		<eventType id="ad" name="Committee Meet"/>
 		<eventType id="ae" name="Tsunami 2005"/>
 		<eventType id="af" name="ARR Function"/>
-		<eventType id="ag" name="???"/>
+		<eventType id="ag" name="Isha Yoga Practices"/>
 		<eventType id="ah" name="Isha Home School"/>
 		<eventType id="ai" name="Isha Rejuvenation"/>
 		<eventType id="aj" name="Sounds of Isha"/>
 		<eventType id="ak" name="Isha Samskriti"/>
 		<eventType id="al" name="Ashram Life"/>
+		<eventType id="as" name="Isha Vidhya"/>
+		<eventType id="aw" name="Workshops"/>
+		<eventType id="ax" name="Sacred Spaces"/>
+		<eventType id="ay" name="Project Green Hands"/>
+		<eventType id="az" name="IIIS"/>
+		<eventType id="bb" name="Isha Gramotsavam"/>
+		<eventType id="bc" name="External Shoots"/>
+		<eventType id="bd" name="Sadhguru Class Recording"/>
+		<eventType id="be" name="Non Isha"/>
+		<eventType id="tv" name="Isha on Television"/>
 	</eventTypes>
 	<deviceCodes>
 		<deviceCode id="aud-1" name="Audio Recorder"/>
