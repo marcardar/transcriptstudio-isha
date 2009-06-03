@@ -2,6 +2,7 @@
 <mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" layout="vertical" width="470" height="600" horizontalAlign="center" title="Edit Event" creationComplete="init()" xmlns:event="org.ishafoundation.archives.transcript.components.studio.event.*">
 	<mx:Script>
 	<![CDATA[
+		import mx.rpc.http.HTTPService;
 		import org.ishafoundation.archives.transcript.db.DatabaseManagerUtils;
 		import org.ishafoundation.archives.transcript.db.XMLRetrieverStorer;
 		import org.ishafoundation.archives.transcript.db.DatabaseManager;
@@ -59,12 +60,12 @@
 		private function editEvent(evt:MouseEvent):void {
 			// need to create the new event file
 			var params:Object = {id:eventMetadata.id, metadataXML:eventMetadata.eventMetadataElement.toXMLString()};
-			xqueryExecutor.executeStoredXQuery("update-event-metadata", params, function():void {
+			xqueryExecutor.executeStoredXQuery("update-event.xql", params, function(msg:String):void {
 				closeMe();
 				var evt:Event = new Event(EVENT_EDITED);
 				dispatchEvent(evt);
 			}, function (msg:String):void {
-				Alert.show(msg, "Could not store event file '" + eventMetadata.path + "'");
+				Alert.show(msg, "Could not store event: " + eventMetadata.id);
 			});
 		}
 			

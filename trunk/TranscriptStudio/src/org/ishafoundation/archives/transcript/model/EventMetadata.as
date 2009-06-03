@@ -63,7 +63,7 @@ package org.ishafoundation.archives.transcript.model
 			return result;
 		}
 
-		public function get path():String {
+		private function get path():String {
 			var result:String = eventMetadataElement.attribute("_document-uri");
 			return result;
 		}
