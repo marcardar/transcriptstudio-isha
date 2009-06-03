@@ -50,29 +50,66 @@
 	<deviceCodes>
 		<deviceCode id="aud-1" name="Audio Recorder"/>
 		<deviceCode id="cam-1" name="Main Video Camera"/>
-		<deviceCode id="cam-2" name="Secondary Video Camera"/>
-		<deviceCode id="cam-3" name="Tertiary Video Camera"/>
-		<deviceCode id="pho-1" name="Photographer 1"/>
-		<deviceCode id="pho-2" name="Photographer 2"/>
-		<deviceCode id="pho-3" name="Photographer 3"/>
-		<deviceCode id="pho-4" name="Photographer 4"/>
-		<deviceCode id="pho-5" name="Photographer 5"/>
+		<deviceCode id="cam-2" name="Second Video Camera"/>
+		<deviceCode id="cam-3" name="Third Video Camera"/>
+		<deviceCode id="pho-1" name="Swami Chitranga"/>
+		<deviceCode id="pho-2" name="Murugesh"/>
+		<deviceCode id="pho-3" name="Iqbal"/>
+		<deviceCode id="pho-4" name="Bela"/>
+		<deviceCode id="pho-10" name="Other Photographer"/>
 	</deviceCodes>
 	<places>
 		<country name="India">
 			<location name="Isha Yoga Center">
 				<venue name="Spanda Hall"/>
 				<venue name="Biksha Hall"/>
+				<venue name="Shrine"/>
+				<venue name="Temple"/>
 			</location>
 			<location name="Coimbatore"/>
+			<location name="Delhi"/>
+			<location name="Hyderabad"/>
+			<location name="Calcutta"/>
+			<location name="Chennai"/>
+			<location name="Trivandrum"/>
+			<location name="Bangalore"/>
+			<location name="Mysore"/>
 			<location name="Mumbai">
 				<venue name="Bombay Stock Exchange"/>
 			</location>
+			<location name="Madurai"/>
+			<location name="Trichy"/>
 		</country>
 		<country name="England">
 			<location name="London">
 				<venue name="Millennium Mayfair Hotel"/>
 			</location>
+			<location name="Lake District"/>
+		</country>
+		<country name="Lebanon">
+			<location name="Beirut"/>
+		</country>
+		<country name="Germany">
+			<location name="Frankfurt"/>
+		</country>
+		<country name="Switzerland">
+			<location name="Davos"/>
+		</country>
+		<country name="United States">
+			<location name="IIIT"/>
+			<location name="Atlanta"/>
+			<location name="Detroit"/>
+			<location name="Chicago"/>
+			<location name="California"/>
+			<location name="Dayton"/>
+			<location name="Traverse City"/>
+			<location name="Nashville"/>
+		</country>
+		<country name="Canada">
+			<location name="Toronto"/>
+		</country>
+		<country name="France">
+			<location name="Paris"/>
 		</country>
 	</places>
 	<languages>
@@ -89,6 +126,7 @@
 		<markupType id="music" name="Music" allowOutline="true" allowInline="false"/>
 		<markupType id="process" name="Process" allowOutline="true" allowInline="false"/>
 		<markupType id="soundbite" name="Sound Bite" allowOutline="true" allowInline="true"/>
+		<markupType id="chant" name="Chant" allowOutline="true" allowInline="false"/>
 	</markupTypes>
 	<markupCategories/>
 	<coreConcepts/>
