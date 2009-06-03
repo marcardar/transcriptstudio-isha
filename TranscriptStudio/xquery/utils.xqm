@@ -8,6 +8,8 @@ import module namespace transform = "http://exist-db.org/xquery/transform";
 declare namespace xmldb = "http://exist-db.org/xquery/xmldb";
 declare namespace util = "http://exist-db.org/xquery/util";
 
+declare variable $utils:MAX_FILENAME_LENGTH := 200;
+
 declare variable $utils:ts4ishaCollectionPath := '/db/ts4isha';
 declare variable $utils:dataCollectionPath := concat($utils:ts4ishaCollectionPath, '/data');
 declare variable $utils:dataCollection := collection($utils:dataCollectionPath);
@@ -198,7 +200,14 @@ declare function utils:days-diff($date1 as xs:date?, $date2 as xs:date?) as xs:i
 
 declare function utils:make-filename-friendly($rawFilename as xs:string) as xs:string
 {
-	replace(replace($rawFilename, '\s+', '-'), '[^a-z0-9\-_]', '')
+	utils:make-filename-friendly($rawFilename, ())
+};
+
+declare function utils:make-filename-friendly($rawFilename as xs:string, $maxLength as xs:integer?) as xs:string
+{
+	let $maxLength := ($maxLength, $utils:MAX_FILENAME_LENGTH)[1]
+	return
+		substring(replace(replace($rawFilename, '\s+', '-'), '[^a-z0-9\-_]', ''), 0, $maxLength)
 };
 
 declare function utils:build-event-path($event as element()) as xs:string
@@ -210,8 +219,13 @@ declare function utils:build-event-path($event as element()) as xs:string
 
 declare function utils:build-event-full-name($event as element()) as xs:string?
 {
+	utils:build-event-full-name($event, ())
+};
+
+declare function utils:build-event-full-name($event as element(), $maxLength as xs:integer?) as xs:string?
+{
 	let $fullName := lower-case(string-join(($event/metadata/@startAt, $event/metadata/@subTitle, $event/metadata/@location, $event/metadata/@venue), '_'))
-	let $fullName := utils:make-filename-friendly($fullName)
+	let $fullName := utils:make-filename-friendly($fullName, $maxLength)
 	return
 		if (string-length($fullName) > 0) then
 			$fullName
@@ -229,11 +243,16 @@ declare function utils:build-session-path($sessionXML as element()) as xs:string
 
 declare function utils:build-session-full-name($sessionXML as element(), $eventXML as element()) as xs:string?
 {
+	utils:build-session-full-name($sessionXML, $eventXML, ())
+};
+
+declare function utils:build-session-full-name($sessionXML as element(), $eventXML as element(), $maxLength as xs:integer?) as xs:string?
+{
 	let $metadataXML := $sessionXML/metadata[1]
 	let $fullName :=
 		lower-case(string-join( 
 			(
-				utils:build-event-full-name($eventXML)
+				utils:build-event-full-name($eventXML, max($maxLength / 2, $maxLength - 50))
 				,
 				let $eventDate := utils:date-string-to-date($eventXML/metadata/@startAt)
 				let $sessionDate := utils:date-string-to-date($metadataXML/@startAt)
@@ -249,7 +268,7 @@ declare function utils:build-session-full-name($sessionXML as element(), $eventX
 			,
 			'_'
 		))
-	let $fullName := utils:make-filename-friendly($fullName)
+	let $fullName := utils:make-filename-friendly($fullName, $maxLength)
 	return
 		if (exists($fullName) and string-length($fullName) > 0) then
 			$fullName
