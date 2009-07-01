@@ -10,7 +10,7 @@
     | feature or technique, often they are explained in more detail in 
     | the accompanying documentation.
     |
-    | CVS $Id$
+    | CVS $Id: sitemap.xmap 8641 2009-02-22 21:57:26Z wolfgang_m $
     +-->
 <map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
 
@@ -96,7 +96,7 @@
       <use-request-parameters>false</use-request-parameters>
       <use-session-parameters>false</use-session-parameters>
       <use-cookie-parameters>false</use-cookie-parameters>
-      <xslt-processor-role>saxon</xslt-processor-role>
+      <xslt-processor-role>xalan</xslt-processor-role>
       <check-includes>true</check-includes>
     </map:transformer>
 

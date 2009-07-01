@@ -6,7 +6,7 @@
     | Provides XMLRPC + SOAP access to eXist and configures Cocoon2. If you don't need
     | XMLRPC or SOAP or Cocoon, remove the corresponding servlets and servlet-mappings.
     |
-    | $Id: web.xml 7306 2008-01-27 15:08:02Z dizzzz $
+    | $Id: web.xml 8349 2008-12-01 22:31:23Z wolfgang_m $
     +-->
 
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee"
@@ -31,16 +31,20 @@
 
         <load-on-startup>1</load-on-startup>
     </servlet>
-    
-	
+
+
     <!--
-        RpcServlet provides XML-RPC access to eXist 
+        RpcServlet provides XML-RPC access to eXist
     -->
     <servlet>
         <servlet-name>org.exist.xmlrpc.RpcServlet</servlet-name>
         <servlet-class>org.exist.xmlrpc.RpcServlet</servlet-class>
+        <init-param>
+          <param-name>enabledForExtensions</param-name>
+          <param-value>true</param-value>
+        </init-param>
     </servlet>
-  
+
     <!-- 
         DatabaseAdminServlet: this servlet can be used to ensure that
         eXist is running in the background. Just set the start-parameter 
