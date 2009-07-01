@@ -1,5 +1,7 @@
 package name.carter.mark.flex.project.mdoc
 {
+	import name.carter.mark.flex.util.XMLUtils;
+	
 	public class TaggableMNode extends MNode
 	{
 		public function TaggableMNode(element:XML, xmlBasedDoc:MDocument)
@@ -49,6 +51,11 @@ package name.carter.mark.flex.project.mdoc
 			for each (var tag:MTag in getTags(type)) {
 				tag.remove();
 			}
+		}
+		
+		public function removeAllNotesAndSummaries():void {
+			modified = true;
+			XMLUtils.removeAllElements(nodeElement.*.(localName() == MSuperNodeProperties.NOTES_PROP_NAME || localName() == MSuperNodeProperties.SUMMARY_PROP_NAME));
 		}
 		
 	}
