@@ -19,6 +19,7 @@ package name.carter.mark.flex.project.mdoc
 			// don't remove nested nodes (and their inlines etc)
 			parent.modified = true;
 			removeAllTags();
+			removeAllNotesAndSummaries();
 			XMLUtils.removeElement(nodeElement, true);
 			xmlBasedDoc.idToNodeMap.remove(id);
 		}
