@@ -15,7 +15,7 @@ declare function all-concepts-panel:main() as element()*
 	let $coreConcepts := $reference/coreConcepts/concept/string(@id)
 	let $subtypeConcepts := $reference/coreConcepts/concept/subtype/string(@idRef)
 	let $synonymConcepts := $reference/synonymGroups/synonymGroup/synonym/string(@idRef)
-	let $additionalConcepts := $utils:dataCollection/session/transcript/(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
+	let $additionalConcepts := $utils:dataCollection/session/transcript//(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
 	return
 	(
 		<center><h2>Isha Foundation Markup Concepts</h2></center>
