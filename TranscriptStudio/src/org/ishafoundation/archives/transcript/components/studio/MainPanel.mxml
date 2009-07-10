@@ -586,7 +586,7 @@
 					{true &amp;&amp; session != null}
 					{this &amp;&amp; session != null}
 				-->
-				<menuitem id="store" label="Save" enabled="{myMenuBar != null &amp;&amp; session != null &amp;&amp; session.unsavedChanges}"/>
+				<menuitem id="store" label="Save" enabled="true"/>
 				<menuitem id="reloadTranscript" label="Reload from database" enabled="{myMenuBar != null &amp;&amp; session != null}"/>
 				<menuitem type="separator"/>
 				<menuitem id="eventMetadata" label="Event properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/>
