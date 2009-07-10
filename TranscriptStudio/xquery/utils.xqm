@@ -252,7 +252,7 @@ declare function utils:build-session-full-name($sessionXML as element(), $eventX
 	let $fullName :=
 		lower-case(string-join( 
 			(
-				utils:build-event-full-name($eventXML, max($maxLength / 2, $maxLength - 50))
+				utils:build-event-full-name($eventXML, max(($maxLength idiv 2, $maxLength - 50)))
 				,
 				let $eventDate := utils:date-string-to-date($eventXML/metadata/@startAt)
 				let $sessionDate := utils:date-string-to-date($metadataXML/@startAt)
