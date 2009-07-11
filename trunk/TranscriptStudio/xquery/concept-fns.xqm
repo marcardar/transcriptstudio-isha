@@ -25,7 +25,7 @@ declare function concept-fns:get-all-concepts($referenceConceptsOnly as xs:boole
 		if ($referenceConceptsOnly) then
 			()
 		else
-			$utils:dataCollection/session/transcript/(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
+			$utils:dataCollection/session/transcript//(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
 	return
 		for $concept in distinct-values(($categoryConcepts, $coreConcepts, $subtypeConcepts, $synonymConcepts, $additionalConcepts))
 		order by $concept 
