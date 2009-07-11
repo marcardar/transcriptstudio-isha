@@ -53,4 +53,4 @@ In particular the application should support the following functions:
     * Save modified TranscriptMetadata back to the eXist database
 
 
-Note that in order to reduce the development time of Phase One, we do not require any querying functionality, (initially we will just use ad-hoc xqueries issued against the eXist database). We also do not require the ability to edit document root level attributes, block attributes; nor to add blocks, remove blocks, merge or split blocks, or edit block text. Also the definition of nested and multi-parent keywords in the reference file is not required.
+Note that in order to reduce the development time of Phase One, we do not require any querying functionality, (initially we will just use ad-hoc xqueries issued against the eXist database). We also do not require the ability to edit document root level attributes, segment attributes; nor to add segments, remove segments, merge or split segments, or edit content text. Also the definition of nested and multi-parent keywords in the reference file is not required.
