@@ -264,7 +264,7 @@
 		<generic:ConceptTextInput id="additionalConceptsTextInput" width="100%" editable="{allowMarkupEdit}" text="{this.markupAttrs.additionalConcepts.join(' ')}" restrict="{Constants.CONCEPT_ID_RESTRICTION + ' '}" enter="{updateAdditionalTags()}" focusOut="{updateAdditionalTags()}"/>
 		<mx:VBox width="100%" height="100%" verticalGap="0" horizontalAlign="center">
 			<mx:Label text="Content summary" width="100%"/>
-			<mx:TextArea id="summaryTextArea" width="100%" height="50%" minHeight="32" editable="{allowMarkupEdit}" text="{this.markupAttrs.summary}" focusOut="summaryChanged()"/>
+			<mx:TextArea id="summaryTextArea" width="100%" height="50%" minHeight="32" maxChars="500" editable="{allowMarkupEdit}" text="{this.markupAttrs.summary}" focusOut="summaryChanged()"/>
 			<mx:Label width="100%" textAlign="left" text="Notes"/>
 			<mx:TextArea id="notesTextArea" width="100%" height="50%" minHeight="32" editable="{allowMarkupEdit}" text="{this.markupAttrs.notes}" focusOut="notesChanged()"/>
 			<mx:HBox horizontalGap="20" paddingTop="5">
