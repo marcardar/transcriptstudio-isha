@@ -8,7 +8,7 @@ After an initial period of research into existing automated document categorizat
 
 As well as categorizing topics, it was also decided to allow the user to capture and categorize other items of interest such as anecdotes and quotations, and also to allow the possibility of adding new category types if required later.
 
-High Level Requirements
+== High Level Requirements ==
 
 The following seven additional high level requirements were identified that the application should satisfy:
 
@@ -23,17 +23,17 @@ The following seven additional high level requirements were identified that the 
 
 After an unsatisfactory attempt was made at implementing a solution using traditional relational database methods, and after several months of further research, it was decided to go for an XML-based approach, primarily to satisfy requirements 5, 6, and 7. (The main inspiration behind this approach came from the Women Writers Project, funded by Brown University, an electronic-text encoding project based on SGML).
 
-The XML Data Model
+== The XML Data Model ==
 
 All the text content and user specified metadata will be stored in XML format in an XML database. XML was chosen as the desired data storage format for extensibility, ease of querying and expected longevity and widespread usage of the format. We have chosen the open source database eXist as our database.
 
 In order for us to start working with a text document we require that it is first converted into an XML document, which corresponds to the transcript XSD. The main thing that we are doing here is to wrap each paragraph of text in <block> tags. We are working with transcripts stored as Microsoft Word documents. With the new Microsoft Open Office XML standard introduced with Microsoft Office 2007, Word 2007 (docx) documents are now stored internally in XML. We can therefore easily access the transcript content programatically, and transform it into the form we require. (Note: Microsoft has made available a freely downloadable "compatibility pack" which, when installed, will allow any previous versions of Word to open and save the new docx documents, so it is not even necessary to have Office 2007 installed)
 
-The User Interface
+== The User Interface ==
 
 The user interface should allow the user to easily view the transcript text; (the look and feel should be similar to Microsoft Word). The interface should allow the user to select blocks of text and then to define marked content by bringing up some kind of panel. There should also be some way for the user to see what text has been marked up already, and the type of marked content. (This could be done with tool tips, inline headings, or even a separate document metadata view). There also must be a way for the user to edit and remove marked content. The details of the method by which this is accomplished is left to the discretion of the implementer. The main requirement, however, is that non-technical users are comfortable using the application.
 
-Implementation - Phase One
+== Implementation - Phase One ==
 
 The goal of phase one is to deliver the absolute bare minimum of functionality, which allows users to start creating and storing transcript metadata as defined in the XML Data Model section.
 In particular the application should support the following functions:
