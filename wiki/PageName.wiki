@@ -1,8 +1,6 @@
 #summary Project Overview
 
-= Introduction =
-
-Project Overview and Requirements
+= Project Overview and Requirements =
 
 This application is being developed for Isha Foundation with the primary aim of establishing a system for categorizing by topic a large collection of over 2000 (and growing) transcripts of Sadhguru's discourses.
 
