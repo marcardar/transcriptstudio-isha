@@ -12,19 +12,19 @@ As well as categorizing topics, it was also decided to allow the user to capture
 
 The following seven additional high level requirements were identified that the application should satisfy:
 
-   1. The topic categorization process must be easy to use, so that a 'non-technical' person can easily do this task. (i.e. somebody who can use MS Office at a basic level - and who should not need to have any programming skills);
+  1. The topic categorization process must be easy to use, so that a 'non-technical' person can easily do this task. (i.e. somebody who can use MS Office at a basic level - and who should not need to have any programming skills);
 
-   2. The application must be able to deal with transcripts that are stored as Microsoft Word documents (since all of the Isha Archives' transcribed material is currently stored in this format);
+  2. The application must be able to deal with transcripts that are stored as Microsoft Word documents (since all of the Isha Archives' transcribed material is currently stored in this format);
 
-   3. The categorized material should be easily accessible to non-technical users, preferably made available over a local network via a web-based application;
+  3. The categorized material should be easily accessible to non-technical users, preferably made available over a local network via a web-based application;
 
-   4. Both the topic categorization process and the categorized material access must be available to multiple concurrent users;
+  4. Both the topic categorization process and the categorized material access must be available to multiple concurrent users;
 
-   5. The data should be stored in an 'open format', in such a manner that it should be easily exportable to another database should such a need arise in the future;
+  5. The data should be stored in an 'open format', in such a manner that it should be easily exportable to another database should such a need arise in the future;
 
-   6. The transcripts and the categorized material should not exist independently, so that synchronization issues are avoided. (i.e. instead of copying the text content of a topic and storing it separately from the original transcript, we would like to reference the original transcript using some kind of positional markers. This means that if an original transcript is amended for any reason, those amendments will automatically be reflected in any categorized material from the transcript);
+  6. The transcripts and the categorized material should not exist independently, so that synchronization issues are avoided. (i.e. instead of copying the text content of a topic and storing it separately from the original transcript, we would like to reference the original transcript using some kind of positional markers. This means that if an original transcript is amended for any reason, those amendments will automatically be reflected in any categorized material from the transcript);
 
-   7. The solution should be modular and easily extensible so that subsequent phases of development could add further functionality without the need to redevelop the initial phases.
+  7. The solution should be modular and easily extensible so that subsequent phases of development could add further functionality without the need to redevelop the initial phases.
 
 
 After an unsatisfactory attempt was made at implementing a solution using traditional relational database methods, and after several months of further research, it was decided to go for an XML-based approach, primarily to satisfy requirements 5, 6, and 7. (The main inspiration behind this approach came from the Women Writers Project, funded by Brown University, an electronic-text encoding project based on SGML).
