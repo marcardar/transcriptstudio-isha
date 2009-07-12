@@ -1,0 +1,637 @@
+<!--
+   Transcript Studio for Isha Foundation: An XML based application that allows users to define 
+   and store contextual metadata for contiguous sections within a text document. 
+
+   Copyright 2008 Mark Carter, Swami Kevala
+
+   This file is part of Transcript Studio for Isha Foundation.
+
+   Transcript Studio for Isha Foundation is free software: you can redistribute it and/or modify it 
+   under the terms of the GNU General Public License as  published by the Free Software 
+   Foundation, either version 3 of the License, or (at your option) any later version.
+
+   Transcript Studio for Isha Foundation is distributed in the hope that it will be useful, but 
+   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
+   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along with 
+   Transcript Studio for Isha Foundation. If not, see http://www.gnu.org/licenses/.
+-->
+
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:studioNS="org.ishafoundation.archives.transcript.components.studio.*" width="100%" height="100%" verticalGap="0" keyDown="keyDownHandler(event)">
+	<mx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import org.ishafoundation.archives.transcript.model.Transcript;
+			import org.ishafoundation.archives.transcript.model.TranscriptTextSelection;
+			import com.ericfeminella.collections.HashMap;
+			import com.ericfeminella.collections.IMap;
+			import mx.events.PropertyChangeEvent;
+			import org.ishafoundation.archives.transcript.components.studio.importer.TranscriptsToImportSelectorDialog;
+			import org.ishafoundation.archives.transcript.components.studio.importer.ImportDialog;
+			import mx.utils.StringUtil;
+			import mx.managers.CursorManager;
+			import org.ishafoundation.archives.transcript.components.studio.session.SessionSelectorDialog;
+			import org.ishafoundation.archives.transcript.components.studio.OpenDialog;
+			import org.ishafoundation.archives.transcript.components.studio.OpenByIdDialog;
+			import org.ishafoundation.archives.transcript.util.ApplicationUtils;
+			import org.ishafoundation.archives.transcript.db.DatabaseConstants;
+			import org.ishafoundation.archives.transcript.importer.MSWordImporter;
+			import name.carter.mark.flex.util.XMLUtils;
+			import name.carter.mark.flex.util.Utils;
+			import name.carter.mark.flex.util.icon.IconUtils;
+			import org.ishafoundation.archives.transcript.components.generic.UnhandledChangesPopUpManager;
+			import org.ishafoundation.archives.transcript.db.DatabaseManagerUtils;
+			import mx.controls.Alert;
+			import org.ishafoundation.archives.transcript.components.generic.AboutBox;
+			import org.ishafoundation.archives.transcript.components.studio.session.SessionMetadataEditorDialog;
+			import org.ishafoundation.archives.transcript.model.SessionMetadata;
+			import org.ishafoundation.archives.transcript.model.SessionManager;
+			import org.ishafoundation.archives.transcript.model.ReferenceManager;
+			import mx.managers.PopUpManager;
+			import name.carter.mark.flex.project.mdoc.*;
+			import org.ishafoundation.archives.transcript.components.studio.media.MediaPlayerDialog;
+			import org.ishafoundation.archives.transcript.components.studio.event.EventMetadataEditorDialog;
+			import org.ishafoundation.archives.transcript.model.EventMetadata;
+			import org.ishafoundation.archives.transcript.components.generic.DebugPopUp;
+			import org.ishafoundation.archives.transcript.components.studio.concept.ConceptManagerDialog;
+			import org.ishafoundation.archives.transcript.components.studio.category.CategoryManagerDialog;
+			import org.ishafoundation.archives.transcript.model.Session;
+			import mx.events.MenuEvent;
+			import mx.events.CloseEvent;
+			import org.ishafoundation.archives.transcript.db.DatabaseManager;
+
+			[Bindable]
+			public var databaseMgr:DatabaseManager;
+
+			[Bindable]			
+			private var referenceMgr:ReferenceManager;
+
+			[Bindable]
+			private var sessionMgr:SessionManager;
+			
+			[Bindable]
+			private var session:Session;
+			
+			private static const DEFAULT_TITLE:String = ApplicationUtils.getApplicationName();
+			
+			[Bindable]
+			public var title:String = DEFAULT_TITLE;
+			
+			[Bindable]
+			public var status:String;
+			
+			public function init(username:String, databaseMgr:DatabaseManager):void {
+				IconUtils.overrideIcon(Utils.DEFAULT_ICON_PATH, Utils.DEFAULT_ICON_CLASS);
+				this.databaseMgr = databaseMgr;
+				this.referenceMgr = new ReferenceManager(databaseMgr);
+				this.sessionMgr = new SessionManager(username, referenceMgr, databaseMgr);
+				this.referenceMgr.loadReferences(referenceXMLRetrieveSuccess, referenceXMLRetrieveFailure);
+			}
+			
+			private static const KEYBOARD_SHORTCUT_MODIFIER:String = "ctrlKey";
+			/** key is charCode, value is actionName */
+			private static const KEYBOARD_SHORTCUT_MAP:IMap = createKeyboardShortcutMap();		
+			private static function createKeyboardShortcutMap():IMap {
+				var result:IMap = new HashMap();
+				result.put("m", "markupText")
+				return result;
+			}
+		
+			protected override function keyDownHandler(evt:KeyboardEvent):void {
+				if (evt[KEYBOARD_SHORTCUT_MODIFIER]) {
+					var keyStr:String = String.fromCharCode(evt.charCode);
+					var actionName:String = KEYBOARD_SHORTCUT_MAP.getValue(keyStr);
+					if (actionName != null) {
+						var menuItemElement:XML = menuData..*.(hasOwnProperty("@id") && @id == actionName)[0]
+						if (menuItemElement.@enabled == "true") {
+							trace("Keyboard shortcut: " + KEYBOARD_SHORTCUT_MODIFIER + "-" + keyStr);
+							onMenuClick(menuItemElement);
+							evt.preventDefault();
+							return;
+						}
+					}
+				}
+				super.keyDownHandler(evt);				
+			}
+			
+			private function referenceXMLRetrieveSuccess():void {
+				this.status = "References loaded";
+			}
+			
+			private static function referenceXMLRetrieveFailure(msg:String):void {
+				throw new Error(msg);
+			}
+			
+			public function openClicked():void {
+				showUnsavedChangesPopupIfNecessary(showOpenDialog);
+			}
+			
+			public function openByIdClicked():void {
+				showUnsavedChangesPopupIfNecessary(showOpenByIdDialog);
+			}
+			
+			private function managerClicked(openManagerFunc:Function):void {
+				if (this.session != null && this.session.unsavedChanges) {
+					// confirm this operation with the user
+					Alert.show("Save session?", "Unsaved changes...", Alert.YES | Alert.NO | Alert.CANCEL, null, function(evt:CloseEvent):void {
+						if (evt.detail == Alert.YES) {
+							storeSession(openManagerFunc);
+						}
+						else if (evt.detail == Alert.NO) {
+							// dont save (but dont have to really lose the changes just yet
+							openManagerFunc();
+						}
+					});
+				}
+				else {
+					openManagerFunc();
+				}
+			}
+			
+			private function openCategoryManager():void {				
+				var thisRef:DisplayObject = this;
+				reloadReferencesBeforeContinuing(function():void {
+					var categoryManagerDialog:CategoryManagerDialog = new CategoryManagerDialog();
+					categoryManagerDialog.referenceMgr = referenceMgr;
+					PopUpManager.addPopUp(categoryManagerDialog, thisRef, true);
+					categoryManagerDialog.doneButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+						// finished with the dialog box so reload transcript (because changes may have been made during the dialog
+						reloadSession();
+					});
+					var selectedMarkupProps:MSuperNodeProperties = transcriptPane.markupsPane.selectedMarkupProps;
+					if (selectedMarkupProps != null) {
+						categoryManagerDialog.categorySearchPane.initialCategoryId = selectedMarkupProps.markupCategoryId;
+					}
+				});
+			}
+			
+			private function openConceptManager():void {
+				var thisRef:DisplayObject = this;
+				reloadReferencesBeforeContinuing(function():void {
+					var conceptManagerDialog:ConceptManagerDialog = ConceptManagerDialog.createInstance(referenceMgr);
+					PopUpManager.addPopUp(conceptManagerDialog, thisRef, true);
+					conceptManagerDialog.okButton.addEventListener(MouseEvent.CLICK, function(evt:MouseEvent):void {
+						// finished with the dialog box so reload transcript (because changes may have been made during the dialog
+						reloadSession();
+					});
+				});
+			}
+			
+			private function queryClicked():void {
+				var queryExecutorDialog:XQueryExecutorDialog = new XQueryExecutorDialog();
+				queryExecutorDialog.xQueryExecutor = databaseMgr;
+				PopUpManager.addPopUp(queryExecutorDialog, this, true);
+			}
+			
+			private function showUnsavedChangesPopupIfNecessary(successFunction:Function):void {
+				UnhandledChangesPopUpManager.displayIfNecessaryUsingAsyncFunc(this.session != null && this.session.unsavedChanges, storeSession, storeSessionFailure, successFunction); 
+			}
+			
+			private function showOpenDialog():void {
+				var popup:OpenDialog = OpenDialog.display(this, databaseMgr, referenceMgr);
+				popup.addEventListener(OpenDialog.OPEN_SESSION_REQUEST, function(evt:Event):void {
+					var sessionId:String = popup.selectedSessionId;
+					CursorManager.setBusyCursor();
+					// first update the reference file - continue even if it fails
+					reloadReferencesBeforeContinuing(function():void {
+						sessionMgr.retrieveSession(sessionId, popup.eventSelectorPane.selectedEventMetadata, openSessionSuccess, openSessionFailure);
+					});					
+				});
+			}
+			
+			private function showOpenByIdDialog():void {
+				var popup:OpenByIdDialog = new OpenByIdDialog();
+				PopUpManager.addPopUp(popup, this, true);
+				popup.okButton.addEventListener(MouseEvent.CLICK, function(event:MouseEvent):void {
+					trace("Retrieving event/session using id: " + popup.enteredId);
+					// id is of the form: <event/session id>[#<markup/paragraph id>] (i.e. the last part is optional)
+					// examples: 20090329-n1-1-1800, 20090329-n1-1-1800#p12
+					var hashIndex:int = popup.enteredId.indexOf('#');
+					var docId:String = hashIndex < 0 ? popup.enteredId : popup.enteredId.substring(0, hashIndex);
+					var nodeId:String = hashIndex < 0 ? null : popup.enteredId.substring(hashIndex + 1);
+					reloadReferencesBeforeContinuing(function():void {
+						databaseMgr.retrieveXML(function(docXML:XML):void {
+							if (docXML == null) {
+								Alert.show("No document exists with id: " + docId);
+							}
+							else if (docXML.localName() == "event") {
+								var eventMetadata:EventMetadata = EventMetadata.createInstance(docXML);
+								SessionSelectorDialog.displayIfNecessary(eventMetadata, popup, databaseMgr, function(sessionMetadata:SessionMetadata):void {
+									sessionMgr.retrieveSession(sessionMetadata.sessionId, eventMetadata, openSessionSuccess, openSessionFailure);
+									popup.closeMe();
+								});
+							}
+							else if (docXML.localName() == "session") {
+								// first we need to get the event props
+								var sessionMetadata:SessionMetadata = SessionMetadata.createInstanceFromSessionXML(docXML);
+								trace("Opening session based on session XML already in memory");
+								DatabaseManagerUtils.retrieveEventXML(sessionMetadata.eventId, databaseMgr, function(eventXML:XML):void {
+									var eventMetadata:EventMetadata = EventMetadata.createInstance(eventXML);
+									var session:Session = new Session(docXML, eventMetadata, referenceMgr);
+									openSessionSuccess(session);
+									popup.closeMe();
+									// the nodeId might refer to a markup or something
+									if (nodeId != null && nodeId.length > 0) {
+										callLater(function():void {
+											var node:MNode = session.transcript.mdoc.resolveId(nodeId);
+											if (node == null) {
+												Alert.show("Could not find document internal id: " + nodeId);
+												return;
+											}
+											if (node is MSuperNode) {
+												transcriptPane.markupsPane.selectedMarkup = node as MSuperNode;
+												transcriptPane.textPane.selectMarkup(node as MSuperNode);
+											}
+											else {
+												var newSelection:TranscriptTextSelection = new TranscriptTextSelection(node);
+												transcriptPane.textPane.select(newSelection);
+											}
+										});
+									}								
+								}, function(msg:String):void {
+									Alert.show(msg, "Could not open session");
+								});
+							}
+							else {
+								Alert.show("Unknown xml doc type: " + docXML.localName());
+							}
+						}, function(msg:String):void {
+							Alert.show(msg, "Could not retrieve document using id: " + docId);						
+						}, null, docId, "/db/ts4isha/data");
+					});
+				});
+			}
+			
+			private function reloadReferencesBeforeContinuing(nextFunc:Function):void {
+				this.referenceMgr.loadReferences(nextFunc, function(msg:String):void {
+					Alert.show("Could not reload reference file: " + msg);
+				});				
+			}
+
+			private function openSessionSuccess(session:Session):void {
+				this.session = session;
+				this.transcriptPane.transcript = session.transcript;
+				this.status = "Successfully loaded transcript";
+				updateTitle();
+				CursorManager.removeBusyCursor();
+			}
+			
+			private function openSessionFailure(msg:String):void {
+				try {
+					if (msg.indexOf("document not found") >= 0) {
+						// exist message includes this phrase
+						Alert.show("Transcript not found", "Error loading transcript");
+					}
+					else {
+						var index:int = msg.indexOf("PermissionDeniedException:");
+						if (index >= 0) {
+							Alert.show(msg.substr(index + 26), "Error loading transcript");
+						}
+						else {
+							throw new Error(msg);
+						}				
+					}
+				}
+				finally {
+					CursorManager.removeBusyCursor();					
+				}
+			}
+			
+			private function storeSession(successFunc:Function = null, failureFunc:Function = null):void {
+				this.sessionMgr.updateSessionInDatabase(session, function():void {
+					storeSessionSuccess();
+					if (successFunc != null) {
+						successFunc();
+					}
+				}, function(msg:String):void {
+					storeSessionFailure(msg);
+					if (failureFunc != null) {
+						failureFunc(msg);
+					}
+				});
+			}
+			
+			private function storeSessionSuccess():void
+			{
+				this.status = "Successfully saved transcript";
+				this.session.saveChangesHandler();
+				var selectedMarkup:MSuperNode = this.transcriptPane.markupsPane.selectedMarkup;
+				// this is primarily to refresh the "committedMarkup" in the propertiesPane
+				if (selectedMarkup != null) {
+					this.transcriptPane.markupsPane.selectedMarkup = null;
+					this.transcriptPane.markupsPane.selectedMarkup = selectedMarkup;
+				}
+				Alert.show("Successfully saved transcript changes");
+			}
+			 
+			private function storeSessionFailure(msg:String):void
+			{
+				var index:int = msg.indexOf("PermissionDeniedException:");
+				if (index >= 0) {
+					Alert.show(msg.substr(index + 26), "Error saving transcript");
+				}
+				else if (StringUtil.trim(msg).length == 0) {
+					// nothing in the message
+					databaseMgr.testConnection(function():void {
+						Alert.show("Unknown reason", "Error saving transcript");
+					}, function(msg2:String):void {
+						Alert.show("Could not connect to database", "Error saving transcript");						
+					});
+				}
+				else {
+					Alert.show(msg, "Error saving transcript");
+				}				
+			}
+			
+			private function reloadClicked():void {
+				if (session.unsavedChanges) {
+					// confirm this operation with the user
+					Alert.show("Are you sure?", "Discarding changes...", Alert.OK | Alert.CANCEL, null, function(evt:CloseEvent):void {
+						if (evt.detail==Alert.OK) {
+							reloadSession();
+						}
+					});
+				}
+				else {
+					reloadSession();
+				} 
+			}
+			
+			private function reloadSession():void {
+				if (session == null) {
+					return;
+				}
+				var reloadSessionFunction:Function = function():void {
+					sessionMgr.retrieveSession(session.id, session.eventMetadata, openSessionSuccess, openSessionFailure);
+				}
+				// first update the reference file - continue even if it fails
+				referenceMgr.loadReferences(reloadSessionFunction, function(msg:String):void {
+					trace("Couldnt retrieve reference.xml (continuing anyway): " + msg);
+					reloadSessionFunction();
+				});
+			}
+			
+			private function editEventMetadata():void {
+				var thisPanel:MainPanel = this;
+				DatabaseManagerUtils.retrieveEventXML(session.eventMetadata.id, databaseMgr, function(eventXML:XML):void {
+					session.eventMetadata = EventMetadata.createInstance(eventXML);
+					var popup:EventMetadataEditorDialog = EventMetadataEditorDialog.display(thisPanel, databaseMgr, referenceMgr, session.eventMetadata);
+					popup.addEventListener(EventMetadataEditorDialog.EVENT_EDITED, function(event:Event):void {
+						status = "Successfully edited event";
+						Alert.show("Successfully edited event"); 
+						updateTitle();
+					});
+				}, function(msg:String):void {;				
+					Alert.show(msg, "Could not retrieve event XML");
+				});
+			}
+			
+			private function editSessionMetadata():void {
+				var sessionXMLCopy:XML = session.sessionXML.copy();
+				var sessionMetadataCopy:SessionMetadata = SessionMetadata.createInstanceFromSessionXML(sessionXMLCopy);
+				var popup:SessionMetadataEditorDialog = SessionMetadataEditorDialog.display(this, databaseMgr, referenceMgr, sessionMetadataCopy); 
+				popup.addEventListener(FlexEvent.CREATION_COMPLETE, function(evt:FlexEvent):void {
+					popup.sessionMetadataPane.selectableStartAtRange = session.eventMetadata.dateRange;
+				});
+				popup.addEventListener(SessionMetadataEditorDialog.SESSION_PROPS_EDITED, function():void {
+					// copy the session props over the existing ones
+					// first delete the old ones
+					session.metadata.metadataElement = sessionMetadataCopy.metadataElement;
+					session.unsavedChanges = true;
+					Alert.show("Session properties edited but not yet saved");				
+					updateTitle();
+				});
+			}
+			
+			private function eventSessionBuilderClicked():void {
+				if (session != null && session.unsavedChanges) {
+					// confirm this operation with the user
+					Alert.show("Are you sure?", "Discarding changes...", Alert.OK | Alert.CANCEL, null, function(evt:CloseEvent):void {
+						if (evt.detail==Alert.OK) {
+							importTranscript();
+						}
+					});
+				}
+				else {
+					importTranscript();
+				} 
+			}
+			
+			private function importTranscript():void {
+				// always bring up the full import dialog if there is no session loaded or the session already has a transcript
+				if (session == null || session.transcript != null) {
+					importTranscriptComplex();
+				}
+				else {
+					var popup:Alert = Alert.show("Import into current session?", null, Alert.YES + Alert.NO + Alert.CANCEL, this, function(evt:CloseEvent):void {
+						if (evt.detail == Alert.YES) {
+							importTranscriptSimple();
+						}
+						else if (evt.detail == Alert.NO) {
+							importTranscriptComplex();
+						}
+						else {
+							// do nothing
+						}
+					});
+				}
+			}
+			
+			private function importTranscriptComplex():void {
+				var popup:ImportDialog = ImportDialog.display(this, databaseMgr, referenceMgr);
+				popup.addEventListener(ImportDialog.IMPORT_CLICKED, function(event:Event):void {
+					var newSession:Session = sessionMgr.openSessionForEvent(popup.sessionXML, popup.eventMetadata);
+					openSessionSuccess(newSession);
+					storeSession();
+				});
+			}
+			
+			/** imports the selected transcript files into the current session */
+			private function importTranscriptSimple():void {
+				if (session == null) {
+					throw new Error("Cannot do a simple import when no session is open");
+				}
+				var popup:TranscriptsToImportSelectorDialog = TranscriptsToImportSelectorDialog.display(this, databaseMgr, referenceMgr);
+				popup.addEventListener(TranscriptsToImportSelectorDialog.FILES_IMPORTED, function(evt:Event):void {
+					var importedSessionXML:XML = MSWordImporter.createSessionElement(popup.selectedAudioTranscripts);
+					var importedDeviceElements:XMLList = importedSessionXML..device;
+					var importedTranscriptElement:XML = importedSessionXML.transcript[0];
+					session.appendTranscript(importedTranscriptElement, importedDeviceElements);
+					storeSession();
+					session.unsavedChanges = true;
+					openSessionSuccess(session);
+				});
+				
+			}
+			
+			private function showAboutBox():void {
+				var popup:AboutBox = PopUpManager.createPopUp(this, AboutBox, true) as AboutBox;
+				popup.user = databaseMgr.user;
+			}
+			
+			private function updateTitle():void {
+				var title:String = "";
+				if (session == null) {
+					title += "No session open";
+				}
+				else {
+					if (session.eventMetadata != null) {
+						title += session.eventMetadata.generateFullName(referenceMgr) + "; ";
+					}
+					title += session.metadata.getFullName(session.eventMetadata) + " ";
+					if (session.transcript == null) {
+						title += "- NO TRANSCRIPT";
+					}
+				}
+				transcriptPane.label = title;
+			}
+			
+			private function onMenuClick(menuItemElement:XML):void {
+				var actionName:String = menuItemElement.@id;
+				if ( actionName == "open" ) {
+					openClicked();
+				}
+				else if ( actionName == "openById" ) {
+					openByIdClicked();
+				}
+				else if ( actionName == "store" ) {
+					storeSession();
+				}
+				else if ( actionName == "reloadTranscript" ) {
+					reloadClicked();
+				}
+				else if ( actionName == "eventMetadata" ) {
+					editEventMetadata();
+				}
+				else if ( actionName == "sessionMetadata" ) {
+					editSessionMetadata();
+				}
+				else if ( actionName == "markupText" ) {
+					this.transcriptPane.markupText();
+				}
+				else if ( actionName == "removeMarkup" ) {
+					this.transcriptPane.removeMarkup();
+				}
+				else if ( actionName == "mergeSegmentRange" ) {
+					this.transcriptPane.mergeSegmentRange();
+				}
+				else if ( actionName == "deleteText" ) {
+					this.transcriptPane.deleteText();
+				}
+				else if ( actionName == "nudgeUp" ) {
+					this.transcriptPane.nudgeUp();
+				}
+				else if ( actionName == "nudgeDown" ) {
+					this.transcriptPane.nudgeDown();
+				}
+				else if ( actionName == "showMediaPlayer" ) {					
+					var mediaPlayerDialog:MediaPlayerDialog = MediaPlayerDialog.display(this);
+					mediaPlayerDialog.mediaMetadataElement = session.sessionXML.mediaMetadata[0];
+				}
+				else if ( actionName == "showMarkupPropertiesPane" ) {
+					var showMarkupProps:Boolean = menuItemElement.@toggled.toString() == "true";
+					this.transcriptPane.markupsPane.setNodePropertiesPaneVisibility(showMarkupProps);
+				}
+				else if ( actionName == "showTextPropertiesPane" ) {
+					var showTextProps:Boolean = menuItemElement.@toggled.toString() == "true";
+					this.transcriptPane.textPane.setPropertiesPaneVisibility(showTextProps);
+				}
+				else if ( actionName == "eventSessionBuilder" ) {
+					eventSessionBuilderClicked();
+				}
+				else if ( actionName == "categoryManager" ) {
+					managerClicked(openCategoryManager);
+				}
+				else if ( actionName == "conceptManager" ) {
+					managerClicked(openConceptManager);
+				}
+				else if ( actionName == "query" ) {
+					queryClicked();
+				}
+				else if ( actionName == "showHTMLSearchInterface" ) {					
+					navigateToURL(new URLRequest(DatabaseConstants.EXIST_URL + "/rest/db/ts4isha/xquery/main.xql"), "_blank");
+				}
+				else if ( actionName.indexOf("debug") == 0) {
+					var popup:DebugPopUp = new DebugPopUp();
+					PopUpManager.addPopUp(popup, this, true);
+					if ( actionName == "debugSession") {
+						popup.textArea.text = this.session.sessionXML.toXMLString();
+					}
+					else if ( actionName == "debugReference") {
+						popup.textArea.text = referenceMgr.referenceXML.toXMLString();
+					}
+					else if ( actionName == "debugTranscriptHTML") {
+						popup.textArea.text = transcriptPane.textPane.transcriptTextArea.wrappedTextArea.htmlText;
+					}
+				}
+				else if ( actionName == "highlightHTMLElements") {
+					transcriptPane.textPane.transcriptTextArea.highlightHTMLElements();
+				}
+				else if ( actionName == "about") {
+					showAboutBox();
+				}
+			}			
+		]]>
+	</mx:Script>
+	<mx:MenuBar id="myMenuBar" width="100%" labelField="@label" itemClick="onMenuClick(event.item as XML)">
+		<mx:XMLList id="menuData">
+			<menuitem label="File" enabled="{referenceMgr != null}">
+				<menuitem id="open" label="Open..."/>
+				<menuitem id="openById" label="Open by ID..."/>
+				<!-- the enabled attribute value is a workaround because the following do not work:
+					{session != null &amp;&amp; session.unsavedChanges}
+					{session != null}
+					{session != null ? true : false}
+					{true &amp;&amp; session != null}
+					{this &amp;&amp; session != null}
+				-->
+				<menuitem id="store" label="Save" enabled="true"/>
+				<menuitem id="reloadTranscript" label="Reload from database" enabled="{myMenuBar != null &amp;&amp; session != null}"/>
+				<menuitem type="separator"/>
+				<menuitem id="eventMetadata" label="Event properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/>
+				<menuitem id="sessionMetadata" label="Session properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/>
+				<!--menuitem id="mediaProps" label="Media properties..." enabled="{myMenuBar != null &amp;&amp; session != null}"/-->
+			</menuitem>
+			<menuitem label="Selection" enabled="{transcriptPane.textPane.ttSelection != null}">
+				<menuitem id="markupText" label="Markup text" enabled="{databaseMgr.user.isMarkupUser() &amp;&amp; transcriptPane.textPane.ttSelection.allowMarkup()}"/>
+				<menuitem id="removeMarkup" label="Remove markup" enabled="{databaseMgr.user.isMarkupUser() &amp;&amp; transcriptPane.textPane.ttSelection.allowRemoveMarkup()}"/>
+				<menuitem type="separator"/>
+				<menuitem id="mergeSegmentRange" label="Merge paragraphs" enabled="{databaseMgr.user.isTextUser() &amp;&amp; transcriptPane.textPane.ttSelection.allowMerge()}"/>
+				<menuitem id="deleteText" label="Delete text" enabled="{databaseMgr.user.isTextUser() &amp;&amp; transcriptPane.textPane.ttSelection.allowDeleteText()}"/>
+				<menuitem type="separator"/>
+				<menuitem id="nudgeUp" label="Nudge up" enabled="{databaseMgr.user.isMarkupUser() &amp;&amp; transcriptPane.textPane.ttSelection.allowNudgeUp()}"/>
+				<menuitem id="nudgeDown" label="Nudge down" enabled="{databaseMgr.user.isMarkupUser() &amp;&amp; transcriptPane.textPane.ttSelection.allowNudgeDown()}"/>
+			</menuitem>				
+			<menuitem label="Window" enabled="{myMenuBar != null &amp;&amp; session != null}">
+				<menuitem id="showMediaPlayer" label="Media player"/>
+				<menuitem type="separator"/>
+				<menuitem id="showMarkupPropertiesPane" label="Markup properties" type="check" toggled="true"/>
+				<menuitem id="showTextPropertiesPane" label="Text properties" type="check" toggled="true"/>
+			</menuitem>
+			<menuitem label="Admin" enabled="{databaseMgr != null &amp;&amp; databaseMgr.user.isDbaUser()}">
+				<menuitem id="eventSessionBuilder" label="Event/Session Builder..."/>
+				<menuitem type="separator"/>
+				<menuitem id="categoryManager" label="Categories..."/>
+				<menuitem id="conceptManager" label="Concepts..."/>
+				<menuitem type="separator"/>
+				<menuitem id="query" label="Execute XQuery..."/>				
+			</menuitem>
+			<menuitem label="Tools">
+				<menuitem id="showHTMLSearchInterface" label="HTML Search Interface"/>
+			</menuitem>
+			<menuitem label="Help">
+				<menuitem label="Debug">
+					<menuitem id="debugSession" label="Session XML"/>
+					<menuitem id="debugReference" label="Reference XML"/>
+					<menuitem id="debugTranscriptHTML" label="Transcript HTML"/>
+					<!--menuitem id="highlightHTMLElements" label="Highlight HTML Elements"/-->
+				</menuitem>					
+				<menuitem id="about" label="About {ApplicationUtils.getApplicationName()}"/>
+			</menuitem>
+		</mx:XMLList>
+	</mx:MenuBar>
+	<mx:TabNavigator borderStyle="none" tabWidth="{transcriptPane.width}" horizontalAlign="center" width="100%" height="100%" paddingTop="0" visible="{this.session != null}">
+		<studioNS:TranscriptPane id="transcriptPane" width="100%" height="100%" backgroundColor="0x869CA7" referenceMgr="{this.referenceMgr}" visible="{this.session != null}" enabled="{this.transcriptPane.transcript != null}" user="{databaseMgr.user}"/>
+	</mx:TabNavigator>
+</mx:VBox>
