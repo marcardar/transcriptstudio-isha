@@ -78,8 +78,12 @@
 		<markupType id="story" name="Story" allowOutline="true" allowInline="false"/>
 		<markupType id="quote" name="Quote" allowOutline="false" allowInline="true"/>
 		<markupType id="music" name="Music" allowOutline="true" allowInline="false"/>
+		<markupType id="performance" name="Performance" allowOutline="true" allowInline="false"/>
 		<markupType id="process" name="Process" allowOutline="true" allowInline="false"/>
 		<markupType id="soundbite" name="Sound Bite" allowOutline="true" allowInline="true"/>
+		<markupType id="analogy" name="Analogy" allowOutline="true" allowInline="true"/>
+		<markupType id="poem" name="Poem" allowOutline="true" allowInline="false"/>
+		<markupType id="chant" name="Chant" allowOutline="true" allowInline="false"/>
 	</markupTypes>
 	<markupCategories>
 		<markupCategory id="laotzubecomesthe1" name="Lao Tzu becomes the Chief Judge">
