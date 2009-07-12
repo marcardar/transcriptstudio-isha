@@ -607,7 +607,7 @@
 				<menuitem id="showMediaPlayer" label="Media player"/>
 				<menuitem type="separator"/>
 				<menuitem id="showMarkupPropertiesPane" label="Markup properties" type="check" toggled="true"/>
-				<menuitem id="showTextPropertiesPane" label="Text properties" type="check" toggled="true"/>
+				<menuitem id="showTextPropertiesPane" label="Text properties" type="check" toggled="false"/>
 			</menuitem>
 			<menuitem label="Admin" enabled="{databaseMgr != null &amp;&amp; databaseMgr.user.isDbaUser()}">
 				<menuitem id="eventSessionBuilder" label="Event/Session Builder..."/>
