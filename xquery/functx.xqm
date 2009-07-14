@@ -40,7 +40,8 @@ declare function functx:add-or-update-attributes($elements as element()*, $attrN
 		}
 };
 
-declare function functx:remove-elements($elements as element()*, $names as xs:string*) as element()* {			 
+declare function functx:remove-elements($elements as element()*, $names as xs:string*) as element()* 
+{			 
 	for $element in $elements
 	return element
 		{node-name($element)}
@@ -48,4 +49,12 @@ declare function functx:remove-elements($elements as element()*, $names as xs:st
 			$element/@*,
 			$element/*[not(local-name(.) = $names)]
 		}
+};
+
+declare function functx:contains-word($string as xs:string?, $word as xs:string) as xs:boolean
+{
+	let $upString := upper-case($string)
+	let $upWord := upper-case($word)
+	return
+		matches($upString, concat("^(.*\W)?", $upWord, "(\W.*)?$"))
 };
