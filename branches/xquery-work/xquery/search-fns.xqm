@@ -2,6 +2,7 @@ xquery version "1.0";
 
 module namespace search-fns = "http://www.ishafoundation.org/ts4isha/xquery/search-fns";
 import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
+import module namespace functx = "http://www.functx.com" at "functx.xqm";
 
 declare variable $search-fns:maxResults := 500;
 declare variable $search-fns:maxTextChars := 550;
@@ -97,10 +98,10 @@ declare function search-fns:get-events($baseEvents as element()*, $eventSearchTe
 					(: this is an event year :)
 					$baseEvents[starts-with(metadata/@startAt, $searchTerm)]
 				else 
-					if (matches($searchTerm, '^[a-z]{1,2}\d+$', 'i')) then
+					if (matches($searchTerm, '^[a-z]{1,2}-\d+$', 'i')) then
 						(: this is an id (could be event, session or media etc) - but lets assume media id :)
-						let $sessions := search-fns:get-sessions-for-event-ids($baseEvents/@id)
-						return search-fns:get-events-for-session-ids($sessions[//device/*/@id = lower-case($searchTerm)]/@id)
+						let $sessions := search-fns:get-sessions-for-event-ids($baseEvents/xs:string(@id))
+						return search-fns:get-events-for-session-ids($sessions[.//device/*/@id = lower-case($searchTerm)]/@id)
 					else 
 						(: it could be anything :)
 						$baseEvents[matches(metadata/@*, $searchTerm, 'i')]
@@ -130,20 +131,27 @@ declare function search-fns:markup-search($baseMarkups as element()*, $searchTer
 		$baseMarkups
 	else
 		let $searchTerm as xs:string := $searchTerms[1]
-		let $newConcepts := remove($searchTerms, 1)
+		let $newTerms := remove($searchTerms, 1)
 		let $newBaseMarkups :=
 			if (search-fns:is-category-id($searchTerm)) then
 				search-fns:markups-for-category($baseMarkups, $searchTerm)
+			else if (search-fns:is-in-category-name($searchTerm)) then
+				search-fns:markups-for-category-name-match($baseMarkups, $searchTerm)
 			else
 				let $expandedSearchTerm as xs:string* := search-fns:expand-concept($searchTerm)
 				return
 					search-fns:markups-for-any-concept($baseMarkups, $expandedSearchTerm)
-		return search-fns:markup-search($newBaseMarkups, $newConcepts)
+		return search-fns:markup-search($newBaseMarkups, $newTerms)
 };
 
 declare function search-fns:is-category-id($categoryId as xs:string) as xs:boolean
 {
 	exists($utils:referenceCollection/reference/markupCategories/markupCategory[@id = $categoryId])
+};
+
+declare function search-fns:is-in-category-name($searchTerm as xs:string) as xs:boolean
+{
+	exists($utils:referenceCollection/reference/markupCategories/markupCategory[functx:contains-word(xs:string(@name), $searchTerm)])
 };
 
 declare function search-fns:text-search($baseElements as element()*, $searchTerms as xs:string*) as element()*
@@ -227,6 +235,13 @@ declare function search-fns:markups-for-any-concept($baseMarkups as element()*, 
 declare function search-fns:markups-for-category($baseMarkups as element()*, $categoryId as xs:string*) as element()*
 {
 	for $markup in $baseMarkups/tag[@type = 'markupCategory' and @value = $categoryId]/..
+	return $markup
+};
+
+declare function search-fns:markups-for-category-name-match($baseMarkups as element()*, $searchTerm as xs:string*) as element()*
+{
+	let $categoryIds := $utils:referenceCollection/reference/markupCategories/markupCategory[functx:contains-word(xs:string(@name), $searchTerm)]/@id
+	for $markup in $baseMarkups/tag[@type = 'markupCategory' and @value = $categoryIds]/..
 	return $markup
 };
 
@@ -415,4 +430,5 @@ declare function search-fns:extract-sub-search-terms($searchString as xs:string,
 declare function search-fns:substring-before-match($arg as xs:string?, $regex as xs:string ) as xs:string {
 	tokenize($arg, $regex)[1]
 };
+
 
