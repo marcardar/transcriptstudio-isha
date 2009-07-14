@@ -58,3 +58,15 @@ declare function functx:contains-word($string as xs:string?, $word as xs:string)
 	return
 		matches($upString, concat("^(.*\W)?", $upWord, "(\W.*)?$"))
 };
+
+declare function functx:distinct-nodes( $nodes as node()* )  as node()* 
+{       
+    	for $seq in (1 to count($nodes))
+    	return 
+		$nodes[$seq][not(functx:is-node-in-sequence(.,$nodes[position() < $seq]))]
+};
+
+declare function functx:is-node-in-sequence( $node as node()? ,$seq as node()* )  as xs:boolean 
+{       
+   	some $nodeInSeq in $seq satisfies $nodeInSeq is $node
+ };
