@@ -135,12 +135,13 @@ declare function search-fns:markup-search($baseMarkups as element()*, $searchTer
 		let $newBaseMarkups :=
 			if (search-fns:is-category-id($searchTerm)) then
 				search-fns:markups-for-category($baseMarkups, $searchTerm)
-			else if (search-fns:is-in-category-name($searchTerm)) then
-				search-fns:markups-for-category-name-match($baseMarkups, $searchTerm)
 			else
 				let $expandedSearchTerm as xs:string* := search-fns:expand-concept($searchTerm)
 				return
-					search-fns:markups-for-any-concept($baseMarkups, $expandedSearchTerm)
+				(
+					search-fns:markups-for-any-concept($baseMarkups, $expandedSearchTerm),
+					search-fns:markups-for-category-name-match($baseMarkups, $searchTerm)
+				)
 		return search-fns:markup-search($newBaseMarkups, $newTerms)
 };
 
