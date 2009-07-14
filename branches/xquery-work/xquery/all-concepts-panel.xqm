@@ -11,11 +11,14 @@ declare variable $all-concepts-panel:columnWidth := 100;
 declare function all-concepts-panel:main() as element()*
 {	
 	let $reference := $utils:referenceCollection/reference
-	let $categoryConcepts := $reference/markupCategories/markupCategory/tag[@type eq 'concept']/string(@value)
+	let $categoryDefinitionConcepts := $reference/markupCategories/markupCategory/tag[@type eq 'concept']/string(@value)
 	let $coreConcepts := $reference/coreConcepts/concept/string(@id)
 	let $subtypeConcepts := $reference/coreConcepts/concept/subtype/string(@idRef)
 	let $synonymConcepts := $reference/synonymGroups/synonymGroup/synonym/string(@idRef)
-	let $additionalConcepts := $utils:dataCollection/session/transcript//(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
+
+	let $additionalConceptElements := $utils:dataCollection/session/transcript//(superSegment|superContent)/tag[@type eq 'concept']
+	let $additionalConcepts := $additionalConceptElements/string(@value)
+	let $additionalConceptsUsedWithCategories := $additionalConceptElements[exists(../tag[@type eq 'markupCategory'])]/string(@value)
 	return
 	(
 		<center><h2>Isha Foundation Markup Concepts</h2></center>
@@ -29,17 +32,21 @@ declare function all-concepts-panel:main() as element()*
 		,
 		<br/>
 		,
-		<div style="font-size:small;">Note: italics denotes concept referenced by at least one category</div>
+		<div style="font-size:small;">Note: italics denotes concept used in conjunction with at least one category</div>
 		,
 		<br/>
 		,
 		let $concepts := 
-			for $concept in distinct-values(($categoryConcepts, $coreConcepts, $subtypeConcepts, $synonymConcepts, $additionalConcepts))
+			for $concept in distinct-values(($categoryDefinitionConcepts, $coreConcepts, $subtypeConcepts, $synonymConcepts, $additionalConcepts))
 			order by $concept 
 			return $concept
 		for $startCharIndex in (0 to 25)
 		let $startChar := codepoints-to-string($startCharIndex + 97)
 		let $filteredConcepts := all-concepts-panel:filter-concepts-for-start-char($startChar, $concepts)
+		let $categoryConcepts :=
+			for $categoryConcept in distinct-values(($categoryDefinitionConcepts, $additionalConceptsUsedWithCategories))
+			order by $categoryConcept
+			return $categoryConcept
 		return
 			(
 				<b id="{$startChar}">{upper-case($startChar)}:</b>
