@@ -31,3 +31,15 @@ The transcript element initially contains a sequence of *segment* elements. Each
 Segment elements can contain any number of *content* elements. (A content element corresponds to one or more consecutive words within a paragraph). (We sometimes use content elements for capturing information such as emphasized words, or words spoken in Tamil). One or more consecutive content elements can be wrapped in a *superContent* element. (superContent elements correspond to regions of text, within a paragraph, that have been identified for some reason e.g. a quotation). superContent elements can also be nested.
 
 We distinguish between *factual* metadata (e.g. words spoken in Tamil, emphasized words), and *subjective* metadata (e.g. topics, good quotations), and we use superSegments and superContents in the latter case - (which one depends on whether the text spans multiple segments or is fully contained within a single segment). 
+
+=== Tag elements ===
+
+When we want to categorize a span of text - thereby creating a superSegment or superContent element, we also create some additional *tag* elements which define what kind of categorization has been applied. tag elements are children of superSegment or superContent elements. All tag elements have a *type* attribute, and a *value* attribute. The type attribute can be one of the following:
+
+  * markupType
+  * markupCategory
+  * concept
+
+For tags of type markupType and markupCategory the value attribute contains a reference to an element in the reference.xml file. For tags of type concept, the value attribute does not reference anything else - it simply contains the text input by the user. (We call these "additional concepts" - see later)
+
+=== Concepts and Categories ===
