@@ -43,3 +43,30 @@ When we want to categorize a span of text - thereby creating a superSegment or s
 For tags of type markupType and markupCategory the value attribute contains a reference to an element in the reference.xml file. For tags of type concept, the value attribute does not reference anything else - it simply contains the text input by the user. (We call these "additional concepts" - see later)
 
 === Concepts and Categories ===
+
+The categorization model is based on *concepts* and *categories*. A concept is a one or two word keyword or tag-name (e.g. "mysticism", "death", "sadhguru-biography" etc..), which pontentially covers a very broad domain. A category is defined by a category-name, and a set of concepts, and describes a much finer aspect. An example of a category might be: "Effect of Dhyanalinga consecration on Sadhguru's body [sadhguru-biography dhyanalinga-consecration]" - where the items in square brackets are concepts. Category definitions are stored in the refence file.
+
+In addition to associating categories to spans of text, we also allow the user the possibility of defining *additional concepts* to a span of text. (The motivation behind this functionality was to allow the user to specify concepts that are relevant purely from a contextual viewpoint - rather than relating to the definition of the category itself). This allows us to capture contextual information about where the category was used. (e.g. "George Bush sees a kangaroo for the first time [george-bush] +[mysticism]"). This example shows how a category (in this case the markupType = "joke"), has been used in a discourse about mysticism. We denote additional concepts by displaying them in an additional set of square brackets after the category definition, preceded by a plus sign.
+
+Note that for greater flexibility we allow the user to markup spans of text without specifying any category - and let them specify only additional-concepts.
+
+=== Synonyms and Subtypes ===
+
+In the reference file we also store relationships between concepts, which the user can define. These are *synonyms* and *subtypes*. This allows the search results to be more "intelligent" and return more relevant results.
+
+e.g. we define the concepts "enlightenment", "liberation", "mukthi", "nirvana" as synonyms. Now when a user searches on any one of these terms, he receives results for all of them.
+
+Similarly, subtypes allow us to define a hierarchical relationship between concepts - but without the end-user needing to know about it. For example we might have the concept "isha-practices" and we might have the the following concepts defined as subtypes: "shoonya", "shakti-chalana-kriya", "breath-watching". Searching for "isha-practices" would bring back results for all the latter concepts.
+
+=== Markup Types ===
+When defining a superSegment or superContent we assign to it a tag of type = markupType. We use this attribute to distinguish between the different types of things that can be identified by the users - as distinct from the different topics. All the markup types are defined in the reference file. They include:
+
+  * topic
+  * story
+  * joke
+  * question
+  * music
+  * performance
+  * quote
+
+Note that a category can be used in conjunction with any one of these types. The best example of this is when we use the same category to mark up a participants question, and Sadhguru's response - but in the superSegment/superContent we set the markupType attribute to "question" and "topic" respectively
