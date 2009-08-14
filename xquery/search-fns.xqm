@@ -8,7 +8,7 @@ declare variable $search-fns:maxResults := 500;
 declare variable $search-fns:maxTextChars := 550;
 
 (: $defaultType is either "markup", "text" or "event" :)
-declare function search-fns:main($searchString as xs:string, $defaultType as xs:string) as element()*
+declare function search-fns:main($searchString as xs:string, $defaultType as xs:string, $groupResults as xs:string, $markupUuid as xs:string) as element()*
 {
 	let $searchString :=
 		if (contains($searchString, concat($defaultType, ':'))) then
@@ -20,17 +20,25 @@ declare function search-fns:main($searchString as xs:string, $defaultType as xs:
 	let $textSearchTerms := search-fns:extract-sub-search-terms($searchString, 'text')
 	return
 		let $events := search-fns:get-events($utils:dataCollection/event, $eventSearchTerms)
-		let $eventIds := trace($events/string(@id), 'eventIds:')
+		let $eventIds := $events/string(@id)
 		let $transcripts := search-fns:get-transcripts($eventIds)
 		let $tableRows := 
 			if (exists($markupSearchTerms)) then
 				let $matchedMarkups := search-fns:markup-search(($transcripts//superSegment, $transcripts//superContent), $markupSearchTerms)
 				let $matchedMarkups := if (exists($textSearchTerms)) then search-fns:text-search($matchedMarkups, $textSearchTerms) else $matchedMarkups
-				return
-					for $markup in $matchedMarkups
-					order by $markup/tag[@type = 'markupCategory']/@value
-					return
-						search-fns:markup-as-table-row($markup)
+				let $markupClassRepresentatives := search-fns:generate-markup-class-representatives($matchedMarkups)
+				return 
+					if ($groupResults eq 'true') then
+						for $markupClassRepresentative in $markupClassRepresentatives
+						return
+							search-fns:markup-as-table-row($markupClassRepresentative, $searchString, $groupResults)
+					else if (exists($markupUuid)) then
+						let $markup := search-fns:markup-search($matchedMarkups, $markupUuid)
+						for $classMarkup in search-fns:generate-markup-class($markup, $matchedMarkups)
+						return
+							search-fns:markup-as-table-row($classMarkup, $searchString, $groupResults)
+					else
+						()
 			else
 				if (exists($textSearchTerms)) then
 					for $segment in	search-fns:text-search($transcripts//segment, $textSearchTerms)
@@ -66,6 +74,83 @@ declare function search-fns:main($searchString as xs:string, $defaultType as xs:
 							,
 							$tableRows[position() <= $search-fns:maxResults]
 						)
+};
+
+declare function search-fns:generate-markup-class-representatives($matchedMarkups as element()*) as element()*
+{
+	let $categoryMarkups := $matchedMarkups/tag[@type = "markupCategory"]/../.
+	let $conceptMarkups := ($matchedMarkups except $categoryMarkups)/tag[@type = "concept"]/../.
+	let $typeMarkups := $matchedMarkups except ($categoryMarkups, $conceptMarkups)
+
+	let $categoryIds := distinct-values($categoryMarkups/tag[@type = "markupCategory"]/@value)
+	let $conceptLists := distinct-values(
+		for $markup in $conceptMarkups 
+		return 
+			search-fns:get-additional-concepts-list($markup)
+	)
+	let $types := distinct-values($typeMarkups/tag[@type = "markupType"]/@value)
+
+	let $categoryMarkupsClassRepresentatives :=
+		for $categoryId in $categoryIds
+		let $usedMarkupTypes := distinct-values($categoryMarkups/tag[@value = $categoryId][@type = "markupCategory"]/../tag[@type = "markupType"]/string(@value))
+		return
+			for $markupType in $usedMarkupTypes
+			let $classMarkups := $categoryMarkups/tag[@value = $categoryId][@type = "markupCategory"]/../tag[@value = $markupType][@type = "markupType"]/../.
+			let $classCount := count($classMarkups)
+			return
+				functx:add-attributes($classMarkups[1], (xs:QName('sessionId'), xs:QName('classType'), xs:QName('classCount')), ($classMarkups[1]/ancestor::session/@id, 'category', $classCount))
+				
+	let $conceptMarkupsClassRepresentatives :=
+		for $conceptList in $conceptLists
+		let $usedMarkupTypes := distinct-values($conceptMarkups[search-fns:get-additional-concepts-list(.) eq $conceptList]/tag[@type = "markupType"]/string(@value))
+		return
+			for $markupType in $usedMarkupTypes
+			let $classMarkups := $conceptMarkups[search-fns:get-additional-concepts-list(.) eq $conceptList]/tag[@value = $markupType][@type = "markupType"]/../.
+			let $classCount := count($classMarkups)
+			return
+				functx:add-attributes($classMarkups[1], (xs:QName('sessionId'), xs:QName('classType'), xs:QName('classCount')), ($classMarkups[1]/ancestor::session/@id, 'concept', $classCount))
+							
+	let $typeMarkupsClassRepresentatives :=
+		for $type in $types
+		let $classMarkups := $typeMarkups/tag[@value = $type][@type = "markupType"]/../.
+		let $classCount := count($classMarkups)
+		return
+			functx:add-attributes($classMarkups[1], (xs:QName('sessionId'), xs:QName('classType'), xs:QName('classCount')), ($classMarkups[1]/ancestor::session/@id, 'type', $classCount))
+
+	for $markupsClassRepresentatives in $categoryMarkupsClassRepresentatives
+	let $markupType := $markupsClassRepresentatives/tag[@type = "markupType"]/@value
+	let $searchPriority := $utils:referenceCollection//markupType[@id = $markupType]/xs:integer(@searchOrder)
+	order by $searchPriority
+	return
+		$markupsClassRepresentatives
+};
+
+declare function search-fns:generate-markup-class($markup as element(), $baseMarkups as element()*) as element()*
+{
+	let $categoryMarkups := $baseMarkups/tag[@type = "markupCategory"]/../.
+	let $conceptMarkups := ($baseMarkups except $categoryMarkups)/tag[@type = "concept"]/../.
+	let $typeMarkups := $baseMarkups except ($categoryMarkups, $conceptMarkups)
+
+	let $classType := 
+		if (exists(index-of($categoryMarkups, $markup))) then 'category'
+		else if (exists(index-of($conceptMarkups, $markup))) then 'concept'
+		else if (exists(index-of($typeMarkups, $markup))) then 'type'
+		else ()
+
+	let $categoryId := $markup/tag[@type = 'markupCategory']/xs:string(@value)
+	let $conceptList := search-fns:get-additional-concepts-list($markup)
+	let $type := $markup/tag[@type = "markupType"]/xs:string(@value)
+
+	
+	return
+		if ($classType eq 'category') then 
+			$categoryMarkups/tag[@value eq $categoryId][@type eq 'markupCategory']/../tag[@value = $type][@type = "markupType"]/../.
+		else if ($classType eq 'concept') then 
+			$conceptMarkups[search-fns:get-additional-concepts-list(.) eq $conceptList]/tag[@value = $type][@type = "markupType"]/../.
+		else if ($classType eq 'type') then 
+			$typeMarkups/tag[@value = $type][@type = "markupType"]/../.
+		else
+			()
 };
 
 declare function search-fns:get-transcripts($eventIds as xs:string*) as element()*
@@ -133,7 +218,9 @@ declare function search-fns:markup-search($baseMarkups as element()*, $searchTer
 		let $searchTerm as xs:string := $searchTerms[1]
 		let $newTerms := remove($searchTerms, 1)
 		let $newBaseMarkups :=
-			if (search-fns:is-category-id($searchTerm)) then
+			if (search-fns:is-markup-uuid($searchTerm)) then
+				search-fns:markup-for-uuid($baseMarkups, $searchTerm)
+			else if (search-fns:is-category-id($searchTerm)) then
 				search-fns:markups-for-category($baseMarkups, $searchTerm)
 			else
 				let $expandedSearchTerm as xs:string* := search-fns:expand-concept($searchTerm)
@@ -142,14 +229,28 @@ declare function search-fns:markup-search($baseMarkups as element()*, $searchTer
 		return search-fns:markup-search($newBaseMarkups, $newTerms)
 };
 
-declare function search-fns:is-category-id($categoryId as xs:string) as xs:boolean
+declare function search-fns:is-markup-uuid($searchTerm as xs:string) as xs:boolean
 {
-	exists($utils:referenceCollection/reference/markupCategories/markupCategory[@id = $categoryId])
+	let $markups := ($utils:dataCollection//superSegment, $utils:dataCollection//superContent)
+	let $sessionId := substring-before($searchTerm, '#')
+	let $markupId := substring-after($searchTerm, '#')
+	return
+		if ($sessionId eq '' or $markupId eq '') 
+			then false()
+		else if (exists($markups[ancestor::session/@id eq $sessionId][@id eq $markupId]))
+			then true()
+		else
+			()
+};
+
+declare function search-fns:is-category-id($searchTerm as xs:string) as xs:boolean
+{
+	exists($utils:referenceCollection//markupCategory[@id = $searchTerm])
 };
 
 declare function search-fns:is-in-category-name($searchTerm as xs:string) as xs:boolean
 {
-	exists($utils:referenceCollection/reference/markupCategories/markupCategory[functx:contains-word(xs:string(@name), $searchTerm)])
+	exists($utils:referenceCollection//markupCategory[functx:contains-word(xs:string(@name), $searchTerm)])
 };
 
 declare function search-fns:text-search($baseElements as element()*, $searchTerms as xs:string*) as element()*
@@ -181,7 +282,7 @@ declare function search-fns:expand-concept($concept as xs:string) as xs:string*
 {
 	(: expand by synonyms :)
 	let $synonyms := distinct-values(($concept,
-			for $synonym in $utils:referenceCollection/reference/synonymGroups/synonymGroup/synonym[@idRef = $concept]/../synonym
+			for $synonym in $utils:referenceCollection//synonym[@idRef = $concept]/../synonym
 			return string($synonym/@idRef)
 		))
 	(: expand by concept hierarchy :) 
@@ -202,7 +303,7 @@ declare function search-fns:get-sub-concept-ids($unprocessedIds as xs:string*, $
 					()
 				else
 					(: have not processed this one before :)
-					$utils:referenceCollection/reference/coreConcepts/concept[@id = $unprocessedId]/subtype/@idRef
+					$utils:referenceCollection//concept[@id = $unprocessedId]/subtype/@idRef
 	return
 		let $newProcessedIds := ($processedIds, $unprocessedIds)
 		return
@@ -214,14 +315,14 @@ declare function search-fns:get-sub-concept-ids($unprocessedIds as xs:string*, $
 
 declare function search-fns:markups-for-any-concept($baseMarkups as element()*, $concepts as xs:string*) as element()*
 {
-	let $markupCategories as element()*:= $utils:referenceCollection/reference/markupCategories/markupCategory/tag[@type = "concept" and exists(index-of($concepts, string(@value)))]/..
+	let $markupCategories as element()*:= 
+		$utils:referenceCollection//markupCategory/tag[@value = $concepts][@type = "concept"]/..
 	(:
 	let $null := error(QName("http://error.com", "myerror"), concat("Number of markupCategories: ", count($markupCategories)))
 	:)
 	let $result :=
-		for $markup in $baseMarkups
-		where $markup/tag[@type = ('concept', 'markupType') and @value = $concepts] or (exists($markupCategories) and $markup/tag[@type = "markupCategory" and @value = $markupCategories/@id])
-		return $markup
+		($baseMarkups/tag[@value = $concepts][@type = ('concept', 'markupType')]/..,
+		 $baseMarkups/tag[@value = $markupCategories/@id][@type = "markupCategory"]/..)
 	return
 		(:
 			error(QName("http://error.com", "myerror"), concat("Number of markupCategories with concept (", $concept, "): ", count($markupCategories))
@@ -232,22 +333,41 @@ declare function search-fns:markups-for-any-concept($baseMarkups as element()*, 
 
 declare function search-fns:markups-for-category($baseMarkups as element()*, $categoryId as xs:string*) as element()*
 {
-	for $markup in $baseMarkups/tag[@type = 'markupCategory' and @value = $categoryId]/..
+	for $markup in $baseMarkups/tag[@value = $categoryId][@type = 'markupCategory']/..
 	return $markup
 };
 
 declare function search-fns:markups-for-category-name-match($baseMarkups as element()*, $searchTerm as xs:string*) as element()*
 {
-	let $categoryIds := $utils:referenceCollection/reference/markupCategories/markupCategory[functx:contains-word(xs:string(@name), $searchTerm)]/@id
-	for $markup in $baseMarkups/tag[@type = 'markupCategory' and @value = $categoryIds]/..
+	let $categoryIds := $utils:referenceCollection//markupCategory[functx:contains-word(xs:string(@name), $searchTerm)]/@id
+	for $markup in $baseMarkups/tag[@value = $categoryIds][@type = 'markupCategory']/..
 	return $markup
 };
 
-declare function search-fns:markup-as-table-row($markup as element()) as element()
+declare function search-fns:markup-for-uuid($baseMarkups as element()*, $markupUuid as xs:string) as element()
 {
+	let $sessionId := substring-before($markupUuid, '#')
+	let $markupId := substring-after($markupUuid, '#')
+	return
+		$baseMarkups[ancestor::session/@id eq $sessionId][@id eq $markupId]
+};
+
+declare function search-fns:markup-as-table-row($markup as element(), $prevSearchString as xs:string, $groupResults as xs:string) as element()
+{
+	let $count := 
+		if ($groupResults eq 'true') then 
+			$markup/@classCount
+		else
+			1
+	let $markup := 
+		if ($groupResults eq 'true') then 
+			$utils:dataCollection//(superSegment | superContent)[ancestor::session/@id eq $markup/@sessionId][@id = $markup/@id]
+		else
+			$markup
 	let $session := $markup/ancestor::session
 	let $markupTypeId := $markup/tag[@type = 'markupType']/@value
 	let $markupType := $utils:referenceCollection/reference/markupTypes/markupType[@id = $markupTypeId]
+	let $additionalConcepsList := search-fns:get-additional-concepts-list($markup)
 	let $categoryId := $markup/tag[@type = 'markupCategory']/@value
 	let $markupCategory := $utils:referenceCollection/reference/markupCategories/markupCategory[@id = $categoryId]
 	let $markupCategoryName := if (exists($markupCategory)) then
@@ -268,6 +388,12 @@ declare function search-fns:markup-as-table-row($markup as element()) as element
 				search-fns:element-text($markup)
 		else
 			search-fns:element-text($markup)
+	let $searchString := 
+		if (exists($categoryId)) then concat($markupTypeId, ' ', $categoryId)
+		else
+			(if (not($additionalConcepsList eq '')) then concat($markupTypeId, ' ', $additionalConcepsList)
+				else ()
+			)
 	return
 		<table class="single-result">
 			<tr>
@@ -289,8 +415,21 @@ declare function search-fns:markup-as-table-row($markup as element()) as element
 					{search-fns:get-html-word-links($session/@id)}
 				</div></td>
 			</tr>
+			{	
+				if ($count > 1) then (
+				<tr>
+					<td colspan="2"><div class="result-footer">
+						<a href="main.xql?panel=search&amp;search={$prevSearchString}&amp;defaultType=markup&amp;markupUuid={concat($session/xs:string(@id), '%23', $markup/xs:string(@id))}&amp;groupResults=false">{concat('All ', xs:string($count), ' results')}</a>
+					</div></td>
+				</tr>
+				)
+				else 
+				()
+			}
 		</table>
 };
+
+
 
 declare function search-fns:get-markup-category-concepts-string($markupCategory as element()) as xs:string
 {
@@ -310,6 +449,11 @@ declare function search-fns:get-additional-concepts-string($markup as element())
 			concat(' +[', string-join($conceptNames, ' '), ']')
 		else
 			''
+};
+
+declare function search-fns:get-additional-concepts-list($markup as element()) as xs:string
+{
+	string-join($markup/tag[@type = 'concept']/string(@value), ' ')
 };
 
 declare function search-fns:segment-as-table-row($segment as element()) as element()
@@ -337,7 +481,7 @@ declare function search-fns:segment-as-table-row($segment as element()) as eleme
 		</div>
 };
 
-(: returns something like " (20090329-n1-1-1815#o13)" :)
+(: returns something like " (a-12-3#m13)" :)
 declare function search-fns:get-node-uuid-text($sessionId as xs:string, $nodeId as xs:string) as element()
 {
 	<i><b>{concat(' (', $sessionId, '#', $nodeId, ')')}</b></i>

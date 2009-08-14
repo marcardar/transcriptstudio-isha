@@ -12,17 +12,11 @@ declare function categories-panel:main() as element()*
 {	
 	let $conceptId := request:get-parameter('conceptId', ())
 	let $reference := $utils:referenceCollection/reference
-	let $definedCategories := 
+	let $categories := 
 		if ($conceptId) then
 			$reference/markupCategories/markupCategory/tag[@type eq 'concept' and @value eq $conceptId]/..
 		else
-			()
-	let $additionalConceptElements := $utils:dataCollection/session/transcript//(superSegment|superContent)/tag[@type eq 'concept' and @value eq $conceptId]
-	let $associatedCategoryRefs :=
-		if ($conceptId) then
-			$additionalConceptElements/../tag[@type eq 'markupCategory']
-		else
-			()
+			$reference/markupCategories/markupCategory
 	return
 	(
 		<center><h2>Isha Foundation Markup Categories
@@ -42,63 +36,18 @@ declare function categories-panel:main() as element()*
 			}
 		</h2></center>
 	,
-		let $mainCategoryDisplay :=
-			if (exists($definedCategories)) then
-			(
-				<h3>Main categories</h3>,
-				for $category in $definedCategories
-				order by lower-case($category/@name)
-				return
-					<div class="category">
-						<span>
-							<a class="category-anchor" href="main.xql?panel=search&amp;search=markup:{$category/@id}">{concat($category/@name, search-fns:get-markup-category-concepts-string($category))}</a>
-						</span>
-					</div>
-				,
-					<br/>
-			)
-			else
-				()
-		return
-		(
-			$mainCategoryDisplay
-		)
-	,
-		let $contextCategoryDisplay :=
-			if (exists($associatedCategoryRefs)) then
-			(
-				<h3>Context related categories</h3>,
-				for $categoryRef in $associatedCategoryRefs
-				let $category := $reference/markupCategories/markupCategory[@id eq $categoryRef/string(@value)]
-				order by lower-case($category/@name)
-				return
-					<div class="category">
-						<span>
-							<a class="category-anchor" href="main.xql?panel=search&amp;search=markup:{$category/@id} {$conceptId}">{concat($category/@name, search-fns:get-markup-category-concepts-string($category), ' +[', $conceptId, ']')}</a>
-						</span>
-					</div>
-			)
-			else
-				()
-		return
-			$contextCategoryDisplay
-	,
-		let $allCategoryDisplay :=
-			if (not(exists($conceptId))) then
-			(
-				<h3>All categories</h3>,
-				for $category in $reference/markupCategories/markupCategory
-				order by lower-case($category/@name)
-				return
-					<div class="category">
-						<span>
-							<a class="category-anchor" href="main.xql?panel=search&amp;search=markup:{$category/@id}">{concat($category/@name, search-fns:get-markup-category-concepts-string($category))}</a>
-						</span>
-					</div>
-			)
-			else
-				()
-		return
-			$allCategoryDisplay
+		if (exists($categories)) then
+			for $category in $categories
+			order by lower-case($category/@name)
+			return
+				<div class="category">
+					<span>
+						<a class="category-anchor" href="main.xql?panel=search&amp;search=markup:{$category/@id}">{concat($category/@name, search-fns:get-markup-category-concepts-string($category))}</a>
+					</span>
+				</div>
+		else if ($conceptId) then
+			<div>No categories for concept: {$conceptId}</div>
+		else
+			<div>No categories defined!</div>
 	)
 };
