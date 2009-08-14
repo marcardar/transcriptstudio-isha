@@ -29,10 +29,6 @@ declare function all-concepts-panel:main() as element()*
 		,
 		<br/>
 		,
-		<div style="font-size:small;">Note: italics denotes concept referenced by at least one category</div>
-		,
-		<br/>
-		,
 		let $concepts := 
 			for $concept in distinct-values(($categoryConcepts, $coreConcepts, $subtypeConcepts, $synonymConcepts, $additionalConcepts))
 			order by $concept 
@@ -44,7 +40,7 @@ declare function all-concepts-panel:main() as element()*
 			(
 				<b id="{$startChar}">{upper-case($startChar)}:</b>
 			,
-				all-concepts-panel:create-table($filteredConcepts, $categoryConcepts)
+				all-concepts-panel:create-table($filteredConcepts)
 			)
 	)
 };
@@ -56,7 +52,7 @@ declare function all-concepts-panel:filter-concepts-for-start-char($startChar as
 	return $concept
 };
 
-declare function all-concepts-panel:create-table($concepts as xs:string*, $categoryConcepts as xs:string*) as element()*
+declare function all-concepts-panel:create-table($concepts as xs:string*) as element()*
 {
 	let $numConcepts := count($concepts)
 	return
@@ -71,13 +67,13 @@ declare function all-concepts-panel:create-table($concepts as xs:string*, $categ
 				let $numRows := max((xs:integer(ceiling(count($concepts) div $all-concepts-panel:numColumns)), min(($numConcepts, $all-concepts-panel:minRows))))
 				for $rowIndex in (1 to $numRows)
 				return
-					all-concepts-panel:create-table-row($rowIndex, $numRows, $concepts, $categoryConcepts)
+					all-concepts-panel:create-table-row($rowIndex, $numRows, $concepts)
 				}
 			</table>
 	)
 };
 
-declare function all-concepts-panel:create-table-row($rowIndex as xs:integer, $numRows as xs:integer, $concepts as xs:string*, $categoryConcepts as xs:string*) as element()
+declare function all-concepts-panel:create-table-row($rowIndex as xs:integer, $numRows as xs:integer, $concepts as xs:string*) as element()
 {
 	<tr>
 		{
@@ -87,11 +83,7 @@ declare function all-concepts-panel:create-table-row($rowIndex as xs:integer, $n
 		return
 		(
 			<td width="{$all-concepts-panel:columnWidth}" style="white-space: nowrap; background:Moccasin;">
-				{if ($conceptId = $categoryConcepts) then
-					<a class="category-concept-anchor" href="main.xql?panel=categories&amp;conceptId={$conceptId}"><i>{$conceptId}</i></a>
-				else
-					<a class="concept-anchor" href="main.xql?panel=search&amp;search={$conceptId}&amp;defaultType=markup">{$conceptId}</a>
-				}
+				<a class="concept-anchor" href="main.xql?panel=search&amp;search={$conceptId}&amp;defaultType=markup">{$conceptId}</a>
 			</td>
 		,
 			(: for horizontal separation :)

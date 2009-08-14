@@ -21,6 +21,14 @@ declare function search-panel:main() as element()*
 			normalize-space(request:get-parameter('defaultType', ('markup')))
 		else
 			()
+	let $groupResults := if (request:exists()) then
+			normalize-space(request:get-parameter('groupResults', ('true')))
+		else
+			()
+	let $markupUuid := if (request:exists()) then
+			normalize-space(request:get-parameter('markupUuid', ()))
+		else
+			()
 	return
 	(
 		<center><h2>Isha Foundation Transcript &amp; Event Search</h2></center>
@@ -61,7 +69,7 @@ declare function search-panel:main() as element()*
 					<hr/>
 				,
 					if ($searchString) then
-						search-fns:main($searchString, $defaultType)
+						search-fns:main($searchString, $defaultType, $groupResults, $markupUuid)
 					else
 						'Blank search string'
 				)
