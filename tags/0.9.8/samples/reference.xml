@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<reference>
+	<eventTypes>
+		<eventType id="a" newId="ie" name="Inner Engineering"/>
+		<eventType id="b" newId="iy" name="Isha Yoga"/>
+		<eventType id="c" newId="sc" name="Spiritual Cultural"/>
+		<eventType id="d" newId="sam" name="Samyama"/>
+		<eventType id="e" newId="who" name="Wholeness"/>
+		<eventType id="f" newId="bsp" name="BSP"/>
+		<eventType id="g" newId="ht" name="Himalayan Trek"/>
+		<eventType id="h" newId="ms" name="Mahashivarathri"/>
+		<eventType id="i" newId="if" name="Ishafest"/>
+		<eventType id="j" newId="mas" name="Mahasathsang"/>
+		<eventType id="k" newId="se" name="Special Event"/>
+		<eventType id="l" newId="cnf" name="Conference"/>
+		<eventType id="m" newId="mes" name="Meditator Sathsang"/>
+		<eventType id="n" newId="it" name="Intro Talk"/>
+		<eventType id="p" newId="res" name="Resident Sathsang"/>
+		<eventType id="q" newId="ip" name="Interview Press"/>
+		<eventType id="r" newId="va" name="Visit Activity"/>
+		<eventType id="s" newId="dhy" name="Dhyanalinga"/>
+		<eventType id="t" newId="aev" name="Ashram Event"/>
+		<eventType id="u" newId="pri" name="Prison"/>
+		<eventType id="v" newId="cns" name="Construction"/>
+		<eventType id="w" newId="tea" name="Teachers"/>
+		<eventType id="x" newId="pm" name="Private Meeting"/>
+		<eventType id="y" newId="bra" name="Bramhacharis"/>
+		<eventType id="aa" newId="vec" name="Vanashree Eco Center"/>
+		<eventType id="ab" newId="sha" name="Sharings"/>
+		<eventType id="ac" newId="arr" name="ARR"/>
+		<eventType id="ad" newId="cm" name="Committee Meet"/>
+		<eventType id="ae" newId="tsu" name="Tsunami 2005"/>
+		<eventType id="af" newId="arf" name="ARR Function"/>
+		<eventType id="ag" newId="???" name="???"/>
+		<eventType id="ah" newId="ihs" name="Isha Home School"/>
+		<eventType id="ai" newId="ir" name="Isha Rejuvenation"/>
+		<eventType id="aj" newId="soi" name="Sounds of Isha"/>
+		<eventType id="ak" newId="is" name="Isha Samskriti"/>
+		<eventType id="al" newId="al" name="Ashram Life"/>
+	</eventTypes>
+	<deviceCodes>
+		<deviceCode id="aud-1" name="Audio Recorder"/>
+		<deviceCode id="cam-1" name="Main Video Camera"/>
+		<deviceCode id="cam-2" name="Secondary Video Camera"/>
+		<deviceCode id="cam-3" name="Tertiary Video Camera"/>
+		<deviceCode id="pho-1" name="Photographer 1"/>
+		<deviceCode id="pho-2" name="Photographer 2"/>
+		<deviceCode id="pho-3" name="Photographer 3"/>
+		<deviceCode id="pho-4" name="Photographer 4"/>
+		<deviceCode id="pho-5" name="Photographer 5"/>
+	</deviceCodes>
+	<places>
+		<country name="India">
+			<location name="Isha Yoga Center">
+				<venue name="Spanda Hall"/>
+				<venue name="Biksha Hall"/>
+			</location>
+			<location name="Coimbatore"/>
+			<location name="Mumbai">
+				<venue name="Bombay Stock Exchange"/>
+			</location>
+		</country>
+		<country name="England">
+			<location name="London">
+				<venue name="Millennium Mayfair Hotel"/>
+			</location>
+		</country>
+	</places>
+	<languages>
+		<language id="english"/>
+		<language id="tamil"/>
+		<language id="other"/>
+	</languages>
+	<markupTypes>
+		<markupType id="topic" name="Topic" allowOutline="true" allowInline="false"/>
+		<markupType id="question" name="Question" allowOutline="true" allowInline="false"/>
+		<markupType id="joke" name="Joke" allowOutline="true" allowInline="false"/>
+		<markupType id="story" name="Story" allowOutline="true" allowInline="false"/>
+		<markupType id="quote" name="Quote" allowOutline="false" allowInline="true"/>
+		<markupType id="music" name="Music" allowOutline="true" allowInline="false"/>
+		<markupType id="performance" name="Performance" allowOutline="true" allowInline="false"/>
+		<markupType id="process" name="Process" allowOutline="true" allowInline="false"/>
+		<markupType id="soundbite" name="Sound Bite" allowOutline="true" allowInline="true"/>
+		<markupType id="analogy" name="Analogy" allowOutline="true" allowInline="true"/>
+		<markupType id="poem" name="Poem" allowOutline="true" allowInline="false"/>
+		<markupType id="chant" name="Chant" allowOutline="true" allowInline="false"/>
+	</markupTypes>
+	<markupCategories>
+		<markupCategory id="laotzubecomesthe1" name="Lao Tzu becomes the Chief Judge">
+			<tag type="markupType" value="story"/>
+			<tag type="concept" value="lao tzu"/>
+		</markupCategory>
+		<markupCategory id="mygreatgrandmother1" name="My Great Grandmother">
+			<tag type="markupType" value="story"/>
+			<tag type="concept" value="biography"/>
+		</markupCategory>
+		<markupCategory id="shivaandparvathi1" name="Shiva and Parvathi get married">
+			<tag type="markupType" value="story"/>
+			<tag type="concept" value="shiva"/>
+		</markupCategory>
+		<markupCategory id="boyfindsten1" name="Boy finds ten dollar bill">
+			<tag type="markupType" value="joke"/>
+		</markupCategory>
+		<markupCategory id="doyouwantto1" name="Do you want to listen to Alfonso's show?">
+			<tag type="markupType" value="joke"/>
+		</markupCategory>
+		<markupCategory id="shankaranpillai1" name="shankaran-pillai gets arrested shopping for Diwali">
+			<tag type="markupType" value="joke"/>
+			<tag type="concept" value="shankaran-pillai"/>
+		</markupCategory>
+		<markupCategory id="shankaranpillai2" name="shankaran-pillai goes to women's liberation meeting">
+			<tag type="markupType" value="joke"/>
+			<tag type="concept" value="shankaran-pillai"/>
+		</markupCategory>
+		<markupCategory id="shankaranpillai3" name="shankaran-pillai learns Vedanta">
+			<tag type="markupType" value="joke"/>
+			<tag type="concept" value="shankaran-pillai"/>
+		</markupCategory>
+		<markupCategory id="shankaranpillai4" name="shankaran-pillai gets his donkey painted red">
+			<tag type="markupType" value="joke"/>
+			<tag type="concept" value="shankaran-pillai"/>
+		</markupCategory>
+		<markupCategory id="popechauffeur1" name="Pope Chauffeur">
+			<tag type="markupType" value="joke"/>
+			<tag type="concept" value="pope"/>
+		</markupCategory>
+		<markupCategory id="thinkingspirituality1" name="Thinking spirituality">
+			<tag type="markupType" value="joke"/>
+			<tag type="concept" value="spiritual"/>
+		</markupCategory>
+		<markupCategory id="womanmystic1" name="Woman mystic by the lake">
+			<tag type="markupType" value="joke"/>
+		</markupCategory>
+		<markupCategory id="whysuffering1" name="Why Suffering?">
+			<tag type="markupType" value="topic"/>
+			<tag type="markupType" value="question"/>
+			<tag type="concept" value="suffering"/>
+		</markupCategory>
+		<markupCategory id="knowinglife1" name="Knowing Life">
+			<tag type="markupType" value="topic"/>
+			<tag type="concept" value="enlightenment"/>
+			<tag type="concept" value="life"/>
+		</markupCategory>
+		<markupCategory id="doyouhavefree1" name="Do we have free will, or is everything pre-destined?">
+			<tag type="markupType" value="question"/>
+			<tag type="concept" value="destiny"/>
+			<tag type="concept" value="karma"/>
+		</markupCategory>
+		<markupCategory id="whatarethemain1" name="What are the main benefits of sitting in the Dhyanalinga temple?">
+			<tag type="markupType" value="question"/>
+			<tag type="concept" value="dhyanalinga"/>
+		</markupCategory>
+		<markupCategory id="howcaniknow1" name="How can I know the life around me?">
+			<tag type="markupType" value="question"/>
+			<tag type="concept" value="life"/>
+		</markupCategory>
+		<markupCategory id="whatisaguru1" name="What is a guru?">
+			<tag type="markupType" value="question"/>
+			<tag type="concept" value="guru"/>
+		</markupCategory>
+		<markupCategory id="ifthecreatorscreation1" name="If the Creator's creation is perfect, why is there so much suffering in the world?">
+			<tag type="markupType" value="question"/>
+			<tag type="concept" value="creation"/>
+			<tag type="concept" value="suffering"/>
+		</markupCategory>
+		<markupCategory id="canyoutalkaboutishas1" name="Can you talk about Isha's prison-programs?">
+			<tag type="markupType" value="question"/>
+			<tag type="concept" value="prison-programs"/>
+		</markupCategory>
+		<markupCategory id="doyouhaveplansto1" name="Do you have plans to extend the prison-programs to other parts of India and abroad?">
+			<tag type="markupType" value="question"/>
+			<tag type="concept" value="prison-programs"/>
+		</markupCategory>
+		<markupCategory id="yousaidifone1" name="You said if one is willing it just takes a moment to transcend. What do I need to do for this to happen?">
+			<tag type="markupType" value="question"/>
+		</markupCategory>
+		<markupCategory id="soundsofisha1" name="Sounds of Isha">
+			<tag type="markupType" value="music"/>
+		</markupCategory>
+		<markupCategory id="outsideartist1" name="Outside Artist">
+			<tag type="markupType" value="music"/>
+		</markupCategory>
+		<markupCategory id="recordedmusic1" name="Recorded Music">
+			<tag type="markupType" value="music"/>
+		</markupCategory>
+		<markupCategory id="meditationprocess1" name="Meditation Process">
+			<tag type="markupType" value="process"/>
+		</markupCategory>
+	</markupCategories>
+	<coreConcepts>
+		<concept id="life"/>
+		<concept id="after-life"/>
+		<concept id="guru">
+			<subtype idRef="sadhguru"/>
+			<subtype idRef="dhyanalinga"/>
+		</concept>
+		<concept id="being"/>
+		<concept id="master">
+			<subtype idRef="sadhguru"/>
+			<subtype idRef="jesus"/>
+			<subtype idRef="buddha"/>
+		</concept>
+		<concept id="mystic">
+			<subtype idRef="sadhguru"/>
+		</concept>
+		<concept id="dhyanalinga"/>
+		<concept id="isha"/>
+		<concept id="india"/>
+		<concept id="sadhguru"/>
+		<concept id="jesus"/>
+		<concept id="buddha"/>
+		<concept id="shiva"/>
+		<concept id="krishna"/>
+		<concept id="united-states-of-america"/>
+		<concept id="usa"/>
+	</coreConcepts>
+	<synonymGroups>
+		<synonymGroup>
+			<synonym idRef="enlightenment"/>
+			<synonym idRef="liberation"/>
+		</synonymGroup>
+		<synonymGroup>
+			<synonym idRef="guru"/>
+			<synonym idRef="master"/>
+		</synonymGroup>
+	</synonymGroups>
+</reference>
