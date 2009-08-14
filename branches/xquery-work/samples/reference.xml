@@ -72,14 +72,21 @@
 		<language id="other"/>
 	</languages>
 	<markupTypes>
-		<markupType id="topic" name="Topic" allowOutline="true" allowInline="false"/>
-		<markupType id="question" name="Question" allowOutline="true" allowInline="false"/>
-		<markupType id="joke" name="Joke" allowOutline="true" allowInline="false"/>
-		<markupType id="story" name="Story" allowOutline="true" allowInline="false"/>
-		<markupType id="quote" name="Quote" allowOutline="false" allowInline="true"/>
-		<markupType id="music" name="Music" allowOutline="true" allowInline="false"/>
-		<markupType id="process" name="Process" allowOutline="true" allowInline="false"/>
-		<markupType id="soundbite" name="Sound Bite" allowOutline="true" allowInline="true"/>
+        	<markupType id="topic" name="Topic" allowOutline="true" allowInline="false" searchOrder="2"/>
+        	<markupType id="question" name="Question" allowOutline="true" allowInline="false" searchOrder="1"/>
+        	<markupType id="joke" name="Joke" allowOutline="true" allowInline="false" searchOrder="7"/>
+        	<markupType id="story" name="Story" allowOutline="true" allowInline="false" searchOrder="6"/>
+        	<markupType id="quote" name="Quote" allowOutline="false" allowInline="true" searchOrder="4"/>
+        	<markupType id="music" name="Music" allowOutline="true" allowInline="false" searchOrder="12"/>
+        	<markupType id="performance" name="Performance" allowOutline="true" allowInline="false" searchOrder="13"/>
+        	<markupType id="process" name="Process" allowOutline="true" allowInline="false" searchOrder="10"/>
+        	<markupType id="soundbite" name="Sound Bite" allowOutline="true" allowInline="true" searchOrder="3"/>
+        	<markupType id="chant" name="Chant" allowOutline="true" allowInline="false" searchOrder="11"/>
+        	<markupType id="poem" name="Poem" allowOutline="true" allowInline="false" searchOrder="15"/>
+        	<markupType id="analogy" name="Analogy" allowOutline="true" allowInline="true" searchOrder="5"/>
+        	<markupType id="intro" name="Analogy" allowOutline="true" allowInline="true" searchOrder="8"/>
+        	<markupType id="class" name="Analogy" allowOutline="true" allowInline="true" searchOrder="9"/>
+        	<markupType id="sharing" name="Analogy" allowOutline="true" allowInline="true" searchOrder="14"/>
 	</markupTypes>
 	<markupCategories>
 		<markupCategory id="laotzubecomesthe1" name="Lao Tzu becomes the Chief Judge">
