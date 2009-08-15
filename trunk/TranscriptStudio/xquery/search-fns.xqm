@@ -117,7 +117,7 @@ declare function search-fns:generate-markup-class-representatives($matchedMarkup
 		return
 			functx:add-attributes($classMarkups[1], (xs:QName('sessionId'), xs:QName('classType'), xs:QName('classCount')), ($classMarkups[1]/ancestor::session/@id, 'type', $classCount))
 
-	for $markupsClassRepresentatives in $categoryMarkupsClassRepresentatives
+	for $markupsClassRepresentatives in ($categoryMarkupsClassRepresentatives, $conceptMarkupsClassRepresentatives, $typeMarkupsClassRepresentatives)
 	let $markupType := $markupsClassRepresentatives/tag[@type = "markupType"]/@value
 	let $searchPriority := $utils:referenceCollection//markupType[@id = $markupType]/xs:integer(@searchOrder)
 	order by $searchPriority
