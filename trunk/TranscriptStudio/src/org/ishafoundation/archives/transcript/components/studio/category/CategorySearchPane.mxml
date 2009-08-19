@@ -23,7 +23,7 @@
 		[Bindable]
 		public var allowRemove:Boolean = true;
 				
-		private var alreadySearched:Boolean = false;		
+		private var alreadySearched:Boolean = false;	
 		public var initialCategoryId:String = null;
     	
 		private function init():void {
@@ -152,7 +152,7 @@
 				return "All";
 			}
 			else {
-				return this.referenceMgr.getCategoryTypeNameFromId(markupTypeId);
+				return this.referenceMgr.getCategoryTypeNameFromId(markupTypeId); 
 			}
 		}
 		
