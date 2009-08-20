@@ -107,6 +107,7 @@
 					//User didn't want the search to be rerun for category Id (issue 169)
 					//performAutoSearch(categoryId);
 
+					selectedCategoryId = categoryId;
 					dispatchCategoryEditEvent();
 					searchClicked();
 				}, function(msg:String):void {
