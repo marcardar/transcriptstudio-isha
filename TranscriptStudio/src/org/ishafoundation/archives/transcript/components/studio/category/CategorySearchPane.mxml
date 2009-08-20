@@ -103,8 +103,12 @@
 					else {
 						Alert.show("Successfully edited category");						
 					}
-					performAutoSearch(categoryId);
+
+					//User didn't want the search to be rerun for category Id (issue 169)
+					//performAutoSearch(categoryId);
+
 					dispatchCategoryEditEvent();
+					searchClicked();
 				}, function(msg:String):void {
 					Alert.show(msg, "Failed");
 				});
