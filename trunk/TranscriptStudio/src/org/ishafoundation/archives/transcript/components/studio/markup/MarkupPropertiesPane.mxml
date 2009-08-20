@@ -105,11 +105,8 @@
 			categorySearchDialog.categorySearchPane.allowRemove = false;
 			if (markupAttrs.markupCategoryId != null) {
 				categorySearchDialog.categorySearchPane.initialCategoryId = markupAttrs.markupCategoryId;
-				categorySearchDialog.categorySearchPane.typeComboBox.selectedItem = this.markupAttrs.markupTypeId;
-			} else {
-				categorySearchDialog.categorySearchPane.typeComboBox.selectedItem = "all";
 			}
-            
+            categorySearchDialog.categorySearchPane.typeComboBox.selectedItem = this.markupAttrs.markupTypeId;
 			categorySearchDialog.addEventListener(Event.COMPLETE, function(event:Event):void {
 				if (categorySearchDialog.categorySearchPane.selectedCategoryId != null) {
 					markupAttrs.markupCategoryId = categorySearchDialog.categorySearchPane.selectedCategoryId;

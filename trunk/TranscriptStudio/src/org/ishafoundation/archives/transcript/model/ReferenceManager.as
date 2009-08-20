@@ -127,12 +127,10 @@ package org.ishafoundation.archives.transcript.model
 				return new Array();
 			}
 			else {
-				var sortedResultSet:Array = resultSet.toArray();
-				sortedResultSet.sortOn("title");
-				return sortedResultSet
+				return resultSet.toArray();
 			}
 		}
-
+		
 		private function getConceptIdsForCategory(categoryId:String):Array {
 			var result:Array = new Array();
 			var categoryElement:XML = getCategoryElement(categoryId);
@@ -145,14 +143,9 @@ package org.ishafoundation.archives.transcript.model
 		
 		public function getAllCategories():Array {
 			var categoryElements:XMLList = this.referenceXML.markupCategories.markupCategory;
-			var xmlCategories:Array = new Array();
 			var result:Array = new Array();
 			for each (var categoryElement:XML in categoryElements) {
-				xmlCategories.push(categoryElement);
-			}
-			xmlCategories.sortOn(categoryElement.tag.(@type == "markupType").@value);
-			for each (var xmlCategory:XML in xmlCategories) {
-				result.push(xmlCategory.@id.toString());
+				result.push(categoryElement.@id.toString());
 			}
 			return result;
 		}
