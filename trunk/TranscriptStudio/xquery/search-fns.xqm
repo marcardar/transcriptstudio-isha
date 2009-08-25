@@ -225,7 +225,7 @@ declare function search-fns:markup-search($baseMarkups as element()*, $searchTer
 			else
 				let $expandedSearchTerm as xs:string* := search-fns:expand-concept($searchTerm)
 				return
-					functx:distinct-nodes((search-fns:markups-for-any-concept($baseMarkups, $expandedSearchTerm), search-fns:markups-for-category-name-match($baseMarkups, $searchTerm)))
+					functx:distinct-nodes((search-fns:markups-for-any-concept($baseMarkups, $expandedSearchTerm), search-fns:markups-for-category-name-match($baseMarkups, $searchTerm), search-fns:markups-for-concept-name-match($baseMarkups, $searchTerm)))
 		return search-fns:markup-search($newBaseMarkups, $newTerms)
 };
 
@@ -344,6 +344,15 @@ declare function search-fns:markups-for-category-name-match($baseMarkups as elem
 	return $markup
 };
 
+declare function search-fns:markups-for-concept-name-match($baseMarkups as element()*, $searchTerm as xs:string*) as element()*
+{
+	let $categories := $utils:referenceCollection//markupCategory
+	let $categoryConcepts := $categories/tag[@type eq "concept"] 
+	let $partialConceptMatchCategoryIds := $categoryConcepts[search-fns:matches-start-of-word(xs:string(@value), $searchTerm)]/../@id
+	for $markup in $baseMarkups/tag[@value = $partialConceptMatchCategoryIds][@type = 'markupCategory']/..
+	return $markup
+};
+
 declare function search-fns:markup-for-uuid($baseMarkups as element()*, $markupUuid as xs:string) as element()
 {
 	let $sessionId := substring-before($markupUuid, '#')
@@ -367,7 +376,7 @@ declare function search-fns:markup-as-table-row($markup as element(), $prevSearc
 	let $session := $markup/ancestor::session
 	let $markupTypeId := $markup/tag[@type = 'markupType']/@value
 	let $markupType := $utils:referenceCollection/reference/markupTypes/markupType[@id = $markupTypeId]
-	let $additionalConcepsList := search-fns:get-additional-concepts-list($markup)
+	let $additionalConceptsList := search-fns:get-additional-concepts-list($markup)
 	let $categoryId := $markup/tag[@type = 'markupCategory']/@value
 	let $markupCategory := $utils:referenceCollection/reference/markupCategories/markupCategory[@id = $categoryId]
 	let $markupCategoryName := if (exists($markupCategory)) then
@@ -391,7 +400,7 @@ declare function search-fns:markup-as-table-row($markup as element(), $prevSearc
 	let $searchString := 
 		if (exists($categoryId)) then concat($markupTypeId, ' ', $categoryId)
 		else
-			(if (not($additionalConcepsList eq '')) then concat($markupTypeId, ' ', $additionalConcepsList)
+			(if (not($additionalConceptsList eq '')) then concat($markupTypeId, ' ', $additionalConceptsList)
 				else ()
 			)
 	return
@@ -585,9 +594,11 @@ declare function search-fns:filter-categories($categories as element()*, $search
 		let $expandedSearchTerm as xs:string* := search-fns:expand-concept($searchTerm)
 		let $newTerms := remove($searchTerms, 1)
 		let $expandedCategories := $categories/tag[@value = $expandedSearchTerm][@type = "concept"]/..
-		let $nameMatchCategories := $categories[search-fns:matches-start-of-word(xs:string(@name), $searchTerm)]
-		let $newCategories := 
-			functx:distinct-nodes(($expandedCategories, $nameMatchCategories))
+		let $partialNameMatchCategories := $categories[search-fns:matches-start-of-word(xs:string(@name), $searchTerm)]
+		let $categoryConcepts := $utils:referenceCollection//markupCategory/tag[@type eq "concept"] 
+		let $partialConceptMatchCategories := $categoryConcepts[search-fns:matches-start-of-word(xs:string(@value), $searchTerm)]/..
+		let $newCategories := $utils:referenceCollection/
+			functx:distinct-nodes(($expandedCategories, $partialNameMatchCategories, $partialConceptMatchCategories))
 		return
 			search-fns:filter-categories($newCategories, $newTerms, $markupType)	
 };
