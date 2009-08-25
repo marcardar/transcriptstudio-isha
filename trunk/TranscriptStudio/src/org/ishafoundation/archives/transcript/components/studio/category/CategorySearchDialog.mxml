@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:categoryNS="org.ishafoundation.archives.transcript.components.studio.category.*" alpha="2.0" layout="absolute" x="30" y="30" width="604" height="428" title="Search predefined categories" horizontalAlign="center" creationComplete="init()">
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:categoryNS="org.ishafoundation.archives.transcript.components.studio.category.*" alpha="2.0" layout="absolute" x="30" y="30" width="804" height="428" title="Search predefined categories" horizontalAlign="center" creationComplete="init()">
 	<mx:Script>
     <![CDATA[
     	import mx.binding.utils.BindingUtils;
