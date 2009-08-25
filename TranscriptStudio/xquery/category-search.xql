@@ -13,7 +13,7 @@ let $categories :=
 	if ($markupType eq 'all') then 
 		$reference/markupCategories/markupCategory
 	else
-		$reference/markupCategories/markupCategory/tag[@type eq "markupType"][1][@value eq $markupType]/..
+		$reference/markupCategories/markupCategory[(tag[@type eq "markupType"])[1][@value eq $markupType]]
 return
 	<result>
 	{
