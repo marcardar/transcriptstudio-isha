@@ -9,13 +9,15 @@
 		import mx.utils.StringUtil;
 		import name.carter.mark.flex.util.icon.IconUtils;
 		import mx.managers.PopUpManager;
+		import org.ishafoundation.archives.transcript.db.*;
 		import org.ishafoundation.archives.transcript.model.ReferenceManager;
 		import name.carter.mark.flex.util.collection.HashSet;
 		import name.carter.mark.flex.util.collection.ISet;
 		import mx.collections.ArrayCollection;
+		import mx.controls.Alert;
 		
 		public static const CATEGORY_EDIT_EVENT:String = "CATEGORY_EDIT_EVENT";
-		
+
 		[Bindable]
 		public var referenceMgr:ReferenceManager;
 		public var selectedCategoryId:String;
@@ -36,30 +38,9 @@
     		this.selectedCategoryId = resultsList.selectedItem as String;
     	}
     	
-    	internal function searchClicked():void {
-    		var searchTermArray:Array = searchTextInput.text.split(" ");
-    		var searchTerms:ISet = new HashSet();
-    		for each (var searchTerm:String in searchTermArray) {
-    			var s:String = StringUtil.trim(searchTerm);
-    			if (s.length > 0) {
-    				searchTerms.add(s);
-    			}
-    		}
-    		var markupTypeId:String = typeComboBox.selectedItem.toString();
-    		if (markupTypeId != "all") {
-	    		searchTerms.add(new MTagImpl("markupType", markupTypeId));
-	    	}
-	    	var results:Array;
-	    	if (searchTerms.size() == 0) {
-	    		trace("Getting all markup categories"); 
-	    		results = this.referenceMgr.getAllCategories();
-	    	}
-	    	else {
-	    		trace("Using search terms: " + searchTerms);
-				results = this.referenceMgr.searchCategories(searchTerms);
-	    	}
-			resultsList.dataProvider = new ArrayCollection(results);
-    	}
+    	public function searchClicked():void {
+		resultsList.dataProvider = referenceMgr.filterCategories(typeComboBox.selectedItem.toString(), searchTextInput.text);	}
+			
 
 		private function dispatchCategoryEditEvent():void {
 			dispatchEvent(new Event(CATEGORY_EDIT_EVENT));
@@ -204,6 +185,10 @@
 			var result:MessagePopUp = MessagePopUp.display(this, title, "Please wait...", 250);
 			result.okButton.enabled = false;
 			return result;
+		}
+
+		private function showAlert(msg:String, title:String = null):void {
+			Alert.show(msg, title, 0x4, this);			
 		}
 	]]>
 	</mx:Script>
