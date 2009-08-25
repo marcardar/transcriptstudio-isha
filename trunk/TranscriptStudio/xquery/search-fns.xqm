@@ -575,7 +575,7 @@ declare function search-fns:substring-before-match($arg as xs:string?, $regex as
 
 declare function search-fns:filter-categories($categories as element()*, $searchTerms as xs:string*, $markupType as xs:string) as element()*
 {
-	if (not(exists($searchTerms))) then
+	if (not(exists($searchTerms)) or $searchTerms eq '') then
 		$categories
 	else
 		let $markupType :=
