@@ -339,7 +339,7 @@ declare function search-fns:markups-for-category($baseMarkups as element()*, $ca
 
 declare function search-fns:markups-for-category-name-match($baseMarkups as element()*, $searchTerm as xs:string*) as element()*
 {
-	let $categoryIds := $utils:referenceCollection//markupCategory[functx:contains-word(xs:string(@name), $searchTerm)]/@id
+	let $categoryIds := $utils:referenceCollection//markupCategory[search-fns:matches-start-of-word(xs:string(@name), $searchTerm)]/@id
 	for $markup in $baseMarkups/tag[@value = $categoryIds][@type = 'markupCategory']/..
 	return $markup
 };
@@ -575,7 +575,7 @@ declare function search-fns:substring-before-match($arg as xs:string?, $regex as
 
 declare function search-fns:filter-categories($categories as element()*, $searchTerms as xs:string*, $markupType as xs:string) as element()*
 {
-	if (not(exists($searchTerms)) or $searchTerms eq '') then
+	if (not(exists($searchTerms)) or fn:normalize-space($searchTerms) eq '') then
 		$categories
 	else
 		let $markupType :=
@@ -584,9 +584,22 @@ declare function search-fns:filter-categories($categories as element()*, $search
 		let $searchTerm as xs:string := $searchTerms[1]
 		let $expandedSearchTerm as xs:string* := search-fns:expand-concept($searchTerm)
 		let $newTerms := remove($searchTerms, 1)
+		let $expandedCategories := $categories/tag[@value = $expandedSearchTerm][@type = "concept"]/..
+		let $nameMatchCategories := $categories[search-fns:matches-start-of-word(xs:string(@name), $searchTerm)]
 		let $newCategories := 
-			functx:distinct-nodes(($categories/tag[@value = $expandedSearchTerm][@type = "concept"]/.., $categories[functx:contains-word(xs:string(@name), $searchTerm)]))
+			functx:distinct-nodes(($expandedCategories, $nameMatchCategories))
 		return
 			search-fns:filter-categories($newCategories, $newTerms, $markupType)	
+};
+
+declare function search-fns:matches-start-of-word($string as xs:string?, $term as xs:string) as xs:boolean
+{
+	let $upString := upper-case($string)
+	let $upTerm := upper-case($term)
+	return
+		if (string-length($term) < 3) then
+			false()
+		else
+			matches($upString, concat("^(.*\W)?", $upTerm, ".*"))
 };
 
