@@ -22,6 +22,8 @@ package org.ishafoundation.archives.transcript.model
 {
 	import mx.binding.utils.ChangeWatcher;
 	import mx.events.PropertyChangeEvent;
+	import mx.rpc.http.HTTPService;
+	import mx.collections.ArrayCollection;
 	
 	import name.carter.mark.flex.project.mdoc.MTag;
 	import name.carter.mark.flex.util.Utils;
@@ -44,6 +46,7 @@ package org.ishafoundation.archives.transcript.model
 
 		private var xmlRetrieverStorer:XMLRetrieverStorer;
 		private var xqueryExecutor:XQueryExecutor;
+
 		[Bindable]
 		public var isDbaUser:Boolean;
 		
@@ -75,6 +78,26 @@ package org.ishafoundation.archives.transcript.model
 			});
 		}
 		
+		public function filterCategories(markupType:String, searchString:String):ArrayCollection {
+			var filteredCategories:ArrayCollection = new ArrayCollection();
+			xqueryExecutor.executeStoredXQuery("category-search.xql", {markupType:markupType, searchString:searchString}, 
+				function(resultXML:XML):void {
+				 	var arr:Array = new Array();
+					var categoryXMLList:XMLList = resultXML.markupCategory;
+					for each (var categoryXML:XML in categoryXMLList) {
+						arr.push(categoryXML.@id.toString());
+					}
+					filteredCategories.source = arr;
+				},
+    				function(msg:String):void {
+					trace("ERROR generating filtered categories array: " + msg);
+				}, 
+				HTTPService.RESULT_FORMAT_E4X
+			);
+			return filteredCategories;
+		}
+
+
 		public function loadReferences(successFunc:Function, failureFunc:Function):void {
 			// recreate the xmlRetriever because the old one might be still in progress (not timedout)
 			trace("loadReferences");

@@ -573,4 +573,20 @@ declare function search-fns:substring-before-match($arg as xs:string?, $regex as
 	tokenize($arg, $regex)[1]
 };
 
+declare function search-fns:filter-categories($categories as element()*, $searchTerms as xs:string*, $markupType as xs:string) as element()*
+{
+	if (not(exists($searchTerms))) then
+		$categories
+	else
+		let $markupType :=
+			if (not(exists($markupType))) then 'all'
+			else $markupType
+		let $searchTerm as xs:string := $searchTerms[1]
+		let $expandedSearchTerm as xs:string* := search-fns:expand-concept($searchTerm)
+		let $newTerms := remove($searchTerms, 1)
+		let $newCategories := 
+			functx:distinct-nodes(($categories/tag[@value = $expandedSearchTerm][@type = "concept"]/.., $categories[functx:contains-word(xs:string(@name), $searchTerm)]))
+		return
+			search-fns:filter-categories($newCategories, $newTerms, $markupType)	
+};
 
