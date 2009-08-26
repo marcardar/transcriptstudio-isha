@@ -584,7 +584,7 @@ declare function search-fns:substring-before-match($arg as xs:string?, $regex as
 
 declare function search-fns:filter-categories($categories as element()*, $searchTerms as xs:string*, $markupType as xs:string) as element()*
 {
-	if (not(exists($searchTerms)) or fn:normalize-space($searchTerms) eq '') then
+	if (not(exists($searchTerms))) then
 		$categories
 	else
 		let $markupType :=
@@ -596,7 +596,7 @@ declare function search-fns:filter-categories($categories as element()*, $search
 		let $expandedCategories := $categories/tag[@value = $expandedSearchTerm][@type = "concept"]/..
 		let $partialNameMatchCategories := $categories[search-fns:matches-start-of-word(xs:string(@name), $searchTerm)]
 		let $categoryConcepts := $utils:referenceCollection//markupCategory/tag[@type eq "concept"] 
-		let $partialConceptMatchCategories := $categoryConcepts[search-fns:matches-start-of-word(xs:string(@value), $searchTerm)]/..
+		let $partialConceptMatchCategories := ($categories intersect $categoryConcepts[search-fns:matches-start-of-word(xs:string(@value), $searchTerm)]/..)
 		let $newCategories := $utils:referenceCollection/
 			functx:distinct-nodes(($expandedCategories, $partialNameMatchCategories, $partialConceptMatchCategories))
 		return
