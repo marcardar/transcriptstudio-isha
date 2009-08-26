@@ -5,15 +5,15 @@ xquery version "1.0";
 import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
 import module namespace search-fns = "http://www.ishafoundation.org/ts4isha/xquery/search-fns" at "search-fns.xqm";
 
-let $searchString := request:get-parameter('searchString', ())
+let $searchString := tokenize(request:get-parameter('searchString', ()), "\s+")
 let $markupType := request:get-parameter('markupType', ('all'))
 
 let $reference := $utils:referenceCollection/reference
 let $categories := 
 	if ($markupType eq 'all') then 
-		$reference/markupCategories/markupCategory
+		$reference//markupCategory
 	else
-		$reference/markupCategories/markupCategory[(tag[@type eq "markupType"])[1][@value eq $markupType]]
+		$reference//markupCategory[(tag[@type eq "markupType"])[1][@value eq $markupType]]
 return
 	<result>
 	{
