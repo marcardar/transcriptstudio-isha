@@ -114,10 +114,12 @@
 					markupAttrs.markupCategoryId = categorySearchDialog.categorySearchPane.selectedCategoryId;
 					markupAttrs.markupCategorySuggestion = "";
 					var markupTypeIds:Array = referenceMgr.getCategoryTypeIdsForCategoryId(markupAttrs.markupCategoryId); 
-					if (markupTypeIds.indexOf(markupAttrs.markupTypeId) < 0) {
+
+					//We don't want this functionality any more (issue 167)
+					//if (markupTypeIds.indexOf(markupAttrs.markupTypeId) < 0) {
 						// the type id is not compatible with the types of this predefined category
-						markupAttrs.markupTypeId = markupTypeIds[0];
-					}
+					//	markupAttrs.markupTypeId = markupTypeIds[0];
+					//}
 					somePropertyChanged();
 				}
 			}); 
