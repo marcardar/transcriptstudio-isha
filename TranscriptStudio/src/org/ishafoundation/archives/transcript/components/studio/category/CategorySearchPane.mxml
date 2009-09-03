@@ -15,12 +15,14 @@
 		import name.carter.mark.flex.util.collection.ISet;
 		import mx.collections.ArrayCollection;
 		import mx.controls.Alert;
+		import mx.events.CollectionEvent;
 		
 		public static const CATEGORY_EDIT_EVENT:String = "CATEGORY_EDIT_EVENT";
 
 		[Bindable]
 		public var referenceMgr:ReferenceManager;
 		public var selectedCategoryId:String;
+		public var filteredCategories:ArrayCollection;
 		
 		[Bindable]
 		public var allowRemove:Boolean = true;
@@ -39,7 +41,8 @@
     	}
     	
     	public function searchClicked():void {
-		resultsList.dataProvider = referenceMgr.filterCategories(typeComboBox.selectedItem.toString(), searchTextInput.text);	}
+		referenceMgr.filterCategories(typeComboBox.selectedItem.toString(), searchTextInput.text);
+		resultsList.dataProvider = referenceMgr.filteredCategories;	}
 			
 
 		private function dispatchCategoryEditEvent():void {
@@ -80,17 +83,16 @@
 				referenceMgr.editCategory(categoryName, typeIds, concepts, categoryId, function(categoryId:String):void {
 					if (newCategory) {
 						Alert.show("Successfully added new category");
+						performAutoSearch(categoryId);
 					}
 					else {
 						Alert.show("Successfully edited category");						
 					}
 
-					//User didn't want the search to be rerun for category Id (issue 169)
-					//performAutoSearch(categoryId);
-
 					selectedCategoryId = categoryId;
 					dispatchCategoryEditEvent();
-					searchClicked();
+					resultsList.invalidateList();
+					
 				}, function(msg:String):void {
 					Alert.show(msg, "Failed");
 				});
@@ -128,7 +130,7 @@
 		}
 
 		private static function getCategoryTypeIdsForComboBox(referenceMgr:ReferenceManager):ArrayCollection {
-			var result:ArrayCollection = new ArrayCollection(referenceMgr.getCategoryTypeIds(true, true));
+			var result:ArrayCollection = new ArrayCollection(referenceMgr.getCategoryTypeIds(true, false));
 			result.addItemAt("all", 0);
 			return result;
 		}
@@ -192,6 +194,7 @@
 		}
 	]]>
 	</mx:Script>
+
 	<mx:VBox width="100%" height="100%">
 		<mx:HBox width="100%">
 			<mx:ComboBox id="typeComboBox" labelFunction="comboBoxLabelFunc" dataProvider="{getCategoryTypeIdsForComboBox(this.referenceMgr)}"/>
@@ -199,7 +202,7 @@
 			<mx:Button label="Search" id="searchButton" click="searchClicked()" width="80"/>			
 		</mx:HBox>
 		<mx:HBox width="100%" height="100%">
-			<mx:List width="100%" height="100%" id="resultsList" horizontalScrollPolicy="auto" allowMultipleSelection="false" labelFunction="resultLabelFunc" iconFunction="{getIconFunc()}" change="selectionChanged()"/>		
+			<mx:List width="100%" height="100%" id="resultsList" verticalScrollPolicy="auto" horizontalScrollPolicy="auto" allowMultipleSelection="false" labelFunction="resultLabelFunc" iconFunction="{getIconFunc()}" change="selectionChanged()" />		
 		</mx:HBox>
 	</mx:VBox>
 	<mx:VBox id="adminVBox" height="100%" horizontalAlign="center" verticalAlign="middle" visible="{referenceMgr.isDbaUser}" includeInLayout="{referenceMgr.isDbaUser}">

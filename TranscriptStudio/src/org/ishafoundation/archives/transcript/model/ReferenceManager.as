@@ -49,6 +49,8 @@ package org.ishafoundation.archives.transcript.model
 
 		[Bindable]
 		public var isDbaUser:Boolean;
+
+		public var filteredCategories:ArrayCollection;
 		
 		[Bindable]
 		public var referenceXML:XML;
@@ -78,8 +80,8 @@ package org.ishafoundation.archives.transcript.model
 			});
 		}
 		
-		public function filterCategories(markupType:String, searchString:String):ArrayCollection {
-			var filteredCategories:ArrayCollection = new ArrayCollection();
+		public function filterCategories(markupType:String, searchString:String):void {
+			filteredCategories = new ArrayCollection();
 			xqueryExecutor.executeStoredXQuery("category-search.xql", {markupType:markupType, searchString:searchString}, 
 				function(resultXML:XML):void {
 				 	var arr:Array = new Array();
@@ -94,7 +96,6 @@ package org.ishafoundation.archives.transcript.model
 				}, 
 				HTTPService.RESULT_FORMAT_E4X
 			);
-			return filteredCategories;
 		}
 
 
