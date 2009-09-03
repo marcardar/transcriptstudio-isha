@@ -31,7 +31,7 @@
 		}
 		
 		private function getCategoryTypeIdsForComboBox():ArrayCollection {
-			var result:ArrayCollection = new ArrayCollection(this.referenceMgr.getCategoryTypeIds(true, true));
+			var result:ArrayCollection = new ArrayCollection(this.referenceMgr.getCategoryTypeIds(true, false));
 			return result;
 		}
 		

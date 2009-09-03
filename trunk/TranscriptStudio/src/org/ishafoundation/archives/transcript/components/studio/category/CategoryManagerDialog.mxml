@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:categoryNS="org.ishafoundation.archives.transcript.components.studio.category.*" alpha="2.0" layout="vertical" x="30" y="30" width="604" height="428" title="Category Editor" horizontalAlign="center" paddingTop="10" paddingBottom="10" paddingLeft="10" paddingRight="10">
+<mx:TitleWindow xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:categoryNS="org.ishafoundation.archives.transcript.components.studio.category.*" alpha="2.0" layout="vertical" x="30" y="30" width="804" height="428" title="Category Editor" horizontalAlign="center" paddingTop="10" paddingBottom="10" paddingLeft="10" paddingRight="10">
 	<mx:Script>
     <![CDATA[
     	import name.carter.mark.flex.util.icon.IconUtils;
