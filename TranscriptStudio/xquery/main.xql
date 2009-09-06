@@ -135,7 +135,7 @@ return
 			}
 		</head>
 		<body>
-			<div class="content">
+			<div id="top" class="content">
 				{
 					if ($loginStatus) then
 					(

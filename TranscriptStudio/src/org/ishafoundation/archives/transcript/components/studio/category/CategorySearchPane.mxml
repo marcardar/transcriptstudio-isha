@@ -82,11 +82,11 @@
 				var concepts:Array = categoryEditDialog.concepts.toArray();
 				referenceMgr.editCategory(categoryName, typeIds, concepts, categoryId, function(categoryId:String):void {
 					if (newCategory) {
-						Alert.show("Successfully added new category");
+						//Alert.show("Successfully added new category");
 						performAutoSearch(categoryId);
 					}
 					else {
-						Alert.show("Successfully edited category");						
+						//Alert.show("Successfully edited category");						
 					}
 
 					selectedCategoryId = categoryId;

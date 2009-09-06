@@ -10,44 +10,89 @@ import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/ut
 
 declare function categories-panel:main() as element()*
 {	
-	let $conceptId := request:get-parameter('conceptId', ())
 	let $reference := $utils:referenceCollection/reference
-	let $categories := 
-		if ($conceptId) then
-			$reference/markupCategories/markupCategory/tag[@type eq 'concept' and @value eq $conceptId]/..
-		else
-			$reference/markupCategories/markupCategory
+	let $categoryConcepts := $reference/markupCategories/markupCategory/tag[@type eq 'concept']/string(@value)
+	let $coreConcepts := $reference/coreConcepts/concept/string(@id)
+	let $subtypeConcepts := $reference/coreConcepts/concept/subtype/string(@idRef)
+	let $synonymConcepts := $reference/synonymGroups/synonymGroup/synonym/string(@idRef)
+	let $additionalConcepts := $utils:dataCollection/session/transcript//(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
+	let $concepts := 
+		for $concept in distinct-values(($categoryConcepts, $coreConcepts, $subtypeConcepts, $synonymConcepts, $additionalConcepts))
+		order by $concept 
+		return $concept
+
+	let $categories := $reference/markupCategories/markupCategory
+
 	return
 	(
-		<center><h2>Isha Foundation Markup Categories
-			{
-				if ($conceptId) then
-				(
-					<br/>
-					,
-					'(for concept: '
-					,
-					<a href="main.xql?panel=search&amp;search={$conceptId}&amp;defaultType=markup">{$conceptId}</a>
-					,
-					')'
-				)
-				else
-					()
-			}
-		</h2></center>
-	,
-		if (exists($categories)) then
-			for $category in $categories
-			order by lower-case($category/@name)
-			return
-				<div class="category">
-					<span>
-						<a class="category-anchor" href="main.xql?panel=search&amp;search=markup:{$category/@id}">{concat($category/@name, search-fns:get-markup-category-concepts-string($category))}</a>
-					</span>
-				</div>
-		else if ($conceptId) then
-			<div>No categories for concept: {$conceptId}</div>
-		else
-			<div>No categories defined!</div>
+		<center><h2>Isha Foundation Markup Categories</h2></center>
+		,
+		<center>{
+		for $startCharIndex in (0 to 25)
+		let $startChar := codepoints-to-string($startCharIndex + 97)
+		return
+			<a href="#{$startChar}">{upper-case($startChar)}</a>
+		}</center>
+		,
+		<br/>
+		,
+		for $concept in $concepts
+		let $startChar := substring($concept, 1, 1)
+		let $filteredCategories := $categories/tag[@value = $concept and @type eq 'concept']/..
+		return
+			<div id="{$startChar}">
+				<b id="{$concept}">{$concept}:</b>
+				{categories-panel:create-table($filteredCategories)}
+			</div>
+		,
+			<br/>
 	)
 };
+
+
+declare function categories-panel:create-table($categories as element()*) as element()*
+{
+	let $numCategories := count($categories)
+	return
+	(
+		<small><i>{$numCategories} categor{if ($numCategories = 1) then 'y' else 'ies'}</i></small>
+	,
+		<small><i><a href="#top">(top)</a></i></small>
+	,
+		<br/>
+	,
+		if ($numCategories = 0) then
+			<br/>		
+		else
+			<table cellspacing="0">			{
+				let $numCategories := count($categories)
+				for $category in $categories
+				let $primaryMarkupType := $category/tag[@type eq "markupType"][1]/@value
+				let $reference := $utils:referenceCollection/reference
+				let $searchPriority := $reference//markupType[@id = $primaryMarkupType]/xs:integer(@searchOrder)
+				order by $searchPriority
+				return
+				<tr>
+					<td width="24"><img src="../assets/{$category/tag[@type='markupType'][1]/@value}.png" width="24" height="24"/></td>
+					<td style="white-space: nowrap">
+						<small>
+							<a href="main.xql?panel=search&amp;search={$category/xs:string(@id)}&amp;defaultType=markup">{$category/xs:string(@name)}</a> <i>[{categories-panel:get-markup-category-concepts-links($category)}]</i>
+						</small>
+					</td>
+				</tr>
+			}
+			</table>
+		,
+			<br/>
+	)
+};
+
+declare function categories-panel:get-markup-category-concepts-links($markupCategory as element()) as element()*
+{
+	let $conceptNames := $markupCategory/tag[@type = 'concept']/xs:string(@value)
+	for $conceptName in $conceptNames
+	return
+		<a class="concept-anchor" href="#{$conceptName}">{$conceptName}</a>
+};
+
+	
