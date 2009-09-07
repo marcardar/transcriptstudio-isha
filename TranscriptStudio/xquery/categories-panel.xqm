@@ -7,6 +7,7 @@ declare namespace session = "http://exist-db.org/xquery/session";
 
 import module namespace search-fns = "http://www.ishafoundation.org/ts4isha/xquery/search-fns" at "search-fns.xqm";
 import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
+import module namespace functx = "http://www.functx.com" at "functx.xqm";
 
 declare function categories-panel:main() as element()*
 {	
@@ -38,7 +39,9 @@ declare function categories-panel:main() as element()*
 		,
 		for $concept in $concepts
 		let $startChar := substring($concept, 1, 1)
-		let $filteredCategories := $categories/tag[@value = $concept and @type eq 'concept']/..
+		let $conceptMatchCategories := $categories/tag[@value = $concept and @type eq 'concept']/..
+		let $nameMatchCategories := $categories[functx:contains-word(xs:string(@name), $concept)]
+		let $filteredCategories := ($conceptMatchCategories, $nameMatchCategories)/.
 		return
 			<div id="{$startChar}">
 				<b id="{$concept}">{$concept}:</b>
@@ -66,7 +69,10 @@ declare function categories-panel:create-table($categories as element()*) as ele
 		else
 			<table cellspacing="0">			{
 				let $numCategories := count($categories)
+		(:let $data := $utils:dataCollection:)
 				for $category in $categories
+		(:let $markups := search-fns:markups-for-category(($data//superSegment, $data//superContent), $category/xs:string(@id)):)
+		(:let $markupsCount := count($markups):)
 				let $primaryMarkupType := $category/tag[@type eq "markupType"][1]/@value
 				let $reference := $utils:referenceCollection/reference
 				let $searchPriority := $reference//markupType[@id = $primaryMarkupType]/xs:integer(@searchOrder)
