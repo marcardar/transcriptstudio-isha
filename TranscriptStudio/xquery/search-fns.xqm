@@ -614,3 +614,12 @@ declare function search-fns:matches-start-of-word($string as xs:string?, $term a
 			matches($upString, concat("^(.*\W)?", $upTerm, ".*"))
 };
 
+declare function search-fns:name-contains-concept($string as xs:string, $concept as xs:string) as xs:boolean
+{
+	let $concept-no-hyphens := replace($concept, "-", " ")
+	return
+		if (contains($string, $concept-no-hyphens)) then
+			true()
+		else
+			false()
+};
