@@ -40,7 +40,7 @@ declare function categories-panel:main() as element()*
 		for $concept in $concepts
 		let $startChar := substring($concept, 1, 1)
 		let $conceptMatchCategories := $categories/tag[@value = $concept and @type eq 'concept']/..
-		let $nameMatchCategories := $categories[functx:contains-word(xs:string(@name), $concept)]
+		let $nameMatchCategories := $categories[search-fns:name-contains-concept(xs:string(@name), $concept)]
 		let $filteredCategories := ($conceptMatchCategories, $nameMatchCategories)/.
 		return
 			<div id="{$startChar}">
