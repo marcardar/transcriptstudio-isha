@@ -11,45 +11,58 @@ import module namespace functx = "http://www.functx.com" at "functx.xqm";
 
 declare function categories-panel:main() as element()*
 {	
-	let $reference := $utils:referenceCollection/reference
-	let $categoryConcepts := $reference/markupCategories/markupCategory/tag[@type eq 'concept']/string(@value)
-	let $coreConcepts := $reference/coreConcepts/concept/string(@id)
-	let $subtypeConcepts := $reference/coreConcepts/concept/subtype/string(@idRef)
-	let $synonymConcepts := $reference/synonymGroups/synonymGroup/synonym/string(@idRef)
-	let $additionalConcepts := $utils:dataCollection/session/transcript//(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
-	let $concepts := 
-		for $concept in distinct-values(($categoryConcepts, $coreConcepts, $subtypeConcepts, $synonymConcepts, $additionalConcepts))
-		order by $concept 
-		return $concept
-
-	let $categories := $reference/markupCategories/markupCategory
-
+	let $categories-cached := session:get-attribute("categories-cached")
 	return
-	(
-		<center><h2>Isha Foundation Markup Categories</h2></center>
-		,
-		<center>{
-		for $startCharIndex in (0 to 25)
-		let $startChar := codepoints-to-string($startCharIndex + 97)
-		return
-			<a href="#{$startChar}">{upper-case($startChar)}</a>
-		}</center>
-		,
-		<br/>
-		,
-		for $concept in $concepts
-		let $startChar := substring($concept, 1, 1)
-		let $conceptMatchCategories := $categories/tag[@value = $concept and @type eq 'concept']/..
-		let $nameMatchCategories := $categories[search-fns:name-contains-concept(xs:string(@name), $concept)]
-		let $filteredCategories := ($conceptMatchCategories, $nameMatchCategories)/.
-		return
-			<div id="{$startChar}">
-				<b id="{$concept}">{$concept}:</b>
-				{categories-panel:create-table($filteredCategories)}
-			</div>
-		,
-			<br/>
-	)
+		if (exists($categories-cached)) then
+			$categories-cached
+		else
+			(
+				let $reference := $utils:referenceCollection/reference
+				let $categoryConcepts := $reference/markupCategories/markupCategory/tag[@type eq 'concept']/string(@value)
+				let $coreConcepts := $reference/coreConcepts/concept/string(@id)
+				let $subtypeConcepts := $reference/coreConcepts/concept/subtype/string(@idRef)
+				let $synonymConcepts := $reference/synonymGroups/synonymGroup/synonym/string(@idRef)
+				let $additionalConcepts := $utils:dataCollection/session/transcript//(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
+				let $concepts := 
+				for $concept in distinct-values(($categoryConcepts, $coreConcepts, $subtypeConcepts, $synonymConcepts, $additionalConcepts))
+				order by $concept 
+				return $concept
+
+				let $categories := $reference/markupCategories/markupCategory
+
+				let $categories-html :=
+				(
+					<center><h2>Isha Foundation Markup Categories</h2></center>
+					,
+					<center>{
+					for $startCharIndex in (0 to 25)
+					let $startChar := codepoints-to-string($startCharIndex + 97)
+					return
+						<a href="#{$startChar}">{upper-case($startChar)}</a>
+					}</center>
+					,
+					<br/>
+					,
+					for $concept in $concepts
+					let $startChar := substring($concept, 1, 1)
+					let $conceptMatchCategories := $categories/tag[@value = $concept and @type eq 'concept']/.. 
+					let $nameMatchCategories := $categories[search-fns:name-contains-concept(xs:string(@name), $concept)]
+					let $filteredCategories := ($conceptMatchCategories, $nameMatchCategories)/.
+					return
+						<div id="{$startChar}">
+							<b id="{$concept}">{$concept}:</b>
+							{categories-panel:create-table($filteredCategories)}
+						</div>
+					,
+						<br/>
+				)
+				return
+				(
+					session:set-attribute("categories-cached", $categories-html),
+					$categories-html
+				)
+			)
+	
 };
 
 

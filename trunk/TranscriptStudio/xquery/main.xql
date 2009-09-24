@@ -64,6 +64,7 @@ declare function main:display-panel($panel) as element()*
 };
 
 (: main entry point :)
+
 let $panel := request:get-parameter("panel", $defaultPanel)
 let $highlightId := if (request:exists()) then
 		request:get-parameter('highlightId', ())
@@ -79,7 +80,10 @@ let $loginStatus :=
 		(
 			let $null := xdb:login("/db", "guest", "guest")
 			return
+			(
+				session:invalidate(),
 				'Successfully logged out'
+			)
 		)
 		else
 		(
