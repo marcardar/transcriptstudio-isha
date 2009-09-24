@@ -380,7 +380,11 @@ declare function search-fns:markup-as-table-row($markup as element(), $prevSearc
 	let $categoryId := $markup/tag[@type = 'markupCategory']/@value
 	let $markupCategory := $utils:referenceCollection/reference/markupCategories/markupCategory[@id = $categoryId]
 	let $markupCategoryName := if (exists($markupCategory)) then
-			concat(': ', $markupCategory/@name, search-fns:get-markup-category-concepts-string($markupCategory))
+			concat(': ', $markupCategory/@name)
+		else
+			()
+	let $markupCategoryConcepts := if (exists($markupCategory)) then
+			search-fns:get-markup-category-concepts-links($markupCategory)
 		else
 			()
 	let $targetId := 
@@ -408,10 +412,17 @@ declare function search-fns:markup-as-table-row($markup as element(), $prevSearc
 			<tr>
 				<td width="24"><img src="../assets/{$markup/tag[@type='markupType']/@value}.png" width="24" height="24"/></td>
 				<td><div class="result-header">
-					{search-fns:get-result-header($session, $markup/@id, $targetId, concat($markupType/@name, $markupCategoryName, search-fns:get-additional-concepts-string($markup)))}
+					{search-fns:get-result-header($session, $markup/@id, $targetId, concat($markupType/@name, $markupCategoryName))}  
 				</div></td>
 			</tr>
 			<tr>
+				<td width="24"/>
+				<td><div class="result-subheader">
+					{($markupCategoryConcepts, search-fns:get-additional-concepts-links($markup))}
+				</div></td>
+			</tr>
+			<tr>
+				<td width="24"/>
 				<td colspan="2"><div class="result-body">
 					{substring($text, 0, $search-fns:maxTextChars)} 
 					{if (string-length($text) > $search-fns:maxTextChars) then '...' else ()}
@@ -419,6 +430,7 @@ declare function search-fns:markup-as-table-row($markup as element(), $prevSearc
 				</div></td>
 			</tr>
 			<tr>
+				<td width="24"/>
 				<td colspan="2"><div class="result-footer">
 					{concat(search-fns:get-session-title($session), ' (', $session/@id, ')')}
 					{search-fns:get-html-word-links($session/@id)}
@@ -427,6 +439,7 @@ declare function search-fns:markup-as-table-row($markup as element(), $prevSearc
 			{	
 				if ($count > 1) then (
 				<tr>
+					<td width="24"/>
 					<td colspan="2"><div class="result-footer">
 						<a href="main.xql?panel=search&amp;search={$prevSearchString}&amp;defaultType=markup&amp;markupUuid={concat($session/xs:string(@id), '%23', $markup/xs:string(@id))}&amp;groupResults=false">{concat('All ', xs:string($count), ' results')}</a>
 					</div></td>
@@ -450,6 +463,21 @@ declare function search-fns:get-markup-category-concepts-string($markupCategory 
 			''
 };
 
+declare function search-fns:get-markup-category-concepts-links($markupCategory as element()) as element()*
+{
+	let $concepts := $markupCategory/tag[@type = 'concept']
+	return
+		if (exists($concepts)) then
+			<span><i>[
+				{for $value in $concepts
+				return
+					<a href="main.xql?panel=search&amp;search={$value/string(@value)}&amp;defaultType=markup">{$value/string(@value)}</a>
+				}
+			] </i></span>
+		else
+			<span> </span>
+};
+
 declare function search-fns:get-additional-concepts-string($markup as element()) as xs:string
 {
 	let $conceptNames := $markup/tag[@type = 'concept']/@value
@@ -464,6 +492,22 @@ declare function search-fns:get-additional-concepts-list($markup as element()) a
 {
 	string-join($markup/tag[@type = 'concept']/string(@value), ' ')
 };
+
+declare function search-fns:get-additional-concepts-links($markup as element()) as element()*
+{
+	let $concepts := $markup/tag[@type = 'concept']
+	return
+		if (exists($concepts)) then
+			<span><i> +[
+				{for $value in $concepts
+				return
+					<a href="main.xql?panel=search&amp;search={$value/string(@value)}&amp;defaultType=markup">{$value/string(@value)}</a>
+				}
+			]</i></span>
+		else
+			<span/>
+};
+
 
 declare function search-fns:segment-as-table-row($segment as element()) as element()
 {
