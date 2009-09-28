@@ -126,6 +126,11 @@
 				<include name="reference.xml"/>
 			</fileset>
 		</copy>
+		<copy todir="${dist.exist.db.dir}/system/config">
+			<fileset dir="config">
+				<include name="**/collection.xconf"/>
+			</fileset>
+		</copy>
 		<mkdir dir="${dist.exist.db.dir}/ts4isha/data/work"/>
 		<copy todir="${dist.server.dir}">
 			<fileset dir=".">
