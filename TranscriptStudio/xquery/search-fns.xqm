@@ -3,7 +3,7 @@ xquery version "1.0";
 module namespace search-fns = "http://www.ishafoundation.org/ts4isha/xquery/search-fns";
 import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
 import module namespace functx = "http://www.functx.com" at "functx.xqm";
-
+declare namespace ngram = "http://exist-db.org/xquery/ngram";
 declare variable $search-fns:maxResults := 500;
 declare variable $search-fns:maxTextChars := 550;
 
@@ -339,7 +339,9 @@ declare function search-fns:markups-for-category($baseMarkups as element()*, $ca
 
 declare function search-fns:markups-for-category-name-match($baseMarkups as element()*, $searchTerm as xs:string*) as element()*
 {
-	let $categoryIds := $utils:referenceCollection//markupCategory[search-fns:matches-start-of-word(xs:string(@name), $searchTerm)]/@id
+	let $categories := $utils:referenceCollection//markupCategory
+	let $ngramCategories := ngram:contains($categories/@name, $searchTerm)/..
+	let $categoryIds := $ngramCategories[search-fns:name-contains-concept(xs:string(@name), $searchTerm)]/@id
 	for $markup in $baseMarkups/tag[@value = $categoryIds][@type = 'markupCategory']/..
 	return $markup
 };
@@ -348,7 +350,9 @@ declare function search-fns:markups-for-concept-name-match($baseMarkups as eleme
 {
 	let $categories := $utils:referenceCollection//markupCategory
 	let $categoryConcepts := $categories/tag[@type eq "concept"] 
-	let $partialConceptMatchCategoryIds := $categoryConcepts[search-fns:matches-start-of-word(xs:string(@value), $searchTerm)]/../@id
+	let $ngramPartialConceptMatches := ngram:contains($categoryConcepts/@value, $searchTerm)/..
+	let $partialConceptMatches := $ngramPartialConceptMatches[search-fns:name-contains-concept(xs:string(@value), $searchTerm)]
+	let $partialConceptMatchCategoryIds := $partialConceptMatches/../@id
 	for $markup in $baseMarkups/tag[@value = $partialConceptMatchCategoryIds][@type = 'markupCategory']/..
 	return $markup
 };
@@ -662,7 +666,7 @@ declare function search-fns:name-contains-concept($string as xs:string, $concept
 {
 	let $concept-no-hyphens := replace($concept, "-", " ")
 	return
-		if (contains($string, $concept-no-hyphens)) then
+		if (functx:contains-word(upper-case($string), upper-case($concept-no-hyphens))) then
 			true()
 		else
 			false()

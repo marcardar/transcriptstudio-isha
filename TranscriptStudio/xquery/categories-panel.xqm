@@ -4,6 +4,7 @@ module namespace categories-panel = "http://www.ishafoundation.org/ts4isha/xquer
 
 declare namespace request = "http://exist-db.org/xquery/request";
 declare namespace session = "http://exist-db.org/xquery/session";
+declare namespace ngram = "http://exist-db.org/xquery/ngram";
 
 import module namespace search-fns = "http://www.ishafoundation.org/ts4isha/xquery/search-fns" at "search-fns.xqm";
 import module namespace utils = "http://www.ishafoundation.org/ts4isha/xquery/utils" at "utils.xqm";
@@ -44,9 +45,11 @@ declare function categories-panel:main() as element()*
 					<br/>
 					,
 					for $concept in $concepts
+					let $concept-no-hyphens := replace($concept, "-", " ")
 					let $startChar := substring($concept, 1, 1)
 					let $conceptMatchCategories := $categories/tag[@value = $concept and @type eq 'concept']/.. 
-					let $nameMatchCategories := $categories[search-fns:name-contains-concept(xs:string(@name), $concept)]
+					let $ngramNameMatchCategories := ngram:contains($categories/@name, $concept-no-hyphens)/..
+					let $nameMatchCategories := $ngramNameMatchCategories[search-fns:name-contains-concept(xs:string(@name), $concept-no-hyphens)]
 					let $filteredCategories := ($conceptMatchCategories, $nameMatchCategories)/.
 					return
 						<div id="{$startChar}">
@@ -114,4 +117,4 @@ declare function categories-panel:get-markup-category-concepts-links($markupCate
 		<a class="concept-anchor" href="#{$conceptName}">{$conceptName}</a>
 };
 
-	
+

@@ -35,7 +35,7 @@
  		</copy>
 		<chmod file="${exist.home}/bin/startup.sh" perm="ugo+x"/>
 		<echo message="Initialising database..."/>
-		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
+		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true" user="admin" password="admin">
 			<fileset dir="${dist.exist.db.dir}">
 				<include name="**"/>
 				<exclude name="ts4isha/reference/next-media-ids.xml"/>
