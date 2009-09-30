@@ -25,13 +25,13 @@ declare function categories-panel:main() as element()*
 				let $synonymConcepts := $reference/synonymGroups/synonymGroup/synonym/string(@idRef)
 				let $additionalConcepts := $utils:dataCollection/session/transcript//(superSegment|superContent)/tag[@type eq 'concept']/string(@value)
 				let $concepts := 
-				for $concept in distinct-values(($categoryConcepts, $coreConcepts, $subtypeConcepts, $synonymConcepts, $additionalConcepts))
-				order by $concept 
-				return $concept
+					for $concept in distinct-values(($categoryConcepts, $coreConcepts, $subtypeConcepts, $synonymConcepts, $additionalConcepts))
+					order by $concept 
+						return $concept
 
 				let $categories := $reference/markupCategories/markupCategory
 
-				let $categories-html :=
+				let $categoriesHtml :=
 				(
 					<center><h2>Isha Foundation Markup Categories</h2></center>
 					,
@@ -54,27 +54,29 @@ declare function categories-panel:main() as element()*
 					return
 						<div id="{$startChar}">
 							<b id="{$concept}">{$concept}:</b>
-							{categories-panel:create-table($filteredCategories)}
+							{categories-panel:create-table($concept, $filteredCategories)}
 						</div>
 					,
 						<br/>
 				)
 				return
 				(
-					session:set-attribute("categories-cached", $categories-html),
-					$categories-html
+					session:set-attribute("categories-cached", $categoriesHtml),
+					$categoriesHtml
 				)
 			)
 	
 };
 
 
-declare function categories-panel:create-table($categories as element()*) as element()*
+declare function categories-panel:create-table($concept as xs:string, $categories as element()*) as element()*
 {
 	let $numCategories := count($categories)
 	return
 	(
 		<small><i>{$numCategories} categor{if ($numCategories = 1) then 'y' else 'ies'}</i></small>
+	,
+		<small><a href="main.xql?panel=search&amp;search=%2B{$concept}">[+]</a></small>
 	,
 		<small><i><a href="#top">(top)</a></i></small>
 	,
@@ -85,10 +87,7 @@ declare function categories-panel:create-table($categories as element()*) as ele
 		else
 			<table cellspacing="0">			{
 				let $numCategories := count($categories)
-		(:let $data := $utils:dataCollection:)
 				for $category in $categories
-		(:let $markups := search-fns:markups-for-category(($data//superSegment, $data//superContent), $category/xs:string(@id)):)
-		(:let $markupsCount := count($markups):)
 				let $primaryMarkupType := $category/tag[@type eq "markupType"][1]/@value
 				let $reference := $utils:referenceCollection/reference
 				let $searchPriority := $reference//markupType[@id = $primaryMarkupType]/xs:integer(@searchOrder)
@@ -98,7 +97,7 @@ declare function categories-panel:create-table($categories as element()*) as ele
 					<td width="24"><img src="../assets/{$category/tag[@type='markupType'][1]/@value}.png" width="24" height="24"/></td>
 					<td style="white-space: nowrap">
 						<small>
-							<a href="main.xql?panel=search&amp;search={$category/xs:string(@id)}&amp;defaultType=markup">{$category/xs:string(@name)}</a> <i>[{categories-panel:get-markup-category-concepts-links($category)}]</i>
+							<a href="main.xql?panel=search&amp;search={$category/xs:string(@id)}&amp;defaultType=markup&amp;groupResults=false">{$category/xs:string(@name)}</a> <i>[{categories-panel:get-markup-category-concepts-links($category)}]</i>
 						</small>
 					</td>
 				</tr>
@@ -116,5 +115,4 @@ declare function categories-panel:get-markup-category-concepts-links($markupCate
 	return
 		<a class="concept-anchor" href="#{$conceptName}">{$conceptName}</a>
 };
-
 
