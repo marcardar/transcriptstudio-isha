@@ -26,17 +26,21 @@ declare function search-fns:main($searchString as xs:string, $defaultType as xs:
 			if (exists($markupSearchTerms)) then
 				let $matchedMarkups := search-fns:markup-search(($transcripts//superSegment, $transcripts//superContent), $markupSearchTerms)
 				let $matchedMarkups := if (exists($textSearchTerms)) then search-fns:text-search($matchedMarkups, $textSearchTerms) else $matchedMarkups
-				let $markupClassRepresentatives := search-fns:generate-markup-class-representatives($matchedMarkups)
 				return 
 					if ($groupResults eq 'true') then
+						let $markupClassRepresentatives := search-fns:generate-markup-class-representatives($matchedMarkups)
 						for $markupClassRepresentative in $markupClassRepresentatives
 						return
 							search-fns:markup-as-table-row($markupClassRepresentative, $searchString, $groupResults)
-					else if (exists($markupUuid)) then
+					else if ($markupUuid != "") then
 						let $markup := search-fns:markup-search($matchedMarkups, $markupUuid)
 						for $classMarkup in search-fns:generate-markup-class($markup, $matchedMarkups)
 						return
 							search-fns:markup-as-table-row($classMarkup, $searchString, $groupResults)
+					else if (search-fns:is-category-id($markupSearchTerms)) then
+						for $markup in $matchedMarkups
+						return
+							search-fns:markup-as-table-row($markup, $searchString, $groupResults)
 					else
 						()
 			else
@@ -222,6 +226,8 @@ declare function search-fns:markup-search($baseMarkups as element()*, $searchTer
 				search-fns:markup-for-uuid($baseMarkups, $searchTerm)
 			else if (search-fns:is-category-id($searchTerm)) then
 				search-fns:markups-for-category($baseMarkups, $searchTerm)
+			else if (starts-with($searchTerm, '+')) then
+				search-fns:markups-for-additional-concept($baseMarkups, substring-after($searchTerm, '+'))
 			else
 				let $expandedSearchTerm as xs:string* := search-fns:expand-concept($searchTerm)
 				return
@@ -329,6 +335,11 @@ declare function search-fns:markups-for-any-concept($baseMarkups as element()*, 
 		:)
 		(:error(QName("http://error.com", "myerror"), concat("Number of baseMarkups: ", count($baseMarkups))),:)
 		$result
+};
+
+declare function search-fns:markups-for-additional-concept($baseMarkups as element()*, $concept as xs:string) as element()*
+{
+	$baseMarkups/tag[@value = $concept][@type = 'concept']/..
 };
 
 declare function search-fns:markups-for-category($baseMarkups as element()*, $categoryId as xs:string*) as element()*
