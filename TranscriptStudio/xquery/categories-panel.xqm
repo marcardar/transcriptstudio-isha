@@ -76,7 +76,7 @@ declare function categories-panel:create-table($concept as xs:string, $categorie
 	(
 		<small><i>{$numCategories} categor{if ($numCategories = 1) then 'y' else 'ies'}</i></small>
 	,
-		<small><a href="main.xql?panel=search&amp;search=%2B{$concept}">[+]</a></small>
+		<a href="main.xql?panel=search&amp;search=%2B{$concept}">[+]</a>
 	,
 		<small><i><a href="#top">(top)</a></i></small>
 	,
