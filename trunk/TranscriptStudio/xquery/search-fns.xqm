@@ -121,12 +121,13 @@ declare function search-fns:generate-markup-class-representatives($matchedMarkup
 		return
 			functx:add-attributes($classMarkups[1], (xs:QName('sessionId'), xs:QName('classType'), xs:QName('classCount')), ($classMarkups[1]/ancestor::session/@id, 'type', $classCount))
 
-	for $markupsClassRepresentatives in ($categoryMarkupsClassRepresentatives, $conceptMarkupsClassRepresentatives, $typeMarkupsClassRepresentatives)
-	let $markupType := $markupsClassRepresentatives/tag[@type = "markupType"]/@value
-	let $searchPriority := $utils:referenceCollection//markupType[@id = $markupType]/xs:integer(@searchOrder)
-	order by $searchPriority
 	return
-		$markupsClassRepresentatives
+		for $markupsClassRepresentative in ($categoryMarkupsClassRepresentatives, $conceptMarkupsClassRepresentatives, $typeMarkupsClassRepresentatives)
+		let $markupType := $markupsClassRepresentative/tag[@type = "markupType"]/@value
+		let $searchPriority := $utils:referenceCollection//markupType[@id eq $markupType]/@searchOrder
+		order by xs:integer($searchPriority)
+		return
+			$markupsClassRepresentative
 };
 
 declare function search-fns:generate-markup-class($markup as element(), $baseMarkups as element()*) as element()*
@@ -229,7 +230,7 @@ declare function search-fns:markup-search($baseMarkups as element()*, $searchTer
 			else if (starts-with($searchTerm, '+')) then
 				search-fns:markups-for-additional-concept($baseMarkups, substring-after($searchTerm, '+'))
 			else
-				let $expandedSearchTerm as xs:string* := search-fns:expand-concept($searchTerm)
+				let $expandedSearchTerm := search-fns:expand-concept($searchTerm)
 				return
 					functx:distinct-nodes((search-fns:markups-for-any-concept($baseMarkups, $expandedSearchTerm), search-fns:markups-for-category-name-match($baseMarkups, $searchTerm), search-fns:markups-for-concept-name-match($baseMarkups, $searchTerm)))
 		return search-fns:markup-search($newBaseMarkups, $newTerms)
@@ -321,19 +322,11 @@ declare function search-fns:get-sub-concept-ids($unprocessedIds as xs:string*, $
 
 declare function search-fns:markups-for-any-concept($baseMarkups as element()*, $concepts as xs:string*) as element()*
 {
-	let $markupCategories as element()*:= 
-		$utils:referenceCollection//markupCategory/tag[@value = $concepts][@type = "concept"]/..
-	(:
-	let $null := error(QName("http://error.com", "myerror"), concat("Number of markupCategories: ", count($markupCategories)))
-	:)
+	let $markupCategories := $utils:referenceCollection//markupCategory/tag[@value = $concepts][@type = "concept"]/..
 	let $result :=
-		($baseMarkups/tag[@value = $concepts][@type = ('concept', 'markupType')]/..,
+		($baseMarkups/tag[@value = $concepts][@type eq 'concept']/.., $baseMarkups/tag[@value = $concepts][@type eq 'markupType']/..,
 		 $baseMarkups/tag[@value = $markupCategories/@id][@type = "markupCategory"]/..)
 	return
-		(:
-			error(QName("http://error.com", "myerror"), concat("Number of markupCategories with concept (", $concept, "): ", count($markupCategories))
-		:)
-		(:error(QName("http://error.com", "myerror"), concat("Number of baseMarkups: ", count($baseMarkups))),:)
 		$result
 };
 
@@ -505,7 +498,7 @@ declare function search-fns:get-additional-concepts-string($markup as element())
 
 declare function search-fns:get-additional-concepts-list($markup as element()) as xs:string
 {
-	string-join($markup/tag[@type = 'concept']/string(@value), ' ')
+	string-join($markup/tag[@type = 'concept']/@value, ' ')
 };
 
 declare function search-fns:get-additional-concepts-links($markup as element()) as element()*
