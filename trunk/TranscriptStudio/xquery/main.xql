@@ -16,6 +16,7 @@ import module namespace search-panel = "http://www.ishafoundation.org/ts4isha/xq
 import module namespace event-panel = "http://www.ishafoundation.org/ts4isha/xquery/event-panel" at "event-panel.xqm";
 import module namespace session-panel = "http://www.ishafoundation.org/ts4isha/xquery/session-panel" at "session-panel.xqm";
 import module namespace all-concepts-panel = "http://www.ishafoundation.org/ts4isha/xquery/all-concepts-panel" at "all-concepts-panel.xqm";
+import module namespace all-categories-panel = "http://www.ishafoundation.org/ts4isha/xquery/all-categories-panel" at "all-categories-panel.xqm";
 import module namespace categories-panel = "http://www.ishafoundation.org/ts4isha/xquery/categories-panel" at "categories-panel.xqm";
 import module namespace admin-panel = "http://www.ishafoundation.org/ts4isha/xquery/admin-panel" at "admin-panel.xqm";
 import module namespace ids-panel = "http://www.ishafoundation.org/ts4isha/xquery/ids-panel" at "ids-panel.xqm";
@@ -44,6 +45,10 @@ declare function main:display-panel($panel) as element()*
 	else if ($panel eq "all-concepts") then
 	(
 		all-concepts-panel:main()
+	)
+	else if ($panel eq "all-categories") then
+	(
+		all-categories-panel:main()
 	)
 	else if ($panel eq "categories") then
 	(

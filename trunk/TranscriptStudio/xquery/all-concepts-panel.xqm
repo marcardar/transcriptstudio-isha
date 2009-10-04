@@ -83,7 +83,7 @@ declare function all-concepts-panel:create-table-row($rowIndex as xs:integer, $n
 		return
 		(
 			<td width="{$all-concepts-panel:columnWidth}" style="white-space: nowrap; background:Moccasin;">
-				<a class="concept-anchor" href="main.xql?panel=categories#{$conceptId}">{$conceptId}</a>
+				<a class="concept-anchor" href="main.xql?panel=categories&amp;concept={$conceptId}">{$conceptId}</a>
 			</td>
 		,
 			(: for horizontal separation :)

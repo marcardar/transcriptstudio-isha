@@ -12,10 +12,6 @@ ul{
  font-size: medium;
  vertical-align: text-top;
 }
-.result-subheader{
- font-size: 15px;
- vertical-align: text-top;
-}
 .result-body{
  width:800px;
  font-size: smaller;

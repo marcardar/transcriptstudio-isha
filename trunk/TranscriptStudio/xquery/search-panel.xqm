@@ -76,7 +76,7 @@ declare function search-panel:main() as element()*
 			}
 			<hr/>
 			<div class="additional-info">
-				Additional info: <a href="main.xql?panel=all-concepts">concepts</a>, <a href="main.xql?panel=categories">categories</a>
+				Additional info: <a href="main.xql?panel=all-concepts">concepts</a>, <a href="main.xql?panel=all-categories">categories</a>
 			</div>
 			{
 				if (utils:is-current-user-admin()) then
