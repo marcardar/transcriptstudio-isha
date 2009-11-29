@@ -92,7 +92,7 @@ public class ImportFileRead extends BasicFunction {
 			}
 		}
 		catch (Exception e) {
-			throw( new XPathException( getASTNode(), e.getMessage() ) );
+			throw( new XPathException( this, e.getMessage() ) );
 		}
 		finally {
 			try {
@@ -134,11 +134,11 @@ public class ImportFileRead extends BasicFunction {
 			
 			return (DocumentImpl) adapter.getDocument();
 		} catch (ParserConfigurationException e) {
-			throw new XPathException(getASTNode(), "Error while constructing XML parser: " + e.getMessage(), e);
+			throw new XPathException(this, "Error while constructing XML parser: " + e.getMessage(), e);
 		} catch (SAXException e) {
-			throw new XPathException(getASTNode(), "Error while parsing XML: " + e.getMessage(), e);
+			throw new XPathException(this, "Error while parsing XML: " + e.getMessage(), e);
 		} catch (IOException e) {
-			throw new XPathException(getASTNode(), "Error while parsing XML: " + e.getMessage(), e);
+			throw new XPathException(this, "Error while parsing XML: " + e.getMessage(), e);
 		}
 	}*/
 }

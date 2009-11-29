@@ -73,7 +73,7 @@ public class CreateDocxFile extends BasicFunction {
 			return( new Base64Binary( docxByteArray ) );
 		} 		
 		catch( IOException e ) {
-			throw( new XPathException( getASTNode(), e.getMessage() ) );	
+			throw( new XPathException( this, e.getMessage() ) );	
 		}
 
 	}
@@ -101,10 +101,10 @@ public class CreateDocxFile extends BasicFunction {
 			writer.close();
 		}
 		catch( SAXException e ) {
-			throw( new XPathException( getASTNode(), "A problem ocurred while serializing the node set: " + e.getMessage(), e ) );
+			throw( new XPathException( this, "A problem ocurred while serializing the node set: " + e.getMessage(), e ) );
 		}
 		catch ( IOException e ) {
-			throw( new XPathException(getASTNode(), "A problem ocurred while serializing the node set: " + e.getMessage(), e ) );
+			throw( new XPathException( this, "A problem ocurred while serializing the node set: " + e.getMessage(), e ) );
 		}
 		finally {
 			SerializerPool.getInstance().returnObject( sax );
