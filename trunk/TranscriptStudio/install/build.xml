@@ -38,7 +38,6 @@
 		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true" user="admin" password="admin">
 			<fileset dir="${dist.exist.db.dir}">
 				<include name="**"/>
-				<exclude name="ts4isha/reference/next-media-ids.xml"/>
 				<exclude name="ts4isha/reference/reference.xml"/>
 			</fileset>
 		</xdb:store>
@@ -46,8 +45,11 @@
 		<condition property="reference.xml.exists">  
 			<xdb:exist xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/ts4isha/reference" resource="reference.xml"/>
 		</condition>
+		<condition property="data.exists">
+			<xdb:exist xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/ts4isha/data"/>
+		</condition>
 		<antcall target="store-reference-xml"/>
-		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/ts4isha" collection="data"/>  
+		<antcall target="create-data-collection"/>
 	</target>
 
 	<target name="closing-message">
@@ -56,16 +58,16 @@
 	
 	<target name="store-reference-xml" unless="reference.xml.exists">
 		<echo message="Storing reference.xml"/>
-		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
+		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true" user="admin" password="admin">
 			<fileset dir="${dist.exist.db.dir}">
 				<include name="ts4isha/reference/reference.xml"/>
 			</fileset>
 		</xdb:store>
-		<xdb:store xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db" createcollection="true" createsubcollections="true">
-			<fileset dir="${dist.exist.db.dir}">
-				<include name="ts4isha/reference/next-media-ids.xml"/>
-			</fileset>
-		</xdb:store>
+	</target>
+
+	<target name="create-data-collection" unless="data.exists">
+		<echo message="Creating data collection"/>
+		<xdb:create xmlns:xdb="http://exist-db.org/ant" uri="xmldb:exist://localhost:8080/exist/xmlrpc/db/ts4isha" collection="data" user="admin" password="admin"/>  
 	</target>
 
 	<target name="all" depends="init-exist,closing-message" description="Configure eXist for TranscriptStudio"/>

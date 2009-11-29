@@ -13,6 +13,8 @@ public class TranscriptStudioModule extends AbstractInternalModule
 	public final static String NAMESPACE_URI = "http://ishafoundation.org/ts4isha/xquery";
 	
 	public final static String PREFIX = "ts4isha";
+
+	public final static String VERSION = "1.0";
 	
 	private final static FunctionDef[] functions = {
 		new FunctionDef( ImportFileNameList.signatures[0], 	ImportFileNameList.class ),
@@ -52,6 +54,11 @@ public class TranscriptStudioModule extends AbstractInternalModule
 	public String getDescription() 
 	{
 		return( "A module for performing various Transcript Studio functions." );
+	}
+
+	public String getReleaseVersion() 
+	{
+		return( VERSION );
 	}
 		
 	
