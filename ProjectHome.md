@@ -1,0 +1,1 @@
+An XML based web app that allows users to define and store contextual metadata for contiguous sections within a text document. Primary motive is to provide a way of categorizing different topics occurring within transcribed recordings.
